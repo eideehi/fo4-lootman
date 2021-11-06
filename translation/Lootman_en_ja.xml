@@ -1,0 +1,4517 @@
+﻿<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<SSTXMLRessources>
+  <Params>
+    <Addon>Lootman.esp</Addon>
+    <Source>en</Source>
+    <Dest>ja</Dest>
+    <Version>2</Version>
+  </Params>
+  <Content>
+    <String List="0" Partial="2">
+      <EDID>LTMN_ToggleWorkshopLinkMagicEffect</EDID>
+      <REC>MGEF:FULL</REC>
+      <Source>__ToggleWorkshopLink</Source>
+      <Dest>__ToggleWorkshopLink</Dest>
+    </String>
+    <String List="0" Partial="2">
+      <EDID>LTMN_ToggleLootingMagicEffect</EDID>
+      <REC>MGEF:FULL</REC>
+      <Source>__ToggleLooting</Source>
+      <Dest>__ToggleLooting</Dest>
+    </String>
+    <String List="0" Partial="2">
+      <EDID>LTMN_OpenInventoryMagicEffect</EDID>
+      <REC>MGEF:FULL</REC>
+      <Source>__OpenInventory</Source>
+      <Dest>__OpenInventory</Dest>
+    </String>
+    <String List="0" Partial="2">
+      <EDID>LTMN_TmpContainer</EDID>
+      <REC>CONT:FULL</REC>
+      <Source>__TmpContainer</Source>
+      <Dest>__TmpContainer</Dest>
+    </String>
+    <String List="0" Partial="2">
+      <EDID>LTMN_WorkshopWorkbench</EDID>
+      <REC>CONT:FULL</REC>
+      <Source>Lootman</Source>
+      <Dest>Lootman</Dest>
+    </String>
+    <String List="0" Partial="2">
+      <EDID>LTMN_Activator</EDID>
+      <REC>NPC_:FULL</REC>
+      <Source>__Activator</Source>
+      <Dest>__Activator</Dest>
+    </String>
+    <String List="0" Partial="2">
+      <EDID>LTMN_Activator</EDID>
+      <REC>NPC_:SHRT</REC>
+      <Source>__Activator</Source>
+      <Dest>__Activator</Dest>
+    </String>
+    <String List="0" Partial="2">
+      <EDID>LTMN_Lootman</EDID>
+      <REC>NPC_:FULL</REC>
+      <Source>__Lootman</Source>
+      <Dest>__Lootman</Dest>
+    </String>
+    <String List="0" Partial="2">
+      <EDID>LTMN_Lootman</EDID>
+      <REC>NPC_:SHRT</REC>
+      <Source>__Lootman</Source>
+      <Dest>__Lootman</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_ToggleWorkshopLinkChem</EDID>
+      <REC>ALCH:FULL</REC>
+      <Source>- Lootman - Toggle Workshop Link</Source>
+      <Dest>- Lootman - ワークショップリンクの切り替え</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_ToggleLootingChem</EDID>
+      <REC>ALCH:FULL</REC>
+      <Source>- Lootman - Toggle Looting</Source>
+      <Dest>- Lootman - 自動収集の切り替え</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_OpenInventoryChem</EDID>
+      <REC>ALCH:FULL</REC>
+      <Source>- Lootman - Open Inventory</Source>
+      <Dest>- Lootman - インベントリを開く</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_UtilityHolotape</EDID>
+      <REC>NOTE:FULL</REC>
+      <Source>- Lootman - Utility Holotape</Source>
+      <Dest>- Lootman - ユーティリティホロテープ</Dest>
+    </String>
+    <String List="0" Partial="2">
+      <EDID>LTMN_UtilityHolotapeUtility</EDID>
+      <REC>TERM:WNAM</REC>
+      <Source>~**~ EIDEE-OS ~**~</Source>
+      <Dest>~**~ EIDEE-OS ~**~</Dest>
+    </String>
+    <String List="0" Partial="2">
+      <EDID>LTMN_UtilityHolotapeUtility</EDID>
+      <REC>TERM:FULL</REC>
+      <Source>*./lootman.utility</Source>
+      <Dest>*./lootman.utility</Dest>
+    </String>
+    <String List="0" Partial="1">
+      <EDID>LTMN_UtilityHolotapeUtility</EDID>
+      <REC id="0">TERM:ITXT</REC>
+      <Source>Move Items # Player -&gt; Lootman #</Source>
+      <Dest>アイテム転送 # プレイヤー -&gt; Lootman #</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_UtilityHolotapeUtility</EDID>
+      <REC id="0">TERM:RNAM</REC>
+      <Source>Loading...</Source>
+      <Dest>ロード中…</Dest>
+    </String>
+    <String List="0" Partial="1">
+      <EDID>LTMN_UtilityHolotapeUtility</EDID>
+      <REC id="1">TERM:ITXT</REC>
+      <Source>Move Items # Lootman -&gt; Player #</Source>
+      <Dest>アイテム転送 # Lootman -&gt; プレイヤー #</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_UtilityHolotapeUtility</EDID>
+      <REC id="1">TERM:RNAM</REC>
+      <Source>Loading...</Source>
+      <Dest>ロード中…</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_UtilityHolotapeUtility</EDID>
+      <REC id="2">TERM:ITXT</REC>
+      <Source>Move Items # Lootman -&gt; Workshop #</Source>
+      <Dest>アイテム転送 # Lootman -&gt; ワークショップ #</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_UtilityHolotapeUtility</EDID>
+      <REC id="2">TERM:RNAM</REC>
+      <Source>Loading...</Source>
+      <Dest>ロード中…</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_UtilityHolotapeUtility</EDID>
+      <REC id="3">TERM:ITXT</REC>
+      <Source>Scrap Items # Lootman -&gt; #</Source>
+      <Dest>スクラップ # Lootman -&gt; #</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_UtilityHolotapeUtility</EDID>
+      <REC id="3">TERM:RNAM</REC>
+      <Source>Loading...</Source>
+      <Dest>ロード中…</Dest>
+    </String>
+    <String List="0" Partial="2">
+      <EDID>LTMN_UtilityHolotapeMoveItemsPlayerToLootman</EDID>
+      <REC>TERM:WNAM</REC>
+      <Source>~**~ EIDEE-OS ~**~</Source>
+      <Dest>~**~ EIDEE-OS ~**~</Dest>
+    </String>
+    <String List="0" Partial="2">
+      <EDID>LTMN_UtilityHolotapeMoveItemsPlayerToLootman</EDID>
+      <REC>TERM:FULL</REC>
+      <Source>*./lootman.utility.move-items.player-to-lootman</Source>
+      <Dest>*./lootman.utility.move-items.player-to-lootman</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_UtilityHolotapeMoveItemsPlayerToLootman</EDID>
+      <REC id="0">TERM:ITXT</REC>
+      <Source>All</Source>
+      <Dest>全て</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_UtilityHolotapeMoveItemsPlayerToLootman</EDID>
+      <REC id="0">TERM:RNAM</REC>
+      <Source>Please wait for a while...</Source>
+      <Dest>しばらくお待ち下さい...</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_UtilityHolotapeMoveItemsPlayerToLootman</EDID>
+      <REC id="0">TERM:UNAM</REC>
+      <Source>Please wait until the process is completed. When the process is complete, a sound effect will be heard and a message will be displayed.</Source>
+      <Dest>処理が完了するまでお待ちください。処理が完了すると効果音が鳴り、メッセージが表示されます。</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_UtilityHolotapeMoveItemsPlayerToLootman</EDID>
+      <REC id="1">TERM:ITXT</REC>
+      <Source>Weapons</Source>
+      <Dest>武器</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_UtilityHolotapeMoveItemsPlayerToLootman</EDID>
+      <REC id="1">TERM:RNAM</REC>
+      <Source>Please wait for a while...</Source>
+      <Dest>しばらくお待ち下さい...</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_UtilityHolotapeMoveItemsPlayerToLootman</EDID>
+      <REC id="1">TERM:UNAM</REC>
+      <Source>Please wait until the process is completed. When the process is complete, a sound effect will be heard and a message will be displayed.</Source>
+      <Dest>処理が完了するまでお待ちください。処理が完了すると効果音が鳴り、メッセージが表示されます。</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_UtilityHolotapeMoveItemsPlayerToLootman</EDID>
+      <REC id="2">TERM:ITXT</REC>
+      <Source>Apparels</Source>
+      <Dest>防具</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_UtilityHolotapeMoveItemsPlayerToLootman</EDID>
+      <REC id="2">TERM:RNAM</REC>
+      <Source>Please wait for a while...</Source>
+      <Dest>しばらくお待ち下さい...</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_UtilityHolotapeMoveItemsPlayerToLootman</EDID>
+      <REC id="2">TERM:UNAM</REC>
+      <Source>Please wait until the process is completed. When the process is complete, a sound effect will be heard and a message will be displayed.</Source>
+      <Dest>処理が完了するまでお待ちください。処理が完了すると効果音が鳴り、メッセージが表示されます。</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_UtilityHolotapeMoveItemsPlayerToLootman</EDID>
+      <REC id="3">TERM:ITXT</REC>
+      <Source>Chemistry/Food</Source>
+      <Dest>薬品・食料</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_UtilityHolotapeMoveItemsPlayerToLootman</EDID>
+      <REC id="3">TERM:RNAM</REC>
+      <Source>Please wait for a while...</Source>
+      <Dest>しばらくお待ち下さい...</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_UtilityHolotapeMoveItemsPlayerToLootman</EDID>
+      <REC id="3">TERM:UNAM</REC>
+      <Source>Please wait until the process is completed. When the process is complete, a sound effect will be heard and a message will be displayed.</Source>
+      <Dest>処理が完了するまでお待ちください。処理が完了すると効果音が鳴り、メッセージが表示されます。</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_UtilityHolotapeMoveItemsPlayerToLootman</EDID>
+      <REC id="4">TERM:ITXT</REC>
+      <Source>Junk</Source>
+      <Dest>ジャンク</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_UtilityHolotapeMoveItemsPlayerToLootman</EDID>
+      <REC id="4">TERM:RNAM</REC>
+      <Source>Please wait for a while...</Source>
+      <Dest>しばらくお待ち下さい...</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_UtilityHolotapeMoveItemsPlayerToLootman</EDID>
+      <REC id="4">TERM:UNAM</REC>
+      <Source>Please wait until the process is completed. When the process is complete, a sound effect will be heard and a message will be displayed.</Source>
+      <Dest>処理が完了するまでお待ちください。処理が完了すると効果音が鳴り、メッセージが表示されます。</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_UtilityHolotapeMoveItemsPlayerToLootman</EDID>
+      <REC id="5">TERM:ITXT</REC>
+      <Source>Mods</Source>
+      <Dest>MOD</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_UtilityHolotapeMoveItemsPlayerToLootman</EDID>
+      <REC id="5">TERM:RNAM</REC>
+      <Source>Please wait for a while...</Source>
+      <Dest>しばらくお待ち下さい...</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_UtilityHolotapeMoveItemsPlayerToLootman</EDID>
+      <REC id="5">TERM:UNAM</REC>
+      <Source>Please wait until the process is completed. When the process is complete, a sound effect will be heard and a message will be displayed.</Source>
+      <Dest>処理が完了するまでお待ちください。処理が完了すると効果音が鳴り、メッセージが表示されます。</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_UtilityHolotapeMoveItemsPlayerToLootman</EDID>
+      <REC id="6">TERM:ITXT</REC>
+      <Source>Ammo</Source>
+      <Dest>弾薬</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_UtilityHolotapeMoveItemsPlayerToLootman</EDID>
+      <REC id="6">TERM:RNAM</REC>
+      <Source>Please wait for a while...</Source>
+      <Dest>しばらくお待ち下さい...</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_UtilityHolotapeMoveItemsPlayerToLootman</EDID>
+      <REC id="6">TERM:UNAM</REC>
+      <Source>Please wait until the process is completed. When the process is complete, a sound effect will be heard and a message will be displayed.</Source>
+      <Dest>処理が完了するまでお待ちください。処理が完了すると効果音が鳴り、メッセージが表示されます。</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_UtilityHolotapeMoveItemsPlayerToLootman</EDID>
+      <REC id="7">TERM:ITXT</REC>
+      <Source>Books</Source>
+      <Dest>本</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_UtilityHolotapeMoveItemsPlayerToLootman</EDID>
+      <REC id="7">TERM:RNAM</REC>
+      <Source>Please wait for a while...</Source>
+      <Dest>しばらくお待ち下さい...</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_UtilityHolotapeMoveItemsPlayerToLootman</EDID>
+      <REC id="7">TERM:UNAM</REC>
+      <Source>Please wait until the process is completed. When the process is complete, a sound effect will be heard and a message will be displayed.</Source>
+      <Dest>処理が完了するまでお待ちください。処理が完了すると効果音が鳴り、メッセージが表示されます。</Dest>
+    </String>
+    <String List="0" Partial="1">
+      <EDID>LTMN_UtilityHolotapeMoveItemsPlayerToLootman</EDID>
+      <REC id="8">TERM:ITXT</REC>
+      <Source>Keys</Source>
+      <Dest>カギ</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_UtilityHolotapeMoveItemsPlayerToLootman</EDID>
+      <REC id="8">TERM:RNAM</REC>
+      <Source>Please wait for a while...</Source>
+      <Dest>しばらくお待ち下さい...</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_UtilityHolotapeMoveItemsPlayerToLootman</EDID>
+      <REC id="8">TERM:UNAM</REC>
+      <Source>Please wait until the process is completed. When the process is complete, a sound effect will be heard and a message will be displayed.</Source>
+      <Dest>処理が完了するまでお待ちください。処理が完了すると効果音が鳴り、メッセージが表示されます。</Dest>
+    </String>
+    <String List="0" Partial="2">
+      <EDID>LTMN_UtilityHolotapeMoveItemsLootmanToPlayer</EDID>
+      <REC>TERM:WNAM</REC>
+      <Source>~**~ EIDEE-OS ~**~</Source>
+      <Dest>~**~ EIDEE-OS ~**~</Dest>
+    </String>
+    <String List="0" Partial="2">
+      <EDID>LTMN_UtilityHolotapeMoveItemsLootmanToPlayer</EDID>
+      <REC>TERM:FULL</REC>
+      <Source>*./lootman.utility.move-items.lootman-to-player</Source>
+      <Dest>*./lootman.utility.move-items.lootman-to-player</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_UtilityHolotapeMoveItemsLootmanToPlayer</EDID>
+      <REC id="0">TERM:ITXT</REC>
+      <Source>All</Source>
+      <Dest>全て</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_UtilityHolotapeMoveItemsLootmanToPlayer</EDID>
+      <REC id="0">TERM:RNAM</REC>
+      <Source>Please wait for a while...</Source>
+      <Dest>しばらくお待ち下さい...</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_UtilityHolotapeMoveItemsLootmanToPlayer</EDID>
+      <REC id="0">TERM:UNAM</REC>
+      <Source>Please wait until the process is completed. When the process is complete, a sound effect will be heard and a message will be displayed.</Source>
+      <Dest>処理が完了するまでお待ちください。処理が完了すると効果音が鳴り、メッセージが表示されます。</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_UtilityHolotapeMoveItemsLootmanToPlayer</EDID>
+      <REC id="1">TERM:ITXT</REC>
+      <Source>Weapons</Source>
+      <Dest>武器</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_UtilityHolotapeMoveItemsLootmanToPlayer</EDID>
+      <REC id="1">TERM:RNAM</REC>
+      <Source>Please wait for a while...</Source>
+      <Dest>しばらくお待ち下さい...</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_UtilityHolotapeMoveItemsLootmanToPlayer</EDID>
+      <REC id="1">TERM:UNAM</REC>
+      <Source>Please wait until the process is completed. When the process is complete, a sound effect will be heard and a message will be displayed.</Source>
+      <Dest>処理が完了するまでお待ちください。処理が完了すると効果音が鳴り、メッセージが表示されます。</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_UtilityHolotapeMoveItemsLootmanToPlayer</EDID>
+      <REC id="2">TERM:ITXT</REC>
+      <Source>Apparels</Source>
+      <Dest>防具</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_UtilityHolotapeMoveItemsLootmanToPlayer</EDID>
+      <REC id="2">TERM:RNAM</REC>
+      <Source>Please wait for a while...</Source>
+      <Dest>しばらくお待ち下さい...</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_UtilityHolotapeMoveItemsLootmanToPlayer</EDID>
+      <REC id="2">TERM:UNAM</REC>
+      <Source>Please wait until the process is completed. When the process is complete, a sound effect will be heard and a message will be displayed.</Source>
+      <Dest>処理が完了するまでお待ちください。処理が完了すると効果音が鳴り、メッセージが表示されます。</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_UtilityHolotapeMoveItemsLootmanToPlayer</EDID>
+      <REC id="3">TERM:ITXT</REC>
+      <Source>Chemistry/Food</Source>
+      <Dest>薬品・食料</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_UtilityHolotapeMoveItemsLootmanToPlayer</EDID>
+      <REC id="3">TERM:RNAM</REC>
+      <Source>Please wait for a while...</Source>
+      <Dest>しばらくお待ち下さい...</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_UtilityHolotapeMoveItemsLootmanToPlayer</EDID>
+      <REC id="3">TERM:UNAM</REC>
+      <Source>Please wait until the process is completed. When the process is complete, a sound effect will be heard and a message will be displayed.</Source>
+      <Dest>処理が完了するまでお待ちください。処理が完了すると効果音が鳴り、メッセージが表示されます。</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_UtilityHolotapeMoveItemsLootmanToPlayer</EDID>
+      <REC id="4">TERM:ITXT</REC>
+      <Source>Junk</Source>
+      <Dest>ジャンク</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_UtilityHolotapeMoveItemsLootmanToPlayer</EDID>
+      <REC id="4">TERM:RNAM</REC>
+      <Source>Please wait for a while...</Source>
+      <Dest>しばらくお待ち下さい...</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_UtilityHolotapeMoveItemsLootmanToPlayer</EDID>
+      <REC id="4">TERM:UNAM</REC>
+      <Source>Please wait until the process is completed. When the process is complete, a sound effect will be heard and a message will be displayed.</Source>
+      <Dest>処理が完了するまでお待ちください。処理が完了すると効果音が鳴り、メッセージが表示されます。</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_UtilityHolotapeMoveItemsLootmanToPlayer</EDID>
+      <REC id="5">TERM:ITXT</REC>
+      <Source>Mods</Source>
+      <Dest>MOD</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_UtilityHolotapeMoveItemsLootmanToPlayer</EDID>
+      <REC id="5">TERM:RNAM</REC>
+      <Source>Please wait for a while...</Source>
+      <Dest>しばらくお待ち下さい...</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_UtilityHolotapeMoveItemsLootmanToPlayer</EDID>
+      <REC id="5">TERM:UNAM</REC>
+      <Source>Please wait until the process is completed. When the process is complete, a sound effect will be heard and a message will be displayed.</Source>
+      <Dest>処理が完了するまでお待ちください。処理が完了すると効果音が鳴り、メッセージが表示されます。</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_UtilityHolotapeMoveItemsLootmanToPlayer</EDID>
+      <REC id="6">TERM:ITXT</REC>
+      <Source>Ammo</Source>
+      <Dest>弾薬</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_UtilityHolotapeMoveItemsLootmanToPlayer</EDID>
+      <REC id="6">TERM:RNAM</REC>
+      <Source>Please wait for a while...</Source>
+      <Dest>しばらくお待ち下さい...</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_UtilityHolotapeMoveItemsLootmanToPlayer</EDID>
+      <REC id="6">TERM:UNAM</REC>
+      <Source>Please wait until the process is completed. When the process is complete, a sound effect will be heard and a message will be displayed.</Source>
+      <Dest>処理が完了するまでお待ちください。処理が完了すると効果音が鳴り、メッセージが表示されます。</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_UtilityHolotapeMoveItemsLootmanToPlayer</EDID>
+      <REC id="7">TERM:ITXT</REC>
+      <Source>Books</Source>
+      <Dest>本</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_UtilityHolotapeMoveItemsLootmanToPlayer</EDID>
+      <REC id="7">TERM:RNAM</REC>
+      <Source>Please wait for a while...</Source>
+      <Dest>しばらくお待ち下さい...</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_UtilityHolotapeMoveItemsLootmanToPlayer</EDID>
+      <REC id="7">TERM:UNAM</REC>
+      <Source>Please wait until the process is completed. When the process is complete, a sound effect will be heard and a message will be displayed.</Source>
+      <Dest>処理が完了するまでお待ちください。処理が完了すると効果音が鳴り、メッセージが表示されます。</Dest>
+    </String>
+    <String List="0" Partial="1">
+      <EDID>LTMN_UtilityHolotapeMoveItemsLootmanToPlayer</EDID>
+      <REC id="8">TERM:ITXT</REC>
+      <Source>Keys</Source>
+      <Dest>カギ</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_UtilityHolotapeMoveItemsLootmanToPlayer</EDID>
+      <REC id="8">TERM:RNAM</REC>
+      <Source>Please wait for a while...</Source>
+      <Dest>しばらくお待ち下さい...</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_UtilityHolotapeMoveItemsLootmanToPlayer</EDID>
+      <REC id="8">TERM:UNAM</REC>
+      <Source>Please wait until the process is completed. When the process is complete, a sound effect will be heard and a message will be displayed.</Source>
+      <Dest>処理が完了するまでお待ちください。処理が完了すると効果音が鳴り、メッセージが表示されます。</Dest>
+    </String>
+    <String List="0" Partial="2">
+      <EDID>LTMN_UtilityHolotapeMoveItemsLootmanToWorkshop</EDID>
+      <REC>TERM:WNAM</REC>
+      <Source>~**~ EIDEE-OS ~**~</Source>
+      <Dest>~**~ EIDEE-OS ~**~</Dest>
+    </String>
+    <String List="0" Partial="2">
+      <EDID>LTMN_UtilityHolotapeMoveItemsLootmanToWorkshop</EDID>
+      <REC>TERM:FULL</REC>
+      <Source>*./lootman.utility.move-items.lootman-to-workshop</Source>
+      <Dest>*./lootman.utility.move-items.lootman-to-workshop</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_UtilityHolotapeMoveItemsLootmanToWorkshop</EDID>
+      <REC id="0">TERM:ITXT</REC>
+      <Source>All</Source>
+      <Dest>全て</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_UtilityHolotapeMoveItemsLootmanToWorkshop</EDID>
+      <REC id="0">TERM:RNAM</REC>
+      <Source>Please wait for a while...</Source>
+      <Dest>しばらくお待ち下さい...</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_UtilityHolotapeMoveItemsLootmanToWorkshop</EDID>
+      <REC id="0">TERM:UNAM</REC>
+      <Source>Please wait until the process is completed. When the process is complete, a sound effect will be heard and a message will be displayed.</Source>
+      <Dest>処理が完了するまでお待ちください。処理が完了すると効果音が鳴り、メッセージが表示されます。</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_UtilityHolotapeMoveItemsLootmanToWorkshop</EDID>
+      <REC id="1">TERM:ITXT</REC>
+      <Source>Weapons</Source>
+      <Dest>武器</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_UtilityHolotapeMoveItemsLootmanToWorkshop</EDID>
+      <REC id="1">TERM:RNAM</REC>
+      <Source>Please wait for a while...</Source>
+      <Dest>しばらくお待ち下さい...</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_UtilityHolotapeMoveItemsLootmanToWorkshop</EDID>
+      <REC id="1">TERM:UNAM</REC>
+      <Source>Please wait until the process is completed. When the process is complete, a sound effect will be heard and a message will be displayed.</Source>
+      <Dest>処理が完了するまでお待ちください。処理が完了すると効果音が鳴り、メッセージが表示されます。</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_UtilityHolotapeMoveItemsLootmanToWorkshop</EDID>
+      <REC id="2">TERM:ITXT</REC>
+      <Source>Apparels</Source>
+      <Dest>防具</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_UtilityHolotapeMoveItemsLootmanToWorkshop</EDID>
+      <REC id="2">TERM:RNAM</REC>
+      <Source>Please wait for a while...</Source>
+      <Dest>しばらくお待ち下さい...</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_UtilityHolotapeMoveItemsLootmanToWorkshop</EDID>
+      <REC id="2">TERM:UNAM</REC>
+      <Source>Please wait until the process is completed. When the process is complete, a sound effect will be heard and a message will be displayed.</Source>
+      <Dest>処理が完了するまでお待ちください。処理が完了すると効果音が鳴り、メッセージが表示されます。</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_UtilityHolotapeMoveItemsLootmanToWorkshop</EDID>
+      <REC id="3">TERM:ITXT</REC>
+      <Source>Chemistry/Food</Source>
+      <Dest>薬品・食料</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_UtilityHolotapeMoveItemsLootmanToWorkshop</EDID>
+      <REC id="3">TERM:RNAM</REC>
+      <Source>Please wait for a while...</Source>
+      <Dest>しばらくお待ち下さい...</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_UtilityHolotapeMoveItemsLootmanToWorkshop</EDID>
+      <REC id="3">TERM:UNAM</REC>
+      <Source>Please wait until the process is completed. When the process is complete, a sound effect will be heard and a message will be displayed.</Source>
+      <Dest>処理が完了するまでお待ちください。処理が完了すると効果音が鳴り、メッセージが表示されます。</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_UtilityHolotapeMoveItemsLootmanToWorkshop</EDID>
+      <REC id="4">TERM:ITXT</REC>
+      <Source>Junk</Source>
+      <Dest>ジャンク</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_UtilityHolotapeMoveItemsLootmanToWorkshop</EDID>
+      <REC id="4">TERM:RNAM</REC>
+      <Source>Please wait for a while...</Source>
+      <Dest>しばらくお待ち下さい...</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_UtilityHolotapeMoveItemsLootmanToWorkshop</EDID>
+      <REC id="4">TERM:UNAM</REC>
+      <Source>Please wait until the process is completed. When the process is complete, a sound effect will be heard and a message will be displayed.</Source>
+      <Dest>処理が完了するまでお待ちください。処理が完了すると効果音が鳴り、メッセージが表示されます。</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_UtilityHolotapeMoveItemsLootmanToWorkshop</EDID>
+      <REC id="5">TERM:ITXT</REC>
+      <Source>Mods</Source>
+      <Dest>MOD</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_UtilityHolotapeMoveItemsLootmanToWorkshop</EDID>
+      <REC id="5">TERM:RNAM</REC>
+      <Source>Please wait for a while...</Source>
+      <Dest>しばらくお待ち下さい...</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_UtilityHolotapeMoveItemsLootmanToWorkshop</EDID>
+      <REC id="5">TERM:UNAM</REC>
+      <Source>Please wait until the process is completed. When the process is complete, a sound effect will be heard and a message will be displayed.</Source>
+      <Dest>処理が完了するまでお待ちください。処理が完了すると効果音が鳴り、メッセージが表示されます。</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_UtilityHolotapeMoveItemsLootmanToWorkshop</EDID>
+      <REC id="6">TERM:ITXT</REC>
+      <Source>Ammo</Source>
+      <Dest>弾薬</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_UtilityHolotapeMoveItemsLootmanToWorkshop</EDID>
+      <REC id="6">TERM:RNAM</REC>
+      <Source>Please wait for a while...</Source>
+      <Dest>しばらくお待ち下さい...</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_UtilityHolotapeMoveItemsLootmanToWorkshop</EDID>
+      <REC id="6">TERM:UNAM</REC>
+      <Source>Please wait until the process is completed. When the process is complete, a sound effect will be heard and a message will be displayed.</Source>
+      <Dest>処理が完了するまでお待ちください。処理が完了すると効果音が鳴り、メッセージが表示されます。</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_UtilityHolotapeMoveItemsLootmanToWorkshop</EDID>
+      <REC id="7">TERM:ITXT</REC>
+      <Source>Books</Source>
+      <Dest>本</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_UtilityHolotapeMoveItemsLootmanToWorkshop</EDID>
+      <REC id="7">TERM:RNAM</REC>
+      <Source>Please wait for a while...</Source>
+      <Dest>しばらくお待ち下さい...</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_UtilityHolotapeMoveItemsLootmanToWorkshop</EDID>
+      <REC id="7">TERM:UNAM</REC>
+      <Source>Please wait until the process is completed. When the process is complete, a sound effect will be heard and a message will be displayed.</Source>
+      <Dest>処理が完了するまでお待ちください。処理が完了すると効果音が鳴り、メッセージが表示されます。</Dest>
+    </String>
+    <String List="0" Partial="1">
+      <EDID>LTMN_UtilityHolotapeMoveItemsLootmanToWorkshop</EDID>
+      <REC id="8">TERM:ITXT</REC>
+      <Source>Keys</Source>
+      <Dest>カギ</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_UtilityHolotapeMoveItemsLootmanToWorkshop</EDID>
+      <REC id="8">TERM:RNAM</REC>
+      <Source>Please wait for a while...</Source>
+      <Dest>しばらくお待ち下さい...</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_UtilityHolotapeMoveItemsLootmanToWorkshop</EDID>
+      <REC id="8">TERM:UNAM</REC>
+      <Source>Please wait until the process is completed. When the process is complete, a sound effect will be heard and a message will be displayed.</Source>
+      <Dest>処理が完了するまでお待ちください。処理が完了すると効果音が鳴り、メッセージが表示されます。</Dest>
+    </String>
+    <String List="0" Partial="2">
+      <EDID>LTMN_UtilityHolotapeScrapItemsFromLootman</EDID>
+      <REC>TERM:WNAM</REC>
+      <Source>~**~ EIDEE-OS ~**~</Source>
+      <Dest>~**~ EIDEE-OS ~**~</Dest>
+    </String>
+    <String List="0" Partial="2">
+      <EDID>LTMN_UtilityHolotapeScrapItemsFromLootman</EDID>
+      <REC>TERM:FULL</REC>
+      <Source>*./lootman.utility.scrap-items.from-lootman</Source>
+      <Dest>*./lootman.utility.scrap-items.from-lootman</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_UtilityHolotapeScrapItemsFromLootman</EDID>
+      <REC id="0">TERM:ITXT</REC>
+      <Source>Weapons</Source>
+      <Dest>武器</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_UtilityHolotapeScrapItemsFromLootman</EDID>
+      <REC id="0">TERM:RNAM</REC>
+      <Source>Please wait for a while...</Source>
+      <Dest>しばらくお待ち下さい...</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_UtilityHolotapeScrapItemsFromLootman</EDID>
+      <REC id="0">TERM:UNAM</REC>
+      <Source>Please wait until the process is completed. When the process is complete, a sound effect will be heard and a message will be displayed.</Source>
+      <Dest>処理が完了するまでお待ちください。処理が完了すると効果音が鳴り、メッセージが表示されます。</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_UtilityHolotapeScrapItemsFromLootman</EDID>
+      <REC id="1">TERM:ITXT</REC>
+      <Source>Apparels</Source>
+      <Dest>防具</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_UtilityHolotapeScrapItemsFromLootman</EDID>
+      <REC id="1">TERM:RNAM</REC>
+      <Source>Please wait for a while...</Source>
+      <Dest>しばらくお待ち下さい...</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_UtilityHolotapeScrapItemsFromLootman</EDID>
+      <REC id="1">TERM:UNAM</REC>
+      <Source>Please wait until the process is completed. When the process is complete, a sound effect will be heard and a message will be displayed.</Source>
+      <Dest>処理が完了するまでお待ちください。処理が完了すると効果音が鳴り、メッセージが表示されます。</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_UtilityHolotapeScrapItemsFromLootman</EDID>
+      <REC id="2">TERM:ITXT</REC>
+      <Source>Junk</Source>
+      <Dest>ジャンク</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_UtilityHolotapeScrapItemsFromLootman</EDID>
+      <REC id="2">TERM:RNAM</REC>
+      <Source>Please wait for a while...</Source>
+      <Dest>しばらくお待ち下さい...</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_UtilityHolotapeScrapItemsFromLootman</EDID>
+      <REC id="2">TERM:UNAM</REC>
+      <Source>Please wait until the process is completed. When the process is complete, a sound effect will be heard and a message will be displayed.</Source>
+      <Dest>処理が完了するまでお待ちください。処理が完了すると効果音が鳴り、メッセージが表示されます。</Dest>
+    </String>
+    <String List="0" Partial="2">
+      <EDID>LTMN_UtilityHolotapeSystem</EDID>
+      <REC>TERM:WNAM</REC>
+      <Source>~**~ EIDEE-OS ~**~</Source>
+      <Dest>~**~ EIDEE-OS ~**~</Dest>
+    </String>
+    <String List="0" Partial="2">
+      <EDID>LTMN_UtilityHolotapeSystem</EDID>
+      <REC>TERM:FULL</REC>
+      <Source>*./lootman.system</Source>
+      <Dest>*./lootman.system</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_UtilityHolotapeSystem</EDID>
+      <REC id="0">TERM:ITXT</REC>
+      <Source>Force Install</Source>
+      <Dest>強制インストール</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_UtilityHolotapeSystem</EDID>
+      <REC id="1">TERM:ITXT</REC>
+      <Source>Uninstall</Source>
+      <Dest>アンインストール</Dest>
+    </String>
+    <String List="0" Partial="2">
+      <EDID>LTMN_UtilityHolotapeThreadInterval</EDID>
+      <REC>TERM:WNAM</REC>
+      <Source>~**~ EIDEE-OS ~**~</Source>
+      <Dest>~**~ EIDEE-OS ~**~</Dest>
+    </String>
+    <String List="0" Partial="2">
+      <EDID>LTMN_UtilityHolotapeThreadInterval</EDID>
+      <REC>TERM:FULL</REC>
+      <Source>*./lootman.settings.thread-interval</Source>
+      <Dest>*./lootman.settings.thread-interval</Dest>
+    </String>
+    <String List="0" Partial="1">
+      <EDID>LTMN_UtilityHolotapeThreadInterval</EDID>
+      <REC id="0">TERM:BTXT</REC>
+      <Source>Current Thread Interval: &lt;Token.Value=ThreadInterval&gt;</Source>
+      <Dest>現在のスレッド動作間隔: &lt;Token.Value=ThreadInterval&gt;</Dest>
+    </String>
+    <String List="0" Partial="1">
+      <EDID>LTMN_UtilityHolotapeThreadInterval</EDID>
+      <REC id="1">TERM:BTXT</REC>
+      <Source>Current Thread Interval: $ERROR$
+Access from terminal to view this value.</Source>
+      <Dest>現在のスレッド動作間隔: $ERROR$
+この値を表示するためには、ターミナルからのアクセスが必要です。</Dest>
+    </String>
+    <String List="0" Partial="1">
+      <EDID>LTMN_UtilityHolotapeThreadInterval</EDID>
+      <REC id="0">TERM:ITXT</REC>
+      <Source>Thread Interval +1.0</Source>
+      <Dest>スレッド動作間隔 +1.0</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_UtilityHolotapeThreadInterval</EDID>
+      <REC id="0">TERM:RNAM</REC>
+      <Source>Increase 1.0...</Source>
+      <Dest>1.0増加させました...</Dest>
+    </String>
+    <String List="0" Partial="1">
+      <EDID>LTMN_UtilityHolotapeThreadInterval</EDID>
+      <REC id="1">TERM:ITXT</REC>
+      <Source>Thread Interval +0.5</Source>
+      <Dest>スレッド動作間隔 +0.5</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_UtilityHolotapeThreadInterval</EDID>
+      <REC id="1">TERM:RNAM</REC>
+      <Source>Increase 0.5...</Source>
+      <Dest>0.5増加させました...</Dest>
+    </String>
+    <String List="0" Partial="1">
+      <EDID>LTMN_UtilityHolotapeThreadInterval</EDID>
+      <REC id="2">TERM:ITXT</REC>
+      <Source>Thread Interval +0.1</Source>
+      <Dest>スレッド動作間隔 +0.1</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_UtilityHolotapeThreadInterval</EDID>
+      <REC id="2">TERM:RNAM</REC>
+      <Source>Increase 0.1...</Source>
+      <Dest>0.1増加させました...</Dest>
+    </String>
+    <String List="0" Partial="1">
+      <EDID>LTMN_UtilityHolotapeThreadInterval</EDID>
+      <REC id="3">TERM:ITXT</REC>
+      <Source>Thread Interval -0.1</Source>
+      <Dest>スレッド動作間隔 -0.1</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_UtilityHolotapeThreadInterval</EDID>
+      <REC id="3">TERM:RNAM</REC>
+      <Source>Decrease 0.1...</Source>
+      <Dest>0.1減少させました...</Dest>
+    </String>
+    <String List="0" Partial="1">
+      <EDID>LTMN_UtilityHolotapeThreadInterval</EDID>
+      <REC id="4">TERM:ITXT</REC>
+      <Source>Thread Interval -0.5</Source>
+      <Dest>スレッド動作間隔 -0.5</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_UtilityHolotapeThreadInterval</EDID>
+      <REC id="4">TERM:RNAM</REC>
+      <Source>Decrease 0.5...</Source>
+      <Dest>0.5減少させました...</Dest>
+    </String>
+    <String List="0" Partial="1">
+      <EDID>LTMN_UtilityHolotapeThreadInterval</EDID>
+      <REC id="5">TERM:ITXT</REC>
+      <Source>Thread Interval -1.0</Source>
+      <Dest>スレッド動作間隔 -1.0</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_UtilityHolotapeThreadInterval</EDID>
+      <REC id="5">TERM:RNAM</REC>
+      <Source>Decrease 1.0...</Source>
+      <Dest>1.0減少させました...</Dest>
+    </String>
+    <String List="0" Partial="2">
+      <EDID>LTMN_UtilityHolotapeCarryWeight</EDID>
+      <REC>TERM:WNAM</REC>
+      <Source>~**~ EIDEE-OS ~**~</Source>
+      <Dest>~**~ EIDEE-OS ~**~</Dest>
+    </String>
+    <String List="0" Partial="2">
+      <EDID>LTMN_UtilityHolotapeCarryWeight</EDID>
+      <REC>TERM:FULL</REC>
+      <Source>*./lootman.settings.carry-weight</Source>
+      <Dest>*./lootman.settings.carry-weight</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_UtilityHolotapeCarryWeight</EDID>
+      <REC id="0">TERM:BTXT</REC>
+      <Source>Current Carry Weight: &lt;Token.Value=CarryWeight&gt;</Source>
+      <Dest>現在の所持重量: &lt;Token.Value=CarryWeight&gt;</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_UtilityHolotapeCarryWeight</EDID>
+      <REC id="1">TERM:BTXT</REC>
+      <Source>Current Carry Weight: $ERROR$
+Access from terminal to view this value.</Source>
+      <Dest>現在の所持重量: $ERROR$
+この値を表示するためには、ターミナルからのアクセスが必要です。</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_UtilityHolotapeCarryWeight</EDID>
+      <REC id="0">TERM:ITXT</REC>
+      <Source>Carry Weight +100000</Source>
+      <Dest>所持重量 +100000</Dest>
+    </String>
+    <String List="0" Partial="1">
+      <EDID>LTMN_UtilityHolotapeCarryWeight</EDID>
+      <REC id="0">TERM:RNAM</REC>
+      <Source>Increase 100000...</Source>
+      <Dest>100000増加させました...</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_UtilityHolotapeCarryWeight</EDID>
+      <REC id="1">TERM:ITXT</REC>
+      <Source>Carry Weight +10000</Source>
+      <Dest>所持重量 +10000</Dest>
+    </String>
+    <String List="0" Partial="1">
+      <EDID>LTMN_UtilityHolotapeCarryWeight</EDID>
+      <REC id="1">TERM:RNAM</REC>
+      <Source>Increase 10000...</Source>
+      <Dest>10000増加させました...</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_UtilityHolotapeCarryWeight</EDID>
+      <REC id="2">TERM:ITXT</REC>
+      <Source>Carry Weight +1000</Source>
+      <Dest>所持重量 +1000</Dest>
+    </String>
+    <String List="0" Partial="1">
+      <EDID>LTMN_UtilityHolotapeCarryWeight</EDID>
+      <REC id="2">TERM:RNAM</REC>
+      <Source>Increase 1000...</Source>
+      <Dest>1000増加させました...</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_UtilityHolotapeCarryWeight</EDID>
+      <REC id="3">TERM:ITXT</REC>
+      <Source>Carry Weight +500</Source>
+      <Dest>所持重量 +500</Dest>
+    </String>
+    <String List="0" Partial="1">
+      <EDID>LTMN_UtilityHolotapeCarryWeight</EDID>
+      <REC id="3">TERM:RNAM</REC>
+      <Source>Increase 500...</Source>
+      <Dest>500増加させました...</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_UtilityHolotapeCarryWeight</EDID>
+      <REC id="4">TERM:ITXT</REC>
+      <Source>Carry Weight -500</Source>
+      <Dest>所持重量 -500</Dest>
+    </String>
+    <String List="0" Partial="1">
+      <EDID>LTMN_UtilityHolotapeCarryWeight</EDID>
+      <REC id="4">TERM:RNAM</REC>
+      <Source>Decrease 500...</Source>
+      <Dest>500減少させました...</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_UtilityHolotapeCarryWeight</EDID>
+      <REC id="5">TERM:ITXT</REC>
+      <Source>Carry Weight -1000</Source>
+      <Dest>所持重量 -1000</Dest>
+    </String>
+    <String List="0" Partial="1">
+      <EDID>LTMN_UtilityHolotapeCarryWeight</EDID>
+      <REC id="5">TERM:RNAM</REC>
+      <Source>Decrease 1000...</Source>
+      <Dest>1000減少させました...</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_UtilityHolotapeCarryWeight</EDID>
+      <REC id="6">TERM:ITXT</REC>
+      <Source>Carry Weight -10000</Source>
+      <Dest>所持重量 -10000</Dest>
+    </String>
+    <String List="0" Partial="1">
+      <EDID>LTMN_UtilityHolotapeCarryWeight</EDID>
+      <REC id="6">TERM:RNAM</REC>
+      <Source>Decrease 10000...</Source>
+      <Dest>10000減少させました...</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_UtilityHolotapeCarryWeight</EDID>
+      <REC id="7">TERM:ITXT</REC>
+      <Source>Carry Weight -100000</Source>
+      <Dest>所持重量 -100000</Dest>
+    </String>
+    <String List="0" Partial="1">
+      <EDID>LTMN_UtilityHolotapeCarryWeight</EDID>
+      <REC id="7">TERM:RNAM</REC>
+      <Source>Decrease 100000...</Source>
+      <Dest>100000減少させました...</Dest>
+    </String>
+    <String List="0" Partial="2">
+      <EDID>LTMN_UtilityHolotapeLootingRange</EDID>
+      <REC>TERM:WNAM</REC>
+      <Source>~**~ EIDEE-OS ~**~</Source>
+      <Dest>~**~ EIDEE-OS ~**~</Dest>
+    </String>
+    <String List="0" Partial="2">
+      <EDID>LTMN_UtilityHolotapeLootingRange</EDID>
+      <REC>TERM:FULL</REC>
+      <Source>*./lootman.settings.looting-range</Source>
+      <Dest>*./lootman.settings.looting-range</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_UtilityHolotapeLootingRange</EDID>
+      <REC id="0">TERM:BTXT</REC>
+      <Source>Current Looting Range: &lt;Token.Value=LootingRange&gt;</Source>
+      <Dest>現在の収集範囲: &lt;Token.Value=LootingRange&gt;</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_UtilityHolotapeLootingRange</EDID>
+      <REC id="1">TERM:BTXT</REC>
+      <Source>Current Looting Range: $ERROR$
+Access from terminal to view this value.</Source>
+      <Dest>現在の収集範囲: $ERROR$
+この値を表示するためには、ターミナルからのアクセスが必要です。</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_UtilityHolotapeLootingRange</EDID>
+      <REC id="0">TERM:ITXT</REC>
+      <Source>Looting Range +5000</Source>
+      <Dest>収集範囲 +5000</Dest>
+    </String>
+    <String List="0" Partial="1">
+      <EDID>LTMN_UtilityHolotapeLootingRange</EDID>
+      <REC id="0">TERM:RNAM</REC>
+      <Source>Increase 5000...</Source>
+      <Dest>5000増加させました...</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_UtilityHolotapeLootingRange</EDID>
+      <REC id="1">TERM:ITXT</REC>
+      <Source>Looting Range +1000</Source>
+      <Dest>収集範囲 +1000</Dest>
+    </String>
+    <String List="0" Partial="1">
+      <EDID>LTMN_UtilityHolotapeLootingRange</EDID>
+      <REC id="1">TERM:RNAM</REC>
+      <Source>Increase 1000...</Source>
+      <Dest>1000増加させました...</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_UtilityHolotapeLootingRange</EDID>
+      <REC id="2">TERM:ITXT</REC>
+      <Source>Looting Range +500</Source>
+      <Dest>収集範囲 +500</Dest>
+    </String>
+    <String List="0" Partial="1">
+      <EDID>LTMN_UtilityHolotapeLootingRange</EDID>
+      <REC id="2">TERM:RNAM</REC>
+      <Source>Increase 500...</Source>
+      <Dest>500増加させました...</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_UtilityHolotapeLootingRange</EDID>
+      <REC id="3">TERM:ITXT</REC>
+      <Source>Looting Range +100</Source>
+      <Dest>収集範囲 +100</Dest>
+    </String>
+    <String List="0" Partial="1">
+      <EDID>LTMN_UtilityHolotapeLootingRange</EDID>
+      <REC id="3">TERM:RNAM</REC>
+      <Source>Increase 100...</Source>
+      <Dest>100増加させました...</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_UtilityHolotapeLootingRange</EDID>
+      <REC id="4">TERM:ITXT</REC>
+      <Source>Looting Range +50</Source>
+      <Dest>収集範囲 +50</Dest>
+    </String>
+    <String List="0" Partial="1">
+      <EDID>LTMN_UtilityHolotapeLootingRange</EDID>
+      <REC id="4">TERM:RNAM</REC>
+      <Source>Increase 50...</Source>
+      <Dest>50増加させました...</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_UtilityHolotapeLootingRange</EDID>
+      <REC id="5">TERM:ITXT</REC>
+      <Source>Looting Range -50</Source>
+      <Dest>収集範囲 -50</Dest>
+    </String>
+    <String List="0" Partial="1">
+      <EDID>LTMN_UtilityHolotapeLootingRange</EDID>
+      <REC id="5">TERM:RNAM</REC>
+      <Source>Decrease 50...</Source>
+      <Dest>50減少させました...</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_UtilityHolotapeLootingRange</EDID>
+      <REC id="6">TERM:ITXT</REC>
+      <Source>Looting Range -100</Source>
+      <Dest>収集範囲 -100</Dest>
+    </String>
+    <String List="0" Partial="1">
+      <EDID>LTMN_UtilityHolotapeLootingRange</EDID>
+      <REC id="6">TERM:RNAM</REC>
+      <Source>Decrease 100...</Source>
+      <Dest>100減少させました...</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_UtilityHolotapeLootingRange</EDID>
+      <REC id="7">TERM:ITXT</REC>
+      <Source>Looting Range -500</Source>
+      <Dest>収集範囲 -500</Dest>
+    </String>
+    <String List="0" Partial="1">
+      <EDID>LTMN_UtilityHolotapeLootingRange</EDID>
+      <REC id="7">TERM:RNAM</REC>
+      <Source>Decrease 500...</Source>
+      <Dest>500減少させました...</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_UtilityHolotapeLootingRange</EDID>
+      <REC id="8">TERM:ITXT</REC>
+      <Source>Looting Range -1000</Source>
+      <Dest>収集範囲 -1000</Dest>
+    </String>
+    <String List="0" Partial="1">
+      <EDID>LTMN_UtilityHolotapeLootingRange</EDID>
+      <REC id="8">TERM:RNAM</REC>
+      <Source>Decrease 1000...</Source>
+      <Dest>1000減少させました...</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_UtilityHolotapeLootingRange</EDID>
+      <REC id="9">TERM:ITXT</REC>
+      <Source>Looting Range -5000</Source>
+      <Dest>収集範囲 -5000</Dest>
+    </String>
+    <String List="0" Partial="1">
+      <EDID>LTMN_UtilityHolotapeLootingRange</EDID>
+      <REC id="9">TERM:RNAM</REC>
+      <Source>Decrease 5000...</Source>
+      <Dest>5000減少させました...</Dest>
+    </String>
+    <String List="0" Partial="2">
+      <EDID>LTMN_UtilityHolotapeLootingRange</EDID>
+      <REC id="10">TERM:ITXT</REC>
+      <Source>----------------</Source>
+      <Dest>----------------</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_UtilityHolotapeLootingRange</EDID>
+      <REC id="11">TERM:ITXT</REC>
+      <Source>Set Minimum Value</Source>
+      <Dest>最小値に設定</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_UtilityHolotapeLootingRange</EDID>
+      <REC id="10">TERM:RNAM</REC>
+      <Source>Set to Minimum...</Source>
+      <Dest>最小値に設定されました...</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_UtilityHolotapeLootingRange</EDID>
+      <REC id="12">TERM:ITXT</REC>
+      <Source>Set Default Value</Source>
+      <Dest>初期値に戻す</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_UtilityHolotapeLootingRange</EDID>
+      <REC id="11">TERM:RNAM</REC>
+      <Source>Set to Default...</Source>
+      <Dest>初期値に戻しました...</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_UtilityHolotapeLootingRange</EDID>
+      <REC id="13">TERM:ITXT</REC>
+      <Source>Set Maximum Value</Source>
+      <Dest>最大値に設定</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_UtilityHolotapeLootingRange</EDID>
+      <REC id="12">TERM:RNAM</REC>
+      <Source>Set to Maximum...</Source>
+      <Dest>最大値に設定されました...</Dest>
+    </String>
+    <String List="0" Partial="2">
+      <EDID>LTMN_UtilityHolotapeGeneralSettings</EDID>
+      <REC>TERM:WNAM</REC>
+      <Source>~**~ EIDEE-OS ~**~</Source>
+      <Dest>~**~ EIDEE-OS ~**~</Dest>
+    </String>
+    <String List="0" Partial="2">
+      <EDID>LTMN_UtilityHolotapeGeneralSettings</EDID>
+      <REC>TERM:FULL</REC>
+      <Source>*./lootman.settings</Source>
+      <Dest>*./lootman.settings</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_UtilityHolotapeGeneralSettings</EDID>
+      <REC id="0">TERM:ITXT</REC>
+      <Source>Auto Looting ON</Source>
+      <Dest>自動収集 オン</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_UtilityHolotapeGeneralSettings</EDID>
+      <REC id="0">TERM:RNAM</REC>
+      <Source>Set to OFF...</Source>
+      <Dest>オフに設定されました...</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_UtilityHolotapeGeneralSettings</EDID>
+      <REC id="1">TERM:ITXT</REC>
+      <Source>Auto Looting OFF</Source>
+      <Dest>自動収集 オフ</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_UtilityHolotapeGeneralSettings</EDID>
+      <REC id="1">TERM:RNAM</REC>
+      <Source>Set to ON...</Source>
+      <Dest>オンに設定されました...</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_UtilityHolotapeGeneralSettings</EDID>
+      <REC id="2">TERM:ITXT</REC>
+      <Source>Loot In Player Directly ON</Source>
+      <Dest>プレイヤーのインベントリに収納 オン</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_UtilityHolotapeGeneralSettings</EDID>
+      <REC id="2">TERM:RNAM</REC>
+      <Source>Set to OFF...</Source>
+      <Dest>オフに設定されました...</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_UtilityHolotapeGeneralSettings</EDID>
+      <REC id="3">TERM:ITXT</REC>
+      <Source>Loot In Player Directly OFF</Source>
+      <Dest>プレイヤーのインベントリに収納 オフ</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_UtilityHolotapeGeneralSettings</EDID>
+      <REC id="3">TERM:RNAM</REC>
+      <Source>Set to ON...</Source>
+      <Dest>オンに設定されました...</Dest>
+    </String>
+    <String List="0" Partial="1">
+      <EDID>LTMN_UtilityHolotapeGeneralSettings</EDID>
+      <REC id="4">TERM:ITXT</REC>
+      <Source>Looting Disabled In Settlement ON</Source>
+      <Dest>居住地での自動収集を抑制 オン</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_UtilityHolotapeGeneralSettings</EDID>
+      <REC id="4">TERM:RNAM</REC>
+      <Source>Set to OFF...</Source>
+      <Dest>オフに設定されました...</Dest>
+    </String>
+    <String List="0" Partial="1">
+      <EDID>LTMN_UtilityHolotapeGeneralSettings</EDID>
+      <REC id="5">TERM:ITXT</REC>
+      <Source>Looting Disabled In Settlement OFF</Source>
+      <Dest>居住地での自動収集を抑制 オフ</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_UtilityHolotapeGeneralSettings</EDID>
+      <REC id="5">TERM:RNAM</REC>
+      <Source>Set to ON...</Source>
+      <Dest>オンに設定されました...</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_UtilityHolotapeGeneralSettings</EDID>
+      <REC id="6">TERM:ITXT</REC>
+      <Source>Looting Range &gt;&gt;</Source>
+      <Dest>収集範囲 &gt;&gt;</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_UtilityHolotapeGeneralSettings</EDID>
+      <REC id="6">TERM:RNAM</REC>
+      <Source>Loading...</Source>
+      <Dest>ロード中…</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_UtilityHolotapeGeneralSettings</EDID>
+      <REC id="7">TERM:ITXT</REC>
+      <Source>Carry Weight &gt;&gt;</Source>
+      <Dest>所持重量 &gt;&gt;</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_UtilityHolotapeGeneralSettings</EDID>
+      <REC id="7">TERM:RNAM</REC>
+      <Source>Loading...</Source>
+      <Dest>ロード中…</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_UtilityHolotapeGeneralSettings</EDID>
+      <REC id="8">TERM:ITXT</REC>
+      <Source>Ignore Overweight ON</Source>
+      <Dest>重量オーバーを無視 オン</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_UtilityHolotapeGeneralSettings</EDID>
+      <REC id="8">TERM:RNAM</REC>
+      <Source>Set to OFF...</Source>
+      <Dest>オフに設定されました...</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_UtilityHolotapeGeneralSettings</EDID>
+      <REC id="9">TERM:ITXT</REC>
+      <Source>Ignore Overweight OFF</Source>
+      <Dest>重量オーバーを無視 オフ</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_UtilityHolotapeGeneralSettings</EDID>
+      <REC id="9">TERM:RNAM</REC>
+      <Source>Set to ON...</Source>
+      <Dest>オンに設定されました...</Dest>
+    </String>
+    <String List="0" Partial="1">
+      <EDID>LTMN_UtilityHolotapeGeneralSettings</EDID>
+      <REC id="10">TERM:ITXT</REC>
+      <Source>Pickup Sound ON</Source>
+      <Dest>ピックアップ効果音 オン</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_UtilityHolotapeGeneralSettings</EDID>
+      <REC id="10">TERM:RNAM</REC>
+      <Source>Set to OFF...</Source>
+      <Dest>オフに設定されました...</Dest>
+    </String>
+    <String List="0" Partial="1">
+      <EDID>LTMN_UtilityHolotapeGeneralSettings</EDID>
+      <REC id="11">TERM:ITXT</REC>
+      <Source>Pickup Sound OFF</Source>
+      <Dest>ピックアップ効果音 オフ</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_UtilityHolotapeGeneralSettings</EDID>
+      <REC id="11">TERM:RNAM</REC>
+      <Source>Set to ON...</Source>
+      <Dest>オンに設定されました...</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_UtilityHolotapeGeneralSettings</EDID>
+      <REC id="12">TERM:ITXT</REC>
+      <Source>Container Animation ON</Source>
+      <Dest>コンテナのアニメーション オン</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_UtilityHolotapeGeneralSettings</EDID>
+      <REC id="12">TERM:RNAM</REC>
+      <Source>Set to OFF...</Source>
+      <Dest>オフに設定されました...</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_UtilityHolotapeGeneralSettings</EDID>
+      <REC id="13">TERM:ITXT</REC>
+      <Source>Container Animation OFF</Source>
+      <Dest>コンテナのアニメーション オフ</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_UtilityHolotapeGeneralSettings</EDID>
+      <REC id="13">TERM:RNAM</REC>
+      <Source>Set to ON...</Source>
+      <Dest>オンに設定されました...</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_UtilityHolotapeGeneralSettings</EDID>
+      <REC id="14">TERM:ITXT</REC>
+      <Source>Automatically Link Or Unlink To Workshop ON</Source>
+      <Dest>ワークショップとのリンク・リンク解除を自動化 オン</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_UtilityHolotapeGeneralSettings</EDID>
+      <REC id="14">TERM:RNAM</REC>
+      <Source>Set to OFF...</Source>
+      <Dest>オフに設定されました...</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_UtilityHolotapeGeneralSettings</EDID>
+      <REC id="15">TERM:ITXT</REC>
+      <Source>Automatically Link Or Unlink To Workshop OFF</Source>
+      <Dest>ワークショップとのリンク・リンク解除を自動化 オフ</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_UtilityHolotapeGeneralSettings</EDID>
+      <REC id="15">TERM:RNAM</REC>
+      <Source>Set to ON...</Source>
+      <Dest>オンに設定されました...</Dest>
+    </String>
+    <String List="0" Partial="1">
+      <EDID>LTMN_UtilityHolotapeGeneralSettings</EDID>
+      <REC id="16">TERM:ITXT</REC>
+      <Source>Thread Interval &gt;&gt;</Source>
+      <Dest>スレッド動作間隔 &gt;&gt;</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_UtilityHolotapeGeneralSettings</EDID>
+      <REC id="16">TERM:RNAM</REC>
+      <Source>Loading...</Source>
+      <Dest>ロード中…</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_UtilityHolotapeGeneralSettings</EDID>
+      <REC id="17">TERM:ITXT</REC>
+      <Source>System Messages DISPLAY</Source>
+      <Dest>システムメッセージ 表示する</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_UtilityHolotapeGeneralSettings</EDID>
+      <REC id="17">TERM:RNAM</REC>
+      <Source>Set to HIDDEN...</Source>
+      <Dest>表示しないに設定されました...</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_UtilityHolotapeGeneralSettings</EDID>
+      <REC id="18">TERM:ITXT</REC>
+      <Source>System Messages HIDDEN</Source>
+      <Dest>システムメッセージ 表示しない</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_UtilityHolotapeGeneralSettings</EDID>
+      <REC id="18">TERM:RNAM</REC>
+      <Source>Set to DISPLAY...</Source>
+      <Dest>表示するに設定されました...</Dest>
+    </String>
+    <String List="0" Partial="1">
+      <EDID>LTMN_UtilityHolotapeGeneralSettings</EDID>
+      <REC id="19">TERM:ITXT</REC>
+      <Source>Thread Limit &gt;&gt;</Source>
+      <Dest>最大スレッド数 &gt;&gt;</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_UtilityHolotapeGeneralSettings</EDID>
+      <REC id="19">TERM:RNAM</REC>
+      <Source>Loading...</Source>
+      <Dest>ロード中…</Dest>
+    </String>
+    <String List="0" Partial="2">
+      <EDID>LTMN_UtilityHolotapeTop</EDID>
+      <REC>TERM:WNAM</REC>
+      <Source>~**~ EIDEE-OS ~**~</Source>
+      <Dest>~**~ EIDEE-OS ~**~</Dest>
+    </String>
+    <String List="0" Partial="2">
+      <EDID>LTMN_UtilityHolotapeTop</EDID>
+      <REC>TERM:FULL</REC>
+      <Source>*./lootman</Source>
+      <Dest>*./lootman</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_UtilityHolotapeTop</EDID>
+      <REC id="0">TERM:ITXT</REC>
+      <Source>General Settings</Source>
+      <Dest>一般設定</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_UtilityHolotapeTop</EDID>
+      <REC id="0">TERM:RNAM</REC>
+      <Source>Loading...</Source>
+      <Dest>ロード中…</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_UtilityHolotapeTop</EDID>
+      <REC id="1">TERM:ITXT</REC>
+      <Source>Looting Filter</Source>
+      <Dest>収集フィルター</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_UtilityHolotapeTop</EDID>
+      <REC id="1">TERM:RNAM</REC>
+      <Source>Loading...</Source>
+      <Dest>ロード中…</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_UtilityHolotapeTop</EDID>
+      <REC id="2">TERM:ITXT</REC>
+      <Source>Utility</Source>
+      <Dest>ユーティリティ</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_UtilityHolotapeTop</EDID>
+      <REC id="2">TERM:RNAM</REC>
+      <Source>Loading...</Source>
+      <Dest>ロード中…</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_UtilityHolotapeTop</EDID>
+      <REC id="3">TERM:ITXT</REC>
+      <Source>System</Source>
+      <Dest>システム</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_UtilityHolotapeTop</EDID>
+      <REC id="3">TERM:RNAM</REC>
+      <Source>Loading...</Source>
+      <Dest>ロード中…</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_UtilityHolotapeTop</EDID>
+      <REC id="4">TERM:ITXT</REC>
+      <Source>** Lootman has been uninstalled **</Source>
+      <Dest>** Lootman はアンインストールされています **</Dest>
+    </String>
+    <String List="0" Partial="2">
+      <EDID>LTMN_UtilityHolotapeThreadLimitMISC</EDID>
+      <REC>TERM:WNAM</REC>
+      <Source>~**~ EIDEE-OS ~**~</Source>
+      <Dest>~**~ EIDEE-OS ~**~</Dest>
+    </String>
+    <String List="0" Partial="2">
+      <EDID>LTMN_UtilityHolotapeThreadLimitMISC</EDID>
+      <REC>TERM:FULL</REC>
+      <Source>*./lootman.settings.thread-limit.misc</Source>
+      <Dest>*./lootman.settings.thread-limit.misc</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_UtilityHolotapeThreadLimitMISC</EDID>
+      <REC id="0">TERM:ITXT</REC>
+      <Source>* Thread Limit 1</Source>
+      <Dest>* 最大スレッド数 1</Dest>
+    </String>
+    <String List="0" Partial="1">
+      <EDID>LTMN_UtilityHolotapeThreadLimitMISC</EDID>
+      <REC id="1">TERM:ITXT</REC>
+      <Source>Thread Limit 1</Source>
+      <Dest>最大スレッド数 1</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_UtilityHolotapeThreadLimitMISC</EDID>
+      <REC id="0">TERM:RNAM</REC>
+      <Source>Set to 1...</Source>
+      <Dest>1に設定されました...</Dest>
+    </String>
+    <String List="0" Partial="1">
+      <EDID>LTMN_UtilityHolotapeThreadLimitMISC</EDID>
+      <REC id="2">TERM:ITXT</REC>
+      <Source>* Thread Limit 2</Source>
+      <Dest>* 最大スレッド数 2</Dest>
+    </String>
+    <String List="0" Partial="1">
+      <EDID>LTMN_UtilityHolotapeThreadLimitMISC</EDID>
+      <REC id="3">TERM:ITXT</REC>
+      <Source>Thread Limit 2</Source>
+      <Dest>最大スレッド数 2</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_UtilityHolotapeThreadLimitMISC</EDID>
+      <REC id="1">TERM:RNAM</REC>
+      <Source>Set to 2...</Source>
+      <Dest>2に設定されました...</Dest>
+    </String>
+    <String List="0" Partial="1">
+      <EDID>LTMN_UtilityHolotapeThreadLimitMISC</EDID>
+      <REC id="4">TERM:ITXT</REC>
+      <Source>* Thread Limit 3</Source>
+      <Dest>* 最大スレッド数 3</Dest>
+    </String>
+    <String List="0" Partial="1">
+      <EDID>LTMN_UtilityHolotapeThreadLimitMISC</EDID>
+      <REC id="5">TERM:ITXT</REC>
+      <Source>Thread Limit 3</Source>
+      <Dest>最大スレッド数 3</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_UtilityHolotapeThreadLimitMISC</EDID>
+      <REC id="2">TERM:RNAM</REC>
+      <Source>Set to 3...</Source>
+      <Dest>3に設定されました...</Dest>
+    </String>
+    <String List="0" Partial="1">
+      <EDID>LTMN_UtilityHolotapeThreadLimitMISC</EDID>
+      <REC id="6">TERM:ITXT</REC>
+      <Source>* Thread Limit 4</Source>
+      <Dest>* 最大スレッド数 4</Dest>
+    </String>
+    <String List="0" Partial="1">
+      <EDID>LTMN_UtilityHolotapeThreadLimitMISC</EDID>
+      <REC id="7">TERM:ITXT</REC>
+      <Source>Thread Limit 4</Source>
+      <Dest>最大スレッド数 4</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_UtilityHolotapeThreadLimitMISC</EDID>
+      <REC id="3">TERM:RNAM</REC>
+      <Source>Set to 4...</Source>
+      <Dest>4に設定されました...</Dest>
+    </String>
+    <String List="0" Partial="1">
+      <EDID>LTMN_UtilityHolotapeThreadLimitMISC</EDID>
+      <REC id="8">TERM:ITXT</REC>
+      <Source>* Thread Limit 5</Source>
+      <Dest>* 最大スレッド数 5</Dest>
+    </String>
+    <String List="0" Partial="1">
+      <EDID>LTMN_UtilityHolotapeThreadLimitMISC</EDID>
+      <REC id="9">TERM:ITXT</REC>
+      <Source>Thread Limit 5</Source>
+      <Dest>最大スレッド数 5</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_UtilityHolotapeThreadLimitMISC</EDID>
+      <REC id="4">TERM:RNAM</REC>
+      <Source>Set to 5...</Source>
+      <Dest>5に設定されました...</Dest>
+    </String>
+    <String List="0" Partial="1">
+      <EDID>LTMN_UtilityHolotapeThreadLimitMISC</EDID>
+      <REC id="10">TERM:ITXT</REC>
+      <Source>* Thread Limit 6</Source>
+      <Dest>* 最大スレッド数 6</Dest>
+    </String>
+    <String List="0" Partial="1">
+      <EDID>LTMN_UtilityHolotapeThreadLimitMISC</EDID>
+      <REC id="11">TERM:ITXT</REC>
+      <Source>Thread Limit 6</Source>
+      <Dest>最大スレッド数 6</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_UtilityHolotapeThreadLimitMISC</EDID>
+      <REC id="5">TERM:RNAM</REC>
+      <Source>Set to 6...</Source>
+      <Dest>6に設定されました...</Dest>
+    </String>
+    <String List="0" Partial="1">
+      <EDID>LTMN_UtilityHolotapeThreadLimitMISC</EDID>
+      <REC id="12">TERM:ITXT</REC>
+      <Source>* Thread Limit 7</Source>
+      <Dest>* 最大スレッド数 7</Dest>
+    </String>
+    <String List="0" Partial="1">
+      <EDID>LTMN_UtilityHolotapeThreadLimitMISC</EDID>
+      <REC id="13">TERM:ITXT</REC>
+      <Source>Thread Limit 7</Source>
+      <Dest>最大スレッド数 7</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_UtilityHolotapeThreadLimitMISC</EDID>
+      <REC id="6">TERM:RNAM</REC>
+      <Source>Set to 7...</Source>
+      <Dest>7に設定されました...</Dest>
+    </String>
+    <String List="0" Partial="1">
+      <EDID>LTMN_UtilityHolotapeThreadLimitMISC</EDID>
+      <REC id="14">TERM:ITXT</REC>
+      <Source>* Thread Limit 8</Source>
+      <Dest>* 最大スレッド数 8</Dest>
+    </String>
+    <String List="0" Partial="1">
+      <EDID>LTMN_UtilityHolotapeThreadLimitMISC</EDID>
+      <REC id="15">TERM:ITXT</REC>
+      <Source>Thread Limit 8</Source>
+      <Dest>最大スレッド数 8</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_UtilityHolotapeThreadLimitMISC</EDID>
+      <REC id="7">TERM:RNAM</REC>
+      <Source>Set to 8...</Source>
+      <Dest>8に設定されました...</Dest>
+    </String>
+    <String List="0" Partial="2">
+      <EDID>LTMN_UtilityHolotapeThreadLimitCONT</EDID>
+      <REC>TERM:WNAM</REC>
+      <Source>~**~ EIDEE-OS ~**~</Source>
+      <Dest>~**~ EIDEE-OS ~**~</Dest>
+    </String>
+    <String List="0" Partial="2">
+      <EDID>LTMN_UtilityHolotapeThreadLimitCONT</EDID>
+      <REC>TERM:FULL</REC>
+      <Source>*./lootman.settings.thread-limit.cont</Source>
+      <Dest>*./lootman.settings.thread-limit.cont</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_UtilityHolotapeThreadLimitCONT</EDID>
+      <REC id="0">TERM:ITXT</REC>
+      <Source>* Thread Limit 1</Source>
+      <Dest>* 最大スレッド数 1</Dest>
+    </String>
+    <String List="0" Partial="1">
+      <EDID>LTMN_UtilityHolotapeThreadLimitCONT</EDID>
+      <REC id="1">TERM:ITXT</REC>
+      <Source>Thread Limit 1</Source>
+      <Dest>最大スレッド数 1</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_UtilityHolotapeThreadLimitCONT</EDID>
+      <REC id="0">TERM:RNAM</REC>
+      <Source>Set to 1...</Source>
+      <Dest>1に設定されました...</Dest>
+    </String>
+    <String List="0" Partial="1">
+      <EDID>LTMN_UtilityHolotapeThreadLimitCONT</EDID>
+      <REC id="2">TERM:ITXT</REC>
+      <Source>* Thread Limit 2</Source>
+      <Dest>* 最大スレッド数 2</Dest>
+    </String>
+    <String List="0" Partial="1">
+      <EDID>LTMN_UtilityHolotapeThreadLimitCONT</EDID>
+      <REC id="3">TERM:ITXT</REC>
+      <Source>Thread Limit 2</Source>
+      <Dest>最大スレッド数 2</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_UtilityHolotapeThreadLimitCONT</EDID>
+      <REC id="1">TERM:RNAM</REC>
+      <Source>Set to 2...</Source>
+      <Dest>2に設定されました...</Dest>
+    </String>
+    <String List="0" Partial="1">
+      <EDID>LTMN_UtilityHolotapeThreadLimitCONT</EDID>
+      <REC id="4">TERM:ITXT</REC>
+      <Source>* Thread Limit 3</Source>
+      <Dest>* 最大スレッド数 3</Dest>
+    </String>
+    <String List="0" Partial="1">
+      <EDID>LTMN_UtilityHolotapeThreadLimitCONT</EDID>
+      <REC id="5">TERM:ITXT</REC>
+      <Source>Thread Limit 3</Source>
+      <Dest>最大スレッド数 3</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_UtilityHolotapeThreadLimitCONT</EDID>
+      <REC id="2">TERM:RNAM</REC>
+      <Source>Set to 3...</Source>
+      <Dest>3に設定されました...</Dest>
+    </String>
+    <String List="0" Partial="1">
+      <EDID>LTMN_UtilityHolotapeThreadLimitCONT</EDID>
+      <REC id="6">TERM:ITXT</REC>
+      <Source>* Thread Limit 4</Source>
+      <Dest>* 最大スレッド数 4</Dest>
+    </String>
+    <String List="0" Partial="1">
+      <EDID>LTMN_UtilityHolotapeThreadLimitCONT</EDID>
+      <REC id="7">TERM:ITXT</REC>
+      <Source>Thread Limit 4</Source>
+      <Dest>最大スレッド数 4</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_UtilityHolotapeThreadLimitCONT</EDID>
+      <REC id="3">TERM:RNAM</REC>
+      <Source>Set to 4...</Source>
+      <Dest>4に設定されました...</Dest>
+    </String>
+    <String List="0" Partial="1">
+      <EDID>LTMN_UtilityHolotapeThreadLimitCONT</EDID>
+      <REC id="8">TERM:ITXT</REC>
+      <Source>* Thread Limit 5</Source>
+      <Dest>* 最大スレッド数 5</Dest>
+    </String>
+    <String List="0" Partial="1">
+      <EDID>LTMN_UtilityHolotapeThreadLimitCONT</EDID>
+      <REC id="9">TERM:ITXT</REC>
+      <Source>Thread Limit 5</Source>
+      <Dest>最大スレッド数 5</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_UtilityHolotapeThreadLimitCONT</EDID>
+      <REC id="4">TERM:RNAM</REC>
+      <Source>Set to 5...</Source>
+      <Dest>5に設定されました...</Dest>
+    </String>
+    <String List="0" Partial="1">
+      <EDID>LTMN_UtilityHolotapeThreadLimitCONT</EDID>
+      <REC id="10">TERM:ITXT</REC>
+      <Source>* Thread Limit 6</Source>
+      <Dest>* 最大スレッド数 6</Dest>
+    </String>
+    <String List="0" Partial="1">
+      <EDID>LTMN_UtilityHolotapeThreadLimitCONT</EDID>
+      <REC id="11">TERM:ITXT</REC>
+      <Source>Thread Limit 6</Source>
+      <Dest>最大スレッド数 6</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_UtilityHolotapeThreadLimitCONT</EDID>
+      <REC id="5">TERM:RNAM</REC>
+      <Source>Set to 6...</Source>
+      <Dest>6に設定されました...</Dest>
+    </String>
+    <String List="0" Partial="1">
+      <EDID>LTMN_UtilityHolotapeThreadLimitCONT</EDID>
+      <REC id="12">TERM:ITXT</REC>
+      <Source>* Thread Limit 7</Source>
+      <Dest>* 最大スレッド数 7</Dest>
+    </String>
+    <String List="0" Partial="1">
+      <EDID>LTMN_UtilityHolotapeThreadLimitCONT</EDID>
+      <REC id="13">TERM:ITXT</REC>
+      <Source>Thread Limit 7</Source>
+      <Dest>最大スレッド数 7</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_UtilityHolotapeThreadLimitCONT</EDID>
+      <REC id="6">TERM:RNAM</REC>
+      <Source>Set to 7...</Source>
+      <Dest>7に設定されました...</Dest>
+    </String>
+    <String List="0" Partial="1">
+      <EDID>LTMN_UtilityHolotapeThreadLimitCONT</EDID>
+      <REC id="14">TERM:ITXT</REC>
+      <Source>* Thread Limit 8</Source>
+      <Dest>* 最大スレッド数 8</Dest>
+    </String>
+    <String List="0" Partial="1">
+      <EDID>LTMN_UtilityHolotapeThreadLimitCONT</EDID>
+      <REC id="15">TERM:ITXT</REC>
+      <Source>Thread Limit 8</Source>
+      <Dest>最大スレッド数 8</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_UtilityHolotapeThreadLimitCONT</EDID>
+      <REC id="7">TERM:RNAM</REC>
+      <Source>Set to 8...</Source>
+      <Dest>8に設定されました...</Dest>
+    </String>
+    <String List="0" Partial="2">
+      <EDID>LTMN_UtilityHolotapeUninstallConfirm</EDID>
+      <REC>TERM:WNAM</REC>
+      <Source>~**~ EIDEE-OS ~**~</Source>
+      <Dest>~**~ EIDEE-OS ~**~</Dest>
+    </String>
+    <String List="0" Partial="2">
+      <EDID>LTMN_UtilityHolotapeUninstallConfirm</EDID>
+      <REC>TERM:FULL</REC>
+      <Source>*./lootman.system.uninstall-confirm</Source>
+      <Dest>*./lootman.system.uninstall-confirm</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_UtilityHolotapeUninstallConfirm</EDID>
+      <REC>TERM:BTXT</REC>
+      <Source>Once uninstalled, all Lootman features will no longer be available, do you really want to uninstall it?</Source>
+      <Dest>アンインストールすると Lootman のすべての機能が使用できなくなりますが、よろしいですか?</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_UtilityHolotapeUninstallConfirm</EDID>
+      <REC id="0">TERM:ITXT</REC>
+      <Source>OK</Source>
+      <Dest>はい</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_UtilityHolotapeUninstallConfirm</EDID>
+      <REC id="1">TERM:ITXT</REC>
+      <Source>Cancel</Source>
+      <Dest>キャンセル</Dest>
+    </String>
+    <String List="0" Partial="2">
+      <EDID>LTMN_UtilityHolotapeThreadLimitFLOR</EDID>
+      <REC>TERM:WNAM</REC>
+      <Source>~**~ EIDEE-OS ~**~</Source>
+      <Dest>~**~ EIDEE-OS ~**~</Dest>
+    </String>
+    <String List="0" Partial="2">
+      <EDID>LTMN_UtilityHolotapeThreadLimitFLOR</EDID>
+      <REC>TERM:FULL</REC>
+      <Source>*./lootman.settings.thread-limit.flor</Source>
+      <Dest>*./lootman.settings.thread-limit.flor</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_UtilityHolotapeThreadLimitFLOR</EDID>
+      <REC id="0">TERM:ITXT</REC>
+      <Source>* Thread Limit 1</Source>
+      <Dest>* 最大スレッド数 1</Dest>
+    </String>
+    <String List="0" Partial="1">
+      <EDID>LTMN_UtilityHolotapeThreadLimitFLOR</EDID>
+      <REC id="1">TERM:ITXT</REC>
+      <Source>Thread Limit 1</Source>
+      <Dest>最大スレッド数 1</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_UtilityHolotapeThreadLimitFLOR</EDID>
+      <REC id="0">TERM:RNAM</REC>
+      <Source>Set to 1...</Source>
+      <Dest>1に設定されました...</Dest>
+    </String>
+    <String List="0" Partial="1">
+      <EDID>LTMN_UtilityHolotapeThreadLimitFLOR</EDID>
+      <REC id="2">TERM:ITXT</REC>
+      <Source>* Thread Limit 2</Source>
+      <Dest>* 最大スレッド数 2</Dest>
+    </String>
+    <String List="0" Partial="1">
+      <EDID>LTMN_UtilityHolotapeThreadLimitFLOR</EDID>
+      <REC id="3">TERM:ITXT</REC>
+      <Source>Thread Limit 2</Source>
+      <Dest>最大スレッド数 2</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_UtilityHolotapeThreadLimitFLOR</EDID>
+      <REC id="1">TERM:RNAM</REC>
+      <Source>Set to 2...</Source>
+      <Dest>2に設定されました...</Dest>
+    </String>
+    <String List="0" Partial="1">
+      <EDID>LTMN_UtilityHolotapeThreadLimitFLOR</EDID>
+      <REC id="4">TERM:ITXT</REC>
+      <Source>* Thread Limit 3</Source>
+      <Dest>* 最大スレッド数 3</Dest>
+    </String>
+    <String List="0" Partial="1">
+      <EDID>LTMN_UtilityHolotapeThreadLimitFLOR</EDID>
+      <REC id="5">TERM:ITXT</REC>
+      <Source>Thread Limit 3</Source>
+      <Dest>最大スレッド数 3</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_UtilityHolotapeThreadLimitFLOR</EDID>
+      <REC id="2">TERM:RNAM</REC>
+      <Source>Set to 3...</Source>
+      <Dest>3に設定されました...</Dest>
+    </String>
+    <String List="0" Partial="1">
+      <EDID>LTMN_UtilityHolotapeThreadLimitFLOR</EDID>
+      <REC id="6">TERM:ITXT</REC>
+      <Source>* Thread Limit 4</Source>
+      <Dest>* 最大スレッド数 4</Dest>
+    </String>
+    <String List="0" Partial="1">
+      <EDID>LTMN_UtilityHolotapeThreadLimitFLOR</EDID>
+      <REC id="7">TERM:ITXT</REC>
+      <Source>Thread Limit 4</Source>
+      <Dest>最大スレッド数 4</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_UtilityHolotapeThreadLimitFLOR</EDID>
+      <REC id="3">TERM:RNAM</REC>
+      <Source>Set to 4...</Source>
+      <Dest>4に設定されました...</Dest>
+    </String>
+    <String List="0" Partial="1">
+      <EDID>LTMN_UtilityHolotapeThreadLimitFLOR</EDID>
+      <REC id="8">TERM:ITXT</REC>
+      <Source>* Thread Limit 5</Source>
+      <Dest>* 最大スレッド数 5</Dest>
+    </String>
+    <String List="0" Partial="1">
+      <EDID>LTMN_UtilityHolotapeThreadLimitFLOR</EDID>
+      <REC id="9">TERM:ITXT</REC>
+      <Source>Thread Limit 5</Source>
+      <Dest>最大スレッド数 5</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_UtilityHolotapeThreadLimitFLOR</EDID>
+      <REC id="4">TERM:RNAM</REC>
+      <Source>Set to 5...</Source>
+      <Dest>5に設定されました...</Dest>
+    </String>
+    <String List="0" Partial="1">
+      <EDID>LTMN_UtilityHolotapeThreadLimitFLOR</EDID>
+      <REC id="10">TERM:ITXT</REC>
+      <Source>* Thread Limit 6</Source>
+      <Dest>* 最大スレッド数 6</Dest>
+    </String>
+    <String List="0" Partial="1">
+      <EDID>LTMN_UtilityHolotapeThreadLimitFLOR</EDID>
+      <REC id="11">TERM:ITXT</REC>
+      <Source>Thread Limit 6</Source>
+      <Dest>最大スレッド数 6</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_UtilityHolotapeThreadLimitFLOR</EDID>
+      <REC id="5">TERM:RNAM</REC>
+      <Source>Set to 6...</Source>
+      <Dest>6に設定されました...</Dest>
+    </String>
+    <String List="0" Partial="1">
+      <EDID>LTMN_UtilityHolotapeThreadLimitFLOR</EDID>
+      <REC id="12">TERM:ITXT</REC>
+      <Source>* Thread Limit 7</Source>
+      <Dest>* 最大スレッド数 7</Dest>
+    </String>
+    <String List="0" Partial="1">
+      <EDID>LTMN_UtilityHolotapeThreadLimitFLOR</EDID>
+      <REC id="13">TERM:ITXT</REC>
+      <Source>Thread Limit 7</Source>
+      <Dest>最大スレッド数 7</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_UtilityHolotapeThreadLimitFLOR</EDID>
+      <REC id="6">TERM:RNAM</REC>
+      <Source>Set to 7...</Source>
+      <Dest>7に設定されました...</Dest>
+    </String>
+    <String List="0" Partial="1">
+      <EDID>LTMN_UtilityHolotapeThreadLimitFLOR</EDID>
+      <REC id="14">TERM:ITXT</REC>
+      <Source>* Thread Limit 8</Source>
+      <Dest>* 最大スレッド数 8</Dest>
+    </String>
+    <String List="0" Partial="1">
+      <EDID>LTMN_UtilityHolotapeThreadLimitFLOR</EDID>
+      <REC id="15">TERM:ITXT</REC>
+      <Source>Thread Limit 8</Source>
+      <Dest>最大スレッド数 8</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_UtilityHolotapeThreadLimitFLOR</EDID>
+      <REC id="7">TERM:RNAM</REC>
+      <Source>Set to 8...</Source>
+      <Dest>8に設定されました...</Dest>
+    </String>
+    <String List="0" Partial="2">
+      <EDID>LTMN_UtilityHolotapeThreadLimitBOOK</EDID>
+      <REC>TERM:WNAM</REC>
+      <Source>~**~ EIDEE-OS ~**~</Source>
+      <Dest>~**~ EIDEE-OS ~**~</Dest>
+    </String>
+    <String List="0" Partial="2">
+      <EDID>LTMN_UtilityHolotapeThreadLimitBOOK</EDID>
+      <REC>TERM:FULL</REC>
+      <Source>*./lootman.settings.thread-limit.book</Source>
+      <Dest>*./lootman.settings.thread-limit.book</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_UtilityHolotapeThreadLimitBOOK</EDID>
+      <REC id="0">TERM:ITXT</REC>
+      <Source>* Thread Limit 1</Source>
+      <Dest>* 最大スレッド数 1</Dest>
+    </String>
+    <String List="0" Partial="1">
+      <EDID>LTMN_UtilityHolotapeThreadLimitBOOK</EDID>
+      <REC id="1">TERM:ITXT</REC>
+      <Source>Thread Limit 1</Source>
+      <Dest>最大スレッド数 1</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_UtilityHolotapeThreadLimitBOOK</EDID>
+      <REC id="0">TERM:RNAM</REC>
+      <Source>Set to 1...</Source>
+      <Dest>1に設定されました...</Dest>
+    </String>
+    <String List="0" Partial="1">
+      <EDID>LTMN_UtilityHolotapeThreadLimitBOOK</EDID>
+      <REC id="2">TERM:ITXT</REC>
+      <Source>* Thread Limit 2</Source>
+      <Dest>* 最大スレッド数 2</Dest>
+    </String>
+    <String List="0" Partial="1">
+      <EDID>LTMN_UtilityHolotapeThreadLimitBOOK</EDID>
+      <REC id="3">TERM:ITXT</REC>
+      <Source>Thread Limit 2</Source>
+      <Dest>最大スレッド数 2</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_UtilityHolotapeThreadLimitBOOK</EDID>
+      <REC id="1">TERM:RNAM</REC>
+      <Source>Set to 2...</Source>
+      <Dest>2に設定されました...</Dest>
+    </String>
+    <String List="0" Partial="1">
+      <EDID>LTMN_UtilityHolotapeThreadLimitBOOK</EDID>
+      <REC id="4">TERM:ITXT</REC>
+      <Source>* Thread Limit 3</Source>
+      <Dest>* 最大スレッド数 3</Dest>
+    </String>
+    <String List="0" Partial="1">
+      <EDID>LTMN_UtilityHolotapeThreadLimitBOOK</EDID>
+      <REC id="5">TERM:ITXT</REC>
+      <Source>Thread Limit 3</Source>
+      <Dest>最大スレッド数 3</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_UtilityHolotapeThreadLimitBOOK</EDID>
+      <REC id="2">TERM:RNAM</REC>
+      <Source>Set to 3...</Source>
+      <Dest>3に設定されました...</Dest>
+    </String>
+    <String List="0" Partial="1">
+      <EDID>LTMN_UtilityHolotapeThreadLimitBOOK</EDID>
+      <REC id="6">TERM:ITXT</REC>
+      <Source>* Thread Limit 4</Source>
+      <Dest>* 最大スレッド数 4</Dest>
+    </String>
+    <String List="0" Partial="1">
+      <EDID>LTMN_UtilityHolotapeThreadLimitBOOK</EDID>
+      <REC id="7">TERM:ITXT</REC>
+      <Source>Thread Limit 4</Source>
+      <Dest>最大スレッド数 4</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_UtilityHolotapeThreadLimitBOOK</EDID>
+      <REC id="3">TERM:RNAM</REC>
+      <Source>Set to 4...</Source>
+      <Dest>4に設定されました...</Dest>
+    </String>
+    <String List="0" Partial="1">
+      <EDID>LTMN_UtilityHolotapeThreadLimitBOOK</EDID>
+      <REC id="8">TERM:ITXT</REC>
+      <Source>* Thread Limit 5</Source>
+      <Dest>* 最大スレッド数 5</Dest>
+    </String>
+    <String List="0" Partial="1">
+      <EDID>LTMN_UtilityHolotapeThreadLimitBOOK</EDID>
+      <REC id="9">TERM:ITXT</REC>
+      <Source>Thread Limit 5</Source>
+      <Dest>最大スレッド数 5</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_UtilityHolotapeThreadLimitBOOK</EDID>
+      <REC id="4">TERM:RNAM</REC>
+      <Source>Set to 5...</Source>
+      <Dest>5に設定されました...</Dest>
+    </String>
+    <String List="0" Partial="1">
+      <EDID>LTMN_UtilityHolotapeThreadLimitBOOK</EDID>
+      <REC id="10">TERM:ITXT</REC>
+      <Source>* Thread Limit 6</Source>
+      <Dest>* 最大スレッド数 6</Dest>
+    </String>
+    <String List="0" Partial="1">
+      <EDID>LTMN_UtilityHolotapeThreadLimitBOOK</EDID>
+      <REC id="11">TERM:ITXT</REC>
+      <Source>Thread Limit 6</Source>
+      <Dest>最大スレッド数 6</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_UtilityHolotapeThreadLimitBOOK</EDID>
+      <REC id="5">TERM:RNAM</REC>
+      <Source>Set to 6...</Source>
+      <Dest>6に設定されました...</Dest>
+    </String>
+    <String List="0" Partial="1">
+      <EDID>LTMN_UtilityHolotapeThreadLimitBOOK</EDID>
+      <REC id="12">TERM:ITXT</REC>
+      <Source>* Thread Limit 7</Source>
+      <Dest>* 最大スレッド数 7</Dest>
+    </String>
+    <String List="0" Partial="1">
+      <EDID>LTMN_UtilityHolotapeThreadLimitBOOK</EDID>
+      <REC id="13">TERM:ITXT</REC>
+      <Source>Thread Limit 7</Source>
+      <Dest>最大スレッド数 7</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_UtilityHolotapeThreadLimitBOOK</EDID>
+      <REC id="6">TERM:RNAM</REC>
+      <Source>Set to 7...</Source>
+      <Dest>7に設定されました...</Dest>
+    </String>
+    <String List="0" Partial="1">
+      <EDID>LTMN_UtilityHolotapeThreadLimitBOOK</EDID>
+      <REC id="14">TERM:ITXT</REC>
+      <Source>* Thread Limit 8</Source>
+      <Dest>* 最大スレッド数 8</Dest>
+    </String>
+    <String List="0" Partial="1">
+      <EDID>LTMN_UtilityHolotapeThreadLimitBOOK</EDID>
+      <REC id="15">TERM:ITXT</REC>
+      <Source>Thread Limit 8</Source>
+      <Dest>最大スレッド数 8</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_UtilityHolotapeThreadLimitBOOK</EDID>
+      <REC id="7">TERM:RNAM</REC>
+      <Source>Set to 8...</Source>
+      <Dest>8に設定されました...</Dest>
+    </String>
+    <String List="0" Partial="2">
+      <EDID>LTMN_UtilityHolotapeThreadLimitARMO</EDID>
+      <REC>TERM:WNAM</REC>
+      <Source>~**~ EIDEE-OS ~**~</Source>
+      <Dest>~**~ EIDEE-OS ~**~</Dest>
+    </String>
+    <String List="0" Partial="2">
+      <EDID>LTMN_UtilityHolotapeThreadLimitARMO</EDID>
+      <REC>TERM:FULL</REC>
+      <Source>*./lootman.settings.thread-limit.armo</Source>
+      <Dest>*./lootman.settings.thread-limit.armo</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_UtilityHolotapeThreadLimitARMO</EDID>
+      <REC id="0">TERM:ITXT</REC>
+      <Source>* Thread Limit 1</Source>
+      <Dest>* 最大スレッド数 1</Dest>
+    </String>
+    <String List="0" Partial="1">
+      <EDID>LTMN_UtilityHolotapeThreadLimitARMO</EDID>
+      <REC id="1">TERM:ITXT</REC>
+      <Source>Thread Limit 1</Source>
+      <Dest>最大スレッド数 1</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_UtilityHolotapeThreadLimitARMO</EDID>
+      <REC id="0">TERM:RNAM</REC>
+      <Source>Set to 1...</Source>
+      <Dest>1に設定されました...</Dest>
+    </String>
+    <String List="0" Partial="1">
+      <EDID>LTMN_UtilityHolotapeThreadLimitARMO</EDID>
+      <REC id="2">TERM:ITXT</REC>
+      <Source>* Thread Limit 2</Source>
+      <Dest>* 最大スレッド数 2</Dest>
+    </String>
+    <String List="0" Partial="1">
+      <EDID>LTMN_UtilityHolotapeThreadLimitARMO</EDID>
+      <REC id="3">TERM:ITXT</REC>
+      <Source>Thread Limit 2</Source>
+      <Dest>最大スレッド数 2</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_UtilityHolotapeThreadLimitARMO</EDID>
+      <REC id="1">TERM:RNAM</REC>
+      <Source>Set to 2...</Source>
+      <Dest>2に設定されました...</Dest>
+    </String>
+    <String List="0" Partial="1">
+      <EDID>LTMN_UtilityHolotapeThreadLimitARMO</EDID>
+      <REC id="4">TERM:ITXT</REC>
+      <Source>* Thread Limit 3</Source>
+      <Dest>* 最大スレッド数 3</Dest>
+    </String>
+    <String List="0" Partial="1">
+      <EDID>LTMN_UtilityHolotapeThreadLimitARMO</EDID>
+      <REC id="5">TERM:ITXT</REC>
+      <Source>Thread Limit 3</Source>
+      <Dest>最大スレッド数 3</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_UtilityHolotapeThreadLimitARMO</EDID>
+      <REC id="2">TERM:RNAM</REC>
+      <Source>Set to 3...</Source>
+      <Dest>3に設定されました...</Dest>
+    </String>
+    <String List="0" Partial="1">
+      <EDID>LTMN_UtilityHolotapeThreadLimitARMO</EDID>
+      <REC id="6">TERM:ITXT</REC>
+      <Source>* Thread Limit 4</Source>
+      <Dest>* 最大スレッド数 4</Dest>
+    </String>
+    <String List="0" Partial="1">
+      <EDID>LTMN_UtilityHolotapeThreadLimitARMO</EDID>
+      <REC id="7">TERM:ITXT</REC>
+      <Source>Thread Limit 4</Source>
+      <Dest>最大スレッド数 4</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_UtilityHolotapeThreadLimitARMO</EDID>
+      <REC id="3">TERM:RNAM</REC>
+      <Source>Set to 4...</Source>
+      <Dest>4に設定されました...</Dest>
+    </String>
+    <String List="0" Partial="1">
+      <EDID>LTMN_UtilityHolotapeThreadLimitARMO</EDID>
+      <REC id="8">TERM:ITXT</REC>
+      <Source>* Thread Limit 5</Source>
+      <Dest>* 最大スレッド数 5</Dest>
+    </String>
+    <String List="0" Partial="1">
+      <EDID>LTMN_UtilityHolotapeThreadLimitARMO</EDID>
+      <REC id="9">TERM:ITXT</REC>
+      <Source>Thread Limit 5</Source>
+      <Dest>最大スレッド数 5</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_UtilityHolotapeThreadLimitARMO</EDID>
+      <REC id="4">TERM:RNAM</REC>
+      <Source>Set to 5...</Source>
+      <Dest>5に設定されました...</Dest>
+    </String>
+    <String List="0" Partial="1">
+      <EDID>LTMN_UtilityHolotapeThreadLimitARMO</EDID>
+      <REC id="10">TERM:ITXT</REC>
+      <Source>* Thread Limit 6</Source>
+      <Dest>* 最大スレッド数 6</Dest>
+    </String>
+    <String List="0" Partial="1">
+      <EDID>LTMN_UtilityHolotapeThreadLimitARMO</EDID>
+      <REC id="11">TERM:ITXT</REC>
+      <Source>Thread Limit 6</Source>
+      <Dest>最大スレッド数 6</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_UtilityHolotapeThreadLimitARMO</EDID>
+      <REC id="5">TERM:RNAM</REC>
+      <Source>Set to 6...</Source>
+      <Dest>6に設定されました...</Dest>
+    </String>
+    <String List="0" Partial="1">
+      <EDID>LTMN_UtilityHolotapeThreadLimitARMO</EDID>
+      <REC id="12">TERM:ITXT</REC>
+      <Source>* Thread Limit 7</Source>
+      <Dest>* 最大スレッド数 7</Dest>
+    </String>
+    <String List="0" Partial="1">
+      <EDID>LTMN_UtilityHolotapeThreadLimitARMO</EDID>
+      <REC id="13">TERM:ITXT</REC>
+      <Source>Thread Limit 7</Source>
+      <Dest>最大スレッド数 7</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_UtilityHolotapeThreadLimitARMO</EDID>
+      <REC id="6">TERM:RNAM</REC>
+      <Source>Set to 7...</Source>
+      <Dest>7に設定されました...</Dest>
+    </String>
+    <String List="0" Partial="1">
+      <EDID>LTMN_UtilityHolotapeThreadLimitARMO</EDID>
+      <REC id="14">TERM:ITXT</REC>
+      <Source>* Thread Limit 8</Source>
+      <Dest>* 最大スレッド数 8</Dest>
+    </String>
+    <String List="0" Partial="1">
+      <EDID>LTMN_UtilityHolotapeThreadLimitARMO</EDID>
+      <REC id="15">TERM:ITXT</REC>
+      <Source>Thread Limit 8</Source>
+      <Dest>最大スレッド数 8</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_UtilityHolotapeThreadLimitARMO</EDID>
+      <REC id="7">TERM:RNAM</REC>
+      <Source>Set to 8...</Source>
+      <Dest>8に設定されました...</Dest>
+    </String>
+    <String List="0" Partial="2">
+      <EDID>LTMN_UtilityHolotapeThreadLimitAMMO</EDID>
+      <REC>TERM:WNAM</REC>
+      <Source>~**~ EIDEE-OS ~**~</Source>
+      <Dest>~**~ EIDEE-OS ~**~</Dest>
+    </String>
+    <String List="0" Partial="2">
+      <EDID>LTMN_UtilityHolotapeThreadLimitAMMO</EDID>
+      <REC>TERM:FULL</REC>
+      <Source>*./lootman.settings.thread-limit.ammo</Source>
+      <Dest>*./lootman.settings.thread-limit.ammo</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_UtilityHolotapeThreadLimitAMMO</EDID>
+      <REC id="0">TERM:ITXT</REC>
+      <Source>* Thread Limit 1</Source>
+      <Dest>* 最大スレッド数 1</Dest>
+    </String>
+    <String List="0" Partial="1">
+      <EDID>LTMN_UtilityHolotapeThreadLimitAMMO</EDID>
+      <REC id="1">TERM:ITXT</REC>
+      <Source>Thread Limit 1</Source>
+      <Dest>最大スレッド数 1</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_UtilityHolotapeThreadLimitAMMO</EDID>
+      <REC id="0">TERM:RNAM</REC>
+      <Source>Set to 1...</Source>
+      <Dest>1に設定されました...</Dest>
+    </String>
+    <String List="0" Partial="1">
+      <EDID>LTMN_UtilityHolotapeThreadLimitAMMO</EDID>
+      <REC id="2">TERM:ITXT</REC>
+      <Source>* Thread Limit 2</Source>
+      <Dest>* 最大スレッド数 2</Dest>
+    </String>
+    <String List="0" Partial="1">
+      <EDID>LTMN_UtilityHolotapeThreadLimitAMMO</EDID>
+      <REC id="3">TERM:ITXT</REC>
+      <Source>Thread Limit 2</Source>
+      <Dest>最大スレッド数 2</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_UtilityHolotapeThreadLimitAMMO</EDID>
+      <REC id="1">TERM:RNAM</REC>
+      <Source>Set to 2...</Source>
+      <Dest>2に設定されました...</Dest>
+    </String>
+    <String List="0" Partial="1">
+      <EDID>LTMN_UtilityHolotapeThreadLimitAMMO</EDID>
+      <REC id="4">TERM:ITXT</REC>
+      <Source>* Thread Limit 3</Source>
+      <Dest>* 最大スレッド数 3</Dest>
+    </String>
+    <String List="0" Partial="1">
+      <EDID>LTMN_UtilityHolotapeThreadLimitAMMO</EDID>
+      <REC id="5">TERM:ITXT</REC>
+      <Source>Thread Limit 3</Source>
+      <Dest>最大スレッド数 3</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_UtilityHolotapeThreadLimitAMMO</EDID>
+      <REC id="2">TERM:RNAM</REC>
+      <Source>Set to 3...</Source>
+      <Dest>3に設定されました...</Dest>
+    </String>
+    <String List="0" Partial="1">
+      <EDID>LTMN_UtilityHolotapeThreadLimitAMMO</EDID>
+      <REC id="6">TERM:ITXT</REC>
+      <Source>* Thread Limit 4</Source>
+      <Dest>* 最大スレッド数 4</Dest>
+    </String>
+    <String List="0" Partial="1">
+      <EDID>LTMN_UtilityHolotapeThreadLimitAMMO</EDID>
+      <REC id="7">TERM:ITXT</REC>
+      <Source>Thread Limit 4</Source>
+      <Dest>最大スレッド数 4</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_UtilityHolotapeThreadLimitAMMO</EDID>
+      <REC id="3">TERM:RNAM</REC>
+      <Source>Set to 4...</Source>
+      <Dest>4に設定されました...</Dest>
+    </String>
+    <String List="0" Partial="1">
+      <EDID>LTMN_UtilityHolotapeThreadLimitAMMO</EDID>
+      <REC id="8">TERM:ITXT</REC>
+      <Source>* Thread Limit 5</Source>
+      <Dest>* 最大スレッド数 5</Dest>
+    </String>
+    <String List="0" Partial="1">
+      <EDID>LTMN_UtilityHolotapeThreadLimitAMMO</EDID>
+      <REC id="9">TERM:ITXT</REC>
+      <Source>Thread Limit 5</Source>
+      <Dest>最大スレッド数 5</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_UtilityHolotapeThreadLimitAMMO</EDID>
+      <REC id="4">TERM:RNAM</REC>
+      <Source>Set to 5...</Source>
+      <Dest>5に設定されました...</Dest>
+    </String>
+    <String List="0" Partial="1">
+      <EDID>LTMN_UtilityHolotapeThreadLimitAMMO</EDID>
+      <REC id="10">TERM:ITXT</REC>
+      <Source>* Thread Limit 6</Source>
+      <Dest>* 最大スレッド数 6</Dest>
+    </String>
+    <String List="0" Partial="1">
+      <EDID>LTMN_UtilityHolotapeThreadLimitAMMO</EDID>
+      <REC id="11">TERM:ITXT</REC>
+      <Source>Thread Limit 6</Source>
+      <Dest>最大スレッド数 6</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_UtilityHolotapeThreadLimitAMMO</EDID>
+      <REC id="5">TERM:RNAM</REC>
+      <Source>Set to 6...</Source>
+      <Dest>6に設定されました...</Dest>
+    </String>
+    <String List="0" Partial="1">
+      <EDID>LTMN_UtilityHolotapeThreadLimitAMMO</EDID>
+      <REC id="12">TERM:ITXT</REC>
+      <Source>* Thread Limit 7</Source>
+      <Dest>* 最大スレッド数 7</Dest>
+    </String>
+    <String List="0" Partial="1">
+      <EDID>LTMN_UtilityHolotapeThreadLimitAMMO</EDID>
+      <REC id="13">TERM:ITXT</REC>
+      <Source>Thread Limit 7</Source>
+      <Dest>最大スレッド数 7</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_UtilityHolotapeThreadLimitAMMO</EDID>
+      <REC id="6">TERM:RNAM</REC>
+      <Source>Set to 7...</Source>
+      <Dest>7に設定されました...</Dest>
+    </String>
+    <String List="0" Partial="1">
+      <EDID>LTMN_UtilityHolotapeThreadLimitAMMO</EDID>
+      <REC id="14">TERM:ITXT</REC>
+      <Source>* Thread Limit 8</Source>
+      <Dest>* 最大スレッド数 8</Dest>
+    </String>
+    <String List="0" Partial="1">
+      <EDID>LTMN_UtilityHolotapeThreadLimitAMMO</EDID>
+      <REC id="15">TERM:ITXT</REC>
+      <Source>Thread Limit 8</Source>
+      <Dest>最大スレッド数 8</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_UtilityHolotapeThreadLimitAMMO</EDID>
+      <REC id="7">TERM:RNAM</REC>
+      <Source>Set to 8...</Source>
+      <Dest>8に設定されました...</Dest>
+    </String>
+    <String List="0" Partial="2">
+      <EDID>LTMN_UtilityHolotapeThreadLimitACTI</EDID>
+      <REC>TERM:WNAM</REC>
+      <Source>~**~ EIDEE-OS ~**~</Source>
+      <Dest>~**~ EIDEE-OS ~**~</Dest>
+    </String>
+    <String List="0" Partial="2">
+      <EDID>LTMN_UtilityHolotapeThreadLimitACTI</EDID>
+      <REC>TERM:FULL</REC>
+      <Source>*./lootman.settings.thread-limit.acti</Source>
+      <Dest>*./lootman.settings.thread-limit.acti</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_UtilityHolotapeThreadLimitACTI</EDID>
+      <REC id="0">TERM:ITXT</REC>
+      <Source>* Thread Limit 1</Source>
+      <Dest>* 最大スレッド数 1</Dest>
+    </String>
+    <String List="0" Partial="1">
+      <EDID>LTMN_UtilityHolotapeThreadLimitACTI</EDID>
+      <REC id="1">TERM:ITXT</REC>
+      <Source>Thread Limit 1</Source>
+      <Dest>最大スレッド数 1</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_UtilityHolotapeThreadLimitACTI</EDID>
+      <REC id="0">TERM:RNAM</REC>
+      <Source>Set to 1...</Source>
+      <Dest>1に設定されました...</Dest>
+    </String>
+    <String List="0" Partial="1">
+      <EDID>LTMN_UtilityHolotapeThreadLimitACTI</EDID>
+      <REC id="2">TERM:ITXT</REC>
+      <Source>* Thread Limit 2</Source>
+      <Dest>* 最大スレッド数 2</Dest>
+    </String>
+    <String List="0" Partial="1">
+      <EDID>LTMN_UtilityHolotapeThreadLimitACTI</EDID>
+      <REC id="3">TERM:ITXT</REC>
+      <Source>Thread Limit 2</Source>
+      <Dest>最大スレッド数 2</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_UtilityHolotapeThreadLimitACTI</EDID>
+      <REC id="1">TERM:RNAM</REC>
+      <Source>Set to 2...</Source>
+      <Dest>2に設定されました...</Dest>
+    </String>
+    <String List="0" Partial="1">
+      <EDID>LTMN_UtilityHolotapeThreadLimitACTI</EDID>
+      <REC id="4">TERM:ITXT</REC>
+      <Source>* Thread Limit 3</Source>
+      <Dest>* 最大スレッド数 3</Dest>
+    </String>
+    <String List="0" Partial="1">
+      <EDID>LTMN_UtilityHolotapeThreadLimitACTI</EDID>
+      <REC id="5">TERM:ITXT</REC>
+      <Source>Thread Limit 3</Source>
+      <Dest>最大スレッド数 3</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_UtilityHolotapeThreadLimitACTI</EDID>
+      <REC id="2">TERM:RNAM</REC>
+      <Source>Set to 3...</Source>
+      <Dest>3に設定されました...</Dest>
+    </String>
+    <String List="0" Partial="1">
+      <EDID>LTMN_UtilityHolotapeThreadLimitACTI</EDID>
+      <REC id="6">TERM:ITXT</REC>
+      <Source>* Thread Limit 4</Source>
+      <Dest>* 最大スレッド数 4</Dest>
+    </String>
+    <String List="0" Partial="1">
+      <EDID>LTMN_UtilityHolotapeThreadLimitACTI</EDID>
+      <REC id="7">TERM:ITXT</REC>
+      <Source>Thread Limit 4</Source>
+      <Dest>最大スレッド数 4</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_UtilityHolotapeThreadLimitACTI</EDID>
+      <REC id="3">TERM:RNAM</REC>
+      <Source>Set to 4...</Source>
+      <Dest>4に設定されました...</Dest>
+    </String>
+    <String List="0" Partial="1">
+      <EDID>LTMN_UtilityHolotapeThreadLimitACTI</EDID>
+      <REC id="8">TERM:ITXT</REC>
+      <Source>* Thread Limit 5</Source>
+      <Dest>* 最大スレッド数 5</Dest>
+    </String>
+    <String List="0" Partial="1">
+      <EDID>LTMN_UtilityHolotapeThreadLimitACTI</EDID>
+      <REC id="9">TERM:ITXT</REC>
+      <Source>Thread Limit 5</Source>
+      <Dest>最大スレッド数 5</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_UtilityHolotapeThreadLimitACTI</EDID>
+      <REC id="4">TERM:RNAM</REC>
+      <Source>Set to 5...</Source>
+      <Dest>5に設定されました...</Dest>
+    </String>
+    <String List="0" Partial="1">
+      <EDID>LTMN_UtilityHolotapeThreadLimitACTI</EDID>
+      <REC id="10">TERM:ITXT</REC>
+      <Source>* Thread Limit 6</Source>
+      <Dest>* 最大スレッド数 6</Dest>
+    </String>
+    <String List="0" Partial="1">
+      <EDID>LTMN_UtilityHolotapeThreadLimitACTI</EDID>
+      <REC id="11">TERM:ITXT</REC>
+      <Source>Thread Limit 6</Source>
+      <Dest>最大スレッド数 6</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_UtilityHolotapeThreadLimitACTI</EDID>
+      <REC id="5">TERM:RNAM</REC>
+      <Source>Set to 6...</Source>
+      <Dest>6に設定されました...</Dest>
+    </String>
+    <String List="0" Partial="1">
+      <EDID>LTMN_UtilityHolotapeThreadLimitACTI</EDID>
+      <REC id="12">TERM:ITXT</REC>
+      <Source>* Thread Limit 7</Source>
+      <Dest>* 最大スレッド数 7</Dest>
+    </String>
+    <String List="0" Partial="1">
+      <EDID>LTMN_UtilityHolotapeThreadLimitACTI</EDID>
+      <REC id="13">TERM:ITXT</REC>
+      <Source>Thread Limit 7</Source>
+      <Dest>最大スレッド数 7</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_UtilityHolotapeThreadLimitACTI</EDID>
+      <REC id="6">TERM:RNAM</REC>
+      <Source>Set to 7...</Source>
+      <Dest>7に設定されました...</Dest>
+    </String>
+    <String List="0" Partial="1">
+      <EDID>LTMN_UtilityHolotapeThreadLimitACTI</EDID>
+      <REC id="14">TERM:ITXT</REC>
+      <Source>* Thread Limit 8</Source>
+      <Dest>* 最大スレッド数 8</Dest>
+    </String>
+    <String List="0" Partial="1">
+      <EDID>LTMN_UtilityHolotapeThreadLimitACTI</EDID>
+      <REC id="15">TERM:ITXT</REC>
+      <Source>Thread Limit 8</Source>
+      <Dest>最大スレッド数 8</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_UtilityHolotapeThreadLimitACTI</EDID>
+      <REC id="7">TERM:RNAM</REC>
+      <Source>Set to 8...</Source>
+      <Dest>8に設定されました...</Dest>
+    </String>
+    <String List="0" Partial="2">
+      <EDID>LTMN_UtilityHolotapeThreadLimitALCH</EDID>
+      <REC>TERM:WNAM</REC>
+      <Source>~**~ EIDEE-OS ~**~</Source>
+      <Dest>~**~ EIDEE-OS ~**~</Dest>
+    </String>
+    <String List="0" Partial="2">
+      <EDID>LTMN_UtilityHolotapeThreadLimitALCH</EDID>
+      <REC>TERM:FULL</REC>
+      <Source>*./lootman.settings.thread-limit.alch</Source>
+      <Dest>*./lootman.settings.thread-limit.alch</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_UtilityHolotapeThreadLimitALCH</EDID>
+      <REC id="0">TERM:ITXT</REC>
+      <Source>* Thread Limit 1</Source>
+      <Dest>* 最大スレッド数 1</Dest>
+    </String>
+    <String List="0" Partial="1">
+      <EDID>LTMN_UtilityHolotapeThreadLimitALCH</EDID>
+      <REC id="1">TERM:ITXT</REC>
+      <Source>Thread Limit 1</Source>
+      <Dest>最大スレッド数 1</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_UtilityHolotapeThreadLimitALCH</EDID>
+      <REC id="0">TERM:RNAM</REC>
+      <Source>Set to 1...</Source>
+      <Dest>1に設定されました...</Dest>
+    </String>
+    <String List="0" Partial="1">
+      <EDID>LTMN_UtilityHolotapeThreadLimitALCH</EDID>
+      <REC id="2">TERM:ITXT</REC>
+      <Source>* Thread Limit 2</Source>
+      <Dest>* 最大スレッド数 2</Dest>
+    </String>
+    <String List="0" Partial="1">
+      <EDID>LTMN_UtilityHolotapeThreadLimitALCH</EDID>
+      <REC id="3">TERM:ITXT</REC>
+      <Source>Thread Limit 2</Source>
+      <Dest>最大スレッド数 2</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_UtilityHolotapeThreadLimitALCH</EDID>
+      <REC id="1">TERM:RNAM</REC>
+      <Source>Set to 2...</Source>
+      <Dest>2に設定されました...</Dest>
+    </String>
+    <String List="0" Partial="1">
+      <EDID>LTMN_UtilityHolotapeThreadLimitALCH</EDID>
+      <REC id="4">TERM:ITXT</REC>
+      <Source>* Thread Limit 3</Source>
+      <Dest>* 最大スレッド数 3</Dest>
+    </String>
+    <String List="0" Partial="1">
+      <EDID>LTMN_UtilityHolotapeThreadLimitALCH</EDID>
+      <REC id="5">TERM:ITXT</REC>
+      <Source>Thread Limit 3</Source>
+      <Dest>最大スレッド数 3</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_UtilityHolotapeThreadLimitALCH</EDID>
+      <REC id="2">TERM:RNAM</REC>
+      <Source>Set to 3...</Source>
+      <Dest>3に設定されました...</Dest>
+    </String>
+    <String List="0" Partial="1">
+      <EDID>LTMN_UtilityHolotapeThreadLimitALCH</EDID>
+      <REC id="6">TERM:ITXT</REC>
+      <Source>* Thread Limit 4</Source>
+      <Dest>* 最大スレッド数 4</Dest>
+    </String>
+    <String List="0" Partial="1">
+      <EDID>LTMN_UtilityHolotapeThreadLimitALCH</EDID>
+      <REC id="7">TERM:ITXT</REC>
+      <Source>Thread Limit 4</Source>
+      <Dest>最大スレッド数 4</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_UtilityHolotapeThreadLimitALCH</EDID>
+      <REC id="3">TERM:RNAM</REC>
+      <Source>Set to 4...</Source>
+      <Dest>4に設定されました...</Dest>
+    </String>
+    <String List="0" Partial="1">
+      <EDID>LTMN_UtilityHolotapeThreadLimitALCH</EDID>
+      <REC id="8">TERM:ITXT</REC>
+      <Source>* Thread Limit 5</Source>
+      <Dest>* 最大スレッド数 5</Dest>
+    </String>
+    <String List="0" Partial="1">
+      <EDID>LTMN_UtilityHolotapeThreadLimitALCH</EDID>
+      <REC id="9">TERM:ITXT</REC>
+      <Source>Thread Limit 5</Source>
+      <Dest>最大スレッド数 5</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_UtilityHolotapeThreadLimitALCH</EDID>
+      <REC id="4">TERM:RNAM</REC>
+      <Source>Set to 5...</Source>
+      <Dest>5に設定されました...</Dest>
+    </String>
+    <String List="0" Partial="1">
+      <EDID>LTMN_UtilityHolotapeThreadLimitALCH</EDID>
+      <REC id="10">TERM:ITXT</REC>
+      <Source>* Thread Limit 6</Source>
+      <Dest>* 最大スレッド数 6</Dest>
+    </String>
+    <String List="0" Partial="1">
+      <EDID>LTMN_UtilityHolotapeThreadLimitALCH</EDID>
+      <REC id="11">TERM:ITXT</REC>
+      <Source>Thread Limit 6</Source>
+      <Dest>最大スレッド数 6</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_UtilityHolotapeThreadLimitALCH</EDID>
+      <REC id="5">TERM:RNAM</REC>
+      <Source>Set to 6...</Source>
+      <Dest>6に設定されました...</Dest>
+    </String>
+    <String List="0" Partial="1">
+      <EDID>LTMN_UtilityHolotapeThreadLimitALCH</EDID>
+      <REC id="12">TERM:ITXT</REC>
+      <Source>* Thread Limit 7</Source>
+      <Dest>* 最大スレッド数 7</Dest>
+    </String>
+    <String List="0" Partial="1">
+      <EDID>LTMN_UtilityHolotapeThreadLimitALCH</EDID>
+      <REC id="13">TERM:ITXT</REC>
+      <Source>Thread Limit 7</Source>
+      <Dest>最大スレッド数 7</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_UtilityHolotapeThreadLimitALCH</EDID>
+      <REC id="6">TERM:RNAM</REC>
+      <Source>Set to 7...</Source>
+      <Dest>7に設定されました...</Dest>
+    </String>
+    <String List="0" Partial="1">
+      <EDID>LTMN_UtilityHolotapeThreadLimitALCH</EDID>
+      <REC id="14">TERM:ITXT</REC>
+      <Source>* Thread Limit 8</Source>
+      <Dest>* 最大スレッド数 8</Dest>
+    </String>
+    <String List="0" Partial="1">
+      <EDID>LTMN_UtilityHolotapeThreadLimitALCH</EDID>
+      <REC id="15">TERM:ITXT</REC>
+      <Source>Thread Limit 8</Source>
+      <Dest>最大スレッド数 8</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_UtilityHolotapeThreadLimitALCH</EDID>
+      <REC id="7">TERM:RNAM</REC>
+      <Source>Set to 8...</Source>
+      <Dest>8に設定されました...</Dest>
+    </String>
+    <String List="0" Partial="2">
+      <EDID>LTMN_UtilityHolotapeThreadLimitINGR</EDID>
+      <REC>TERM:WNAM</REC>
+      <Source>~**~ EIDEE-OS ~**~</Source>
+      <Dest>~**~ EIDEE-OS ~**~</Dest>
+    </String>
+    <String List="0" Partial="2">
+      <EDID>LTMN_UtilityHolotapeThreadLimitINGR</EDID>
+      <REC>TERM:FULL</REC>
+      <Source>*./lootman.settings.thread-limit.ingr</Source>
+      <Dest>*./lootman.settings.thread-limit.ingr</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_UtilityHolotapeThreadLimitINGR</EDID>
+      <REC id="0">TERM:ITXT</REC>
+      <Source>* Thread Limit 1</Source>
+      <Dest>* 最大スレッド数 1</Dest>
+    </String>
+    <String List="0" Partial="1">
+      <EDID>LTMN_UtilityHolotapeThreadLimitINGR</EDID>
+      <REC id="1">TERM:ITXT</REC>
+      <Source>Thread Limit 1</Source>
+      <Dest>最大スレッド数 1</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_UtilityHolotapeThreadLimitINGR</EDID>
+      <REC id="0">TERM:RNAM</REC>
+      <Source>Set to 1...</Source>
+      <Dest>1に設定されました...</Dest>
+    </String>
+    <String List="0" Partial="1">
+      <EDID>LTMN_UtilityHolotapeThreadLimitINGR</EDID>
+      <REC id="2">TERM:ITXT</REC>
+      <Source>* Thread Limit 2</Source>
+      <Dest>* 最大スレッド数 2</Dest>
+    </String>
+    <String List="0" Partial="1">
+      <EDID>LTMN_UtilityHolotapeThreadLimitINGR</EDID>
+      <REC id="3">TERM:ITXT</REC>
+      <Source>Thread Limit 2</Source>
+      <Dest>最大スレッド数 2</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_UtilityHolotapeThreadLimitINGR</EDID>
+      <REC id="1">TERM:RNAM</REC>
+      <Source>Set to 2...</Source>
+      <Dest>2に設定されました...</Dest>
+    </String>
+    <String List="0" Partial="1">
+      <EDID>LTMN_UtilityHolotapeThreadLimitINGR</EDID>
+      <REC id="4">TERM:ITXT</REC>
+      <Source>* Thread Limit 3</Source>
+      <Dest>* 最大スレッド数 3</Dest>
+    </String>
+    <String List="0" Partial="1">
+      <EDID>LTMN_UtilityHolotapeThreadLimitINGR</EDID>
+      <REC id="5">TERM:ITXT</REC>
+      <Source>Thread Limit 3</Source>
+      <Dest>最大スレッド数 3</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_UtilityHolotapeThreadLimitINGR</EDID>
+      <REC id="2">TERM:RNAM</REC>
+      <Source>Set to 3...</Source>
+      <Dest>3に設定されました...</Dest>
+    </String>
+    <String List="0" Partial="1">
+      <EDID>LTMN_UtilityHolotapeThreadLimitINGR</EDID>
+      <REC id="6">TERM:ITXT</REC>
+      <Source>* Thread Limit 4</Source>
+      <Dest>* 最大スレッド数 4</Dest>
+    </String>
+    <String List="0" Partial="1">
+      <EDID>LTMN_UtilityHolotapeThreadLimitINGR</EDID>
+      <REC id="7">TERM:ITXT</REC>
+      <Source>Thread Limit 4</Source>
+      <Dest>最大スレッド数 4</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_UtilityHolotapeThreadLimitINGR</EDID>
+      <REC id="3">TERM:RNAM</REC>
+      <Source>Set to 4...</Source>
+      <Dest>4に設定されました...</Dest>
+    </String>
+    <String List="0" Partial="1">
+      <EDID>LTMN_UtilityHolotapeThreadLimitINGR</EDID>
+      <REC id="8">TERM:ITXT</REC>
+      <Source>* Thread Limit 5</Source>
+      <Dest>* 最大スレッド数 5</Dest>
+    </String>
+    <String List="0" Partial="1">
+      <EDID>LTMN_UtilityHolotapeThreadLimitINGR</EDID>
+      <REC id="9">TERM:ITXT</REC>
+      <Source>Thread Limit 5</Source>
+      <Dest>最大スレッド数 5</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_UtilityHolotapeThreadLimitINGR</EDID>
+      <REC id="4">TERM:RNAM</REC>
+      <Source>Set to 5...</Source>
+      <Dest>5に設定されました...</Dest>
+    </String>
+    <String List="0" Partial="1">
+      <EDID>LTMN_UtilityHolotapeThreadLimitINGR</EDID>
+      <REC id="10">TERM:ITXT</REC>
+      <Source>* Thread Limit 6</Source>
+      <Dest>* 最大スレッド数 6</Dest>
+    </String>
+    <String List="0" Partial="1">
+      <EDID>LTMN_UtilityHolotapeThreadLimitINGR</EDID>
+      <REC id="11">TERM:ITXT</REC>
+      <Source>Thread Limit 6</Source>
+      <Dest>最大スレッド数 6</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_UtilityHolotapeThreadLimitINGR</EDID>
+      <REC id="5">TERM:RNAM</REC>
+      <Source>Set to 6...</Source>
+      <Dest>6に設定されました...</Dest>
+    </String>
+    <String List="0" Partial="1">
+      <EDID>LTMN_UtilityHolotapeThreadLimitINGR</EDID>
+      <REC id="12">TERM:ITXT</REC>
+      <Source>* Thread Limit 7</Source>
+      <Dest>* 最大スレッド数 7</Dest>
+    </String>
+    <String List="0" Partial="1">
+      <EDID>LTMN_UtilityHolotapeThreadLimitINGR</EDID>
+      <REC id="13">TERM:ITXT</REC>
+      <Source>Thread Limit 7</Source>
+      <Dest>最大スレッド数 7</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_UtilityHolotapeThreadLimitINGR</EDID>
+      <REC id="6">TERM:RNAM</REC>
+      <Source>Set to 7...</Source>
+      <Dest>7に設定されました...</Dest>
+    </String>
+    <String List="0" Partial="1">
+      <EDID>LTMN_UtilityHolotapeThreadLimitINGR</EDID>
+      <REC id="14">TERM:ITXT</REC>
+      <Source>* Thread Limit 8</Source>
+      <Dest>* 最大スレッド数 8</Dest>
+    </String>
+    <String List="0" Partial="1">
+      <EDID>LTMN_UtilityHolotapeThreadLimitINGR</EDID>
+      <REC id="15">TERM:ITXT</REC>
+      <Source>Thread Limit 8</Source>
+      <Dest>最大スレッド数 8</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_UtilityHolotapeThreadLimitINGR</EDID>
+      <REC id="7">TERM:RNAM</REC>
+      <Source>Set to 8...</Source>
+      <Dest>8に設定されました...</Dest>
+    </String>
+    <String List="0" Partial="2">
+      <EDID>LTMN_UtilityHolotapeThreadLimit</EDID>
+      <REC>TERM:WNAM</REC>
+      <Source>~**~ EIDEE-OS ~**~</Source>
+      <Dest>~**~ EIDEE-OS ~**~</Dest>
+    </String>
+    <String List="0" Partial="2">
+      <EDID>LTMN_UtilityHolotapeThreadLimit</EDID>
+      <REC>TERM:FULL</REC>
+      <Source>*./lootman.settings.thread-limit</Source>
+      <Dest>*./lootman.settings.thread-limit</Dest>
+    </String>
+    <String List="0" Partial="1">
+      <EDID>LTMN_UtilityHolotapeThreadLimit</EDID>
+      <REC id="0">TERM:ITXT</REC>
+      <Source>Containers &gt;&gt;</Source>
+      <Dest>コンテナ &gt;&gt;</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_UtilityHolotapeThreadLimit</EDID>
+      <REC id="0">TERM:RNAM</REC>
+      <Source>Loading...</Source>
+      <Dest>ロード中…</Dest>
+    </String>
+    <String List="0" Partial="1">
+      <EDID>LTMN_UtilityHolotapeThreadLimit</EDID>
+      <REC id="1">TERM:ITXT</REC>
+      <Source>Corpses &gt;&gt;</Source>
+      <Dest>死体 &gt;&gt;</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_UtilityHolotapeThreadLimit</EDID>
+      <REC id="1">TERM:RNAM</REC>
+      <Source>Loading...</Source>
+      <Dest>ロード中…</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_UtilityHolotapeThreadLimit</EDID>
+      <REC id="2">TERM:ITXT</REC>
+      <Source>Weapons &gt;&gt;</Source>
+      <Dest>武器 &gt;&gt;</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_UtilityHolotapeThreadLimit</EDID>
+      <REC id="2">TERM:RNAM</REC>
+      <Source>Loading...</Source>
+      <Dest>ロード中…</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_UtilityHolotapeThreadLimit</EDID>
+      <REC id="3">TERM:ITXT</REC>
+      <Source>Apparels &gt;&gt;</Source>
+      <Dest>防具 &gt;&gt;</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_UtilityHolotapeThreadLimit</EDID>
+      <REC id="3">TERM:RNAM</REC>
+      <Source>Loading...</Source>
+      <Dest>ロード中…</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_UtilityHolotapeThreadLimit</EDID>
+      <REC id="4">TERM:ITXT</REC>
+      <Source>Chemistry/Food &gt;&gt;</Source>
+      <Dest>薬品・食料 &gt;&gt;</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_UtilityHolotapeThreadLimit</EDID>
+      <REC id="4">TERM:RNAM</REC>
+      <Source>Loading...</Source>
+      <Dest>ロード中…</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_UtilityHolotapeThreadLimit</EDID>
+      <REC id="5">TERM:ITXT</REC>
+      <Source>Junk/etc &gt;&gt;</Source>
+      <Dest>ジャンク・その他 &gt;&gt;</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_UtilityHolotapeThreadLimit</EDID>
+      <REC id="5">TERM:RNAM</REC>
+      <Source>Loading...</Source>
+      <Dest>ロード中…</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_UtilityHolotapeThreadLimit</EDID>
+      <REC id="6">TERM:ITXT</REC>
+      <Source>Ammo &gt;&gt;</Source>
+      <Dest>弾薬 &gt;&gt;</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_UtilityHolotapeThreadLimit</EDID>
+      <REC id="6">TERM:RNAM</REC>
+      <Source>Loading...</Source>
+      <Dest>ロード中…</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_UtilityHolotapeThreadLimit</EDID>
+      <REC id="7">TERM:ITXT</REC>
+      <Source>Books &gt;&gt;</Source>
+      <Dest>本 &gt;&gt;</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_UtilityHolotapeThreadLimit</EDID>
+      <REC id="7">TERM:RNAM</REC>
+      <Source>Loading...</Source>
+      <Dest>ロード中…</Dest>
+    </String>
+    <String List="0" Partial="1">
+      <EDID>LTMN_UtilityHolotapeThreadLimit</EDID>
+      <REC id="8">TERM:ITXT</REC>
+      <Source>Keys &gt;&gt;</Source>
+      <Dest>カギ &gt;&gt;</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_UtilityHolotapeThreadLimit</EDID>
+      <REC id="8">TERM:RNAM</REC>
+      <Source>Loading...</Source>
+      <Dest>ロード中…</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_UtilityHolotapeThreadLimit</EDID>
+      <REC id="9">TERM:ITXT</REC>
+      <Source>Flora &gt;&gt;</Source>
+      <Dest>植物 &gt;&gt;</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_UtilityHolotapeThreadLimit</EDID>
+      <REC id="9">TERM:RNAM</REC>
+      <Source>Loading...</Source>
+      <Dest>ロード中…</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_UtilityHolotapeThreadLimit</EDID>
+      <REC id="10">TERM:ITXT</REC>
+      <Source>Activator &gt;&gt;</Source>
+      <Dest>アクティベーター &gt;&gt;</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_UtilityHolotapeThreadLimit</EDID>
+      <REC id="10">TERM:RNAM</REC>
+      <Source>Loading...</Source>
+      <Dest>ロード中…</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_UtilityHolotapeThreadLimit</EDID>
+      <REC id="11">TERM:ITXT</REC>
+      <Source>Ingredients &gt;&gt;</Source>
+      <Dest>材料 &gt;&gt;</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_UtilityHolotapeThreadLimit</EDID>
+      <REC id="11">TERM:RNAM</REC>
+      <Source>Loading...</Source>
+      <Dest>ロード中…</Dest>
+    </String>
+    <String List="0" Partial="2">
+      <EDID>LTMN_UtilityHolotapeThreadLimitKEYM</EDID>
+      <REC>TERM:WNAM</REC>
+      <Source>~**~ EIDEE-OS ~**~</Source>
+      <Dest>~**~ EIDEE-OS ~**~</Dest>
+    </String>
+    <String List="0" Partial="2">
+      <EDID>LTMN_UtilityHolotapeThreadLimitKEYM</EDID>
+      <REC>TERM:FULL</REC>
+      <Source>*./lootman.settings.thread-limit.keym</Source>
+      <Dest>*./lootman.settings.thread-limit.keym</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_UtilityHolotapeThreadLimitKEYM</EDID>
+      <REC id="0">TERM:ITXT</REC>
+      <Source>* Thread Limit 1</Source>
+      <Dest>* 最大スレッド数 1</Dest>
+    </String>
+    <String List="0" Partial="1">
+      <EDID>LTMN_UtilityHolotapeThreadLimitKEYM</EDID>
+      <REC id="1">TERM:ITXT</REC>
+      <Source>Thread Limit 1</Source>
+      <Dest>最大スレッド数 1</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_UtilityHolotapeThreadLimitKEYM</EDID>
+      <REC id="0">TERM:RNAM</REC>
+      <Source>Set to 1...</Source>
+      <Dest>1に設定されました...</Dest>
+    </String>
+    <String List="0" Partial="1">
+      <EDID>LTMN_UtilityHolotapeThreadLimitKEYM</EDID>
+      <REC id="2">TERM:ITXT</REC>
+      <Source>* Thread Limit 2</Source>
+      <Dest>* 最大スレッド数 2</Dest>
+    </String>
+    <String List="0" Partial="1">
+      <EDID>LTMN_UtilityHolotapeThreadLimitKEYM</EDID>
+      <REC id="3">TERM:ITXT</REC>
+      <Source>Thread Limit 2</Source>
+      <Dest>最大スレッド数 2</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_UtilityHolotapeThreadLimitKEYM</EDID>
+      <REC id="1">TERM:RNAM</REC>
+      <Source>Set to 2...</Source>
+      <Dest>2に設定されました...</Dest>
+    </String>
+    <String List="0" Partial="1">
+      <EDID>LTMN_UtilityHolotapeThreadLimitKEYM</EDID>
+      <REC id="4">TERM:ITXT</REC>
+      <Source>* Thread Limit 3</Source>
+      <Dest>* 最大スレッド数 3</Dest>
+    </String>
+    <String List="0" Partial="1">
+      <EDID>LTMN_UtilityHolotapeThreadLimitKEYM</EDID>
+      <REC id="5">TERM:ITXT</REC>
+      <Source>Thread Limit 3</Source>
+      <Dest>最大スレッド数 3</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_UtilityHolotapeThreadLimitKEYM</EDID>
+      <REC id="2">TERM:RNAM</REC>
+      <Source>Set to 3...</Source>
+      <Dest>3に設定されました...</Dest>
+    </String>
+    <String List="0" Partial="1">
+      <EDID>LTMN_UtilityHolotapeThreadLimitKEYM</EDID>
+      <REC id="6">TERM:ITXT</REC>
+      <Source>* Thread Limit 4</Source>
+      <Dest>* 最大スレッド数 4</Dest>
+    </String>
+    <String List="0" Partial="1">
+      <EDID>LTMN_UtilityHolotapeThreadLimitKEYM</EDID>
+      <REC id="7">TERM:ITXT</REC>
+      <Source>Thread Limit 4</Source>
+      <Dest>最大スレッド数 4</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_UtilityHolotapeThreadLimitKEYM</EDID>
+      <REC id="3">TERM:RNAM</REC>
+      <Source>Set to 4...</Source>
+      <Dest>4に設定されました...</Dest>
+    </String>
+    <String List="0" Partial="1">
+      <EDID>LTMN_UtilityHolotapeThreadLimitKEYM</EDID>
+      <REC id="8">TERM:ITXT</REC>
+      <Source>* Thread Limit 5</Source>
+      <Dest>* 最大スレッド数 5</Dest>
+    </String>
+    <String List="0" Partial="1">
+      <EDID>LTMN_UtilityHolotapeThreadLimitKEYM</EDID>
+      <REC id="9">TERM:ITXT</REC>
+      <Source>Thread Limit 5</Source>
+      <Dest>最大スレッド数 5</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_UtilityHolotapeThreadLimitKEYM</EDID>
+      <REC id="4">TERM:RNAM</REC>
+      <Source>Set to 5...</Source>
+      <Dest>5に設定されました...</Dest>
+    </String>
+    <String List="0" Partial="1">
+      <EDID>LTMN_UtilityHolotapeThreadLimitKEYM</EDID>
+      <REC id="10">TERM:ITXT</REC>
+      <Source>* Thread Limit 6</Source>
+      <Dest>* 最大スレッド数 6</Dest>
+    </String>
+    <String List="0" Partial="1">
+      <EDID>LTMN_UtilityHolotapeThreadLimitKEYM</EDID>
+      <REC id="11">TERM:ITXT</REC>
+      <Source>Thread Limit 6</Source>
+      <Dest>最大スレッド数 6</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_UtilityHolotapeThreadLimitKEYM</EDID>
+      <REC id="5">TERM:RNAM</REC>
+      <Source>Set to 6...</Source>
+      <Dest>6に設定されました...</Dest>
+    </String>
+    <String List="0" Partial="1">
+      <EDID>LTMN_UtilityHolotapeThreadLimitKEYM</EDID>
+      <REC id="12">TERM:ITXT</REC>
+      <Source>* Thread Limit 7</Source>
+      <Dest>* 最大スレッド数 7</Dest>
+    </String>
+    <String List="0" Partial="1">
+      <EDID>LTMN_UtilityHolotapeThreadLimitKEYM</EDID>
+      <REC id="13">TERM:ITXT</REC>
+      <Source>Thread Limit 7</Source>
+      <Dest>最大スレッド数 7</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_UtilityHolotapeThreadLimitKEYM</EDID>
+      <REC id="6">TERM:RNAM</REC>
+      <Source>Set to 7...</Source>
+      <Dest>7に設定されました...</Dest>
+    </String>
+    <String List="0" Partial="1">
+      <EDID>LTMN_UtilityHolotapeThreadLimitKEYM</EDID>
+      <REC id="14">TERM:ITXT</REC>
+      <Source>* Thread Limit 8</Source>
+      <Dest>* 最大スレッド数 8</Dest>
+    </String>
+    <String List="0" Partial="1">
+      <EDID>LTMN_UtilityHolotapeThreadLimitKEYM</EDID>
+      <REC id="15">TERM:ITXT</REC>
+      <Source>Thread Limit 8</Source>
+      <Dest>最大スレッド数 8</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_UtilityHolotapeThreadLimitKEYM</EDID>
+      <REC id="7">TERM:RNAM</REC>
+      <Source>Set to 8...</Source>
+      <Dest>8に設定されました...</Dest>
+    </String>
+    <String List="0" Partial="2">
+      <EDID>LTMN_UtilityHolotapeAdvancedFilterExtra</EDID>
+      <REC>TERM:WNAM</REC>
+      <Source>~**~ EIDEE-OS ~**~</Source>
+      <Dest>~**~ EIDEE-OS ~**~</Dest>
+    </String>
+    <String List="0" Partial="2">
+      <EDID>LTMN_UtilityHolotapeAdvancedFilterExtra</EDID>
+      <REC>TERM:FULL</REC>
+      <Source>*./lootman.looting-filter.advanced-filter.extra</Source>
+      <Dest>*./lootman.looting-filter.advanced-filter.extra</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_UtilityHolotapeAdvancedFilterExtra</EDID>
+      <REC id="0">TERM:ITXT</REC>
+      <Source>Legendary Only YES</Source>
+      <Dest>レジェンダリーのみ収集 はい</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_UtilityHolotapeAdvancedFilterExtra</EDID>
+      <REC id="0">TERM:RNAM</REC>
+      <Source>Set to NO...</Source>
+      <Dest>いいえに設定されました...</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_UtilityHolotapeAdvancedFilterExtra</EDID>
+      <REC id="1">TERM:ITXT</REC>
+      <Source>Legendary Only NO</Source>
+      <Dest>レジェンダリーのみ収集 いいえ</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_UtilityHolotapeAdvancedFilterExtra</EDID>
+      <REC id="1">TERM:RNAM</REC>
+      <Source>Set to YES...</Source>
+      <Dest>はいに設定されました...</Dest>
+    </String>
+    <String List="0" Partial="2">
+      <EDID>LTMN_UtilityHolotapeAdvancedFilter</EDID>
+      <REC>TERM:WNAM</REC>
+      <Source>~**~ EIDEE-OS ~**~</Source>
+      <Dest>~**~ EIDEE-OS ~**~</Dest>
+    </String>
+    <String List="0" Partial="2">
+      <EDID>LTMN_UtilityHolotapeAdvancedFilter</EDID>
+      <REC>TERM:FULL</REC>
+      <Source>*./lootman.looting-filter.advanced-filter</Source>
+      <Dest>*./lootman.looting-filter.advanced-filter</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_UtilityHolotapeAdvancedFilter</EDID>
+      <REC id="0">TERM:ITXT</REC>
+      <Source>Weapons &gt;&gt;</Source>
+      <Dest>武器 &gt;&gt;</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_UtilityHolotapeAdvancedFilter</EDID>
+      <REC id="0">TERM:RNAM</REC>
+      <Source>Loading...</Source>
+      <Dest>ロード中…</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_UtilityHolotapeAdvancedFilter</EDID>
+      <REC id="1">TERM:ITXT</REC>
+      <Source>Chemistry/Food &gt;&gt;</Source>
+      <Dest>薬品・食料 &gt;&gt;</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_UtilityHolotapeAdvancedFilter</EDID>
+      <REC id="1">TERM:RNAM</REC>
+      <Source>Loading...</Source>
+      <Dest>ロード中…</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_UtilityHolotapeAdvancedFilter</EDID>
+      <REC id="2">TERM:ITXT</REC>
+      <Source>Books &gt;&gt;</Source>
+      <Dest>本 &gt;&gt;</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_UtilityHolotapeAdvancedFilter</EDID>
+      <REC id="2">TERM:RNAM</REC>
+      <Source>Loading...</Source>
+      <Dest>ロード中…</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_UtilityHolotapeAdvancedFilter</EDID>
+      <REC id="3">TERM:ITXT</REC>
+      <Source>Extra &gt;&gt;</Source>
+      <Dest>その他 &gt;&gt;</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_UtilityHolotapeAdvancedFilter</EDID>
+      <REC id="3">TERM:RNAM</REC>
+      <Source>Loading...</Source>
+      <Dest>ロード中…</Dest>
+    </String>
+    <String List="0" Partial="2">
+      <EDID>LTMN_UtilityHolotapeCategoryFilter</EDID>
+      <REC>TERM:WNAM</REC>
+      <Source>~**~ EIDEE-OS ~**~</Source>
+      <Dest>~**~ EIDEE-OS ~**~</Dest>
+    </String>
+    <String List="0" Partial="2">
+      <EDID>LTMN_UtilityHolotapeCategoryFilter</EDID>
+      <REC>TERM:FULL</REC>
+      <Source>*./lootman.looting-filter.category-filter</Source>
+      <Dest>*./lootman.looting-filter.category-filter</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_UtilityHolotapeCategoryFilter</EDID>
+      <REC id="0">TERM:ITXT</REC>
+      <Source>Weapons ON</Source>
+      <Dest>武器 オン</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_UtilityHolotapeCategoryFilter</EDID>
+      <REC id="0">TERM:RNAM</REC>
+      <Source>Set to OFF...</Source>
+      <Dest>オフに設定されました...</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_UtilityHolotapeCategoryFilter</EDID>
+      <REC id="1">TERM:ITXT</REC>
+      <Source>Weapons OFF</Source>
+      <Dest>武器 オフ</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_UtilityHolotapeCategoryFilter</EDID>
+      <REC id="1">TERM:RNAM</REC>
+      <Source>Set to ON...</Source>
+      <Dest>オンに設定されました...</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_UtilityHolotapeCategoryFilter</EDID>
+      <REC id="2">TERM:ITXT</REC>
+      <Source>Apparels ON</Source>
+      <Dest>防具 オン</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_UtilityHolotapeCategoryFilter</EDID>
+      <REC id="2">TERM:RNAM</REC>
+      <Source>Set to OFF...</Source>
+      <Dest>オフに設定されました...</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_UtilityHolotapeCategoryFilter</EDID>
+      <REC id="3">TERM:ITXT</REC>
+      <Source>Apparels OFF</Source>
+      <Dest>防具 オフ</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_UtilityHolotapeCategoryFilter</EDID>
+      <REC id="3">TERM:RNAM</REC>
+      <Source>Set to ON...</Source>
+      <Dest>オンに設定されました...</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_UtilityHolotapeCategoryFilter</EDID>
+      <REC id="4">TERM:ITXT</REC>
+      <Source>Chemistry/Food ON</Source>
+      <Dest>薬品・食料 オン</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_UtilityHolotapeCategoryFilter</EDID>
+      <REC id="4">TERM:RNAM</REC>
+      <Source>Set to OFF...</Source>
+      <Dest>オフに設定されました...</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_UtilityHolotapeCategoryFilter</EDID>
+      <REC id="5">TERM:ITXT</REC>
+      <Source>Chemistry/Food OFF</Source>
+      <Dest>薬品・食料 オフ</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_UtilityHolotapeCategoryFilter</EDID>
+      <REC id="5">TERM:RNAM</REC>
+      <Source>Set to ON...</Source>
+      <Dest>オンに設定されました...</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_UtilityHolotapeCategoryFilter</EDID>
+      <REC id="6">TERM:ITXT</REC>
+      <Source>Junk/etc ON</Source>
+      <Dest>ジャンク・その他 オン</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_UtilityHolotapeCategoryFilter</EDID>
+      <REC id="6">TERM:RNAM</REC>
+      <Source>Set to OFF...</Source>
+      <Dest>オフに設定されました...</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_UtilityHolotapeCategoryFilter</EDID>
+      <REC id="7">TERM:ITXT</REC>
+      <Source>Junk/etc OFF</Source>
+      <Dest>ジャンク・その他 オフ</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_UtilityHolotapeCategoryFilter</EDID>
+      <REC id="7">TERM:RNAM</REC>
+      <Source>Set to ON...</Source>
+      <Dest>オンに設定されました...</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_UtilityHolotapeCategoryFilter</EDID>
+      <REC id="8">TERM:ITXT</REC>
+      <Source>Ammo ON</Source>
+      <Dest>弾薬 オン</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_UtilityHolotapeCategoryFilter</EDID>
+      <REC id="8">TERM:RNAM</REC>
+      <Source>Set to OFF...</Source>
+      <Dest>オフに設定されました...</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_UtilityHolotapeCategoryFilter</EDID>
+      <REC id="9">TERM:ITXT</REC>
+      <Source>Ammo OFF</Source>
+      <Dest>弾薬 オフ</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_UtilityHolotapeCategoryFilter</EDID>
+      <REC id="9">TERM:RNAM</REC>
+      <Source>Set to ON...</Source>
+      <Dest>オンに設定されました...</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_UtilityHolotapeCategoryFilter</EDID>
+      <REC id="10">TERM:ITXT</REC>
+      <Source>Books ON</Source>
+      <Dest>本 オン</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_UtilityHolotapeCategoryFilter</EDID>
+      <REC id="10">TERM:RNAM</REC>
+      <Source>Set to OFF...</Source>
+      <Dest>オフに設定されました...</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_UtilityHolotapeCategoryFilter</EDID>
+      <REC id="11">TERM:ITXT</REC>
+      <Source>Books OFF</Source>
+      <Dest>本 オフ</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_UtilityHolotapeCategoryFilter</EDID>
+      <REC id="11">TERM:RNAM</REC>
+      <Source>Set to ON...</Source>
+      <Dest>オンに設定されました...</Dest>
+    </String>
+    <String List="0" Partial="1">
+      <EDID>LTMN_UtilityHolotapeCategoryFilter</EDID>
+      <REC id="12">TERM:ITXT</REC>
+      <Source>Keys ON</Source>
+      <Dest>カギ オン</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_UtilityHolotapeCategoryFilter</EDID>
+      <REC id="12">TERM:RNAM</REC>
+      <Source>Set to OFF...</Source>
+      <Dest>オフに設定されました...</Dest>
+    </String>
+    <String List="0" Partial="1">
+      <EDID>LTMN_UtilityHolotapeCategoryFilter</EDID>
+      <REC id="13">TERM:ITXT</REC>
+      <Source>Keys OFF</Source>
+      <Dest>カギ オフ</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_UtilityHolotapeCategoryFilter</EDID>
+      <REC id="13">TERM:RNAM</REC>
+      <Source>Set to ON...</Source>
+      <Dest>オンに設定されました...</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_UtilityHolotapeCategoryFilter</EDID>
+      <REC id="14">TERM:ITXT</REC>
+      <Source>Flora ON</Source>
+      <Dest>植物 オン</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_UtilityHolotapeCategoryFilter</EDID>
+      <REC id="14">TERM:RNAM</REC>
+      <Source>Set to OFF...</Source>
+      <Dest>オフに設定されました...</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_UtilityHolotapeCategoryFilter</EDID>
+      <REC id="15">TERM:ITXT</REC>
+      <Source>Flora OFF</Source>
+      <Dest>植物 オフ</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_UtilityHolotapeCategoryFilter</EDID>
+      <REC id="15">TERM:RNAM</REC>
+      <Source>Set to ON...</Source>
+      <Dest>オンに設定されました...</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_UtilityHolotapeCategoryFilter</EDID>
+      <REC id="16">TERM:ITXT</REC>
+      <Source>Activator ON</Source>
+      <Dest>アクティベーター オン</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_UtilityHolotapeCategoryFilter</EDID>
+      <REC id="16">TERM:RNAM</REC>
+      <Source>Set to OFF...</Source>
+      <Dest>オフに設定されました...</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_UtilityHolotapeCategoryFilter</EDID>
+      <REC id="17">TERM:ITXT</REC>
+      <Source>Activator OFF</Source>
+      <Dest>アクティベーター オフ</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_UtilityHolotapeCategoryFilter</EDID>
+      <REC id="17">TERM:RNAM</REC>
+      <Source>Set to ON...</Source>
+      <Dest>オンに設定されました...</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_UtilityHolotapeCategoryFilter</EDID>
+      <REC id="18">TERM:ITXT</REC>
+      <Source>Ingredients ON</Source>
+      <Dest>材料 オン</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_UtilityHolotapeCategoryFilter</EDID>
+      <REC id="18">TERM:RNAM</REC>
+      <Source>Set to OFF...</Source>
+      <Dest>オフに設定されました...</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_UtilityHolotapeCategoryFilter</EDID>
+      <REC id="19">TERM:ITXT</REC>
+      <Source>Ingredients OFF</Source>
+      <Dest>材料 オフ</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_UtilityHolotapeCategoryFilter</EDID>
+      <REC id="19">TERM:RNAM</REC>
+      <Source>Set to ON...</Source>
+      <Dest>オンに設定されました...</Dest>
+    </String>
+    <String List="0" Partial="2">
+      <EDID>LTMN_UtilityHolotapeTargetFilter</EDID>
+      <REC>TERM:WNAM</REC>
+      <Source>~**~ EIDEE-OS ~**~</Source>
+      <Dest>~**~ EIDEE-OS ~**~</Dest>
+    </String>
+    <String List="0" Partial="2">
+      <EDID>LTMN_UtilityHolotapeTargetFilter</EDID>
+      <REC>TERM:FULL</REC>
+      <Source>*./lootman.looting-filter.target-filter</Source>
+      <Dest>*./lootman.looting-filter.target-filter</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_UtilityHolotapeTargetFilter</EDID>
+      <REC id="0">TERM:ITXT</REC>
+      <Source>Objects ON</Source>
+      <Dest>オブジェクト オン</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_UtilityHolotapeTargetFilter</EDID>
+      <REC id="0">TERM:RNAM</REC>
+      <Source>Set to OFF...</Source>
+      <Dest>オフに設定されました...</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_UtilityHolotapeTargetFilter</EDID>
+      <REC id="1">TERM:ITXT</REC>
+      <Source>Objects OFF</Source>
+      <Dest>オブジェクト オフ</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_UtilityHolotapeTargetFilter</EDID>
+      <REC id="1">TERM:RNAM</REC>
+      <Source>Set to ON...</Source>
+      <Dest>オンに設定されました...</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_UtilityHolotapeTargetFilter</EDID>
+      <REC id="2">TERM:ITXT</REC>
+      <Source>Containers ON</Source>
+      <Dest>コンテナ オン</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_UtilityHolotapeTargetFilter</EDID>
+      <REC id="2">TERM:RNAM</REC>
+      <Source>Set to OFF...</Source>
+      <Dest>オフに設定されました...</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_UtilityHolotapeTargetFilter</EDID>
+      <REC id="3">TERM:ITXT</REC>
+      <Source>Containers OFF</Source>
+      <Dest>コンテナ オフ</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_UtilityHolotapeTargetFilter</EDID>
+      <REC id="3">TERM:RNAM</REC>
+      <Source>Set to ON...</Source>
+      <Dest>オンに設定されました...</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_UtilityHolotapeTargetFilter</EDID>
+      <REC id="4">TERM:ITXT</REC>
+      <Source>Corpses ON</Source>
+      <Dest>死体 オン</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_UtilityHolotapeTargetFilter</EDID>
+      <REC id="4">TERM:RNAM</REC>
+      <Source>Set to OFF...</Source>
+      <Dest>オフに設定されました...</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_UtilityHolotapeTargetFilter</EDID>
+      <REC id="5">TERM:ITXT</REC>
+      <Source>Corpses OFF</Source>
+      <Dest>死体 オフ</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_UtilityHolotapeTargetFilter</EDID>
+      <REC id="5">TERM:RNAM</REC>
+      <Source>Set to ON...</Source>
+      <Dest>オンに設定されました...</Dest>
+    </String>
+    <String List="0" Partial="2">
+      <EDID>LTMN_UtilityHolotapeLootingFilter</EDID>
+      <REC>TERM:WNAM</REC>
+      <Source>~**~ EIDEE-OS ~**~</Source>
+      <Dest>~**~ EIDEE-OS ~**~</Dest>
+    </String>
+    <String List="0" Partial="2">
+      <EDID>LTMN_UtilityHolotapeLootingFilter</EDID>
+      <REC>TERM:FULL</REC>
+      <Source>*./lootman.looting-filter</Source>
+      <Dest>*./lootman.looting-filter</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_UtilityHolotapeLootingFilter</EDID>
+      <REC id="0">TERM:ITXT</REC>
+      <Source>Target Filter &gt;&gt;</Source>
+      <Dest>ターゲットフィルター &gt;&gt;</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_UtilityHolotapeLootingFilter</EDID>
+      <REC id="0">TERM:RNAM</REC>
+      <Source>Loading...</Source>
+      <Dest>ロード中…</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_UtilityHolotapeLootingFilter</EDID>
+      <REC id="1">TERM:ITXT</REC>
+      <Source>Category Filter &gt;&gt;</Source>
+      <Dest>カテゴリフィルター &gt;&gt;</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_UtilityHolotapeLootingFilter</EDID>
+      <REC id="1">TERM:RNAM</REC>
+      <Source>Loading...</Source>
+      <Dest>ロード中…</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_UtilityHolotapeLootingFilter</EDID>
+      <REC id="2">TERM:ITXT</REC>
+      <Source>Advanced Filter &gt;&gt;</Source>
+      <Dest>詳細なフィルター &gt;&gt;</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_UtilityHolotapeLootingFilter</EDID>
+      <REC id="2">TERM:RNAM</REC>
+      <Source>Loading...</Source>
+      <Dest>ロード中…</Dest>
+    </String>
+    <String List="0" Partial="2">
+      <EDID>LTMN_UtilityHolotapeThreadLimitNPC_</EDID>
+      <REC>TERM:WNAM</REC>
+      <Source>~**~ EIDEE-OS ~**~</Source>
+      <Dest>~**~ EIDEE-OS ~**~</Dest>
+    </String>
+    <String List="0" Partial="2">
+      <EDID>LTMN_UtilityHolotapeThreadLimitNPC_</EDID>
+      <REC>TERM:FULL</REC>
+      <Source>*./lootman.settings.thread-limit.npc_</Source>
+      <Dest>*./lootman.settings.thread-limit.npc_</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_UtilityHolotapeThreadLimitNPC_</EDID>
+      <REC id="0">TERM:ITXT</REC>
+      <Source>* Thread Limit 1</Source>
+      <Dest>* 最大スレッド数 1</Dest>
+    </String>
+    <String List="0" Partial="1">
+      <EDID>LTMN_UtilityHolotapeThreadLimitNPC_</EDID>
+      <REC id="1">TERM:ITXT</REC>
+      <Source>Thread Limit 1</Source>
+      <Dest>最大スレッド数 1</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_UtilityHolotapeThreadLimitNPC_</EDID>
+      <REC id="0">TERM:RNAM</REC>
+      <Source>Set to 1...</Source>
+      <Dest>1に設定されました...</Dest>
+    </String>
+    <String List="0" Partial="1">
+      <EDID>LTMN_UtilityHolotapeThreadLimitNPC_</EDID>
+      <REC id="2">TERM:ITXT</REC>
+      <Source>* Thread Limit 2</Source>
+      <Dest>* 最大スレッド数 2</Dest>
+    </String>
+    <String List="0" Partial="1">
+      <EDID>LTMN_UtilityHolotapeThreadLimitNPC_</EDID>
+      <REC id="3">TERM:ITXT</REC>
+      <Source>Thread Limit 2</Source>
+      <Dest>最大スレッド数 2</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_UtilityHolotapeThreadLimitNPC_</EDID>
+      <REC id="1">TERM:RNAM</REC>
+      <Source>Set to 2...</Source>
+      <Dest>2に設定されました...</Dest>
+    </String>
+    <String List="0" Partial="1">
+      <EDID>LTMN_UtilityHolotapeThreadLimitNPC_</EDID>
+      <REC id="4">TERM:ITXT</REC>
+      <Source>* Thread Limit 3</Source>
+      <Dest>* 最大スレッド数 3</Dest>
+    </String>
+    <String List="0" Partial="1">
+      <EDID>LTMN_UtilityHolotapeThreadLimitNPC_</EDID>
+      <REC id="5">TERM:ITXT</REC>
+      <Source>Thread Limit 3</Source>
+      <Dest>最大スレッド数 3</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_UtilityHolotapeThreadLimitNPC_</EDID>
+      <REC id="2">TERM:RNAM</REC>
+      <Source>Set to 3...</Source>
+      <Dest>3に設定されました...</Dest>
+    </String>
+    <String List="0" Partial="1">
+      <EDID>LTMN_UtilityHolotapeThreadLimitNPC_</EDID>
+      <REC id="6">TERM:ITXT</REC>
+      <Source>* Thread Limit 4</Source>
+      <Dest>* 最大スレッド数 4</Dest>
+    </String>
+    <String List="0" Partial="1">
+      <EDID>LTMN_UtilityHolotapeThreadLimitNPC_</EDID>
+      <REC id="7">TERM:ITXT</REC>
+      <Source>Thread Limit 4</Source>
+      <Dest>最大スレッド数 4</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_UtilityHolotapeThreadLimitNPC_</EDID>
+      <REC id="3">TERM:RNAM</REC>
+      <Source>Set to 4...</Source>
+      <Dest>4に設定されました...</Dest>
+    </String>
+    <String List="0" Partial="1">
+      <EDID>LTMN_UtilityHolotapeThreadLimitNPC_</EDID>
+      <REC id="8">TERM:ITXT</REC>
+      <Source>* Thread Limit 5</Source>
+      <Dest>* 最大スレッド数 5</Dest>
+    </String>
+    <String List="0" Partial="1">
+      <EDID>LTMN_UtilityHolotapeThreadLimitNPC_</EDID>
+      <REC id="9">TERM:ITXT</REC>
+      <Source>Thread Limit 5</Source>
+      <Dest>最大スレッド数 5</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_UtilityHolotapeThreadLimitNPC_</EDID>
+      <REC id="4">TERM:RNAM</REC>
+      <Source>Set to 5...</Source>
+      <Dest>5に設定されました...</Dest>
+    </String>
+    <String List="0" Partial="1">
+      <EDID>LTMN_UtilityHolotapeThreadLimitNPC_</EDID>
+      <REC id="10">TERM:ITXT</REC>
+      <Source>* Thread Limit 6</Source>
+      <Dest>* 最大スレッド数 6</Dest>
+    </String>
+    <String List="0" Partial="1">
+      <EDID>LTMN_UtilityHolotapeThreadLimitNPC_</EDID>
+      <REC id="11">TERM:ITXT</REC>
+      <Source>Thread Limit 6</Source>
+      <Dest>最大スレッド数 6</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_UtilityHolotapeThreadLimitNPC_</EDID>
+      <REC id="5">TERM:RNAM</REC>
+      <Source>Set to 6...</Source>
+      <Dest>6に設定されました...</Dest>
+    </String>
+    <String List="0" Partial="1">
+      <EDID>LTMN_UtilityHolotapeThreadLimitNPC_</EDID>
+      <REC id="12">TERM:ITXT</REC>
+      <Source>* Thread Limit 7</Source>
+      <Dest>* 最大スレッド数 7</Dest>
+    </String>
+    <String List="0" Partial="1">
+      <EDID>LTMN_UtilityHolotapeThreadLimitNPC_</EDID>
+      <REC id="13">TERM:ITXT</REC>
+      <Source>Thread Limit 7</Source>
+      <Dest>最大スレッド数 7</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_UtilityHolotapeThreadLimitNPC_</EDID>
+      <REC id="6">TERM:RNAM</REC>
+      <Source>Set to 7...</Source>
+      <Dest>7に設定されました...</Dest>
+    </String>
+    <String List="0" Partial="1">
+      <EDID>LTMN_UtilityHolotapeThreadLimitNPC_</EDID>
+      <REC id="14">TERM:ITXT</REC>
+      <Source>* Thread Limit 8</Source>
+      <Dest>* 最大スレッド数 8</Dest>
+    </String>
+    <String List="0" Partial="1">
+      <EDID>LTMN_UtilityHolotapeThreadLimitNPC_</EDID>
+      <REC id="15">TERM:ITXT</REC>
+      <Source>Thread Limit 8</Source>
+      <Dest>最大スレッド数 8</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_UtilityHolotapeThreadLimitNPC_</EDID>
+      <REC id="7">TERM:RNAM</REC>
+      <Source>Set to 8...</Source>
+      <Dest>8に設定されました...</Dest>
+    </String>
+    <String List="0" Partial="2">
+      <EDID>LTMN_UtilityHolotapeThreadLimitWEAP</EDID>
+      <REC>TERM:WNAM</REC>
+      <Source>~**~ EIDEE-OS ~**~</Source>
+      <Dest>~**~ EIDEE-OS ~**~</Dest>
+    </String>
+    <String List="0" Partial="2">
+      <EDID>LTMN_UtilityHolotapeThreadLimitWEAP</EDID>
+      <REC>TERM:FULL</REC>
+      <Source>*./lootman.settings.thread-limit.weap</Source>
+      <Dest>*./lootman.settings.thread-limit.weap</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_UtilityHolotapeThreadLimitWEAP</EDID>
+      <REC id="0">TERM:ITXT</REC>
+      <Source>* Thread Limit 1</Source>
+      <Dest>* 最大スレッド数 1</Dest>
+    </String>
+    <String List="0" Partial="1">
+      <EDID>LTMN_UtilityHolotapeThreadLimitWEAP</EDID>
+      <REC id="1">TERM:ITXT</REC>
+      <Source>Thread Limit 1</Source>
+      <Dest>最大スレッド数 1</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_UtilityHolotapeThreadLimitWEAP</EDID>
+      <REC id="0">TERM:RNAM</REC>
+      <Source>Set to 1...</Source>
+      <Dest>1に設定されました...</Dest>
+    </String>
+    <String List="0" Partial="1">
+      <EDID>LTMN_UtilityHolotapeThreadLimitWEAP</EDID>
+      <REC id="2">TERM:ITXT</REC>
+      <Source>* Thread Limit 2</Source>
+      <Dest>* 最大スレッド数 2</Dest>
+    </String>
+    <String List="0" Partial="1">
+      <EDID>LTMN_UtilityHolotapeThreadLimitWEAP</EDID>
+      <REC id="3">TERM:ITXT</REC>
+      <Source>Thread Limit 2</Source>
+      <Dest>最大スレッド数 2</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_UtilityHolotapeThreadLimitWEAP</EDID>
+      <REC id="1">TERM:RNAM</REC>
+      <Source>Set to 2...</Source>
+      <Dest>2に設定されました...</Dest>
+    </String>
+    <String List="0" Partial="1">
+      <EDID>LTMN_UtilityHolotapeThreadLimitWEAP</EDID>
+      <REC id="4">TERM:ITXT</REC>
+      <Source>* Thread Limit 3</Source>
+      <Dest>* 最大スレッド数 3</Dest>
+    </String>
+    <String List="0" Partial="1">
+      <EDID>LTMN_UtilityHolotapeThreadLimitWEAP</EDID>
+      <REC id="5">TERM:ITXT</REC>
+      <Source>Thread Limit 3</Source>
+      <Dest>最大スレッド数 3</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_UtilityHolotapeThreadLimitWEAP</EDID>
+      <REC id="2">TERM:RNAM</REC>
+      <Source>Set to 3...</Source>
+      <Dest>3に設定されました...</Dest>
+    </String>
+    <String List="0" Partial="1">
+      <EDID>LTMN_UtilityHolotapeThreadLimitWEAP</EDID>
+      <REC id="6">TERM:ITXT</REC>
+      <Source>* Thread Limit 4</Source>
+      <Dest>* 最大スレッド数 4</Dest>
+    </String>
+    <String List="0" Partial="1">
+      <EDID>LTMN_UtilityHolotapeThreadLimitWEAP</EDID>
+      <REC id="7">TERM:ITXT</REC>
+      <Source>Thread Limit 4</Source>
+      <Dest>最大スレッド数 4</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_UtilityHolotapeThreadLimitWEAP</EDID>
+      <REC id="3">TERM:RNAM</REC>
+      <Source>Set to 4...</Source>
+      <Dest>4に設定されました...</Dest>
+    </String>
+    <String List="0" Partial="1">
+      <EDID>LTMN_UtilityHolotapeThreadLimitWEAP</EDID>
+      <REC id="8">TERM:ITXT</REC>
+      <Source>* Thread Limit 5</Source>
+      <Dest>* 最大スレッド数 5</Dest>
+    </String>
+    <String List="0" Partial="1">
+      <EDID>LTMN_UtilityHolotapeThreadLimitWEAP</EDID>
+      <REC id="9">TERM:ITXT</REC>
+      <Source>Thread Limit 5</Source>
+      <Dest>最大スレッド数 5</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_UtilityHolotapeThreadLimitWEAP</EDID>
+      <REC id="4">TERM:RNAM</REC>
+      <Source>Set to 5...</Source>
+      <Dest>5に設定されました...</Dest>
+    </String>
+    <String List="0" Partial="1">
+      <EDID>LTMN_UtilityHolotapeThreadLimitWEAP</EDID>
+      <REC id="10">TERM:ITXT</REC>
+      <Source>* Thread Limit 6</Source>
+      <Dest>* 最大スレッド数 6</Dest>
+    </String>
+    <String List="0" Partial="1">
+      <EDID>LTMN_UtilityHolotapeThreadLimitWEAP</EDID>
+      <REC id="11">TERM:ITXT</REC>
+      <Source>Thread Limit 6</Source>
+      <Dest>最大スレッド数 6</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_UtilityHolotapeThreadLimitWEAP</EDID>
+      <REC id="5">TERM:RNAM</REC>
+      <Source>Set to 6...</Source>
+      <Dest>6に設定されました...</Dest>
+    </String>
+    <String List="0" Partial="1">
+      <EDID>LTMN_UtilityHolotapeThreadLimitWEAP</EDID>
+      <REC id="12">TERM:ITXT</REC>
+      <Source>* Thread Limit 7</Source>
+      <Dest>* 最大スレッド数 7</Dest>
+    </String>
+    <String List="0" Partial="1">
+      <EDID>LTMN_UtilityHolotapeThreadLimitWEAP</EDID>
+      <REC id="13">TERM:ITXT</REC>
+      <Source>Thread Limit 7</Source>
+      <Dest>最大スレッド数 7</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_UtilityHolotapeThreadLimitWEAP</EDID>
+      <REC id="6">TERM:RNAM</REC>
+      <Source>Set to 7...</Source>
+      <Dest>7に設定されました...</Dest>
+    </String>
+    <String List="0" Partial="1">
+      <EDID>LTMN_UtilityHolotapeThreadLimitWEAP</EDID>
+      <REC id="14">TERM:ITXT</REC>
+      <Source>* Thread Limit 8</Source>
+      <Dest>* 最大スレッド数 8</Dest>
+    </String>
+    <String List="0" Partial="1">
+      <EDID>LTMN_UtilityHolotapeThreadLimitWEAP</EDID>
+      <REC id="15">TERM:ITXT</REC>
+      <Source>Thread Limit 8</Source>
+      <Dest>最大スレッド数 8</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_UtilityHolotapeThreadLimitWEAP</EDID>
+      <REC id="7">TERM:RNAM</REC>
+      <Source>Set to 8...</Source>
+      <Dest>8に設定されました...</Dest>
+    </String>
+    <String List="0" Partial="2">
+      <EDID>LTMN_UtilityHolotapeAdvancedFilterWEAP</EDID>
+      <REC>TERM:WNAM</REC>
+      <Source>~**~ EIDEE-OS ~**~</Source>
+      <Dest>~**~ EIDEE-OS ~**~</Dest>
+    </String>
+    <String List="0" Partial="2">
+      <EDID>LTMN_UtilityHolotapeAdvancedFilterWEAP</EDID>
+      <REC>TERM:FULL</REC>
+      <Source>*./lootman.looting-filter.advanced-filter.weap</Source>
+      <Dest>*./lootman.looting-filter.advanced-filter.weap</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_UtilityHolotapeAdvancedFilterWEAP</EDID>
+      <REC id="0">TERM:ITXT</REC>
+      <Source>Grenade ON</Source>
+      <Dest>グレネード オン</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_UtilityHolotapeAdvancedFilterWEAP</EDID>
+      <REC id="0">TERM:RNAM</REC>
+      <Source>Set to OFF...</Source>
+      <Dest>オフに設定されました...</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_UtilityHolotapeAdvancedFilterWEAP</EDID>
+      <REC id="1">TERM:ITXT</REC>
+      <Source>Grenade OFF</Source>
+      <Dest>グレネード オフ</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_UtilityHolotapeAdvancedFilterWEAP</EDID>
+      <REC id="1">TERM:RNAM</REC>
+      <Source>Set to ON...</Source>
+      <Dest>オンに設定されました...</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_UtilityHolotapeAdvancedFilterWEAP</EDID>
+      <REC id="2">TERM:ITXT</REC>
+      <Source>Mine ON</Source>
+      <Dest>地雷 オン</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_UtilityHolotapeAdvancedFilterWEAP</EDID>
+      <REC id="2">TERM:RNAM</REC>
+      <Source>Set to OFF...</Source>
+      <Dest>オフに設定されました...</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_UtilityHolotapeAdvancedFilterWEAP</EDID>
+      <REC id="3">TERM:ITXT</REC>
+      <Source>Mine OFF</Source>
+      <Dest>地雷 オフ</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_UtilityHolotapeAdvancedFilterWEAP</EDID>
+      <REC id="3">TERM:RNAM</REC>
+      <Source>Set to ON...</Source>
+      <Dest>オンに設定されました...</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_UtilityHolotapeAdvancedFilterWEAP</EDID>
+      <REC id="4">TERM:ITXT</REC>
+      <Source>Other Weapons ON</Source>
+      <Dest>その他の武器 オン</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_UtilityHolotapeAdvancedFilterWEAP</EDID>
+      <REC id="4">TERM:RNAM</REC>
+      <Source>Set to OFF...</Source>
+      <Dest>オフに設定されました...</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_UtilityHolotapeAdvancedFilterWEAP</EDID>
+      <REC id="5">TERM:ITXT</REC>
+      <Source>Other Weapons OFF</Source>
+      <Dest>その他の武器 オフ</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_UtilityHolotapeAdvancedFilterWEAP</EDID>
+      <REC id="5">TERM:RNAM</REC>
+      <Source>Set to ON...</Source>
+      <Dest>オンに設定されました...</Dest>
+    </String>
+    <String List="0" Partial="2">
+      <EDID>LTMN_UtilityHolotapeAdvancedFilterALCH</EDID>
+      <REC>TERM:WNAM</REC>
+      <Source>~**~ EIDEE-OS ~**~</Source>
+      <Dest>~**~ EIDEE-OS ~**~</Dest>
+    </String>
+    <String List="0" Partial="2">
+      <EDID>LTMN_UtilityHolotapeAdvancedFilterALCH</EDID>
+      <REC>TERM:FULL</REC>
+      <Source>*./lootman.looting-filter.advanced-filter.alch</Source>
+      <Dest>*./lootman.looting-filter.advanced-filter.alch</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_UtilityHolotapeAdvancedFilterALCH</EDID>
+      <REC id="0">TERM:ITXT</REC>
+      <Source>Alcohol ON</Source>
+      <Dest>アルコール オン</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_UtilityHolotapeAdvancedFilterALCH</EDID>
+      <REC id="0">TERM:RNAM</REC>
+      <Source>Set to OFF...</Source>
+      <Dest>オフに設定されました...</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_UtilityHolotapeAdvancedFilterALCH</EDID>
+      <REC id="1">TERM:ITXT</REC>
+      <Source>Alcohol OFF</Source>
+      <Dest>アルコール オフ</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_UtilityHolotapeAdvancedFilterALCH</EDID>
+      <REC id="1">TERM:RNAM</REC>
+      <Source>Set to ON...</Source>
+      <Dest>オンに設定されました...</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_UtilityHolotapeAdvancedFilterALCH</EDID>
+      <REC id="2">TERM:ITXT</REC>
+      <Source>Chemistry ON</Source>
+      <Dest>薬品 オン</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_UtilityHolotapeAdvancedFilterALCH</EDID>
+      <REC id="2">TERM:RNAM</REC>
+      <Source>Set to OFF...</Source>
+      <Dest>オフに設定されました...</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_UtilityHolotapeAdvancedFilterALCH</EDID>
+      <REC id="3">TERM:ITXT</REC>
+      <Source>Chemistry OFF</Source>
+      <Dest>薬品 オフ</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_UtilityHolotapeAdvancedFilterALCH</EDID>
+      <REC id="3">TERM:RNAM</REC>
+      <Source>Set to ON...</Source>
+      <Dest>オンに設定されました...</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_UtilityHolotapeAdvancedFilterALCH</EDID>
+      <REC id="4">TERM:ITXT</REC>
+      <Source>Food ON</Source>
+      <Dest>食料 オン</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_UtilityHolotapeAdvancedFilterALCH</EDID>
+      <REC id="4">TERM:RNAM</REC>
+      <Source>Set to OFF...</Source>
+      <Dest>オフに設定されました...</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_UtilityHolotapeAdvancedFilterALCH</EDID>
+      <REC id="5">TERM:ITXT</REC>
+      <Source>Food OFF</Source>
+      <Dest>食料 オフ</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_UtilityHolotapeAdvancedFilterALCH</EDID>
+      <REC id="5">TERM:RNAM</REC>
+      <Source>Set to ON...</Source>
+      <Dest>オンに設定されました...</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_UtilityHolotapeAdvancedFilterALCH</EDID>
+      <REC id="6">TERM:ITXT</REC>
+      <Source>Nuka-Cola ON</Source>
+      <Dest>ヌカ・コーラ オン</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_UtilityHolotapeAdvancedFilterALCH</EDID>
+      <REC id="6">TERM:RNAM</REC>
+      <Source>Set to OFF...</Source>
+      <Dest>オフに設定されました...</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_UtilityHolotapeAdvancedFilterALCH</EDID>
+      <REC id="7">TERM:ITXT</REC>
+      <Source>Nuka-Cola OFF</Source>
+      <Dest>ヌカ・コーラ オフ</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_UtilityHolotapeAdvancedFilterALCH</EDID>
+      <REC id="7">TERM:RNAM</REC>
+      <Source>Set to ON...</Source>
+      <Dest>オンに設定されました...</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_UtilityHolotapeAdvancedFilterALCH</EDID>
+      <REC id="8">TERM:ITXT</REC>
+      <Source>Stimpak ON</Source>
+      <Dest>スティムパック オン</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_UtilityHolotapeAdvancedFilterALCH</EDID>
+      <REC id="8">TERM:RNAM</REC>
+      <Source>Set to OFF...</Source>
+      <Dest>オフに設定されました...</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_UtilityHolotapeAdvancedFilterALCH</EDID>
+      <REC id="9">TERM:ITXT</REC>
+      <Source>Stimpak OFF</Source>
+      <Dest>スティムパック オフ</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_UtilityHolotapeAdvancedFilterALCH</EDID>
+      <REC id="9">TERM:RNAM</REC>
+      <Source>Set to ON...</Source>
+      <Dest>オンに設定されました...</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_UtilityHolotapeAdvancedFilterALCH</EDID>
+      <REC id="10">TERM:ITXT</REC>
+      <Source>Syringer Ammo ON</Source>
+      <Dest>シリンジャーの弾薬 オン</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_UtilityHolotapeAdvancedFilterALCH</EDID>
+      <REC id="10">TERM:RNAM</REC>
+      <Source>Set to OFF...</Source>
+      <Dest>オフに設定されました...</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_UtilityHolotapeAdvancedFilterALCH</EDID>
+      <REC id="11">TERM:ITXT</REC>
+      <Source>Syringer Ammo OFF</Source>
+      <Dest>シリンジャーの弾薬 オフ</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_UtilityHolotapeAdvancedFilterALCH</EDID>
+      <REC id="11">TERM:RNAM</REC>
+      <Source>Set to ON...</Source>
+      <Dest>オンに設定されました...</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_UtilityHolotapeAdvancedFilterALCH</EDID>
+      <REC id="12">TERM:ITXT</REC>
+      <Source>Water ON</Source>
+      <Dest>水 オン</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_UtilityHolotapeAdvancedFilterALCH</EDID>
+      <REC id="12">TERM:RNAM</REC>
+      <Source>Set to OFF...</Source>
+      <Dest>オフに設定されました...</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_UtilityHolotapeAdvancedFilterALCH</EDID>
+      <REC id="13">TERM:ITXT</REC>
+      <Source>Water OFF</Source>
+      <Dest>水 オフ</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_UtilityHolotapeAdvancedFilterALCH</EDID>
+      <REC id="13">TERM:RNAM</REC>
+      <Source>Set to ON...</Source>
+      <Dest>オンに設定されました...</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_UtilityHolotapeAdvancedFilterALCH</EDID>
+      <REC id="14">TERM:ITXT</REC>
+      <Source>Other Items ON</Source>
+      <Dest>その他のアイテム オン</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_UtilityHolotapeAdvancedFilterALCH</EDID>
+      <REC id="14">TERM:RNAM</REC>
+      <Source>Set to OFF...</Source>
+      <Dest>オフに設定されました...</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_UtilityHolotapeAdvancedFilterALCH</EDID>
+      <REC id="15">TERM:ITXT</REC>
+      <Source>Other Items OFF</Source>
+      <Dest>その他のアイテム オフ</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_UtilityHolotapeAdvancedFilterALCH</EDID>
+      <REC id="15">TERM:RNAM</REC>
+      <Source>Set to ON...</Source>
+      <Dest>オンに設定されました...</Dest>
+    </String>
+    <String List="0" Partial="2">
+      <EDID>LTMN_UtilityHolotapeAdvancedFilterBOOK</EDID>
+      <REC>TERM:WNAM</REC>
+      <Source>~**~ EIDEE-OS ~**~</Source>
+      <Dest>~**~ EIDEE-OS ~**~</Dest>
+    </String>
+    <String List="0" Partial="2">
+      <EDID>LTMN_UtilityHolotapeAdvancedFilterBOOK</EDID>
+      <REC>TERM:FULL</REC>
+      <Source>*./lootman.looting-filter.advanced-filter.book</Source>
+      <Dest>*./lootman.looting-filter.advanced-filter.book</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_UtilityHolotapeAdvancedFilterBOOK</EDID>
+      <REC id="0">TERM:ITXT</REC>
+      <Source>Perk Magazine ON</Source>
+      <Dest>スキル雑誌 オン</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_UtilityHolotapeAdvancedFilterBOOK</EDID>
+      <REC id="0">TERM:RNAM</REC>
+      <Source>Set to OFF...</Source>
+      <Dest>オフに設定されました...</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_UtilityHolotapeAdvancedFilterBOOK</EDID>
+      <REC id="1">TERM:ITXT</REC>
+      <Source>Perk Magazine OFF</Source>
+      <Dest>スキル雑誌 オフ</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_UtilityHolotapeAdvancedFilterBOOK</EDID>
+      <REC id="1">TERM:RNAM</REC>
+      <Source>Set to ON...</Source>
+      <Dest>オンに設定されました...</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_UtilityHolotapeAdvancedFilterBOOK</EDID>
+      <REC id="2">TERM:ITXT</REC>
+      <Source>Other Books ON</Source>
+      <Dest>その他の本 オン</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_UtilityHolotapeAdvancedFilterBOOK</EDID>
+      <REC id="2">TERM:RNAM</REC>
+      <Source>Set to OFF...</Source>
+      <Dest>オフに設定されました...</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_UtilityHolotapeAdvancedFilterBOOK</EDID>
+      <REC id="3">TERM:ITXT</REC>
+      <Source>Other Books OFF</Source>
+      <Dest>その他の本 オフ</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_UtilityHolotapeAdvancedFilterBOOK</EDID>
+      <REC id="3">TERM:RNAM</REC>
+      <Source>Set to ON...</Source>
+      <Dest>オンに設定されました...</Dest>
+    </String>
+    <String List="0" Partial="2">
+      <EDID>LTMNLootmansPlace</EDID>
+      <REC>CELL:FULL</REC>
+      <Source>__LootmansPlace</Source>
+      <Dest>__LootmansPlace</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_SystemQuest</EDID>
+      <REC id="0">QUST:NNAM</REC>
+      <Source>[Lootman] Installation is complete.</Source>
+      <Dest>[Lootman] インストールが完了しました</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_SystemQuest</EDID>
+      <REC id="1">QUST:NNAM</REC>
+      <Source>[Lootman] Looting is disabled.</Source>
+      <Dest>[Lootman] 自動収集を無効にしました</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_SystemQuest</EDID>
+      <REC id="2">QUST:NNAM</REC>
+      <Source>[Lootman] Looting is enabled.</Source>
+      <Dest>[Lootman] 自動収集を有効にしました</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_SystemQuest</EDID>
+      <REC id="3">QUST:NNAM</REC>
+      <Source>[Lootman] Looting stopped due to overweight.</Source>
+      <Dest>[Lootman] 重量オーバーのため自動収集が停止しました</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_SystemQuest</EDID>
+      <REC id="4">QUST:NNAM</REC>
+      <Source>[Lootman] Overweight has been cleared, looting resumes.</Source>
+      <Dest>[Lootman] 重量オーバーが解消され、自動収集が再開しました</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_SystemQuest</EDID>
+      <REC id="5">QUST:NNAM</REC>
+      <Source>[Lootman] Disabled the workshop link for this settlement.</Source>
+      <Dest>[Lootman] この居住地とのワークショップのリンクを有効にしました</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_SystemQuest</EDID>
+      <REC id="6">QUST:NNAM</REC>
+      <Source>[Lootman] Enabled the workshop link for this settlement.</Source>
+      <Dest>[Lootman] この居住地とのワークショップのリンクを無効にしました</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_SystemQuest</EDID>
+      <REC id="7">QUST:NNAM</REC>
+      <Source>[Lootman] Workshop is not found.</Source>
+      <Dest>[Lootman] ワークショップが見つかりません</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_SystemQuest</EDID>
+      <REC id="8">QUST:NNAM</REC>
+      <Source>[Lootman] Process is complete.</Source>
+      <Dest>[Lootman] プロセス完了</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_SystemQuest</EDID>
+      <REC id="9">QUST:NNAM</REC>
+      <Source>[Lootman] Uninstallation is complete.</Source>
+      <Dest>[Lootman] アンインストールが完了しました</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_SystemQuest</EDID>
+      <REC id="10">QUST:NNAM</REC>
+      <Source>[Lootman] Temporarily disable looting because entered the settlement.</Source>
+      <Dest>[Lootman] 居住地に入ったので自動収集を無効化します</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_SystemQuest</EDID>
+      <REC id="11">QUST:NNAM</REC>
+      <Source>[Lootman] Looting has been enabled as have left the settlement.</Source>
+      <Dest>[Lootman] 居住地を出たので自動収集を有効化します</Dest>
+    </String>
+    <String List="0" Partial="2">
+      <EDID>LTMN_ExcludeLocationRefList</EDID>
+      <REC>FLST:FULL</REC>
+      <Source>[Not Edit] Exclude LocationRef List</Source>
+      <Dest>[Not Edit] Exclude LocationRef List</Dest>
+    </String>
+    <String List="0" Partial="2">
+      <EDID>LTMN_ExcludeFormList</EDID>
+      <REC>FLST:FULL</REC>
+      <Source>[Not Edit] Exclude Form List</Source>
+      <Dest>[Not Edit] Exclude Form List</Dest>
+    </String>
+    <String List="0" Partial="2">
+      <EDID>LTMN_AllowedFeaturedItemList</EDID>
+      <REC>FLST:FULL</REC>
+      <Source>[Not Edit] Allowed Featured Item List</Source>
+      <Dest>[Not Edit] Allowed Featured Item List</Dest>
+    </String>
+    <String List="0" Partial="2">
+      <EDID>LTMN_VendorChestList</EDID>
+      <REC>FLST:FULL</REC>
+      <Source>[Not Edit] Vendor Chest List</Source>
+      <Dest>[Not Edit] Vendor Chest List</Dest>
+    </String>
+    <String List="0" Partial="2">
+      <EDID>LTMN_WeaponTypeMineKeywordList</EDID>
+      <REC>FLST:FULL</REC>
+      <Source>[Not Edit] Weapon Type Mine Keywords</Source>
+      <Dest>[Not Edit] Weapon Type Mine Keywords</Dest>
+    </String>
+    <String List="0" Partial="2">
+      <EDID>LTMN_ExcludeKeywordList</EDID>
+      <REC>FLST:FULL</REC>
+      <Source>[Not Edit] Exclude Keyword List</Source>
+      <Dest>[Not Edit] Exclude Keyword List</Dest>
+    </String>
+    <String List="0" Partial="2">
+      <EDID>LTMN_AllowedUniqueItemList</EDID>
+      <REC>FLST:FULL</REC>
+      <Source>[Not Edit] Allowed Unique Item List</Source>
+      <Dest>[Not Edit] Allowed Unique Item List</Dest>
+    </String>
+    <String List="0" Partial="2">
+      <EDID>LTMN_IgnorableActivationBlockeList</EDID>
+      <REC>FLST:FULL</REC>
+      <Source>[Not Edit] Ignorable Activation Blocke List</Source>
+      <Dest>[Not Edit] Ignorable Activation Blocke List</Dest>
+    </String>
+    <String List="0" Partial="2">
+      <EDID>LTMN_AllowedActivatorList</EDID>
+      <REC>FLST:FULL</REC>
+      <Source>[Not Edit] Allowed Activator List</Source>
+      <Dest>[Not Edit] Allowed Activator List</Dest>
+    </String>
+    <String List="0" Partial="2">
+      <EDID>LTMN_WeaponTypeGrenadeKeywordList</EDID>
+      <REC>FLST:FULL</REC>
+      <Source>[Not Edit] Weapon Type Grenade Keywords</Source>
+      <Dest>[Not Edit] Weapon Type Grenade Keywords</Dest>
+    </String>
+    <String List="0" Partial="2">
+      <EDID>LTMN_LootmansPlaceLocation</EDID>
+      <REC>LCTN:FULL</REC>
+      <Source>__LootmansPlace</Source>
+      <Dest>__LootmansPlace</Dest>
+    </String>
+  </Content>
+</SSTXMLRessources>
