@@ -626,6 +626,7 @@ namespace PapyrusLootman
             return false;
         }
 
+        bool hasLegendaryMod = false;
         {
             inventoryList->inventoryLock.LockForRead();
 
@@ -650,7 +651,6 @@ namespace PapyrusLootman
                     continue;
                 }
 
-                bool hasLegendaryMod = false;
                 item.stack->Visit([&hasLegendaryMod](BGSInventoryItem::Stack* stack) mutable
                 {
                     hasLegendaryMod = _HasLegendaryMod(_GetAllMod(stack->extraData));
@@ -663,10 +663,7 @@ namespace PapyrusLootman
 
                 if (hasLegendaryMod)
                 {
-#ifdef _DEBUG
-                    _MESSAGE("| %s | *** HasLegendaryItem end ***", processId);
-#endif
-                    return true;
+                    break;
                 }
             }
 
@@ -676,7 +673,7 @@ namespace PapyrusLootman
 #ifdef _DEBUG
         _MESSAGE("| %s | *** HasLegendaryItem end ***", processId);
 #endif
-        return false;
+        return hasLegendaryMod;
     }
 
     // Verify the object is a Legendary item. Returns false if the object is not playable, or if it is neither a weapon nor armor
