@@ -1,12 +1,14 @@
 ﻿#include "Utility.h"
 
 #include "f4se/GameData.h"
+#include "f4se/GameReferences.h"
 #include "f4se/GameRTTI.h"
 
 namespace Utility
 {
     typedef bool (*_IKeywordFormBase_HasKeyword)(IKeywordFormBase* keywordFormBase, BGSKeyword* keyword,
                                                  TBO_InstanceData* instanceData);
+    typedef bool (*_TESForm_IsWater)(TESForm* form);
 
     TESForm* LookupForm(std::string value)
     {
@@ -40,5 +42,11 @@ namespace Utility
             return function(keywordFormBase, keyword, nullptr);
         }
         return false;
+    }
+
+    bool IsWater(TESForm* form)
+    {
+        const auto function = GetVirtualFunction<_TESForm_IsWater>(form, 49);
+        return function(form);
     }
 }

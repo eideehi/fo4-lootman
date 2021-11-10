@@ -101,6 +101,12 @@ namespace PapyrusLootman
         return (ref->formID >> 24) == 0xFF && (ref->baseForm->formID >> 24) == 0xFF && (ref->flags & 1 << 14) != 0;
     }
 
+    // Verify that the object is a valid
+    inline bool _IsValid(TESForm* form)
+    {
+        return (form->flags & (TESForm::kFlag_IsDeleted | TESForm::kFlag_IsDisabled)) == 0;
+    }
+
     // Retrieves objects that exist within a certain range starting from a specified object, and returns the objects filtered by form type
     VMArray<TESObjectREFR*> _FindAllReferencesOfFormType(TESObjectREFR* ref, UInt32 range, UInt32 formType)
     {
@@ -110,7 +116,7 @@ namespace PapyrusLootman
             return result;
         }
 
-        std::unordered_set<UInt32> knownIDs;
+        std::unordered_set<UInt32> processedObject;
         typedef std::pair<TESObjectREFR*, float> foundObject;
         std::vector<foundObject> foundObjects;
         NiPoint3 origin = ref->pos;
@@ -126,19 +132,14 @@ namespace PapyrusLootman
             for (int i = 0; i < cell->objectList.count; i++)
             {
                 TESObjectREFR* obj = cell->objectList.entries[i];
-                if (!obj)
+                // Skip if the object cannot be referenced, or if the object has already been processed
+                if (!obj || !processedObject.emplace(obj->formID).second)
                 {
                     continue;
                 }
 
-                // Skip items once they've been processed.
-                if (!knownIDs.insert(obj->formID).second)
-                {
-                    continue;
-                }
-
-                // Ignore deleted or disabled objects.
-                if ((obj->flags & (TESForm::kFlag_IsDeleted | TESForm::kFlag_IsDisabled)) != 0)
+                // Ignore water or invalid objects
+                if (Utility::IsWater(obj) || !_IsValid(obj))
                 {
                     continue;
                 }

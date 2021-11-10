@@ -17,4 +17,6 @@ namespace Utility
     TESForm* LookupForm(std::string value);
 
     bool HasKeyword(TESForm* form, BGSKeyword* keyword);
+
+    bool IsWater(TESForm* form);
 }
