@@ -294,24 +294,36 @@ namespace PapyrusLootman
         }
 
         VMArray<TESObjectREFR*> objects = _FindAllReferencesOfFormType(ref, range, -1);
+#ifdef _DEBUG
+        _MESSAGE("| %s |   Total objects to check: %d", processId, objects.Length());
+#endif
         for (UInt32 i = 0; i < objects.Length(); i++)
         {
             TESObjectREFR* obj = nullptr;
             objects.Get(&obj, i);
+#ifdef _DEBUG
+            _MESSAGE("| %s |     ** Check Object_%d **", processId, i);
+#endif
+            auto actorValueOwner = DYNAMIC_CAST(obj, TESObjectREFR, ActorValueOwner);
+            if (!actorValueOwner)
+            {
+                continue;
+            }
 
-            float timestamp = obj->actorValueOwner.GetValue(avif);
+            const float timestamp = actorValueOwner->GetValue(avif);
             if (currentTime < timestamp || (timestamp > 0 && (currentTime - timestamp) >= expiration))
             {
                 result.Push(&obj);
 #ifdef _DEBUG
-                _MESSAGE("| %s |   ** Expired object **", processId);
-                _TraceTESObjectREFR(processId, obj, 2);
-                _MESSAGE("| %s |       Distance: [%f]", processId, _GetMagnitude(obj->pos));
+                _MESSAGE("| %s |       ** Object_%d is expired **", processId, i);
+                _TraceTESObjectREFR(processId, obj, 4);
+                _MESSAGE("| %s |         Distance: [%f]", processId, _GetMagnitude(obj->pos));
                 _TraceReferenceFlags(processId, obj, 3, true);
 #endif
             }
         }
 #ifdef _DEBUG
+        _MESSAGE("| %s |   Found expired objects: %d", processId, result.Length());
         _MESSAGE("| %s | *** GetAllExpiredObject end ***", processId);
 #endif
         return result;
