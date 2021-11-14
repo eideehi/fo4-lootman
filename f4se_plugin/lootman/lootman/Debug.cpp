@@ -232,8 +232,6 @@ void _TraceExtraDataList(const char* processId, ExtraDataList* extraDataList, in
 
             _MESSAGE("| %s | %s[ ExtraUniqueID ]", processId, i2);
             _MESSAGE("| %s | %sUniqueID  : %08X", processId, i3, uniqueId->uniqueId);
-            _MESSAGE("| %s | %sunk1A     : [D=%d, H=%08X, B=%s]", processId, i3, uniqueId->unk1A, uniqueId->unk1A,
-                     _flags2s(uniqueId->unk1A));
             _MESSAGE("| %s | %sFormOwner : %08X", processId, i3, uniqueId->formOwner);
         }
     }
@@ -277,8 +275,6 @@ void _TraceExtraDataList(const char* processId, ExtraDataList* extraDataList, in
             {
                 _MESSAGE("| %s | %s[ InstanceData_%d ]", processId, i3, count);
                 _MESSAGE("| %s | %sID    : %08X", processId, i4, data->forms[i].formId);
-                _MESSAGE("| %s | %sunk04 : [D=%d, H=%08X, B=%s]", processId, i4, data->forms[i].unk04,
-                         data->forms[i].unk04, _flags2s(data->forms[i].unk04));
                 count++;
             }
         }
@@ -328,17 +324,6 @@ void _TraceTESObjectCELL(const char* processId, TESObjectCELL* cell, int indent,
     _MESSAGE("| %s | %sName  : %s", processId, i2, cell->GetFullName());
     _MESSAGE("| %s | %sID    : %08X", processId, i2, cell->formID);
     _MESSAGE("| %s | %sFlags : [D=%d, B=%s]", processId, i2, cell->flags, _flags2s(cell->flags));
-    _MESSAGE("| %s | %sunk30 : [D=%d, B=%s]", processId, i2, cell->unk30, _flags2s(cell->unk30));
-    _MESSAGE("| %s | %sunk38 : [D=%d, B=%s]", processId, i2, cell->unk38, _flags2s(cell->unk38));
-    _MESSAGE("| %s | %sunk42 : [D=%d, B=%s]", processId, i2, cell->unk42, _flags2s(cell->unk42));
-    _MESSAGE("| %s | %sunk44 : [D=%d, B=%s]", processId, i2, cell->unk44, _flags2s(cell->unk44));
-    _MESSAGE("| %s | %sunk60 : [D=%d, B=%s]", processId, i2, cell->unk60, _flags2s(cell->unk60));
-    _MESSAGE("| %s | %sunk64 : [F=%f]", processId, i2, cell->unk64);
-    _MESSAGE("| %s | %sunk88 : [D=%d, B=%s]", processId, i2, cell->unk88, _flags2s(cell->unk88));
-    _MESSAGE("| %s | %sunkD0 : [D=%d, B=%s]", processId, i2, cell->unkD0, _flags2s(cell->unkD0));
-    _MESSAGE("| %s | %sunkD8 : [D=%d, B=%s]", processId, i2, cell->unkD8, _flags2s(cell->unkD8));
-    _MESSAGE("| %s | %sunkE0 : [D=%d, B=%s]", processId, i2, cell->unkE0, _flags2s(cell->unkE0));
-    _MESSAGE("| %s | %sunkEC : [D=%d, B=%s]", processId, i2, cell->unkEC, _flags2s(cell->unkEC));
 
     _TraceExtraDataList(processId, cell->extraDataList, indent + 1);
 
@@ -374,14 +359,7 @@ void _TraceTESObjectREFR(const char* processId, TESObjectREFR* ref, int indent, 
     {
         const char* i3 = _MakeIndent(indent + 2);
         _MESSAGE("| %s | %s[ Loaded Data ]", processId, i2);
-        _MESSAGE("| %s | %sFlags : [D=%d, B=%s]", processId, i3, loadedData->flags,
-                 _flags2s(loadedData->flags));
-        _MESSAGE("| %s | %sunk00 : [D=%d, B=%s]", processId, i3, loadedData->unk00,
-                 _flags2s(loadedData->unk00));
-        _MESSAGE("| %s | %sunk10 : [D=%d, B=%s]", processId, i3, loadedData->unk10,
-                 _flags2s(loadedData->unk10));
-        _MESSAGE("| %s | %sunk18 : [D=%d, B=%s]", processId, i3, loadedData->unk18,
-                 _flags2s(loadedData->unk18));
+        _MESSAGE("| %s | %sFlags : [D=%d, B=%s]", processId, i3, loadedData->flags, _flags2s(loadedData->flags));
     }
 
     _TraceExtraDataList(processId, ref->extraDataList, indent + 1);
@@ -445,52 +423,7 @@ void _TraceReferenceFlags(const char* processId, TESObjectREFR* ref, int indent,
 
     _referenceIdByFlags[referenceId] = flags;
 
-    const char* i1 = _MakeIndent(indent);
-    const char* i2 = _MakeIndent(indent + 1);
-    const char* i3 = _MakeIndent(indent + 2);
-
-    _MESSAGE("| %s | %s[ Reference Flags ]", processId, i1);
-
-    _MESSAGE("| %s | %sFlags      : %s", processId, i2, _flags2s(flags));
-
-    _MESSAGE("| %s | %s[ Digits ]", processId, i2);
-    _MESSAGE("| %s | %sDigit  1 : %d", processId, i3, (flags & 1 << 0) ? 1 : 0);
-    _MESSAGE("| %s | %sDigit  2 : %d", processId, i3, (flags & 1 << 1) ? 1 : 0);
-    _MESSAGE("| %s | %sDigit  3 : %d", processId, i3, (flags & 1 << 2) ? 1 : 0);
-    _MESSAGE("| %s | %sDigit  4 : %d", processId, i3, (flags & 1 << 3) ? 1 : 0);
-    _MESSAGE("| %s | %sDigit  5 : %d", processId, i3, (flags & 1 << 4) ? 1 : 0);
-    _MESSAGE("| %s | %sDigit  6 : %d", processId, i3, (flags & 1 << 5) ? 1 : 0);
-    _MESSAGE("| %s | %sDigit  7 : %d", processId, i3, (flags & 1 << 6) ? 1 : 0);
-    _MESSAGE("| %s | %sDigit  8 : %d", processId, i3, (flags & 1 << 7) ? 1 : 0);
-    _MESSAGE("| %s | %sDigit  9 : %d", processId, i3, (flags & 1 << 8) ? 1 : 0);
-    _MESSAGE("| %s | %sDigit 10 : %d", processId, i3, (flags & 1 << 9) ? 1 : 0);
-    _MESSAGE("| %s | %sDigit 11 : %d", processId, i3, (flags & 1 << 10) ? 1 : 0);
-    _MESSAGE("| %s | %sDigit 12 : %d", processId, i3, (flags & 1 << 11) ? 1 : 0);
-    _MESSAGE("| %s | %sDigit 13 : %d", processId, i3, (flags & 1 << 12) ? 1 : 0);
-    _MESSAGE("| %s | %sDigit 14 : %d", processId, i3, (flags & 1 << 13) ? 1 : 0);
-    _MESSAGE("| %s | %sDigit 15 : %d", processId, i3, (flags & 1 << 14) ? 1 : 0);
-    _MESSAGE("| %s | %sDigit 16 : %d", processId, i3, (flags & 1 << 15) ? 1 : 0);
-    _MESSAGE("| %s | %sDigit 17 : %d", processId, i3, (flags & 1 << 16) ? 1 : 0);
-    _MESSAGE("| %s | %sDigit 18 : %d", processId, i3, (flags & 1 << 17) ? 1 : 0);
-    _MESSAGE("| %s | %sDigit 19 : %d", processId, i3, (flags & 1 << 18) ? 1 : 0);
-    _MESSAGE("| %s | %sDigit 20 : %d", processId, i3, (flags & 1 << 19) ? 1 : 0);
-    _MESSAGE("| %s | %sDigit 21 : %d", processId, i3, (flags & 1 << 20) ? 1 : 0);
-    _MESSAGE("| %s | %sDigit 22 : %d", processId, i3, (flags & 1 << 21) ? 1 : 0);
-    _MESSAGE("| %s | %sDigit 23 : %d", processId, i3, (flags & 1 << 22) ? 1 : 0);
-    _MESSAGE("| %s | %sDigit 24 : %d", processId, i3, (flags & 1 << 23) ? 1 : 0);
-    _MESSAGE("| %s | %sDigit 25 : %d", processId, i3, (flags & 1 << 24) ? 1 : 0);
-    _MESSAGE("| %s | %sDigit 26 : %d", processId, i3, (flags & 1 << 25) ? 1 : 0);
-    _MESSAGE("| %s | %sDigit 27 : %d", processId, i3, (flags & 1 << 26) ? 1 : 0);
-    _MESSAGE("| %s | %sDigit 28 : %d", processId, i3, (flags & 1 << 27) ? 1 : 0);
-    _MESSAGE("| %s | %sDigit 29 : %d", processId, i3, (flags & 1 << 28) ? 1 : 0);
-    _MESSAGE("| %s | %sDigit 30 : %d", processId, i3, (flags & 1 << 29) ? 1 : 0);
-    _MESSAGE("| %s | %sDigit 31 : %d", processId, i3, (flags & 1 << 30) ? 1 : 0);
-    _MESSAGE("| %s | %sDigit 32 : %d", processId, i3, (flags & 1 << 31) ? 1 : 0);
-
-    if (close)
-    {
-        _MESSAGE("| %s | %s[ =============== ]", processId, i1);
-    }
+    _MESSAGE("| %s | %s{ Flags has been updated }", processId, _MakeIndent(indent));
 }
 
 #endif
