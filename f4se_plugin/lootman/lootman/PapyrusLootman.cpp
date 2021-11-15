@@ -253,7 +253,13 @@ namespace PapyrusLootman
             TESObjectREFR* obj = nullptr;
             tmp.Get(&obj, i);
 
-            if (obj->actorValueOwner.GetValue(avif) <= 0)
+            auto actorValueOwner = DYNAMIC_CAST(obj, TESObjectREFR, ActorValueOwner);
+            if (!actorValueOwner)
+            {
+                continue;
+            }
+
+            if (actorValueOwner->GetValue(avif) <= 0)
             {
                 result.Push(&obj);
 #ifdef _DEBUG
