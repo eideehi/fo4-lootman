@@ -18,7 +18,7 @@ void Messaging(F4SEMessagingInterface::Message* msg)
     _MESSAGE(">> F4SE messaging: [type: %d]", msg->type);
     if (msg->type == F4SEMessagingInterface::kMessage_GameLoaded)
     {
-        FormIDCache::RegisterEventListener();
+        FormIDCache::Initialize();
     }
     else if (msg->type == F4SEMessagingInterface::kMessage_PreLoadGame)
     {

@@ -235,7 +235,7 @@ namespace PapyrusLootman
             return result;
         }
 
-        ActorValueInfo* avif = DYNAMIC_CAST(Utility::LookupForm("Lootman.esp|00D5EF"), TESForm, ActorValueInfo);
+        ActorValueInfo* avif = DYNAMIC_CAST(LookupFormByID(FormIDCache::lastLootingTimestamp), TESForm, ActorValueInfo);
         if (!avif)
         {
             _ERROR(">> [ERROR] ACTOR_VALUE GET ERROR!!");
@@ -286,7 +286,7 @@ namespace PapyrusLootman
             return result;
         }
 
-        ActorValueInfo* avif = DYNAMIC_CAST(Utility::LookupForm("Lootman.esp|00D5EF"), TESForm, ActorValueInfo);
+        ActorValueInfo* avif = DYNAMIC_CAST(LookupFormByID(FormIDCache::lastLootingTimestamp), TESForm, ActorValueInfo);
         if (!avif)
         {
             _ERROR(">> [ERROR] ACTOR_VALUE GET ERROR!!");
