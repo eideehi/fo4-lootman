@@ -238,7 +238,7 @@ namespace PapyrusLootman
         ActorValueInfo* avif = DYNAMIC_CAST(LookupFormByID(FormIDCache::lastLootingTimestamp), TESForm, ActorValueInfo);
         if (!avif)
         {
-            _ERROR(">> [ERROR] ACTOR_VALUE GET ERROR!!");
+            _ERROR(">>   [ERROR] Failed to get LastLootingTimestamp of ActorValueInfo.");
             return result;
         }
 
@@ -289,7 +289,7 @@ namespace PapyrusLootman
         ActorValueInfo* avif = DYNAMIC_CAST(LookupFormByID(FormIDCache::lastLootingTimestamp), TESForm, ActorValueInfo);
         if (!avif)
         {
-            _ERROR(">> [ERROR] ACTOR_VALUE GET ERROR!!");
+            _ERROR(">>   [ERROR] Failed to get LastLootingTimestamp of ActorValueInfo.");
             return result;
         }
 
