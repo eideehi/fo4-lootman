@@ -116,6 +116,13 @@ namespace PapyrusLootman
             return result;
         }
 
+        const auto lootingMarker = DYNAMIC_CAST(LookupFormByID(FormIDCache::lootingMarker), TESForm, BGSKeyword);
+        if (!lootingMarker)
+        {
+            _ERROR(">>   [ERROR] Failed to get LootingMarker of BGSKeyword.");
+            return result;
+        }
+
         std::unordered_set<UInt32> processedObject;
         typedef std::pair<TESObjectREFR*, float> foundObject;
         std::vector<foundObject> foundObjects;
@@ -138,20 +145,9 @@ namespace PapyrusLootman
                     continue;
                 }
 
-                // Ignore water or invalid objects
-                if (Utility::IsWater(obj) || !_IsValid(obj))
+                // Skip objects that are not processed by Papyrus.
+                if (Utility::IsWater(obj) || !_IsValid(obj) || Utility::HasKeyword(obj, lootingMarker))
                 {
-                    continue;
-                }
-
-                // Ignore native objects that cannot be bound to papyrus
-                if (_IsNativeObject(obj))
-                {
-#ifdef _DEBUG
-                    const char* processId = _GetRandomProcessID();
-                    _MESSAGE("| %s | ** Maybe a native object **", processId);
-                    _TraceTESObjectREFR(processId, obj, 1, true);
-#endif
                     continue;
                 }
 
