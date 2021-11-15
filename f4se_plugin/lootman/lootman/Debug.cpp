@@ -192,12 +192,12 @@ const char* _MakeIndent(int depth, std::string indent = "  ")
 // Pages used for reference: https://stackoverflow.com/questions/12110209/how-to-fill-a-string-with-random-hex-characters#answer-12110369
 const char* _GetRandomProcessID()
 {
-    const char* hex = "0123456789ABCDEF";
     std::random_device rand;
-
     std::stringstream ss;
+
     for (int i = 0; i < 10; i++)
     {
+        const char* hex = "0123456789ABCDEF";
         ss << hex[rand() % 16];
     }
 
@@ -270,7 +270,7 @@ void _TraceExtraDataList(const char* processId, ExtraDataList* extraDataList, in
             const char* i4 = _MakeIndent(indent + 3);
 
             int count = 0;
-            BGSObjectInstanceExtra::Data* data = objectInstanceData->data;
+            const BGSObjectInstanceExtra::Data* data = objectInstanceData->data;
             for (UInt32 i = 0; i < (data->blockSize / sizeof(BGSObjectInstanceExtra::Data::Form)); i++)
             {
                 _MESSAGE("| %s | %s[ InstanceData_%d ]", processId, i3, count);
@@ -343,7 +343,7 @@ void _TraceTESObjectREFR(const char* processId, TESObjectREFR* ref, int indent, 
     const char* i1 = _MakeIndent(indent);
     const char* i2 = _MakeIndent(indent + 1);
 
-    NiPoint3 pos = ref->pos;
+    const NiPoint3 pos = ref->pos;
 
     _MESSAGE("| %s | %s[ TESObjectREFR ]", processId, i1);
     _MESSAGE("| %s | %sName  : %s", processId, i2, CALL_MEMBER_FN(ref, GetReferenceName)());
@@ -413,8 +413,8 @@ void _TraceReferenceFlags(const char* processId, TESObjectREFR* ref, int indent,
         return;
     }
 
-    UInt32 referenceId = ref->formID;
-    UInt32 flags = ref->flags;
+    const UInt32 referenceId = ref->formID;
+    const UInt32 flags = ref->flags;
 
     if (_referenceIdByFlags[referenceId] == flags)
     {

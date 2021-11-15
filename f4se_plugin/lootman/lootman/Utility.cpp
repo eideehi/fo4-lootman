@@ -1,7 +1,6 @@
 ﻿#include "Utility.h"
 
 #include "f4se/GameData.h"
-#include "f4se/GameReferences.h"
 #include "f4se/GameRTTI.h"
 
 namespace Utility
@@ -35,7 +34,7 @@ namespace Utility
 
     bool HasKeyword(TESForm* form, BGSKeyword* keyword)
     {
-        IKeywordFormBase* keywordFormBase = DYNAMIC_CAST(form, TESForm, IKeywordFormBase);
+        const auto keywordFormBase = DYNAMIC_CAST(form, TESForm, IKeywordFormBase);
         if (keywordFormBase)
         {
             const auto function = GetVirtualFunction<_IKeywordFormBase_HasKeyword>(keywordFormBase, 1);

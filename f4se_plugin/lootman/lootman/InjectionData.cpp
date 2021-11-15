@@ -81,7 +81,7 @@ namespace InjectionData
         // Pages used for reference: https://qiita.com/sukakako/items/c329878ce8d622bfd801
         for (std::tr2::sys::directory_iterator it(dir); it != std::tr2::sys::directory_iterator(); it++)
         {
-            std::tr2::sys::path file = dir / (std::tr2::sys::path)*it;
+            std::tr2::sys::path file = dir / static_cast<std::tr2::sys::path>(*it);
             _MESSAGE(">>     Check file path [%s]", file.string().c_str());
             if (std::tr2::sys::is_regular_file(file) && _stricmp(file.extension().c_str(), ".JSON") == 0)
             {

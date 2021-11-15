@@ -49,7 +49,7 @@ bool F4SEPlugin_Query(const F4SEInterface* f4se, PluginInfo* info)
         return false;
     }
 
-    papyrus = (F4SEPapyrusInterface*)f4se->QueryInterface(kInterface_Papyrus);
+    papyrus = static_cast<F4SEPapyrusInterface*>(f4se->QueryInterface(kInterface_Papyrus));
     if (!papyrus)
     {
         _FATALERROR(">>   Couldn't get papyrus interface");
@@ -57,7 +57,7 @@ bool F4SEPlugin_Query(const F4SEInterface* f4se, PluginInfo* info)
     }
 
     pluginHandle = f4se->GetPluginHandle();
-    messaging = (F4SEMessagingInterface*)f4se->QueryInterface(kInterface_Messaging);
+    messaging = static_cast<F4SEMessagingInterface*>(f4se->QueryInterface(kInterface_Messaging));
     if (!messaging)
     {
         _FATALERROR(">>   Couldn't get message interface");

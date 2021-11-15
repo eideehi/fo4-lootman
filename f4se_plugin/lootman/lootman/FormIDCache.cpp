@@ -12,10 +12,10 @@ namespace FormIDCache
     UInt32 lastLootingTimestamp;
     UInt32 lootingMarker;
 
-    class ObjectLoadedListener : public BSTEventSink<TESObjectLoadedEvent>
+    class ObjectLoadedListener final : public BSTEventSink<TESObjectLoadedEvent>
     {
     public:
-        EventResult ReceiveEvent(TESObjectLoadedEvent* evn, void* dispatcher)
+        EventResult ReceiveEvent(TESObjectLoadedEvent* evn, void* dispatcher) override
         {
             TESForm* form = LookupFormByID(evn->formId);
             if (!form)
@@ -23,10 +23,10 @@ namespace FormIDCache
                 return kEvent_Continue;
             }
 
-            TESObjectREFR* ref = DYNAMIC_CAST(form, TESForm, TESObjectREFR);
+            const auto ref = DYNAMIC_CAST(form, TESForm, TESObjectREFR);
             if (ref)
             {
-                UInt8 formType = ref->baseForm->formType;
+                const UInt8 formType = ref->baseForm->formType;
                 if (formType == kFormType_ACTI || formType == kFormType_ALCH || formType == kFormType_AMMO ||
                     formType == kFormType_ARMO || formType == kFormType_BOOK || formType == kFormType_CONT ||
                     formType == kFormType_FLOR || formType == kFormType_INGR || formType == kFormType_KEYM ||
@@ -60,9 +60,7 @@ namespace FormIDCache
             return;
         }
 
-        TESForm* form = nullptr;
-
-        form = Utility::LookupForm("Lootman.esp|0098CF");
+        TESForm* form = Utility::LookupForm("Lootman.esp|0098CF");
         if (!form)
         {
             _ERROR(">>     [ERROR] Failed to lookup form by identifier: 'Lootman.esp|0098CF'");

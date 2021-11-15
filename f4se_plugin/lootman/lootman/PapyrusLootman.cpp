@@ -31,7 +31,7 @@ namespace PapyrusLootman
 {
     DECLARE_STRUCT(MiscComponent, "MiscObject")
 
-    // Get all mod data from extradata
+    // Get all mod data from extra data
     VMArray<BGSMod::Attachment::Mod*> _GetAllMod(ExtraDataList* extraDataList)
     {
         VMArray<BGSMod::Attachment::Mod*> result;
@@ -47,7 +47,7 @@ namespace PapyrusLootman
             return result;
         }
 
-        BGSObjectInstanceExtra* objectModData = DYNAMIC_CAST(extraData, BSExtraData, BGSObjectInstanceExtra);
+        const auto objectModData = DYNAMIC_CAST(extraData, BSExtraData, BGSObjectInstanceExtra);
         if (!objectModData)
         {
             return result;
@@ -61,7 +61,7 @@ namespace PapyrusLootman
 
         for (UInt32 i = 0; i < (data->blockSize / sizeof(BGSObjectInstanceExtra::Data::Form)); i++)
         {
-            BGSMod::Attachment::Mod* objectMod = static_cast<BGSMod::Attachment::Mod*>(Runtime_DynamicCast(
+            auto objectMod = static_cast<BGSMod::Attachment::Mod*>(Runtime_DynamicCast(
                 LookupFormByID(data->forms[i].formId), RTTI_TESForm, RTTI_BGSMod__Attachment__Mod));
             if (objectMod)
             {
@@ -119,7 +119,7 @@ namespace PapyrusLootman
         std::unordered_set<UInt32> processedObject;
         typedef std::pair<TESObjectREFR*, float> foundObject;
         std::vector<foundObject> foundObjects;
-        NiPoint3 origin = ref->pos;
+        const NiPoint3 origin = ref->pos;
 
         auto find = [&](TESObjectCELL* cell)
         {
@@ -161,7 +161,7 @@ namespace PapyrusLootman
                     continue;
                 }
 
-                UInt8 type = form->formType;
+                const UInt8 type = form->formType;
                 if (form->formType != formType)
                 {
                     if (formType != -1)
@@ -178,10 +178,10 @@ namespace PapyrusLootman
                     }
                 }
 
-                NiPoint3 target = obj->pos;
-                float x = origin.x - target.x;
-                float y = origin.y - target.y;
-                float z = origin.z - target.z;
+                const NiPoint3 target = obj->pos;
+                const float x = origin.x - target.x;
+                const float y = origin.y - target.y;
+                const float z = origin.z - target.z;
                 float distance = std::sqrtf((x * x) + (y * y) + (z * z));
 
                 // Ignore objects with a distance of 0 because they are players
@@ -235,8 +235,9 @@ namespace PapyrusLootman
             return result;
         }
 
-        ActorValueInfo* avif = DYNAMIC_CAST(LookupFormByID(FormIDCache::lastLootingTimestamp), TESForm, ActorValueInfo);
-        if (!avif)
+        const auto lastLootingTimestamp = DYNAMIC_CAST(LookupFormByID(FormIDCache::lastLootingTimestamp), TESForm,
+                                                       ActorValueInfo);
+        if (!lastLootingTimestamp)
         {
             _ERROR(">>   [ERROR] Failed to get LastLootingTimestamp of ActorValueInfo.");
             return result;
@@ -253,13 +254,13 @@ namespace PapyrusLootman
             TESObjectREFR* obj = nullptr;
             tmp.Get(&obj, i);
 
-            auto actorValueOwner = DYNAMIC_CAST(obj, TESObjectREFR, ActorValueOwner);
+            const auto actorValueOwner = DYNAMIC_CAST(obj, TESObjectREFR, ActorValueOwner);
             if (!actorValueOwner)
             {
                 continue;
             }
 
-            if (actorValueOwner->GetValue(avif) <= 0)
+            if (actorValueOwner->GetValue(lastLootingTimestamp) <= 0)
             {
                 result.Push(&obj);
 #ifdef _DEBUG
@@ -292,8 +293,9 @@ namespace PapyrusLootman
             return result;
         }
 
-        ActorValueInfo* avif = DYNAMIC_CAST(LookupFormByID(FormIDCache::lastLootingTimestamp), TESForm, ActorValueInfo);
-        if (!avif)
+        const auto lastLootingTimestamp = DYNAMIC_CAST(LookupFormByID(FormIDCache::lastLootingTimestamp), TESForm,
+                                                       ActorValueInfo);
+        if (!lastLootingTimestamp)
         {
             _ERROR(">>   [ERROR] Failed to get LastLootingTimestamp of ActorValueInfo.");
             return result;
@@ -310,13 +312,13 @@ namespace PapyrusLootman
 #ifdef _DEBUG
             _MESSAGE("| %s |     ** Check Object_%d **", processId, i);
 #endif
-            auto actorValueOwner = DYNAMIC_CAST(obj, TESObjectREFR, ActorValueOwner);
+            const auto actorValueOwner = DYNAMIC_CAST(obj, TESObjectREFR, ActorValueOwner);
             if (!actorValueOwner)
             {
                 continue;
             }
 
-            const float timestamp = actorValueOwner->GetValue(avif);
+            const float timestamp = actorValueOwner->GetValue(lastLootingTimestamp);
             if (currentTime < timestamp || (timestamp > 0 && (currentTime - timestamp) >= expiration))
             {
                 result.Push(&obj);
@@ -362,22 +364,22 @@ namespace PapyrusLootman
         }
 
         std::map<BGSComponent*, UInt32> map;
-        auto push = [&map](BGSConstructibleObject* cobj)
+        auto push = [&map](BGSConstructibleObject* obj)
         {
-            if (!cobj)
+            if (!obj)
             {
                 return;
             }
 
-            for (UInt32 i = 0; i < cobj->components->count; i++)
+            for (UInt32 i = 0; i < obj->components->count; i++)
             {
-                BGSConstructibleObject::Component cobjComponent;
-                cobj->components->GetNthItem(i, cobjComponent);
+                BGSConstructibleObject::Component objComponent;
+                obj->components->GetNthItem(i, objComponent);
 
-                TESObjectMISC* misc = DYNAMIC_CAST(cobjComponent.component, TESForm, TESObjectMISC);
+                const auto misc = DYNAMIC_CAST(objComponent.component, TESForm, TESObjectMISC);
                 if (misc)
                 {
-                    for (UInt32 j = 0; j < cobjComponent.count; j++)
+                    for (UInt32 j = 0; j < objComponent.count; j++)
                     {
                         for (UInt32 k = 0; k < misc->components->count; k++)
                         {
@@ -390,30 +392,30 @@ namespace PapyrusLootman
                 }
                 else
                 {
-                    map[cobjComponent.component] += cobjComponent.count;
+                    map[objComponent.component] += objComponent.count;
                 }
             }
         };
 
-        tArray<BGSConstructibleObject*> cobjList = (*g_dataHandler)->arrCOBJ;
-        auto find = [&cobjList](const TESForm* form)
+        tArray<BGSConstructibleObject*> allObj = (*g_dataHandler)->arrCOBJ;
+        auto find = [&allObj](const TESForm* form)
         {
-            for (UInt32 i = 0; i < cobjList.count; i++)
+            for (UInt32 i = 0; i < allObj.count; i++)
             {
-                BGSConstructibleObject* cobj = nullptr;
-                cobjList.GetNthItem(i, cobj);
+                BGSConstructibleObject* obj = nullptr;
+                allObj.GetNthItem(i, obj);
 
-                if (!cobj || !cobj->createdObject || !cobj->components)
+                if (!obj || !obj->createdObject || !obj->components)
                 {
                     continue;
                 }
 
-                if (form->formID == cobj->createdObject->formID)
+                if (form->formID == obj->createdObject->formID)
                 {
-                    return cobj;
+                    return obj;
                 }
 
-                BGSListForm* formList = DYNAMIC_CAST(cobj->createdObject, TESForm, BGSListForm);
+                const auto formList = DYNAMIC_CAST(obj->createdObject, TESForm, BGSListForm);
                 if (formList)
                 {
                     for (UInt32 j = 0; j < formList->forms.count; j++)
@@ -423,7 +425,7 @@ namespace PapyrusLootman
 
                         if (item && form->formID == item->formID)
                         {
-                            return cobj;
+                            return obj;
                         }
                     }
                 }
@@ -467,7 +469,7 @@ namespace PapyrusLootman
     {
         VMArray<TESForm*> result;
 
-        auto dataIt = InjectionData::formListData.FindMember(identify);
+        const auto dataIt = InjectionData::formListData.FindMember(identify);
         if (dataIt == InjectionData::formListData.MemberEnd() || !dataIt->value.IsArray())
         {
             return result;
@@ -550,7 +552,7 @@ namespace PapyrusLootman
                 continue;
             }
 
-            UInt8 formType = form->formType;
+            const UInt8 formType = form->formType;
             bool isFormTypeMatches = false;
             for (UInt32 j = 0; j < formTypes.Length(); j++)
             {
@@ -793,7 +795,7 @@ namespace PapyrusLootman
     // Get and return the form's identify
     BSFixedString GetIdentify(StaticFunctionTag*, TESForm* form)
     {
-        TESFullName* fullName = DYNAMIC_CAST(form, TESForm, TESFullName);
+        const auto fullName = DYNAMIC_CAST(form, TESForm, TESFullName);
         if (fullName && strlen(fullName->name))
         {
             return fullName->name;
@@ -804,8 +806,8 @@ namespace PapyrusLootman
     // Get and return the current millisecond
     BSFixedString GetMilliseconds(StaticFunctionTag*)
     {
-        auto now = std::chrono::system_clock::now();
-        auto ms = std::chrono::duration_cast<std::chrono::milliseconds>(now.time_since_epoch()) % 1000;
+        const auto now = std::chrono::system_clock::now();
+        const auto ms = std::chrono::duration_cast<std::chrono::milliseconds>(now.time_since_epoch()) % 1000;
         std::stringstream ss;
         ss << std::setfill('0') << std::setw(3) << ms.count();
         return ss.str().c_str();
