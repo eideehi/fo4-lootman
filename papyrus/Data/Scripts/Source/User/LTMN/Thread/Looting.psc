@@ -49,21 +49,29 @@ Function Looting()
     While i
         i -= 1
         ObjectReference ref = refs[i]
-        If (Lootman.IsValidRef(ref) && !ref.HasKeyword(properties.LootingMarker))
-            ref.AddKeyword(properties.LootingMarker)
-            Lootman.Log(prefix + "  [Object_" + objectIndex + "]");; Debug
-            TraceObject(ref);; Debug
-            If (IsLootingTarget(ref))
-                LootObject(ref)
+        If (Lootman.IsValidRef(ref))
+            If (!ref.HasKeyword(properties.LootingMarker))
+                ref.AddKeyword(properties.LootingMarker)
+
+                ; Verify whether the processed object should be skipped for a certain period of time, and if necessary, set the timestamp to be used for the skipping process.
+                If (IsToBeSkipped(ref))
+                    ref.SetValue(properties.LastLootingTimestamp, Utility.GetCurrentRealTime())
+                EndIf
+
+                Lootman.Log(prefix + "  [Object_" + objectIndex + "]");; Debug
+                TraceObject(ref);; Debug
+                If (IsLootingTarget(ref))
+                    LootObject(ref)
+                Else;; Debug
+                    Lootman.Log(prefix + "    ** Is not a target of looting **");; Debug
+                EndIf
+
+                ref.ResetKeyword(properties.LootingMarker)
             Else;; Debug
-                Lootman.Log(prefix + "    ** Is not a target of looting **");; Debug
+                Lootman.Log(prefix + "  ** Object_" + objectIndex + " was skipped because it is being processed by another thread **");; Debug
             EndIf
-            If (IsToBeSkipped(ref))
-                ref.SetValue(properties.LastLootingTimestamp, Utility.GetCurrentRealTime())
-            EndIf
-            ref.ResetKeyword(properties.LootingMarker)
         Else;; Debug
-            Lootman.Log(prefix + "  ** Object_" + objectIndex + " was skipped because it is being processed by another thread **");; Debug
+            Lootman.Log(prefix + "  ** Object_" + objectIndex + " is not a valid object **");; Debug
         EndIf
 
         ; Since it is not desirable to keep processing an old list of objects forever, we force the thread to be released when the processing time exceeds 2 seconds.
