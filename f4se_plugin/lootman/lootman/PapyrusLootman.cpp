@@ -189,12 +189,7 @@ namespace PapyrusLootman
                     }
                 }
 
-                const NiPoint3 target = obj->pos;
-                const float x = origin.x - target.x;
-                const float y = origin.y - target.y;
-                const float z = origin.z - target.z;
-                float distance = std::sqrtf((x * x) + (y * y) + (z * z));
-
+                float distance = _GetDistance(origin, obj->pos);
                 // Ignore objects with a distance of 0 because they are players
                 if (distance > 0 && distance <= range)
                 {
