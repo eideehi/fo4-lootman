@@ -33,11 +33,6 @@ inline const char* _flags2s(SInt32 flags)
     return BSFixedString(std::bitset<32>(flags).to_string().c_str());
 }
 
-inline float _GetMagnitude(NiPoint3 pos)
-{
-    return std::sqrt(pos.x * pos.x + pos.y * pos.y + pos.z * pos.z);
-}
-
 const char* _GetFormTypeIdentify(UInt8 formType);
 
 const char* _GetRandomProcessID();

@@ -31,6 +31,21 @@ namespace PapyrusLootman
 {
     DECLARE_STRUCT(MiscComponent, "MiscObject")
 
+    inline float _GetMagnitude(NiPoint3 pos)
+    {
+        return std::sqrt(pos.x * pos.x + pos.y * pos.y + pos.z * pos.z);
+    }
+
+    inline float _GetDistance(NiPoint3 pos1, NiPoint3 pos2)
+    {
+        return _GetMagnitude(NiPoint3(pos1.x - pos2.x, pos1.y - pos2.y, pos1.z - pos2.z));
+    }
+
+    inline float _GetDistance(TESObjectREFR* ref1, TESObjectREFR* ref2)
+    {
+        return _GetDistance(ref1->pos, ref2->pos);
+    }
+
     // Get all mod data from extra data
     VMArray<BGSMod::Attachment::Mod*> _GetAllMod(ExtraDataList* extraDataList)
     {
@@ -242,7 +257,7 @@ namespace PapyrusLootman
         VMArray<TESObjectREFR*> tmp = _FindAllReferencesOfFormType(ref, range, formType);
 
 #ifdef _DEBUG
-        _MESSAGE("| %s |   ** Found objects **", processId);
+        _MESSAGE("| %s |   Total found objects: %d", processId, tmp.Length());
 #endif
 
         for (UInt32 i = 0; i < tmp.Length(); i++)
@@ -260,15 +275,15 @@ namespace PapyrusLootman
             {
                 result.Push(&obj);
 #ifdef _DEBUG
-                _TraceTESObjectREFR(processId, obj, 2);
-                _MESSAGE("| %s |       Distance: [%f]", processId, _GetMagnitude(obj->pos));
+                _MESSAGE("| %s |     ** Object_%d **", processId, tmp.Length() - i);
+                _MESSAGE("| %s |       Distance: [%f]", processId, _GetDistance(ref, obj));
                 _TraceReferenceFlags(processId, obj, 3, true);
+                _TraceTESObjectREFR(processId, obj, 3, true);
 #endif
             }
         }
 
 #ifdef _DEBUG
-        _MESSAGE("| %s |     Total count: %d", processId, result.Length());
         _MESSAGE("| %s | *** FindAllLootingTarget end ***", processId);
 #endif
         return result;
@@ -281,6 +296,9 @@ namespace PapyrusLootman
 #ifdef _DEBUG
         const char* processId = _GetRandomProcessID();
         _MESSAGE("| %s | *** GetAllExpiredObject start ***", processId);
+        _MESSAGE("| %s |   Range: %d", processId, range);
+        _MESSAGE("| %s |   Current time: %f", processId, currentTime);
+        _MESSAGE("| %s |   Expiration: %f", processId, expiration);
 #endif
         VMArray<TESObjectREFR*> result;
 
@@ -305,9 +323,7 @@ namespace PapyrusLootman
         {
             TESObjectREFR* obj = nullptr;
             objects.Get(&obj, i);
-#ifdef _DEBUG
-            _MESSAGE("| %s |     ** Check Object_%d **", processId, i);
-#endif
+
             const auto actorValueOwner = DYNAMIC_CAST(obj, TESObjectREFR, ActorValueOwner);
             if (!actorValueOwner)
             {
@@ -319,10 +335,10 @@ namespace PapyrusLootman
             {
                 result.Push(&obj);
 #ifdef _DEBUG
-                _MESSAGE("| %s |       ** Object_%d is expired **", processId, i);
-                _TraceTESObjectREFR(processId, obj, 4);
-                _MESSAGE("| %s |         Distance: [%f]", processId, _GetMagnitude(obj->pos));
+                _MESSAGE("| %s |     ** Object_%d is expired **", processId, i);
+                _MESSAGE("| %s |       Distance: [%f]", processId, _GetDistance(ref, obj));
                 _TraceReferenceFlags(processId, obj, 3, true);
+                _TraceTESObjectREFR(processId, obj, 3, true);
 #endif
             }
         }
