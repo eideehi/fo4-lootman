@@ -204,7 +204,7 @@ namespace PapyrusLootman
             SimpleLocker locker(&FormIDCache::lock);
             for (auto it = FormIDCache::cells.begin(); it != FormIDCache::cells.end(); ++it)
             {
-                TESObjectCELL* cell = DYNAMIC_CAST(LookupFormByID(*it), TESForm, TESObjectCELL);
+                const auto cell = DYNAMIC_CAST(LookupFormByID(*it), TESForm, TESObjectCELL);
                 // Not explore cells that are not 3D loaded
                 if (cell && (cell->flags & 16) != 0)
                 {
