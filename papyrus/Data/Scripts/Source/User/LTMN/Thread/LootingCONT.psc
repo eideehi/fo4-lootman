@@ -52,7 +52,7 @@ EndFunction
 bool Function IsLootingTarget(ObjectReference ref)
     Form base = ref.GetBaseObject()
 
-    If (!ref.Is3DLoaded() || ref.IsLocked() || (ref.IsActivationBlocked() && !properties.IgnorableActivationBlockeList.HasForm(base)) || ref.GetItemCount() <= 0)
+    If (!ref.Is3DLoaded() || (ref.IsActivationBlocked() && !properties.IgnorableActivationBlockeList.HasForm(base)) || ref.GetItemCount() <= 0)
         Return false
     EndIf
 
@@ -68,7 +68,11 @@ bool Function IsLootingTarget(ObjectReference ref)
         Return false
     EndIf
 
-    Return IsLootableRarity(base)
+    If (!IsLootableRarity(base))
+        Return false
+    EndIf
+
+    Return !ref.IsLocked() || _TryUnlock(ref)
 EndFunction
 
 Function TraceObject(ObjectReference ref);; Debug
@@ -82,3 +86,50 @@ Function TraceObject(ObjectReference ref);; Debug
     LTMN:Quest:Methods.TraceForm(prefix + "  ", base);; Debug
     Lootman.Log(prefix + "    Is vendor chest: " + properties.VendorChestList.HasForm(base));; Debug
 EndFunction;; Debug
+
+bool Function _TryUnlock(ObjectReference ref)
+    string prefix = ("| Looting @ " + GetThreadID() + " | " + GetProcessID() + " |     ");; Debug
+
+    If (!ref.IsLockBroken() && properties.AllowContainerUnlock.GetValueInt() == 1)
+        Lootman.Log(prefix + "*** Try to unlock ***");; Debug
+        Lootman.Log(prefix + "  Object: [Name: " + ref.GetDisplayName() + ", ID: " + Lootman.GetHexID(ref) + "]");; Debug
+
+        ObjectReference _lootman = properties.LootmanWorkshop
+        int level = ref.GetLockLevel()
+        int bobbyPinCount = _lootman.GetItemCount(properties.BobbyPin)
+
+        Lootman.Log(prefix + "  Lock level: " + level);; Debug
+
+        int consumeCount = -1
+        If (level == 100 && player.HasPerk(properties.Locksmith03))
+            consumeCount = 4
+        ElseIf (level == 75 && player.HasPerk(properties.Locksmith02))
+            consumeCount = 3
+        ElseIf (level == 50 && player.HasPerk(properties.Locksmith01))
+            consumeCount = 2
+        ElseIf (level < 50)
+            consumeCount = 1
+        EndIf
+
+        If (consumeCount > 0 && player.HasPerk(properties.Locksmith04))
+            consumeCount = 0
+        EndIf
+
+        Lootman.Log(prefix + "  Consume count: " + consumeCount);; Debug
+        Lootman.Log(prefix + "  Bobby pin count: " + bobbyPinCount);; Debug
+
+        If (consumeCount >= 0 && bobbyPinCount >= consumeCount)
+            If (consumeCount > 0)
+                _lootman.RemoveItem(properties.BobbyPin, consumeCount, true)
+            EndIf
+
+            ref.Unlock()
+
+            Lootman.Log(prefix + "*** Unlock successful ***");; Debug
+            Return true
+        EndIf
+    EndIf
+
+    Lootman.Log(prefix + "*** Unlock failure ***");; Debug
+    Return false
+EndFunction

@@ -6,6 +6,9 @@ Group ActorValues
 EndGroup
 
 Group Forms
+    ; Reference to it in the container unlocking process.
+    Form property BobbyPin auto const mandatory
+
     ; Required to play the generator animation
     Form property FusionCore auto const mandatory
 
@@ -89,6 +92,7 @@ Group Globals
     GlobalVariable property ThreadInterval auto const mandatory
     GlobalVariable property ThreadAllowedWorkingTime auto const mandatory
     GlobalVariable property ExpirationToSkipLooting auto const mandatory
+    GlobalVariable property AllowContainerUnlock auto const mandatory
 
     ; Thread limit
     GlobalVariable property ThreadLimitACTI auto const mandatory
@@ -189,4 +193,11 @@ Group Sounds
     Sound property PickupSoundFLOR auto const mandatory
     Sound property PickupSoundNPC_ auto const mandatory
     Sound property ProcessCompleteSound auto const mandatory
+EndGroup
+
+Group Perks
+    Perk property Locksmith01 auto const mandatory
+    Perk property Locksmith02 auto const mandatory
+    Perk property Locksmith03 auto const mandatory
+    Perk property Locksmith04 auto const mandatory
 EndGroup
