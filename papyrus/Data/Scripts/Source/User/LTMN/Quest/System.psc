@@ -476,8 +476,11 @@ Function UpdaetState()
     int i = refs.Length
     While i
         i -= 1
-        LTMN:Quest:Methods.TraceObject(prefix + "    ", refs[i]);; Debug
-        refs[i].SetValue(properties.LastLootingTimestamp, 0)
+        ObjectReference ref = refs[i]
+        If (Lootman.IsValidRef(ref))
+            LTMN:Quest:Methods.TraceObject(prefix + "    ", ref);; Debug
+            ref.SetValue(properties.LastLootingTimestamp, 0)
+        EndIf
     EndWhile
 
     Lootman.Log(prefix + "*** State update is complete ***");; Debug
