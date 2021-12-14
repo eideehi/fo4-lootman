@@ -20,6 +20,9 @@ Group Forms
 EndGroup
 
 Group FormLists
+    FormList property ShipmentItemList auto const mandatory
+
+    ; Injectuin data list
     FormList property AllowedActivatorList auto const mandatory
     FormList property AllowedFeaturedItemList auto const mandatory
     FormList property AllowedUniqueItemList auto const mandatory
@@ -62,6 +65,8 @@ Group FormTypes
 EndGroup
 
 Group Globals
+    GlobalVariable property ModVersion auto const mandatory
+
     ; Lootman flags
     GlobalVariable property IsEnabled auto const mandatory
     GlobalVariable property IsInitializing auto const mandatory

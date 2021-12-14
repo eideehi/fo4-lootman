@@ -24,6 +24,8 @@ int TIMER_INITIALIZE = 4 const
 Actor player
 LTMN:Quest:Properties properties
 
+float modVersion = 0.0
+
 int messageShowTimer = 0
 int messageShowCount = 0
 
@@ -36,6 +38,7 @@ Event OnInit()
 
     player = Game.GetPlayer()
     properties = Lootman.GetProperties()
+    modVersion = properties.ModVersion.GetValue()
 
     StartTimer(5, TIMER_TRY_INSTALL)
 EndEvent
@@ -56,6 +59,7 @@ Event OnTimer(int aiTimerID)
     EndIf
 EndEvent
 
+; An event that register to player. Process that should be performed when loading save data.
 Event Actor.OnPlayerLoadGame(Actor akSender)
     Lootman.OpenLog();; Debug
     Lootman.Log("| System | Lootman has been running");; Debug
@@ -63,9 +67,15 @@ Event Actor.OnPlayerLoadGame(Actor akSender)
     ; Reset the number of times the overweight notification message is displayed for each game load
     messageShowCount = 0
 
+    ; Apply the patches if the save data and the Mod version of the esp do not match due to the Lootman update.
+    If (modVersion < properties.ModVersion.GetValue())
+        Patch()
+    EndIf
+
     Initialize()
 EndEvent
 
+; An event that register to player. Process that should be performed when location is changed.
 Event Actor.OnLocationChange(Actor akSender, Location akOldLoc, Location akNewLoc)
     string prefix = ("| System | " + Lootman.GetRandomProcessID() + " | ");; Debug
     Lootman.Log(prefix + "*** Start the process that will be executed when the location is changed ***");; Debug
@@ -114,6 +124,7 @@ Event Actor.OnLocationChange(Actor akSender, Location akOldLoc, Location akNewLo
     Lootman.Log(prefix + "*** The process performed when the location is changed has been completed ***");; Debug
 EndEvent
 
+; Event hook when the menu is opened.
 Event OnMenuOpenCloseEvent(string asMenuName, bool abOpening)
     If (asMenuName == "PipboyMenu")
         If (abOpening)
@@ -121,6 +132,18 @@ Event OnMenuOpenCloseEvent(string asMenuName, bool abOpening)
         Else
             properties.IsPipboyOpen.SetValueInt(0)
         EndIf
+    EndIf
+EndEvent
+
+; Events to be registered in Lootman's Actor. Moves the looted item to the appropriate container.
+Event ObjectReference.OnItemAdded(ObjectReference akSender, Form akBaseItem, int aiItemCount, ObjectReference akItemReference, ObjectReference akSourceContainer)
+    string prefix = ("| System | " + Lootman.GetRandomProcessID() + " | ");; Debug
+
+    ; Shipment will be lost if it is moved to the Wrokshop container using RemoveItem, so add it using AddItem. Don't forget to delete the item from the original container.
+    If (properties.ShipmentItemList.HasForm(akBaseItem))
+        Lootman.Log(prefix + "*** Lootman is loot the shipments, move to the player's inventory ***");; Debug
+        akSender.RemoveItem(akBaseItem, aiItemCount, true)
+        properties.LootmanWorkshop.AddItem(akBaseItem, aiItemCount, true)
     EndIf
 EndEvent
 
@@ -174,6 +197,8 @@ Function Install()
     RegisterForRemoteEvent(player, "OnPlayerLoadGame")
     RegisterForRemoteEvent(player, "OnLocationChange")
     RegisterForMenuOpenCloseEvent("PipboyMenu")
+    AddInventoryEventFilter(properties.ShipmentItemList)
+    RegisterForRemoteEvent(properties.LootmanActor, "OnItemAdded")
 
     Lootman.Log(prefix + "  ** Start thread manager **");; Debug
     (LootingACTIQuest As LTMN:Thread:LootingACTIManager).Startup()
@@ -260,6 +285,7 @@ Function Uninstall()
     UnregisterForRemoteEvent(player, "OnPlayerLoadGame")
     UnregisterForRemoteEvent(player, "OnLocationChange")
     UnregisterForMenuOpenCloseEvent("PipboyMenu")
+    UnregisterForRemoteEvent(properties.LootmanActor, "OnItemAdded")
 
     self.SetObjectiveDisplayed(properties.MESSAGE_LOOTMAN_UNINSTALLED)
     self.SetObjectiveSkipped(properties.MESSAGE_LOOTMAN_UNINSTALLED)
@@ -314,6 +340,26 @@ Function Initialize()
     properties.IsInitializing.SetValueInt(0)
 
     Lootman.Log(prefix + "*** Lootman initialization completed ***");; Debug
+EndFunction
+
+; Apply patches for migration
+Function Patch()
+    string prefix = ("| System | " + Lootman.GetRandomProcessID() + " | ");; Debug
+
+    Lootman.Log(prefix + "*** Start patching Lootman ***");; Debug
+    Lootman.Log(prefix + "  Current version: " + modVersion);; Debug
+
+    ; Patches for version 1.3.6
+    If (modVersion < 1.0306)
+        Lootman.Log(prefix + "  Patches for version 1.3.6");; Debug
+        AddInventoryEventFilter(properties.ShipmentItemList)
+        RegisterForRemoteEvent(properties.LootmanActor, "OnItemAdded")
+    EndIf
+
+    modVersion = properties.ModVersion.GetValue()
+
+    Lootman.Log(prefix + "  Update to version: " + modVersion);; Debug
+    Lootman.Log(prefix + "*** Lootman patching completed ***");; Debug
 EndFunction
 
 ; Update the status of Lootman
