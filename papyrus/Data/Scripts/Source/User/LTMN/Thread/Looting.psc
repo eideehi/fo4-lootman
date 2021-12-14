@@ -48,6 +48,19 @@ Function Looting()
     int i = refs.Length
     While i
         i -= 1
+
+        ; Since it is not desirable to keep processing an old list of objects forever, we force the thread to be released when the processing time exceeds 2 seconds.
+        If ((Utility.GetCurrentRealTime() - time) > properties.ThreadAllowedWorkingTime.GetValue())
+            i = 0
+            Lootman.Log(prefix + "  ** Force the thread to be released because the processing time of the thread has exceeded the threshold **");; Debug
+        EndIf
+
+        ; If the looting disabled in the middle of the loop, release the thread immediately.
+        If (!IsLootingEnabled())
+            i = 0
+            Lootman.Log(prefix + "  ** Force the thread to be released because the looting disabled **");; Debug
+        EndIf
+
         ObjectReference ref = refs[i]
         If (Lootman.IsValidRef(ref))
             If (!ref.HasKeyword(properties.LootingMarker))
@@ -72,12 +85,6 @@ Function Looting()
             EndIf
         Else;; Debug
             Lootman.Log(prefix + "  ** Object_" + objectIndex + " is not a valid object **");; Debug
-        EndIf
-
-        ; Since it is not desirable to keep processing an old list of objects forever, we force the thread to be released when the processing time exceeds 2 seconds.
-        If ((Utility.GetCurrentRealTime() - time) > properties.ThreadAllowedWorkingTime.GetValue())
-            i = 0
-            Lootman.Log(prefix + "  ** Force the thread to be released because the processing time of the thread has exceeded the threshold **");; Debug
         EndIf
 
         objectIndex += 1;; Debug
@@ -118,6 +125,9 @@ bool Function IsLootingEnabled()
         Return false
     EndIf
     If (properties.LootingDisabledInSettlement.GetValueInt() == 1 && properties.IsInSettlement.GetValueInt() == 1)
+        Return false
+    EndIf
+    If (!Lootman.GetSystem().IsWorldActive())
         Return false
     EndIf
     Return true

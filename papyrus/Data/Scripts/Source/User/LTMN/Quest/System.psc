@@ -376,6 +376,11 @@ Function UpdaetState()
         Return
     EndIf
 
+    If (!IsWorldActive())
+        Lootman.Log(prefix + "*** World is not in active ***");; Debug
+        Return
+    EndIf
+
     Lootman.Log(prefix + "*** Start updating the state ***");; Debug
 
     Lootman.Log(prefix + "  Lootman's (Actor) inventory weight: " + properties.LootmanActor.GetInventoryWeight());; Debug
@@ -484,6 +489,10 @@ Function TryLooting()
         Return
     EndIf
 
+    If (!IsWorldActive())
+        Return
+    EndIf
+
     If (properties.TargetFilterObject.GetValueInt() == 1)
         If (properties.CategoryFilterACTI.GetValueInt() == 1)
             (LootingACTIQuest As LTMN:Thread:LootingACTIManager).TryLooting()
@@ -531,6 +540,17 @@ Function ShowMessage(int messageId)
         self.SetObjectiveDisplayed(messageId)
         self.SetObjectiveSkipped(messageId)
     EndIf
+EndFunction
+
+; Verify that the world is in an active.
+bool Function IsWorldActive()
+    If (player.GetParentCell() == None || !player.GetParentCell().IsLoaded())
+        Return false
+    EndIf
+    If (Utility.IsInMenuMode())
+        Return false
+    EndIf
+    Return true
 EndFunction
 
 ; Clear the form list (Internal function)
