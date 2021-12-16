@@ -203,7 +203,7 @@ bool Function IsLootableOwnership(ObjectReference ref)
     EndIf
 
     Faction factionOwner = ref.GetFactionOwner()
-    If (factionOwner && factionOwner.GetFactionReaction(player) < 2)
+    If (factionOwner && factionOwner.GetFactionReaction(player) < 3)
         Return false
     EndIf
 
