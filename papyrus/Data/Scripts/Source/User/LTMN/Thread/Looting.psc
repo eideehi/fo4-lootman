@@ -51,14 +51,14 @@ Function Looting()
 
         ; Since it is not desirable to keep processing an old list of objects forever, we force the thread to be released when the processing time exceeds 2 seconds.
         If ((Utility.GetCurrentRealTime() - time) > properties.ThreadAllowedWorkingTime.GetValue())
-            i = 0
-            Lootman.Log(prefix + "  ** Force the thread to be released because the processing time of the thread has exceeded the threshold **");; Debug
+            Lootman.Log(prefix + "*** Force the thread to be released because the processing time of the thread has exceeded the threshold ***");; Debug
+            Return
         EndIf
 
         ; If the looting disabled in the middle of the loop, release the thread immediately.
         If (!IsLootingEnabled())
-            i = 0
-            Lootman.Log(prefix + "  ** Force the thread to be released because the looting disabled **");; Debug
+            Lootman.Log(prefix + "*** Force the thread to be released because the looting disabled ***");; Debug
+            Return
         EndIf
 
         ObjectReference ref = refs[i]
