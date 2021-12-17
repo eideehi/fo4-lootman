@@ -1,0 +1,156 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://qconsulting.ca/fo3/ModConfig5.0.xsd">
+    <moduleName>Lootman</moduleName>
+
+    <installSteps order="Explicit">
+
+        <installStep name="Choose Option">
+            <optionalFileGroups order="Explicit">
+
+                <group name="Select your language." type="SelectExactlyOne">
+                    <plugins order="Explicit">
+                        <plugin name="English">
+                            <description>English is here.</description>
+                            <conditionFlags>
+                                <flag name="language_en">selected</flag>
+                            </conditionFlags>
+                            <typeDescriptor>
+                                <type name="Optional"/>
+                            </typeDescriptor>
+                        </plugin>
+
+                        <plugin name="Japanese">
+                            <description>日本語はこちら。</description>
+                            <conditionFlags>
+                                <flag name="language_ja">selected</flag>
+                            </conditionFlags>
+                            <typeDescriptor>
+                                <type name="Optional"/>
+                            </typeDescriptor>
+                        </plugin>
+                    </plugins>
+                </group>
+
+                <group name="Select your game version." type="SelectExactlyOne">
+                    <plugins order="Explicit">
+                        <plugin name="1.10.163">
+                            <description>Fallout4.exe version.</description>
+                            <conditionFlags>
+                                <flag name="runtime_1_10_163">selected</flag>
+                            </conditionFlags>
+                            <typeDescriptor>
+                                <type name="Required"/>
+                            </typeDescriptor>
+                        </plugin>
+                    </plugins>
+                </group>
+
+                <group name="Do you want to install the debug version to output the debug log?" type="SelectExactlyOne">
+                    <plugins order="Explicit">
+                        <plugin name="No">
+                            <description>Normally, please select this option.</description>
+                            <conditionFlags>
+                                <flag name="install_product">selected</flag>
+                            </conditionFlags>
+                            <typeDescriptor>
+                                <type name="Recommended"/>
+                            </typeDescriptor>
+                        </plugin>
+
+                        <plugin name="Yes">
+                            <description>The debug log is quite a storage hog, so don't use it regularly.</description>
+                            <conditionFlags>
+                                <flag name="install_debug">selected</flag>
+                            </conditionFlags>
+                            <typeDescriptor>
+                                <type name="Optional"/>
+                            </typeDescriptor>
+                        </plugin>
+                    </plugins>
+                </group>
+
+                <group name="Do you want to install the papyrus source code?" type="SelectExactlyOne">
+                    <plugins order="Explicit">
+                        <plugin name="No">
+                            <description>It is usually not necessary to install the source code.</description>
+                            <conditionFlags>
+                                <flag name="install_source">not_selected</flag>
+                            </conditionFlags>
+                            <typeDescriptor>
+                                <type name="Recommended"/>
+                            </typeDescriptor>
+                        </plugin>
+
+                        <plugin name="Yes">
+                            <description>Select this option when you want to investigate the cause of a bug.</description>
+                            <conditionFlags>
+                                <flag name="install_source">selected</flag>
+                            </conditionFlags>
+                            <typeDescriptor>
+                                <type name="Optional"/>
+                            </typeDescriptor>
+                        </plugin>
+                    </plugins>
+                </group>
+
+            </optionalFileGroups>
+        </installStep>
+
+    </installSteps>
+
+    <conditionalFileInstalls>
+        <patterns>
+
+            <pattern>
+                <dependencies>
+                    <flagDependency flag="language_en" value="selected"/>
+                </dependencies>
+                <files>
+                    <folder source="files/common/en" destination="Data"/>
+                </files>
+            </pattern>
+
+            <pattern>
+                <dependencies>
+                    <flagDependency flag="language_ja" value="selected"/>
+                </dependencies>
+                <files>
+                    <folder source="files/common/ja" destination="Data"/>
+                </files>
+            </pattern>
+
+            <pattern>
+                <dependencies operator="And">
+                    <flagDependency flag="runtime_1_10_163" value="selected"/>
+                    <flagDependency flag="install_product" value="selected"/>
+                </dependencies>
+                <files>
+                    <folder source="files/product/dll/1_10_163" destination="Data/F4SE/Plugins"/>
+                    <folder source="files/product/archive" destination="Data"/>
+                </files>
+            </pattern>
+
+            <pattern>
+                <dependencies operator="And">
+                    <flagDependency flag="runtime_1_10_163" value="selected"/>
+                    <flagDependency flag="install_debug" value="selected"/>
+                </dependencies>
+                <files>
+                    <folder source="files/debug/dll/1_10_163" destination="Data/F4SE/Plugins"/>
+                    <folder source="files/debug/papyrus-binary" destination="Data/Scripts"/>
+                </files>
+            </pattern>
+
+            <pattern>
+                <dependencies>
+                    <flagDependency flag="install_source" value="selected"/>
+                </dependencies>
+                <files>
+                    <folder source="files/debug/papyrus-source" destination="Data/Scripts/Source/User"/>
+                </files>
+            </pattern>
+
+        </patterns>
+    </conditionalFileInstalls>
+
+</config>

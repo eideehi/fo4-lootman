@@ -1,0 +1,35 @@
+{
+  "modName": "Lootman",
+  "keybinds": [
+    {
+      "id": "ToggleLooting",
+      "desc": "キーを押すたびに自動収集のオンとオフが切り替わります。",
+      "action": {
+        "type": "CallFunction",
+        "form": "Lootman.esp|9917",
+        "function": "ToggleLooting",
+        "params": []
+      }
+    },
+    {
+      "id": "OpenInventory",
+      "desc": "キーを押すとLootmanのインベントリが開きます。",
+      "action": {
+        "type": "CallFunction",
+        "form": "Lootman.esp|9917",
+        "function": "OpenInventory",
+        "params": []
+      }
+    },
+    {
+      "id": "ToggleWorkshopLink",
+      "desc": "キーを押すたびに近くのワークショップとLootmanのリンク状態が切り替わります。",
+      "action": {
+        "type": "CallFunction",
+        "form": "Lootman.esp|9917",
+        "function": "ToggleWorkshopLink",
+        "params": []
+      }
+    }
+  ]
+}

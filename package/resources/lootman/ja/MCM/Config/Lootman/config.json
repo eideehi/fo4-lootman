@@ -1,0 +1,1072 @@
+{
+  "modName": "Lootman",
+  "displayName": "Lootman",
+  "minMcmVersion": 1,
+  "pluginRequirements": ["Lootman.esp"],
+  "content": [
+    {
+      "text": "概要",
+      "type": "section"
+    },
+    {
+      "text": "アイテムの自動収集を行うMod。武器・防具・薬品/食料・ジャンク/その他・弾薬・植物・本・カギなどを収集可能です。死体やコンテナからも収集できます。収集するアイテムは、武器だけ、ジャンクだけ、といったようにフィルターをかけることができます。DLCやModで追加された要素にも対応していると思います。",
+      "type": "text"
+    }
+  ],
+  "pages": [
+    {
+      "pageDisplayName": "一般設定",
+      "content": [
+        { "text": "==== 設定 ================", "type": "text" },
+        {
+          "text": "一般的な自動収集に関する設定項目です。",
+          "type": "text"
+        },
+        { "text": "================================", "type": "text" },
+        {
+          "text": "自動収集",
+          "type": "switcher",
+          "help": "オンの場合、自動収集が有効となります。",
+          "valueOptions": {
+            "sourceType": "GlobalValue",
+            "sourceForm": "Lootman.esp|FA4"
+          }
+        },
+        {
+          "text": "プレイヤーのインベントリに収納",
+          "type": "switcher",
+          "help": "オンの場合、自動収集したアイテムはプレイヤーのインベントリに収納されるようになります。",
+          "valueOptions": {
+            "sourceType": "GlobalValue",
+            "sourceForm": "Lootman.esp|CE50"
+          }
+        },
+        {
+          "text": "居住地での自動収集を抑制",
+          "type": "switcher",
+          "help": "オンの場合、居住地のアイテムを自動収集しなくなります。",
+          "valueOptions": {
+            "sourceType": "GlobalValue",
+            "sourceForm": "Lootman.esp|98B5"
+          }
+        },
+        {
+          "text": "ワークショップとのリンク・リンク解除を自動化",
+          "type": "switcher",
+          "help": "オンの場合、近くのワークショップとのリンク・リンク解除処理を自動で行うようになります。",
+          "valueOptions": {
+            "sourceType": "GlobalValue",
+            "sourceForm": "Lootman.esp|98B6"
+          }
+        },
+        {
+          "text": "コンテナの解錠",
+          "type": "switcher",
+          "help": "オンの場合、ヘアピンを消費して施錠されたコンテナを解錠して自動収集を行います。",
+          "valueOptions": {
+            "sourceType": "GlobalValue",
+            "sourceForm": "Lootman.esp|DD8C"
+          }
+        },
+        {
+          "text": "収集範囲",
+          "type": "slider",
+          "help": "自動収集を行う範囲です。（プレイヤーからターゲットまでの距離）",
+          "valueOptions": {
+            "min": 100,
+            "max": 32000,
+            "step": 100,
+            "sourceType": "GlobalValue",
+            "sourceForm": "Lootman.esp|FA9"
+          }
+        },
+        {
+          "text": "所持重量",
+          "type": "slider",
+          "help": "Lootman の最大所持重量です。",
+          "valueOptions": {
+            "min": 500,
+            "max": 1000000,
+            "step": 500,
+            "sourceType": "GlobalValue",
+            "sourceForm": "Lootman.esp|2695"
+          }
+        },
+        {
+          "text": "重量オーバーを無視する",
+          "type": "switcher",
+          "help": "オンの場合、Lootman は重量オーバーを無視して自動収集を続けます。",
+          "valueOptions": {
+            "sourceType": "GlobalValue",
+            "sourceForm": "Lootman.esp|2697"
+          }
+        },
+        {
+          "text": "ピックアップ効果音",
+          "type": "switcher",
+          "help": "オンの場合、アイテムを自動収集したときに効果音が再生されるようになります。",
+          "valueOptions": {
+            "sourceType": "GlobalValue",
+            "sourceForm": "Lootman.esp|5BDB"
+          }
+        },
+        {
+          "text": "コンテナのアニメーション",
+          "type": "switcher",
+          "help": "オンの場合、コンテナからアイテムを自動収集したときにアニメーションが再生されるようになります。",
+          "valueOptions": {
+            "sourceType": "GlobalValue",
+            "sourceForm": "Lootman.esp|CE51"
+          }
+        },
+        {
+          "text": "システムメッセージ",
+          "type": "switcher",
+          "help": "オンの場合、Lootman のシステムメッセージが表示されるようになります。",
+          "valueOptions": {
+            "sourceType": "GlobalValue",
+            "sourceForm": "Lootman.esp|BF1B"
+          }
+        },
+        {
+          "text": "スレッド動作間隔",
+          "type": "slider",
+          "help": "自動収集を行うスレッドの動作間隔です。（秒）",
+          "valueOptions": {
+            "min": 0.1,
+            "max": 10,
+            "step": 0.1,
+            "sourceType": "GlobalValue",
+            "sourceForm": "Lootman.esp|2E31"
+          }
+        },
+        { "type": "spacer" },
+        { "text": "==== 最大スレッド数 ================", "type": "text" },
+        {
+          "text": "自動収集を行うスクリプトの種別ごとに最大スレッド数を設定できます。",
+          "type": "text"
+        },
+        { "text": "================================", "type": "text" },
+        {
+          "text": "コンテナ",
+          "type": "slider",
+          "help": "コンテナの自動収集を行うスクリプトの最大スレッド数です。",
+          "valueOptions": {
+            "min": 1,
+            "max": 8,
+            "step": 1,
+            "sourceType": "GlobalValue",
+            "sourceForm": "Lootman.esp|98D7"
+          }
+        },
+        {
+          "text": "死体",
+          "type": "slider",
+          "help": "死体の自動収集を行うスクリプトの最大スレッド数です。",
+          "valueOptions": {
+            "min": 1,
+            "max": 8,
+            "step": 1,
+            "sourceType": "GlobalValue",
+            "sourceForm": "Lootman.esp|98DB"
+          }
+        },
+        {
+          "text": "武器",
+          "type": "slider",
+          "help": "武器の自動収集を行うスクリプトの最大スレッド数です。",
+          "valueOptions": {
+            "min": 1,
+            "max": 8,
+            "step": 1,
+            "sourceType": "GlobalValue",
+            "sourceForm": "Lootman.esp|98DC"
+          }
+        },
+        {
+          "text": "防具",
+          "type": "slider",
+          "help": "防具の自動収集を行うスクリプトの最大スレッド数です。",
+          "valueOptions": {
+            "min": 1,
+            "max": 8,
+            "step": 1,
+            "sourceType": "GlobalValue",
+            "sourceForm": "Lootman.esp|98D5"
+          }
+        },
+        {
+          "text": "薬品/食料",
+          "type": "slider",
+          "help": "薬品/食料の自動収集を行うスクリプトの最大スレッド数です。",
+          "valueOptions": {
+            "min": 1,
+            "max": 8,
+            "step": 1,
+            "sourceType": "GlobalValue",
+            "sourceForm": "Lootman.esp|98D3"
+          }
+        },
+        {
+          "text": "ジャンク/その他",
+          "type": "slider",
+          "help": "ジャンク/その他の自動収集を行うスクリプトの最大スレッド数です。",
+          "valueOptions": {
+            "min": 1,
+            "max": 8,
+            "step": 1,
+            "sourceType": "GlobalValue",
+            "sourceForm": "Lootman.esp|98D1"
+          }
+        },
+        {
+          "text": "弾薬",
+          "type": "slider",
+          "help": "弾薬の自動収集を行うスクリプトの最大スレッド数です。",
+          "valueOptions": {
+            "min": 1,
+            "max": 8,
+            "step": 1,
+            "sourceType": "GlobalValue",
+            "sourceForm": "Lootman.esp|98D4"
+          }
+        },
+        {
+          "text": "本",
+          "type": "slider",
+          "help": "本の自動収集を行うスクリプトの最大スレッド数です。",
+          "valueOptions": {
+            "min": 1,
+            "max": 8,
+            "step": 1,
+            "sourceType": "GlobalValue",
+            "sourceForm": "Lootman.esp|98D6"
+          }
+        },
+        {
+          "text": "カギ",
+          "type": "slider",
+          "help": "カギの自動収集を行うスクリプトの最大スレッド数です。",
+          "valueOptions": {
+            "min": 1,
+            "max": 8,
+            "step": 1,
+            "sourceType": "GlobalValue",
+            "sourceForm": "Lootman.esp|98DA"
+          }
+        },
+        {
+          "text": "植物",
+          "type": "slider",
+          "help": "植物の自動収集を行うスクリプトの最大スレッド数です。",
+          "valueOptions": {
+            "min": 1,
+            "max": 8,
+            "step": 1,
+            "sourceType": "GlobalValue",
+            "sourceForm": "Lootman.esp|98D8"
+          }
+        },
+        {
+          "text": "アクティベーター",
+          "type": "slider",
+          "help": "アクティベーターの自動収集を行うスクリプトの最大スレッド数です。",
+          "valueOptions": {
+            "min": 1,
+            "max": 8,
+            "step": 1,
+            "sourceType": "GlobalValue",
+            "sourceForm": "Lootman.esp|98D2"
+          }
+        },
+        {
+          "text": "材料",
+          "type": "slider",
+          "help": "材料の自動収集を行うスクリプトの最大スレッド数です。（このカテゴリのアイテムはバニラには１つしかありません）",
+          "valueOptions": {
+            "min": 1,
+            "max": 8,
+            "step": 1,
+            "sourceType": "GlobalValue",
+            "sourceForm": "Lootman.esp|98D9"
+          }
+        }
+      ]
+    },
+    {
+      "pageDisplayName": "自動収集 フィルター",
+      "content": [
+        { "text": "==== ターゲットフィルター ================", "type": "text" },
+        {
+          "text": "コンテナ・死体・その他のオブジェクトを自動収集の対象とするか設定できます。",
+          "type": "text"
+        },
+        { "text": "================================", "type": "text" },
+        {
+          "text": "コンテナ",
+          "type": "switcher",
+          "help": "オンの場合、コンテナからアイテムを自動収集します。",
+          "valueOptions": {
+            "sourceType": "GlobalValue",
+            "sourceForm": "Lootman.esp|FA3"
+          }
+        },
+        {
+          "text": "死体",
+          "type": "switcher",
+          "help": "オンの場合、死体からアイテムを自動収集します。",
+          "valueOptions": {
+            "sourceType": "GlobalValue",
+            "sourceForm": "Lootman.esp|FA8"
+          }
+        },
+        {
+          "text": "オブジェクト",
+          "type": "switcher",
+          "help": "オンの場合、コンテナ・死体以外のオブジェクトを自動収集します。",
+          "valueOptions": {
+            "sourceType": "GlobalValue",
+            "sourceForm": "Lootman.esp|BF1A"
+          }
+        },
+        { "type": "spacer" },
+        { "text": "==== カテゴリフィルター ================", "type": "text" },
+        {
+          "text": "どのアイテムを自動収集するかをカテゴリー別に設定することができます。この設定は、死体・コンテナ・その他のオブジェクトを自動収集する際に適用されます。また、クエストアイテムやフィーチャーアイテムなど、設定に関わらず自動収集されないアイテムもあります。",
+          "type": "text"
+        },
+        { "text": "================================", "type": "text" },
+        {
+          "text": "武器",
+          "type": "switcher",
+          "help": "オンの場合、武器を自動収集の対象とします。",
+          "valueOptions": {
+            "sourceType": "GlobalValue",
+            "sourceForm": "Lootman.esp|FAA"
+          }
+        },
+        {
+          "text": "防具",
+          "type": "switcher",
+          "help": "オンの場合、防具を自動収集の対象とします。",
+          "valueOptions": {
+            "sourceType": "GlobalValue",
+            "sourceForm": "Lootman.esp|FA2"
+          }
+        },
+        {
+          "text": "薬品/食料",
+          "type": "switcher",
+          "help": "オンの場合、薬品/食料を自動収集の対象とします。",
+          "valueOptions": {
+            "sourceType": "GlobalValue",
+            "sourceForm": "Lootman.esp|FA0"
+          }
+        },
+        {
+          "text": "ジャンク/その他",
+          "type": "switcher",
+          "help": "オンの場合、ジャンク/その他を自動収集の対象とします。",
+          "valueOptions": {
+            "sourceType": "GlobalValue",
+            "sourceForm": "Lootman.esp|FA7"
+          }
+        },
+        {
+          "text": "本",
+          "type": "switcher",
+          "help": "オンの場合、本を自動収集の対象とします。",
+          "valueOptions": {
+            "sourceType": "GlobalValue",
+            "sourceForm": "Lootman.esp|1EEF"
+          }
+        },
+        {
+          "text": "カギ",
+          "type": "switcher",
+          "help": "オンの場合、カギを自動収集の対象とします。",
+          "valueOptions": {
+            "sourceType": "GlobalValue",
+            "sourceForm": "Lootman.esp|4507"
+          }
+        },
+        {
+          "text": "材料",
+          "type": "switcher",
+          "help": "オンの場合、材料（謎）を自動収集の対象とします。",
+          "valueOptions": {
+            "sourceType": "GlobalValue",
+            "sourceForm": "Lootman.esp|FA6"
+          }
+        },
+        {
+          "text": "弾薬",
+          "type": "switcher",
+          "help": "オンの場合、弾薬を自動収集の対象とします。",
+          "valueOptions": {
+            "sourceType": "GlobalValue",
+            "sourceForm": "Lootman.esp|FA1"
+          }
+        },
+        {
+          "text": "植物",
+          "type": "switcher",
+          "help": "オンの場合、植物を自動収集の対象とします。",
+          "valueOptions": {
+            "sourceType": "GlobalValue",
+            "sourceForm": "Lootman.esp|FA5"
+          }
+        },
+        {
+          "text": "アクティベーター",
+          "type": "switcher",
+          "help": "オンの場合、キャップ箱やマイアラークの卵などの特別なアイテムの自動略奪が可能になります。",
+          "valueOptions": {
+            "sourceType": "GlobalValue",
+            "sourceForm": "Lootman.esp|1EFB"
+          }
+        },
+        { "type": "spacer" },
+        { "text": "==== 詳細なフィルター ================", "type": "text" },
+        {
+          "text": "カテゴリごとに、より詳細なフィルターを設定できます。",
+          "type": "text"
+        },
+        { "text": "================================", "type": "text" },
+        {
+          "text": "武器 - グレネード",
+          "type": "switcher",
+          "help": "オンの場合、グレネードを自動収集の対象とします。",
+          "valueOptions": {
+            "sourceType": "GlobalValue",
+            "sourceForm": "Lootman.esp|98BB"
+          }
+        },
+        {
+          "text": "武器 - 地雷",
+          "type": "switcher",
+          "help": "オンの場合、地雷を自動収集の対象とします。",
+          "valueOptions": {
+            "sourceType": "GlobalValue",
+            "sourceForm": "Lootman.esp|98BC"
+          }
+        },
+        {
+          "text": "武器 - その他の武器",
+          "type": "switcher",
+          "help": "オンの場合、いずれにも分類されない武器を自動収集の対象とします。",
+          "valueOptions": {
+            "sourceType": "GlobalValue",
+            "sourceForm": "Lootman.esp|98BD"
+          }
+        },
+        {
+          "text": "薬品/食料 - 酒",
+          "type": "switcher",
+          "help": "オンの場合、酒を自動収集の対象とします。",
+          "valueOptions": {
+            "sourceType": "GlobalValue",
+            "sourceForm": "Lootman.esp|98BE"
+          }
+        },
+        {
+          "text": "薬品/食料 - ドラッグ",
+          "type": "switcher",
+          "help": "オンの場合、ドラッグを自動収集の対象とします。",
+          "valueOptions": {
+            "sourceType": "GlobalValue",
+            "sourceForm": "Lootman.esp|98BF"
+          }
+        },
+        {
+          "text": "薬品/食料 - 食品",
+          "type": "switcher",
+          "help": "オンの場合、食品を自動収集の対象とします。",
+          "valueOptions": {
+            "sourceType": "GlobalValue",
+            "sourceForm": "Lootman.esp|98C0"
+          }
+        },
+        {
+          "text": "薬品/食料 - ヌカ・コーラ",
+          "type": "switcher",
+          "help": "オンの場合、ヌカ・コーラを自動収集の対象とします。",
+          "valueOptions": {
+            "sourceType": "GlobalValue",
+            "sourceForm": "Lootman.esp|98C1"
+          }
+        },
+        {
+          "text": "薬品/食料 - スティムパック",
+          "type": "switcher",
+          "help": "オンの場合、スティムパックを自動収集の対象とします。",
+          "valueOptions": {
+            "sourceType": "GlobalValue",
+            "sourceForm": "Lootman.esp|98C2"
+          }
+        },
+        {
+          "text": "薬品/食料 - シリンジャーの弾薬",
+          "type": "switcher",
+          "help": "オンの場合、シリンジャーの弾薬を自動収集の対象とします。",
+          "valueOptions": {
+            "sourceType": "GlobalValue",
+            "sourceForm": "Lootman.esp|98C3"
+          }
+        },
+        {
+          "text": "薬品/食料 - 水",
+          "type": "switcher",
+          "help": "オンの場合、水を自動収集の対象とします。",
+          "valueOptions": {
+            "sourceType": "GlobalValue",
+            "sourceForm": "Lootman.esp|98C4"
+          }
+        },
+        {
+          "text": "薬品/食料 - その他のアイテム",
+          "type": "switcher",
+          "help": "オンの場合、いずれにも分類されない薬品/食料を自動収集の対象とします。",
+          "valueOptions": {
+            "sourceType": "GlobalValue",
+            "sourceForm": "Lootman.esp|98C5"
+          }
+        },
+        {
+          "text": "本 - スキル雑誌",
+          "type": "switcher",
+          "help": "オンの場合、スキル雑誌を自動収集の対象とします。",
+          "valueOptions": {
+            "sourceType": "GlobalValue",
+            "sourceForm": "Lootman.esp|1EF0"
+          }
+        },
+        {
+          "text": "本 - その他の本",
+          "type": "switcher",
+          "help": "オンの場合、いずれにも分類されない本を自動収集の対象とします。",
+          "valueOptions": {
+            "sourceType": "GlobalValue",
+            "sourceForm": "Lootman.esp|98C6"
+          }
+        },
+        { "type": "spacer" },
+        { "text": "==== その他のフィルター ================", "type": "text" },
+        {
+          "text": "上記フィルターのいずれにも該当しないフィルターを設定できます。",
+          "type": "text"
+        },
+        { "text": "================================", "type": "text" },
+        {
+          "text": "装備品 - レジェンダリーのみ収集",
+          "type": "switcher",
+          "help": "オンの場合、武器・防具カテゴリではレジェンダリーのアイテムのみを自動収集の対象とします。",
+          "valueOptions": {
+            "sourceType": "GlobalValue",
+            "sourceForm": "Lootman.esp|5BDC"
+          }
+        }
+      ]
+    },
+    {
+      "pageDisplayName": "ユーティリティ",
+      "content": [
+        {
+          "id": "MenuOpen_MoveItems_PlayerToLootman:Utility",
+          "text": "==== アイテム移動 プレイヤーから Lootman ================",
+          "type": "switcher",
+          "help": "",
+          "groupControl": 1,
+          "valueOptions": {
+            "sourceType": "ModSettingBool"
+          }
+        },
+        {
+          "text": "プレイヤーのアイテムをカテゴリ別に Lootman に転送します。ボタンを押した後は、処理が完了するまで待ってください。処理が完了すると、経験値を取得したときの効果音が鳴ります。",
+          "type": "text",
+          "groupCondition": 1
+        },
+        { "text": "================================", "type": "text", "groupCondition": 1 },
+        {
+          "text": "全部",
+          "type": "button",
+          "help": "プレイヤーが装備しているものや、お気に入りに登録されているもの以外のアイテムを、プレイヤーから Lootman に移動させます。",
+          "groupCondition": 1,
+          "action": {
+            "type": "CallFunction",
+            "form": "Lootman.esp|9917",
+            "function": "MoveItemsPlayerToLootman",
+            "params": [-1.0, 0.0]
+          }
+        },
+        {
+          "text": "武器",
+          "type": "button",
+          "help": "プレイヤーが装備しているものや、お気に入りに登録されているもの以外の武器を、プレイヤーから Lootman に移動させます。",
+          "groupCondition": 1,
+          "action": {
+            "type": "CallFunction",
+            "form": "Lootman.esp|9917",
+            "function": "MoveItemsPlayerToLootman",
+            "params": [43.0, 0.0]
+          }
+        },
+        {
+          "text": "防具",
+          "type": "button",
+          "help": "プレイヤーが装備しているものや、お気に入りに登録されているもの以外の防具を、プレイヤーから Lootman に移動させます。",
+          "groupCondition": 1,
+          "action": {
+            "type": "CallFunction",
+            "form": "Lootman.esp|9917",
+            "function": "MoveItemsPlayerToLootman",
+            "params": [29.0, 0.0]
+          }
+        },
+        {
+          "text": "薬品/食料",
+          "type": "button",
+          "help": "お気に入りに登録されているもの以外の薬品/食料を、プレイヤーから Lootman に移動させます。",
+          "groupCondition": 1,
+          "action": {
+            "type": "CallFunction",
+            "form": "Lootman.esp|9917",
+            "function": "MoveItemsPlayerToLootman",
+            "params": [48.0, 0.0]
+          }
+        },
+        {
+          "text": "ジャンク",
+          "type": "button",
+          "help": "すべてのジャンクをプレイヤーから Lootman に移動させます。",
+          "groupCondition": 1,
+          "action": {
+            "type": "CallFunction",
+            "form": "Lootman.esp|9917",
+            "function": "MoveItemsPlayerToLootman",
+            "params": [35.0, 0.0]
+          }
+        },
+        {
+          "text": "MOD",
+          "type": "button",
+          "help": "すべての MOD（モジュール） をプレイヤーから Lootman に移動させます。",
+          "groupCondition": 1,
+          "action": {
+            "type": "CallFunction",
+            "form": "Lootman.esp|9917",
+            "function": "MoveItemsPlayerToLootman",
+            "params": [35.0, 1.0]
+          }
+        },
+        {
+          "text": "弾薬",
+          "type": "button",
+          "help": "すべての弾薬をプレイヤーから Lootman に移動させます。",
+          "groupCondition": 1,
+          "action": {
+            "type": "CallFunction",
+            "form": "Lootman.esp|9917",
+            "function": "MoveItemsPlayerToLootman",
+            "params": [44.0, 0.0]
+          }
+        },
+        {
+          "text": "本",
+          "type": "button",
+          "help": "すべての本をプレイヤーから Lootman に移動させます。",
+          "groupCondition": 1,
+          "action": {
+            "type": "CallFunction",
+            "form": "Lootman.esp|9917",
+            "function": "MoveItemsPlayerToLootman",
+            "params": [30.0, 0.0]
+          }
+        },
+        {
+          "text": "カギ",
+          "type": "button",
+          "help": "すべてのカギをプレイヤーから Lootman に移動させます。",
+          "groupCondition": 1,
+          "action": {
+            "type": "CallFunction",
+            "form": "Lootman.esp|9917",
+            "function": "MoveItemsPlayerToLootman",
+            "params": [47.0, 0.0]
+          }
+        },
+        { "type": "spacer", "groupCondition": 1 },
+        {
+          "id": "MenuOpen_MoveItems_LootmanToPlayer:Utility",
+          "text": "==== アイテム移動 Lootman からプレイヤー ================",
+          "type": "switcher",
+          "help": "",
+          "groupControl": 2,
+          "valueOptions": {
+            "sourceType": "ModSettingBool"
+          }
+        },
+        {
+          "text": "Lootman のアイテムをカテゴリ別にプレイヤーに転送します。ボタンを押した後は、処理が完了するまで待ってください。処理が完了すると、経験値を取得したときの効果音が鳴ります。",
+          "type": "text",
+          "groupCondition": 2
+        },
+        { "text": "================================", "type": "text", "groupCondition": 2 },
+        {
+          "text": "全部",
+          "type": "button",
+          "help": "すべてのアイテムを Lootman からプレイヤーに移動させます。",
+          "groupCondition": 2,
+          "action": {
+            "type": "CallFunction",
+            "form": "Lootman.esp|9917",
+            "function": "MoveItemsLootmanToPlayer",
+            "params": [-1.0, 0.0]
+          }
+        },
+        {
+          "text": "武器",
+          "type": "button",
+          "help": "すべての武器を Lootman からプレイヤーに移動させます。",
+          "groupCondition": 2,
+          "action": {
+            "type": "CallFunction",
+            "form": "Lootman.esp|9917",
+            "function": "MoveItemsLootmanToPlayer",
+            "params": [43.0, 0.0]
+          }
+        },
+        {
+          "text": "防具",
+          "type": "button",
+          "help": "すべての防具を Lootman からプレイヤーに移動させます。",
+          "groupCondition": 2,
+          "action": {
+            "type": "CallFunction",
+            "form": "Lootman.esp|9917",
+            "function": "MoveItemsLootmanToPlayer",
+            "params": [29.0, 0.0]
+          }
+        },
+        {
+          "text": "薬品/食料",
+          "type": "button",
+          "help": "すべての薬品/食料を Lootman からプレイヤーに移動させます。",
+          "groupCondition": 2,
+          "action": {
+            "type": "CallFunction",
+            "form": "Lootman.esp|9917",
+            "function": "MoveItemsLootmanToPlayer",
+            "params": [48.0, 0.0]
+          }
+        },
+        {
+          "text": "ジャンク",
+          "type": "button",
+          "help": "すべてのジャンクを Lootman からプレイヤーに移動させます。",
+          "groupCondition": 2,
+          "action": {
+            "type": "CallFunction",
+            "form": "Lootman.esp|9917",
+            "function": "MoveItemsLootmanToPlayer",
+            "params": [35.0, 0.0]
+          }
+        },
+        {
+          "text": "MOD",
+          "type": "button",
+          "help": "すべてのMOD（モジュール）を Lootman からプレイヤーに移動させます。",
+          "groupCondition": 2,
+          "action": {
+            "type": "CallFunction",
+            "form": "Lootman.esp|9917",
+            "function": "MoveItemsLootmanToPlayer",
+            "params": [35.0, 1.0]
+          }
+        },
+        {
+          "text": "弾薬",
+          "type": "button",
+          "help": "すべての弾薬を Lootman からプレイヤーに移動させます。",
+          "groupCondition": 2,
+          "action": {
+            "type": "CallFunction",
+            "form": "Lootman.esp|9917",
+            "function": "MoveItemsLootmanToPlayer",
+            "params": [44.0, 0.0]
+          }
+        },
+        {
+          "text": "本",
+          "type": "button",
+          "help": "すべての本を Lootman からプレイヤーに移動させます。",
+          "groupCondition": 2,
+          "action": {
+            "type": "CallFunction",
+            "form": "Lootman.esp|9917",
+            "function": "MoveItemsLootmanToPlayer",
+            "params": [30.0, 0.0]
+          }
+        },
+        {
+          "text": "カギ",
+          "type": "button",
+          "help": "すべてのカギを Lootman からプレイヤーに移動させます。",
+          "groupCondition": 2,
+          "action": {
+            "type": "CallFunction",
+            "form": "Lootman.esp|9917",
+            "function": "MoveItemsLootmanToPlayer",
+            "params": [47.0, 0.0]
+          }
+        },
+        { "type": "spacer", "groupCondition": 2 },
+        {
+          "id": "MenuOpen_MoveItems_LootmanToWorkshop:Utility",
+          "text": "==== アイテム移動 Lootman からワークショップ ================",
+          "type": "switcher",
+          "help": "",
+          "groupControl": 3,
+          "valueOptions": {
+            "sourceType": "ModSettingBool"
+          }
+        },
+        {
+          "text": "Lootman のアイテムをカテゴリ別に近くのワークショップに転送します。ボタンを押した後は、処理が完了するまで待ってください。処理が完了すると、経験値を取得したときの効果音が鳴ります。",
+          "type": "text",
+          "groupCondition": 3
+        },
+        { "text": "================================", "type": "text", "groupCondition": 3 },
+        {
+          "text": "全部",
+          "type": "button",
+          "help": "すべてのアイテムを Lootman からワークショップに移動させます。",
+          "groupCondition": 3,
+          "action": {
+            "type": "CallFunction",
+            "form": "Lootman.esp|9917",
+            "function": "MoveItemsLootmanToWorkshop",
+            "params": [-1.0, 0.0]
+          }
+        },
+        {
+          "text": "武器",
+          "type": "button",
+          "help": "すべての武器を Lootman からワークショップに移動させます。",
+          "groupCondition": 3,
+          "action": {
+            "type": "CallFunction",
+            "form": "Lootman.esp|9917",
+            "function": "MoveItemsLootmanToWorkshop",
+            "params": [43.0, 0.0]
+          }
+        },
+        {
+          "text": "防具",
+          "type": "button",
+          "help": "すべての防具を Lootman からワークショップに移動させます。",
+          "groupCondition": 3,
+          "action": {
+            "type": "CallFunction",
+            "form": "Lootman.esp|9917",
+            "function": "MoveItemsLootmanToWorkshop",
+            "params": [29.0, 0.0]
+          }
+        },
+        {
+          "text": "薬品/食料",
+          "type": "button",
+          "help": "すべての薬品/食料を Lootman からワークショップに移動させます。",
+          "groupCondition": 3,
+          "action": {
+            "type": "CallFunction",
+            "form": "Lootman.esp|9917",
+            "function": "MoveItemsLootmanToWorkshop",
+            "params": [48.0, 0.0]
+          }
+        },
+        {
+          "text": "ジャンク",
+          "type": "button",
+          "help": "すべてのジャンクを Lootman からワークショップに移動させます。",
+          "groupCondition": 3,
+          "action": {
+            "type": "CallFunction",
+            "form": "Lootman.esp|9917",
+            "function": "MoveItemsLootmanToWorkshop",
+            "params": [35.0, 0.0]
+          }
+        },
+        {
+          "text": "MOD",
+          "type": "button",
+          "help": "すべてのMOD（モジュール）を Lootman からワークショップに移動させます。",
+          "groupCondition": 3,
+          "action": {
+            "type": "CallFunction",
+            "form": "Lootman.esp|9917",
+            "function": "MoveItemsLootmanToWorkshop",
+            "params": [35.0, 1.0]
+          }
+        },
+        {
+          "text": "弾薬",
+          "type": "button",
+          "help": "すべての弾薬を Lootman からワークショップに移動させます。",
+          "groupCondition": 3,
+          "action": {
+            "type": "CallFunction",
+            "form": "Lootman.esp|9917",
+            "function": "MoveItemsLootmanToWorkshop",
+            "params": [44.0, 0.0]
+          }
+        },
+        {
+          "text": "本",
+          "type": "button",
+          "help": "すべての本を Lootman からワークショップに移動させます。",
+          "groupCondition": 3,
+          "action": {
+            "type": "CallFunction",
+            "form": "Lootman.esp|9917",
+            "function": "MoveItemsLootmanToWorkshop",
+            "params": [30.0, 0.0]
+          }
+        },
+        {
+          "text": "カギ",
+          "type": "button",
+          "help": "すべてのカギを Lootman からワークショップに移動させます。",
+          "groupCondition": 3,
+          "action": {
+            "type": "CallFunction",
+            "form": "Lootman.esp|9917",
+            "function": "MoveItemsLootmanToWorkshop",
+            "params": [47.0, 0.0]
+          }
+        },
+        { "type": "spacer", "groupCondition": 3 },
+        {
+          "id": "MenuOpen_ScrapItems_FromLootman:Utility",
+          "text": "==== Lootman のアイテムをスクラップ ================",
+          "type": "switcher",
+          "help": "",
+          "groupControl": 4,
+          "valueOptions": {
+            "sourceType": "ModSettingBool"
+          }
+        },
+        {
+          "text": "Lootman のアイテムをカテゴリ別にスクラップします。ボタンを押した後は、処理が完了するまで待ってください。処理が完了すると、経験値を取得したときの効果音が鳴ります。",
+          "type": "text",
+          "groupCondition": 4
+        },
+        { "text": "================================", "type": "text", "groupCondition": 4 },
+        {
+          "text": "武器",
+          "type": "button",
+          "help": "Lootman が持っているすべての武器をスクラップします。",
+          "groupCondition": 4,
+          "action": {
+            "type": "CallFunction",
+            "form": "Lootman.esp|9917",
+            "function": "ScrapItemsFromLootman",
+            "params": [43.0, 0.0]
+          }
+        },
+        {
+          "text": "防具",
+          "type": "button",
+          "help": "Lootman が持っているすべての防具をスクラップします。",
+          "groupCondition": 4,
+          "action": {
+            "type": "CallFunction",
+            "form": "Lootman.esp|9917",
+            "function": "ScrapItemsFromLootman",
+            "params": [29.0, 0.0]
+          }
+        },
+        {
+          "text": "ジャンク",
+          "type": "button",
+          "help": "Lootman が持っているすべてのジャンクをスクラップします。",
+          "groupCondition": 4,
+          "action": {
+            "type": "CallFunction",
+            "form": "Lootman.esp|9917",
+            "function": "ScrapItemsFromLootman",
+            "params": [35.0, 0.0]
+          }
+        }
+      ]
+    },
+    {
+      "pageDisplayName": "システム",
+      "content": [
+        {
+          "text": "強制インストール",
+          "type": "button",
+          "help": "",
+          "action": {
+            "type": "CallFunction",
+            "form": "Lootman.esp|9917",
+            "function": "Install",
+            "params": []
+          }
+        },
+        {
+          "id": "Uninstall:System",
+          "text": "アンインストール",
+          "type": "switcher",
+          "help": "Lootman がシステムに加えたすべての変更を削除します。",
+          "groupControl": 5,
+          "valueOptions": {
+            "sourceType": "ModSettingBool"
+          }
+        },
+        { "text": "==== 警告 ================", "type": "text", "groupCondition": 5 },
+        {
+          "text": "アンインストールすると Lootman のすべての機能が使用できなくなりますが、よろしいですか？",
+          "type": "text",
+          "groupCondition": 5
+        },
+        { "text": "================================", "type": "text", "groupCondition": 5 },
+        {
+          "text": "はい",
+          "type": "button",
+          "help": "",
+          "groupCondition": 5,
+          "action": {
+            "type": "CallFunction",
+            "form": "Lootman.esp|9917",
+            "function": "Uninstall",
+            "params": []
+          }
+        }
+      ]
+    },
+    {
+      "pageDisplayName": "ホットキー",
+      "content": [
+        {
+          "id": "ToggleLooting",
+          "text": "自動収集のオン・オフ切り替え",
+          "type": "hotkey",
+          "help": "キーを押すたびに自動収集のオンとオフが切り替わります。"
+        },
+        {
+          "id": "OpenInventory",
+          "text": "インベントリを開く",
+          "type": "hotkey",
+          "help": "キーを押すとLootmanのインベントリが開きます。"
+        },
+        {
+          "id": "ToggleWorkshopLink",
+          "text": "ワークショップへのリンク状態を切り替え",
+          "type": "hotkey",
+          "help": "キーを押すたびに近くのワークショップとLootmanのリンク状態が切り替わります。"
+        }
+      ]
+    }
+  ]
+}

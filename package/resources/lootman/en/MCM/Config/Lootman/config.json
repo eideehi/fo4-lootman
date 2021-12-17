@@ -1,0 +1,1072 @@
+{
+  "modName": "Lootman",
+  "displayName": "Lootman",
+  "minMcmVersion": 1,
+  "pluginRequirements": ["Lootman.esp"],
+  "content": [
+    {
+      "text": "About",
+      "type": "section"
+    },
+    {
+      "text": "Mod for automatic item looting. It handles the looting of weapons, apparels, chemistry/food, junk/etc, ammo, flora, books and keys. It can also be looted from dead bodies and containers. The items to be looted can be filtered like only Weapons, only Junk. I think it supports elements added by DLC and Mod.",
+      "type": "text"
+    }
+  ],
+  "pages": [
+    {
+      "pageDisplayName": "General Settings",
+      "content": [
+        { "text": "==== General ================", "type": "text" },
+        {
+          "text": "This is a general looting settings.",
+          "type": "text"
+        },
+        { "text": "================================", "type": "text" },
+        {
+          "text": "Auto Looting",
+          "type": "switcher",
+          "help": "When on, auto looting is enabled.",
+          "valueOptions": {
+            "sourceType": "GlobalValue",
+            "sourceForm": "Lootman.esp|FA4"
+          }
+        },
+        {
+          "text": "Loot In Player Directly",
+          "type": "switcher",
+          "help": "When on, the loot will be added directly to the player's inventory.",
+          "valueOptions": {
+            "sourceType": "GlobalValue",
+            "sourceForm": "Lootman.esp|CE50"
+          }
+        },
+        {
+          "text": "Looting Disabled In Settlement",
+          "type": "switcher",
+          "help": "When on, auto looting at settlements will be suspended.",
+          "valueOptions": {
+            "sourceType": "GlobalValue",
+            "sourceForm": "Lootman.esp|98B5"
+          }
+        },
+        {
+          "text": "Automatically Link Or Unlink To Workshop",
+          "type": "switcher",
+          "help": "When on, linking and unlinking to nearby workshops will be performed automatically.",
+          "valueOptions": {
+            "sourceType": "GlobalValue",
+            "sourceForm": "Lootman.esp|98B6"
+          }
+        },
+        {
+          "text": "Container Unlock",
+          "type": "switcher",
+          "help": "When on, consumed Bobby Pin to unlock a locked container.",
+          "valueOptions": {
+            "sourceType": "GlobalValue",
+            "sourceForm": "Lootman.esp|DD8C"
+          }
+        },
+        {
+          "text": "Looting Range",
+          "type": "slider",
+          "help": "Range of auto looting. (distance from player to target)",
+          "valueOptions": {
+            "min": 100,
+            "max": 32000,
+            "step": 100,
+            "sourceType": "GlobalValue",
+            "sourceForm": "Lootman.esp|FA9"
+          }
+        },
+        {
+          "text": "Carry Weight",
+          "type": "slider",
+          "help": "Carry weight of the lootman.",
+          "valueOptions": {
+            "min": 500,
+            "max": 1000000,
+            "step": 500,
+            "sourceType": "GlobalValue",
+            "sourceForm": "Lootman.esp|2695"
+          }
+        },
+        {
+          "text": "Ignore Overweight",
+          "type": "switcher",
+          "help": "When on, Lootman will ignore overweight and continue looting.",
+          "valueOptions": {
+            "sourceType": "GlobalValue",
+            "sourceForm": "Lootman.esp|2697"
+          }
+        },
+        {
+          "text": "Pickup Sound",
+          "type": "switcher",
+          "help": "When on, the sound effects will play after the looting.",
+          "valueOptions": {
+            "sourceType": "GlobalValue",
+            "sourceForm": "Lootman.esp|5BDB"
+          }
+        },
+        {
+          "text": "Container Animation",
+          "type": "switcher",
+          "help": "When on, the animation will play after the container is looting.",
+          "valueOptions": {
+            "sourceType": "GlobalValue",
+            "sourceForm": "Lootman.esp|CE51"
+          }
+        },
+        {
+          "text": "System Message",
+          "type": "switcher",
+          "help": "When on, it will display Lootman system messages.",
+          "valueOptions": {
+            "sourceType": "GlobalValue",
+            "sourceForm": "Lootman.esp|BF1B"
+          }
+        },
+        {
+          "text": "Thread Interval",
+          "type": "slider",
+          "help": "Thread interval for looting process. (seconds)",
+          "valueOptions": {
+            "min": 0.1,
+            "max": 10,
+            "step": 0.1,
+            "sourceType": "GlobalValue",
+            "sourceForm": "Lootman.esp|2E31"
+          }
+        },
+        { "type": "spacer" },
+        { "text": "==== Thread Limit ================", "type": "text" },
+        {
+          "text": "You can set the maximum number of threads to be started for each type of Looting process.",
+          "type": "text"
+        },
+        { "text": "================================", "type": "text" },
+        {
+          "text": "Containers",
+          "type": "slider",
+          "help": "The maximum number of threads in the script that will looting the containers.",
+          "valueOptions": {
+            "min": 1,
+            "max": 8,
+            "step": 1,
+            "sourceType": "GlobalValue",
+            "sourceForm": "Lootman.esp|98D7"
+          }
+        },
+        {
+          "text": "Corpses",
+          "type": "slider",
+          "help": "The maximum number of threads in the script that will looting the corpses.",
+          "valueOptions": {
+            "min": 1,
+            "max": 8,
+            "step": 1,
+            "sourceType": "GlobalValue",
+            "sourceForm": "Lootman.esp|98DB"
+          }
+        },
+        {
+          "text": "Weapons",
+          "type": "slider",
+          "help": "The maximum number of threads in the script that will looting the weapons.",
+          "valueOptions": {
+            "min": 1,
+            "max": 8,
+            "step": 1,
+            "sourceType": "GlobalValue",
+            "sourceForm": "Lootman.esp|98DC"
+          }
+        },
+        {
+          "text": "Apparels",
+          "type": "slider",
+          "help": "The maximum number of threads in the script that will looting the apparels.",
+          "valueOptions": {
+            "min": 1,
+            "max": 8,
+            "step": 1,
+            "sourceType": "GlobalValue",
+            "sourceForm": "Lootman.esp|98D5"
+          }
+        },
+        {
+          "text": "Chemistry/Food",
+          "type": "slider",
+          "help": "The maximum number of threads in the script that will looting the chemistry/food.",
+          "valueOptions": {
+            "min": 1,
+            "max": 8,
+            "step": 1,
+            "sourceType": "GlobalValue",
+            "sourceForm": "Lootman.esp|98D3"
+          }
+        },
+        {
+          "text": "Junk/etc",
+          "type": "slider",
+          "help": "The maximum number of threads in the script that will looting the junk/etc.",
+          "valueOptions": {
+            "min": 1,
+            "max": 8,
+            "step": 1,
+            "sourceType": "GlobalValue",
+            "sourceForm": "Lootman.esp|98D1"
+          }
+        },
+        {
+          "text": "Ammo",
+          "type": "slider",
+          "help": "The maximum number of threads in the script that will looting the ammo.",
+          "valueOptions": {
+            "min": 1,
+            "max": 8,
+            "step": 1,
+            "sourceType": "GlobalValue",
+            "sourceForm": "Lootman.esp|98D4"
+          }
+        },
+        {
+          "text": "Books",
+          "type": "slider",
+          "help": "The maximum number of threads in the script that will looting the books.",
+          "valueOptions": {
+            "min": 1,
+            "max": 8,
+            "step": 1,
+            "sourceType": "GlobalValue",
+            "sourceForm": "Lootman.esp|98D6"
+          }
+        },
+        {
+          "text": "Keys",
+          "type": "slider",
+          "help": "The maximum number of threads in the script that will looting the keys.",
+          "valueOptions": {
+            "min": 1,
+            "max": 8,
+            "step": 1,
+            "sourceType": "GlobalValue",
+            "sourceForm": "Lootman.esp|98DA"
+          }
+        },
+        {
+          "text": "Flora",
+          "type": "slider",
+          "help": "The maximum number of threads in the script that will looting the flora.",
+          "valueOptions": {
+            "min": 1,
+            "max": 8,
+            "step": 1,
+            "sourceType": "GlobalValue",
+            "sourceForm": "Lootman.esp|98D8"
+          }
+        },
+        {
+          "text": "Activator",
+          "type": "slider",
+          "help": "The maximum number of threads in the script that will looting the activator.",
+          "valueOptions": {
+            "min": 1,
+            "max": 8,
+            "step": 1,
+            "sourceType": "GlobalValue",
+            "sourceForm": "Lootman.esp|98D2"
+          }
+        },
+        {
+          "text": "Ingredients",
+          "type": "slider",
+          "help": "The maximum number of threads in the script that will looting the ingredients. (There is only one item in this category in vanilla)",
+          "valueOptions": {
+            "min": 1,
+            "max": 8,
+            "step": 1,
+            "sourceType": "GlobalValue",
+            "sourceForm": "Lootman.esp|98D9"
+          }
+        }
+      ]
+    },
+    {
+      "pageDisplayName": "Looting Filter",
+      "content": [
+        { "text": "==== Target Filter ================", "type": "text" },
+        {
+          "text": "You can set whether or not to loot containers, corpses, and other objects.",
+          "type": "text"
+        },
+        { "text": "================================", "type": "text" },
+        {
+          "text": "Containers",
+          "type": "switcher",
+          "help": "When on, looting items from the container.",
+          "valueOptions": {
+            "sourceType": "GlobalValue",
+            "sourceForm": "Lootman.esp|FA3"
+          }
+        },
+        {
+          "text": "Corpses",
+          "type": "switcher",
+          "help": "When on, looting items from the corpse.",
+          "valueOptions": {
+            "sourceType": "GlobalValue",
+            "sourceForm": "Lootman.esp|FA8"
+          }
+        },
+        {
+          "text": "Objects",
+          "type": "switcher",
+          "help": "When on, looting other objects.",
+          "valueOptions": {
+            "sourceType": "GlobalValue",
+            "sourceForm": "Lootman.esp|BF1A"
+          }
+        },
+        { "type": "spacer" },
+        { "text": "==== Category Filter ================", "type": "text" },
+        {
+          "text": "You can set which items are lootetd by category. This setting also applies when looting dead bodies and containers. Also, some items, such as quest items and featured item, will not be lootetd, regardless of their settings.",
+          "type": "text"
+        },
+        { "text": "================================", "type": "text" },
+        {
+          "text": "Weapons",
+          "type": "switcher",
+          "help": "When on, enables auto looting of weapons.",
+          "valueOptions": {
+            "sourceType": "GlobalValue",
+            "sourceForm": "Lootman.esp|FAA"
+          }
+        },
+        {
+          "text": "Apparels",
+          "type": "switcher",
+          "help": "When on, enables auto looting of apparels.",
+          "valueOptions": {
+            "sourceType": "GlobalValue",
+            "sourceForm": "Lootman.esp|FA2"
+          }
+        },
+        {
+          "text": "Chemistry/Food",
+          "type": "switcher",
+          "help": "When on, enables auto looting of chemistry/food.",
+          "valueOptions": {
+            "sourceType": "GlobalValue",
+            "sourceForm": "Lootman.esp|FA0"
+          }
+        },
+        {
+          "text": "Junk/etc",
+          "type": "switcher",
+          "help": "When on, enables auto looting of junk/etc.",
+          "valueOptions": {
+            "sourceType": "GlobalValue",
+            "sourceForm": "Lootman.esp|FA7"
+          }
+        },
+        {
+          "text": "Books",
+          "type": "switcher",
+          "help": "When on, enables auto looting of book.",
+          "valueOptions": {
+            "sourceType": "GlobalValue",
+            "sourceForm": "Lootman.esp|1EEF"
+          }
+        },
+        {
+          "text": "Keys",
+          "type": "switcher",
+          "help": "When on, enables auto looting of key.",
+          "valueOptions": {
+            "sourceType": "GlobalValue",
+            "sourceForm": "Lootman.esp|4507"
+          }
+        },
+        {
+          "text": "Ingredients",
+          "type": "switcher",
+          "help": "When on, enables auto looting of ingredient.",
+          "valueOptions": {
+            "sourceType": "GlobalValue",
+            "sourceForm": "Lootman.esp|FA6"
+          }
+        },
+        {
+          "text": "Ammo",
+          "type": "switcher",
+          "help": "When on, enables auto looting of ammo.",
+          "valueOptions": {
+            "sourceType": "GlobalValue",
+            "sourceForm": "Lootman.esp|FA1"
+          }
+        },
+        {
+          "text": "Flora",
+          "type": "switcher",
+          "help": "When on, enables auto looting of flora.",
+          "valueOptions": {
+            "sourceType": "GlobalValue",
+            "sourceForm": "Lootman.esp|FA5"
+          }
+        },
+        {
+          "text": "Activator",
+          "type": "switcher",
+          "help": "When on, enables auto looting of special items such as Caps Stash and Mirelurk Egg.",
+          "valueOptions": {
+            "sourceType": "GlobalValue",
+            "sourceForm": "Lootman.esp|1EFB"
+          }
+        },
+        { "type": "spacer" },
+        { "text": "==== Advanced Filter ================", "type": "text" },
+        {
+          "text": "You can set up more detailed filters for each item type.",
+          "type": "text"
+        },
+        { "text": "================================", "type": "text" },
+        {
+          "text": "Weapons - Grenade",
+          "type": "switcher",
+          "help": "When on, the grenade is targeted for looting.",
+          "valueOptions": {
+            "sourceType": "GlobalValue",
+            "sourceForm": "Lootman.esp|98BB"
+          }
+        },
+        {
+          "text": "Weapons - Mine",
+          "type": "switcher",
+          "help": "When on, the mine is targeted for looting.",
+          "valueOptions": {
+            "sourceType": "GlobalValue",
+            "sourceForm": "Lootman.esp|98BC"
+          }
+        },
+        {
+          "text": "Weapons - Other Weapons",
+          "type": "switcher",
+          "help": "When on, weapons that are not classified as any of these are targeted for looting.",
+          "valueOptions": {
+            "sourceType": "GlobalValue",
+            "sourceForm": "Lootman.esp|98BD"
+          }
+        },
+        {
+          "text": "Chemistry/Food - Alcohol",
+          "type": "switcher",
+          "help": "When on, the alcohol is targeted for looting.",
+          "valueOptions": {
+            "sourceType": "GlobalValue",
+            "sourceForm": "Lootman.esp|98BE"
+          }
+        },
+        {
+          "text": "Chemistry/Food - Chemistry",
+          "type": "switcher",
+          "help": "When on, the chemistry is targeted for looting.",
+          "valueOptions": {
+            "sourceType": "GlobalValue",
+            "sourceForm": "Lootman.esp|98BF"
+          }
+        },
+        {
+          "text": "Chemistry/Food - Food",
+          "type": "switcher",
+          "help": "When on, the food is targeted for looting.",
+          "valueOptions": {
+            "sourceType": "GlobalValue",
+            "sourceForm": "Lootman.esp|98C0"
+          }
+        },
+        {
+          "text": "Chemistry/Food - Nuka-Cola",
+          "type": "switcher",
+          "help": "When on, the nuka-cola is targeted for looting.",
+          "valueOptions": {
+            "sourceType": "GlobalValue",
+            "sourceForm": "Lootman.esp|98C1"
+          }
+        },
+        {
+          "text": "Chemistry/Food - Stimpak",
+          "type": "switcher",
+          "help": "When on, the stimpak is targeted for looting.",
+          "valueOptions": {
+            "sourceType": "GlobalValue",
+            "sourceForm": "Lootman.esp|98C2"
+          }
+        },
+        {
+          "text": "Chemistry/Food - Syringer Ammo",
+          "type": "switcher",
+          "help": "When on, the syringer ammo is targeted for looting.",
+          "valueOptions": {
+            "sourceType": "GlobalValue",
+            "sourceForm": "Lootman.esp|98C3"
+          }
+        },
+        {
+          "text": "Chemistry/Food - Water",
+          "type": "switcher",
+          "help": "When on, the water is targeted for looting.",
+          "valueOptions": {
+            "sourceType": "GlobalValue",
+            "sourceForm": "Lootman.esp|98C4"
+          }
+        },
+        {
+          "text": "Chemistry/Food - Other Items",
+          "type": "switcher",
+          "help": "When on, chemistry/food that are not classified as any of these are targeted for looting.",
+          "valueOptions": {
+            "sourceType": "GlobalValue",
+            "sourceForm": "Lootman.esp|98C5"
+          }
+        },
+        {
+          "text": "Books - Perk Magazine",
+          "type": "switcher",
+          "help": "When on, park magazine will be the target of the looting.",
+          "valueOptions": {
+            "sourceType": "GlobalValue",
+            "sourceForm": "Lootman.esp|1EF0"
+          }
+        },
+        {
+          "text": "Books - Other Books",
+          "type": "switcher",
+          "help": "When on, books that are not classified as any of these are targeted for looting.",
+          "valueOptions": {
+            "sourceType": "GlobalValue",
+            "sourceForm": "Lootman.esp|98C6"
+          }
+        },
+        { "type": "spacer" },
+        { "text": "==== Extra Filter ================", "type": "text" },
+        {
+          "text": "You can set up extra filters that do not fall into any of these categories.",
+          "type": "text"
+        },
+        { "text": "================================", "type": "text" },
+        {
+          "text": "Equipment - Legendary Only",
+          "type": "switcher",
+          "help": "When on, only legendary equipment is looted in the weapons and armor category.",
+          "valueOptions": {
+            "sourceType": "GlobalValue",
+            "sourceForm": "Lootman.esp|5BDC"
+          }
+        }
+      ]
+    },
+    {
+      "pageDisplayName": "Utility",
+      "content": [
+        {
+          "id": "MenuOpen_MoveItems_PlayerToLootman:Utility",
+          "text": "==== Move Items Player To Lootman ================",
+          "type": "switcher",
+          "help": "",
+          "groupControl": 1,
+          "valueOptions": {
+            "sourceType": "ModSettingBool"
+          }
+        },
+        {
+          "text": "Transfers the player's items to lootman by category. After pressing the button, wait until the process is complete. When the process is complete, you'll hear the sound of the EXP acquisition.",
+          "type": "text",
+          "groupCondition": 1
+        },
+        { "text": "================================", "type": "text", "groupCondition": 1 },
+        {
+          "text": "All",
+          "type": "button",
+          "help": "Move all items from the player to the lootman except what player equipped or favorited.",
+          "groupCondition": 1,
+          "action": {
+            "type": "CallFunction",
+            "form": "Lootman.esp|9917",
+            "function": "MoveItemsPlayerToLootman",
+            "params": [-1.0, 0.0]
+          }
+        },
+        {
+          "text": "Weapons",
+          "type": "button",
+          "help": "Move all weapons from the player to the lootman except what player equipped or favorited.",
+          "groupCondition": 1,
+          "action": {
+            "type": "CallFunction",
+            "form": "Lootman.esp|9917",
+            "function": "MoveItemsPlayerToLootman",
+            "params": [43.0, 0.0]
+          }
+        },
+        {
+          "text": "Apparels",
+          "type": "button",
+          "help": "Move all apparels from the player to the lootman except what player equipped or favorited.",
+          "groupCondition": 1,
+          "action": {
+            "type": "CallFunction",
+            "form": "Lootman.esp|9917",
+            "function": "MoveItemsPlayerToLootman",
+            "params": [29.0, 0.0]
+          }
+        },
+        {
+          "text": "Chemistry/Food",
+          "type": "button",
+          "help": "Move all chemistry/food from the player to the lootman except what player favorited.",
+          "groupCondition": 1,
+          "action": {
+            "type": "CallFunction",
+            "form": "Lootman.esp|9917",
+            "function": "MoveItemsPlayerToLootman",
+            "params": [48.0, 0.0]
+          }
+        },
+        {
+          "text": "Junk",
+          "type": "button",
+          "help": "Move all junk from the player to the lootman.",
+          "groupCondition": 1,
+          "action": {
+            "type": "CallFunction",
+            "form": "Lootman.esp|9917",
+            "function": "MoveItemsPlayerToLootman",
+            "params": [35.0, 0.0]
+          }
+        },
+        {
+          "text": "Mods",
+          "type": "button",
+          "help": "Move all mods from the player to the lootman.",
+          "groupCondition": 1,
+          "action": {
+            "type": "CallFunction",
+            "form": "Lootman.esp|9917",
+            "function": "MoveItemsPlayerToLootman",
+            "params": [35.0, 1.0]
+          }
+        },
+        {
+          "text": "Ammo",
+          "type": "button",
+          "help": "Move all ammo from the player to the lootman.",
+          "groupCondition": 1,
+          "action": {
+            "type": "CallFunction",
+            "form": "Lootman.esp|9917",
+            "function": "MoveItemsPlayerToLootman",
+            "params": [44.0, 0.0]
+          }
+        },
+        {
+          "text": "Books",
+          "type": "button",
+          "help": "Move all books from the player to the lootman.",
+          "groupCondition": 1,
+          "action": {
+            "type": "CallFunction",
+            "form": "Lootman.esp|9917",
+            "function": "MoveItemsPlayerToLootman",
+            "params": [30.0, 0.0]
+          }
+        },
+        {
+          "text": "Keys",
+          "type": "button",
+          "help": "Move all keys from the player to the lootman.",
+          "groupCondition": 1,
+          "action": {
+            "type": "CallFunction",
+            "form": "Lootman.esp|9917",
+            "function": "MoveItemsPlayerToLootman",
+            "params": [47.0, 0.0]
+          }
+        },
+        { "type": "spacer", "groupCondition": 1 },
+        {
+          "id": "MenuOpen_MoveItems_LootmanToPlayer:Utility",
+          "text": "==== Move Items Lootman To Player ================",
+          "type": "switcher",
+          "help": "",
+          "groupControl": 2,
+          "valueOptions": {
+            "sourceType": "ModSettingBool"
+          }
+        },
+        {
+          "text": "Transfer lootman items to the player by category. After pressing the button, wait until the process is complete. When the process is complete, you'll hear the sound of the EXP acquisition.",
+          "type": "text",
+          "groupCondition": 2
+        },
+        { "text": "================================", "type": "text", "groupCondition": 2 },
+        {
+          "text": "All",
+          "type": "button",
+          "help": "Move all items from the lootman to the player.",
+          "groupCondition": 2,
+          "action": {
+            "type": "CallFunction",
+            "form": "Lootman.esp|9917",
+            "function": "MoveItemsLootmanToPlayer",
+            "params": [-1.0, 0.0]
+          }
+        },
+        {
+          "text": "Weapons",
+          "type": "button",
+          "help": "Move all weapons from the lootman to the player.",
+          "groupCondition": 2,
+          "action": {
+            "type": "CallFunction",
+            "form": "Lootman.esp|9917",
+            "function": "MoveItemsLootmanToPlayer",
+            "params": [43.0, 0.0]
+          }
+        },
+        {
+          "text": "Apparels",
+          "type": "button",
+          "help": "Move all apparels from the lootman to the player.",
+          "groupCondition": 2,
+          "action": {
+            "type": "CallFunction",
+            "form": "Lootman.esp|9917",
+            "function": "MoveItemsLootmanToPlayer",
+            "params": [29.0, 0.0]
+          }
+        },
+        {
+          "text": "Chemistry/Food",
+          "type": "button",
+          "help": "Move all chemistry/food from the lootman to the player inventory.",
+          "groupCondition": 2,
+          "action": {
+            "type": "CallFunction",
+            "form": "Lootman.esp|9917",
+            "function": "MoveItemsLootmanToPlayer",
+            "params": [48.0, 0.0]
+          }
+        },
+        {
+          "text": "Junk",
+          "type": "button",
+          "help": "Move all junk from the lootman to the player.",
+          "groupCondition": 2,
+          "action": {
+            "type": "CallFunction",
+            "form": "Lootman.esp|9917",
+            "function": "MoveItemsLootmanToPlayer",
+            "params": [35.0, 0.0]
+          }
+        },
+        {
+          "text": "Mods",
+          "type": "button",
+          "help": "Move all mods from the lootman to the player.",
+          "groupCondition": 2,
+          "action": {
+            "type": "CallFunction",
+            "form": "Lootman.esp|9917",
+            "function": "MoveItemsLootmanToPlayer",
+            "params": [35.0, 1.0]
+          }
+        },
+        {
+          "text": "Ammo",
+          "type": "button",
+          "help": "Move all ammo from the lootman to the player.",
+          "groupCondition": 2,
+          "action": {
+            "type": "CallFunction",
+            "form": "Lootman.esp|9917",
+            "function": "MoveItemsLootmanToPlayer",
+            "params": [44.0, 0.0]
+          }
+        },
+        {
+          "text": "Books",
+          "type": "button",
+          "help": "Move all books from the lootman to the player.",
+          "groupCondition": 2,
+          "action": {
+            "type": "CallFunction",
+            "form": "Lootman.esp|9917",
+            "function": "MoveItemsLootmanToPlayer",
+            "params": [30.0, 0.0]
+          }
+        },
+        {
+          "text": "Keys",
+          "type": "button",
+          "help": "Move all keys from the lootman to the player.",
+          "groupCondition": 2,
+          "action": {
+            "type": "CallFunction",
+            "form": "Lootman.esp|9917",
+            "function": "MoveItemsLootmanToPlayer",
+            "params": [47.0, 0.0]
+          }
+        },
+        { "type": "spacer", "groupCondition": 2 },
+        {
+          "id": "MenuOpen_MoveItems_LootmanToWorkshop:Utility",
+          "text": "==== Move Items Lootman To Workshop ================",
+          "type": "switcher",
+          "help": "",
+          "groupControl": 3,
+          "valueOptions": {
+            "sourceType": "ModSettingBool"
+          }
+        },
+        {
+          "text": "Transfer lootman items by category to a nearby workshop. After pressing the button, wait until the process is complete. When the process is complete, you'll hear the sound of the EXP acquisition.",
+          "type": "text",
+          "groupCondition": 3
+        },
+        { "text": "================================", "type": "text", "groupCondition": 3 },
+        {
+          "text": "All",
+          "type": "button",
+          "help": "Move all items from the lootman to the workshop.",
+          "groupCondition": 3,
+          "action": {
+            "type": "CallFunction",
+            "form": "Lootman.esp|9917",
+            "function": "MoveItemsLootmanToWorkshop",
+            "params": [-1.0, 0.0]
+          }
+        },
+        {
+          "text": "Weapons",
+          "type": "button",
+          "help": "Move all weapons from the lootman to the workshop.",
+          "groupCondition": 3,
+          "action": {
+            "type": "CallFunction",
+            "form": "Lootman.esp|9917",
+            "function": "MoveItemsLootmanToWorkshop",
+            "params": [43.0, 0.0]
+          }
+        },
+        {
+          "text": "Apparels",
+          "type": "button",
+          "help": "Move all apparels from the lootman to the workshop.",
+          "groupCondition": 3,
+          "action": {
+            "type": "CallFunction",
+            "form": "Lootman.esp|9917",
+            "function": "MoveItemsLootmanToWorkshop",
+            "params": [29.0, 0.0]
+          }
+        },
+        {
+          "text": "Chemistry/Food",
+          "type": "button",
+          "help": "Move all chemistry/food from the lootman to the workshop.",
+          "groupCondition": 3,
+          "action": {
+            "type": "CallFunction",
+            "form": "Lootman.esp|9917",
+            "function": "MoveItemsLootmanToWorkshop",
+            "params": [48.0, 0.0]
+          }
+        },
+        {
+          "text": "Junk",
+          "type": "button",
+          "help": "Move all junk from the lootman to the workshop.",
+          "groupCondition": 3,
+          "action": {
+            "type": "CallFunction",
+            "form": "Lootman.esp|9917",
+            "function": "MoveItemsLootmanToWorkshop",
+            "params": [35.0, 0.0]
+          }
+        },
+        {
+          "text": "Mods",
+          "type": "button",
+          "help": "Move all mods from the lootman to the workshop.",
+          "groupCondition": 3,
+          "action": {
+            "type": "CallFunction",
+            "form": "Lootman.esp|9917",
+            "function": "MoveItemsLootmanToWorkshop",
+            "params": [35.0, 1.0]
+          }
+        },
+        {
+          "text": "Ammo",
+          "type": "button",
+          "help": "Move all ammo from the lootman to the workshop.",
+          "groupCondition": 3,
+          "action": {
+            "type": "CallFunction",
+            "form": "Lootman.esp|9917",
+            "function": "MoveItemsLootmanToWorkshop",
+            "params": [44.0, 0.0]
+          }
+        },
+        {
+          "text": "Books",
+          "type": "button",
+          "help": "Move all books from the lootman to the workshop.",
+          "groupCondition": 3,
+          "action": {
+            "type": "CallFunction",
+            "form": "Lootman.esp|9917",
+            "function": "MoveItemsLootmanToWorkshop",
+            "params": [30.0, 0.0]
+          }
+        },
+        {
+          "text": "Keys",
+          "type": "button",
+          "help": "Move all keys from the lootman to the workshop.",
+          "groupCondition": 3,
+          "action": {
+            "type": "CallFunction",
+            "form": "Lootman.esp|9917",
+            "function": "MoveItemsLootmanToWorkshop",
+            "params": [47.0, 0.0]
+          }
+        },
+        { "type": "spacer", "groupCondition": 3 },
+        {
+          "id": "MenuOpen_ScrapItems_FromLootman:Utility",
+          "text": "==== Scrap Items From Lootman ================",
+          "type": "switcher",
+          "help": "",
+          "groupControl": 4,
+          "valueOptions": {
+            "sourceType": "ModSettingBool"
+          }
+        },
+        {
+          "text": "Scrap lootman items by category. After pressing the button, wait until the process is complete. When the process is complete, you'll hear the sound of the EXP acquisition.",
+          "type": "text",
+          "groupCondition": 4
+        },
+        { "text": "================================", "type": "text", "groupCondition": 4 },
+        {
+          "text": "Weapons",
+          "type": "button",
+          "help": "Scrap all weapons in lootman inventory.",
+          "groupCondition": 4,
+          "action": {
+            "type": "CallFunction",
+            "form": "Lootman.esp|9917",
+            "function": "ScrapItemsFromLootman",
+            "params": [43.0, 0.0]
+          }
+        },
+        {
+          "text": "Apparels",
+          "type": "button",
+          "help": "Scrap all apparels in lootman inventory.",
+          "groupCondition": 4,
+          "action": {
+            "type": "CallFunction",
+            "form": "Lootman.esp|9917",
+            "function": "ScrapItemsFromLootman",
+            "params": [29.0, 0.0]
+          }
+        },
+        {
+          "text": "Junk",
+          "type": "button",
+          "help": "Scrap all junk in lootman inventory.",
+          "groupCondition": 4,
+          "action": {
+            "type": "CallFunction",
+            "form": "Lootman.esp|9917",
+            "function": "ScrapItemsFromLootman",
+            "params": [35.0, 0.0]
+          }
+        }
+      ]
+    },
+    {
+      "pageDisplayName": "System",
+      "content": [
+        {
+          "text": "Force Install",
+          "type": "button",
+          "help": "",
+          "action": {
+            "type": "CallFunction",
+            "form": "Lootman.esp|9917",
+            "function": "Install",
+            "params": []
+          }
+        },
+        {
+          "id": "Uninstall:System",
+          "text": "Uninstall",
+          "type": "switcher",
+          "help": "Remove all changes that Lootman has made to the system.",
+          "groupControl": 5,
+          "valueOptions": {
+            "sourceType": "ModSettingBool"
+          }
+        },
+        { "text": "==== Warning ================", "type": "text", "groupCondition": 5 },
+        {
+          "text": "Once uninstalled, all Lootman features will no longer be available, do you really want to uninstall it?",
+          "type": "text",
+          "groupCondition": 5
+        },
+        { "text": "================================", "type": "text", "groupCondition": 5 },
+        {
+          "text": "Yes",
+          "type": "button",
+          "help": "",
+          "groupCondition": 5,
+          "action": {
+            "type": "CallFunction",
+            "form": "Lootman.esp|9917",
+            "function": "Uninstall",
+            "params": []
+          }
+        }
+      ]
+    },
+    {
+      "pageDisplayName": "Hotkeys",
+      "content": [
+        {
+          "id": "ToggleLooting",
+          "text": "Toggle Auto Looting",
+          "type": "hotkey",
+          "help": "Each press of the key turns automatic looting on and off."
+        },
+        {
+          "id": "OpenInventory",
+          "text": "Open Inventory",
+          "type": "hotkey",
+          "help": "Press the key to open the Lootman's inventory."
+        },
+        {
+          "id": "ToggleWorkshopLink",
+          "text": "Toggle Workshop Link",
+          "type": "hotkey",
+          "help": "Each key press toggles the link status between nearby workshops and Lootman."
+        }
+      ]
+    }
+  ]
+}
