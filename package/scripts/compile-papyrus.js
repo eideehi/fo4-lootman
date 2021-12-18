@@ -29,9 +29,8 @@ exec(debugCompileCmd,
 
 
 const productDir = path.join(commonOutDir, "product");
-const productSourceDir = path.join(productDir, ".papyrus-source");
 const productOutDir = path.join(productDir, ".archive-main", "Scripts");
-const productCompileCmd = `"${papyrusCompilerPath}" "${productSourceDir}" -i="${productSourceDir};${importDirs}" -o="${productOutDir}" -f="Institute_Papyrus_Flags.flg" -op -r -final -a`;
+const productCompileCmd = `"${papyrusCompilerPath}" "${debugSourceDir}" -i="${debugSourceDir};${importDirs}" -o="${productOutDir}" -f="Institute_Papyrus_Flags.flg" -op -r -final -a`;
 
 fs.removeSync(productOutDir);
 fs.mkdirsSync(productOutDir);
