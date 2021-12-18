@@ -6,7 +6,7 @@ EndFunction
 
 Function LootObject(ObjectReference ref)
     string prefix = ("| Looting @ " + GetThreadID() + " | " + GetProcessID() + " |     ");; Debug
-    Lootman.Log(prefix + "Loot: [Name: " + ref.GetDisplayName() + ", ID: " + Lootman.GetHexID(ref) + "]");; Debug
+    LTMN:Debug.Log(prefix + "Loot: [Name: " + ref.GetDisplayName() + ", ID: " + LTMN:Debug.GetHexID(ref) + "]");; Debug
     GetLootingActor().AddItem(ref, 1)
     If (properties.PlayPickupSound.GetValueInt() == 1 && properties.LootInPlayerDirectly.GetValueInt() != 1)
         ref.Activate(properties.ActivatorActor, true)
@@ -32,14 +32,14 @@ EndFunction
 
 Function TraceObject(ObjectReference ref);; Debug
     string prefix = ("| Looting @ " + GetThreadID() + " | " + GetProcessID() + " |     ");; Debug
-    LTMN:Quest:Methods.TraceObject(prefix, ref);; Debug
+    LTMN:Debug.TraceObject(prefix, ref);; Debug
     Form base = ref.GetBaseObject();; Debug
-    LTMN:Quest:Methods.TraceForm(prefix + "  ", base);; Debug
-    Lootman.Log(prefix + "    Is alcohol: " + base.HasKeyword(properties.ObjectTypeAlcohol));; Debug
-    Lootman.Log(prefix + "    Is chemical: " + base.HasKeyword(properties.ObjectTypeChem));; Debug
-    Lootman.Log(prefix + "    Is food: " + base.HasKeyword(properties.ObjectTypeFood));; Debug
-    Lootman.Log(prefix + "    Is Nuka-Cola: " + base.HasKeyword(properties.ObjectTypeNukaCola));; Debug
-    Lootman.Log(prefix + "    Is stimpak: " + base.HasKeyword(properties.ObjectTypeStimpak));; Debug
-    Lootman.Log(prefix + "    Is syringer ammo:" + base.HasKeyword(properties.ObjectTypeSyringerAmmo));; Debug
-    Lootman.Log(prefix + "    Is water: " + base.HasKeyword(properties.ObjectTypeWater));; Debug
+    LTMN:Debug.TraceForm(prefix + "  ", base);; Debug
+    LTMN:Debug.Log(prefix + "    Is alcohol: " + base.HasKeyword(properties.ObjectTypeAlcohol));; Debug
+    LTMN:Debug.Log(prefix + "    Is chemical: " + base.HasKeyword(properties.ObjectTypeChem));; Debug
+    LTMN:Debug.Log(prefix + "    Is food: " + base.HasKeyword(properties.ObjectTypeFood));; Debug
+    LTMN:Debug.Log(prefix + "    Is Nuka-Cola: " + base.HasKeyword(properties.ObjectTypeNukaCola));; Debug
+    LTMN:Debug.Log(prefix + "    Is stimpak: " + base.HasKeyword(properties.ObjectTypeStimpak));; Debug
+    LTMN:Debug.Log(prefix + "    Is syringer ammo:" + base.HasKeyword(properties.ObjectTypeSyringerAmmo));; Debug
+    LTMN:Debug.Log(prefix + "    Is water: " + base.HasKeyword(properties.ObjectTypeWater));; Debug
 EndFunction;; Debug

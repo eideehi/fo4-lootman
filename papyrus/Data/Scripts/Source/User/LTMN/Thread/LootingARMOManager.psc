@@ -23,8 +23,8 @@ Event OnInit()
 EndEvent
 
 Function Startup()
-    Lootman.OpenLog();; Debug
-    Lootman.Log("| Loot @ ARMO | *** Start thread manager ***");; Debug
+    LTMN:Debug.OpenLog();; Debug
+    LTMN:Debug.Log("| Loot @ ARMO | *** Start thread manager ***");; Debug
 
     thread01.Initialize()
     thread02.Initialize()
@@ -37,8 +37,8 @@ Function Startup()
 EndFunction
 
 Function Shutdown()
-    Lootman.OpenLog();; Debug
-    Lootman.Log("| Loot @ ARMO | *** Shutdown thread manager ***");; Debug
+    LTMN:Debug.OpenLog();; Debug
+    LTMN:Debug.Log("| Loot @ ARMO | *** Shutdown thread manager ***");; Debug
 
     thread01.Finalize()
     thread02.Finalize()

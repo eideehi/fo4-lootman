@@ -38,12 +38,12 @@ bool Function Busy()
 EndFunction
 
 Function Looting()
-    processId = Lootman.GetRandomProcessID();; Debug
+    processId = LTMN:Debug.GetRandomProcessID();; Debug
     string prefix = ("| Looting @ " + GetThreadID() + " | " + processId + " | ");; Debug
-    Lootman.Log(prefix + "*** Start looting ***");; Debug
+    LTMN:Debug.Log(prefix + "*** Start looting ***");; Debug
     int objectIndex = 1;; Debug
     ObjectReference[] refs = Lootman.FindAllLootingTarget(player, properties.LootingRange.GetValueInt(), GetFindObjectFormType())
-    Lootman.Log(prefix + "  Total number of objects found: " + refs.Length);; Debug
+    LTMN:Debug.Log(prefix + "  Total number of objects found: " + refs.Length);; Debug
     float time = Utility.GetCurrentRealTime()
     int i = refs.Length
     While i
@@ -51,13 +51,13 @@ Function Looting()
 
         ; Since it is not desirable to keep processing an old list of objects forever, we force the thread to be released when the processing time exceeds 2 seconds.
         If ((Utility.GetCurrentRealTime() - time) > properties.ThreadAllowedWorkingTime.GetValue())
-            Lootman.Log(prefix + "*** Force the thread to be released because the processing time of the thread has exceeded the threshold ***");; Debug
+            LTMN:Debug.Log(prefix + "*** Force the thread to be released because the processing time of the thread has exceeded the threshold ***");; Debug
             Return
         EndIf
 
         ; If the looting disabled in the middle of the loop, release the thread immediately.
         If (!IsLootingEnabled())
-            Lootman.Log(prefix + "*** Force the thread to be released because the looting disabled ***");; Debug
+            LTMN:Debug.Log(prefix + "*** Force the thread to be released because the looting disabled ***");; Debug
             Return
         EndIf
 
@@ -71,25 +71,25 @@ Function Looting()
                     ref.SetValue(properties.LastLootingTimestamp, Utility.GetCurrentRealTime())
                 EndIf
 
-                Lootman.Log(prefix + "  [Object_" + objectIndex + "]");; Debug
+                LTMN:Debug.Log(prefix + "  [Object_" + objectIndex + "]");; Debug
                 TraceObject(ref);; Debug
                 If (IsLootingTarget(ref))
                     LootObject(ref)
                 Else;; Debug
-                    Lootman.Log(prefix + "    ** Is not a target of looting **");; Debug
+                    LTMN:Debug.Log(prefix + "    ** Is not a target of looting **");; Debug
                 EndIf
 
                 ref.ResetKeyword(properties.LootingMarker)
             Else;; Debug
-                Lootman.Log(prefix + "  ** Object_" + objectIndex + " was skipped because it is being processed by another thread **");; Debug
+                LTMN:Debug.Log(prefix + "  ** Object_" + objectIndex + " was skipped because it is being processed by another thread **");; Debug
             EndIf
         Else;; Debug
-            Lootman.Log(prefix + "  ** Object_" + objectIndex + " is not a valid object **");; Debug
+            LTMN:Debug.Log(prefix + "  ** Object_" + objectIndex + " is not a valid object **");; Debug
         EndIf
 
         objectIndex += 1;; Debug
     EndWhile
-    Lootman.Log(prefix + "*** Looting complete ***");; Debug
+    LTMN:Debug.Log(prefix + "*** Looting complete ***");; Debug
 EndFunction
 
 int Function GetFindObjectFormType()

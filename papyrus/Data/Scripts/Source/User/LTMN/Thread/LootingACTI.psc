@@ -6,7 +6,7 @@ EndFunction
 
 Function LootObject(ObjectReference ref)
     string prefix = ("| Looting @ " + GetThreadID() + " | " + GetProcessID() + " |     ");; Debug
-    Lootman.Log(prefix + "Loot: [Name: " + ref.GetDisplayName() + ", ID: " + Lootman.GetHexID(ref) + "]");; Debug
+    LTMN:Debug.Log(prefix + "Loot: [Name: " + ref.GetDisplayName() + ", ID: " + LTMN:Debug.GetHexID(ref) + "]");; Debug
     If (ref.Activate(GetLootingActor()) && properties.PlayPickupSound.GetValueInt() == 1 && properties.LootInPlayerDirectly.GetValueInt() != 1)
         properties.PickupSoundACTI.Play(player)
     EndIf
@@ -36,9 +36,9 @@ EndFunction
 
 Function TraceObject(ObjectReference ref);; Debug
     string prefix = ("| Looting @ " + GetThreadID() + " | " + GetProcessID() + " |     ");; Debug
-    LTMN:Quest:Methods.TraceObject(prefix, ref);; Debug
+    LTMN:Debug.TraceObject(prefix, ref);; Debug
     Form base = ref.GetBaseObject();; Debug
-    LTMN:Quest:Methods.TraceForm(prefix + "  ", base);; Debug
-    Lootman.Log(prefix + "    Is activator that is allowed to loot: " + properties.AllowedActivatorList.HasForm(base));; Debug
-    Lootman.Log(prefix + "    Is allowed to ignore the activation block: " + properties.IgnorableActivationBlockeList.HasForm(base));; Debug
+    LTMN:Debug.TraceForm(prefix + "  ", base);; Debug
+    LTMN:Debug.Log(prefix + "    Is activator that is allowed to loot: " + properties.AllowedActivatorList.HasForm(base));; Debug
+    LTMN:Debug.Log(prefix + "    Is allowed to ignore the activation block: " + properties.IgnorableActivationBlockeList.HasForm(base));; Debug
 EndFunction;; Debug

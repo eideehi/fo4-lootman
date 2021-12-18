@@ -6,7 +6,7 @@ EndFunction
 
 Function LootObject(ObjectReference ref)
     string prefix = ("| Looting @ " + GetThreadID() + " | " + GetProcessID() + " |     ");; Debug
-    Lootman.Log(prefix + "Loot: [Name: " + ref.GetDisplayName() + ", ID: " + Lootman.GetHexID(ref) + "]");; Debug
+    LTMN:Debug.Log(prefix + "Loot: [Name: " + ref.GetDisplayName() + ", ID: " + LTMN:Debug.GetHexID(ref) + "]");; Debug
     If (ref.Activate(GetLootingActor()) && properties.PlayPickupSound.GetValueInt() == 1 && properties.LootInPlayerDirectly.GetValueInt() != 1)
         properties.PickupSoundFLOR.Play(player)
     EndIf
@@ -28,6 +28,6 @@ EndFunction
 
 Function TraceObject(ObjectReference ref);; Debug
     string prefix = ("| Looting @ " + GetThreadID() + " | " + GetProcessID() + " |     ");; Debug
-    LTMN:Quest:Methods.TraceObject(prefix, ref);; Debug
-    Lootman.Log(prefix + "  Is linked to workshop: " + Lootman.IsLinkedToWorkshop(ref));; Debug
+    LTMN:Debug.TraceObject(prefix, ref);; Debug
+    LTMN:Debug.Log(prefix + "  Is linked to workshop: " + Lootman.IsLinkedToWorkshop(ref));; Debug
 EndFunction;; Debug

@@ -874,22 +874,23 @@ bool PapyrusLootman::RegisterFunctions(VirtualMachine* vm)
 
 #ifdef _DEBUG
     vm->RegisterFunction(
-        new NativeFunction1<StaticFunctionTag, BSFixedString, TESForm*>("GetFormTypeIdentify", "Lootman",
+        new NativeFunction1<StaticFunctionTag, BSFixedString, TESForm*>("GetFormTypeIdentify", "LTMN:Debug",
                                                                         GetFormTypeIdentify, vm));
     vm->RegisterFunction(
-        new NativeFunction1<StaticFunctionTag, BSFixedString, TESForm*>("GetHexID", "Lootman", GetHexID, vm));
+        new NativeFunction1<StaticFunctionTag, BSFixedString, TESForm*>("GetHexID", "LTMN:Debug", GetHexID, vm));
     vm->RegisterFunction(
-        new NativeFunction1<StaticFunctionTag, BSFixedString, TESForm*>("GetIdentify", "Lootman", GetIdentify, vm));
+        new NativeFunction1<StaticFunctionTag, BSFixedString, TESForm*>("GetIdentify", "LTMN:Debug", GetIdentify, vm));
     vm->RegisterFunction(
-        new NativeFunction0<StaticFunctionTag, BSFixedString>("GetMilliseconds", "Lootman", GetMilliseconds, vm));
+        new NativeFunction0<StaticFunctionTag, BSFixedString>("GetMilliseconds", "LTMN:Debug", GetMilliseconds, vm));
     vm->RegisterFunction(
-        new NativeFunction0<StaticFunctionTag, BSFixedString>("GetRandomProcessID", "Lootman", GetRandomProcessID, vm));
+        new NativeFunction0<StaticFunctionTag, BSFixedString>("GetRandomProcessID", "LTMN:Debug", GetRandomProcessID,
+                                                              vm));
 
-    vm->SetFunctionFlags("Lootman", "GetFormTypeIdentify", IFunction::kFunctionFlag_NoWait);
-    vm->SetFunctionFlags("Lootman", "GetHexID", IFunction::kFunctionFlag_NoWait);
-    vm->SetFunctionFlags("Lootman", "GetIdentify", IFunction::kFunctionFlag_NoWait);
-    vm->SetFunctionFlags("Lootman", "GetMilliseconds", IFunction::kFunctionFlag_NoWait);
-    vm->SetFunctionFlags("Lootman", "GetRandomProcessID", IFunction::kFunctionFlag_NoWait);
+    vm->SetFunctionFlags("LTMN:Debug", "GetFormTypeIdentify", IFunction::kFunctionFlag_NoWait);
+    vm->SetFunctionFlags("LTMN:Debug", "GetHexID", IFunction::kFunctionFlag_NoWait);
+    vm->SetFunctionFlags("LTMN:Debug", "GetIdentify", IFunction::kFunctionFlag_NoWait);
+    vm->SetFunctionFlags("LTMN:Debug", "GetMilliseconds", IFunction::kFunctionFlag_NoWait);
+    vm->SetFunctionFlags("LTMN:Debug", "GetRandomProcessID", IFunction::kFunctionFlag_NoWait);
 #endif
 
     _MESSAGE(">> Lootman papyrus functions register phase end.");

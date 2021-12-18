@@ -51,28 +51,3 @@ bool Function IsLinkedToWorkshop(ObjectReference ref) global native
 
 ; Verify that the object reference is a valid
 bool Function IsValidRef(ObjectReference ref) global native
-
-; Output the Lootman user log (Debug only)
-Function Log(string msg) global;; Debug
-    Debug.TraceUser("Lootman", "[" + GetMilliseconds() + "ms] " + msg);; Debug
-EndFunction;; Debug
-
-; Open the Lootman user log (Debug only)
-Function OpenLog() global;; Debug
-    Debug.OpenUserLog("Lootman");; Debug
-EndFunction;; Debug
-
-; Get and return the identifier of the form type (Debug only)
-string Function GetFormTypeIdentify(Form form) global native;; Debug
-
-; Converts the form ID to a hexadecimal string and returns it (Debug only)
-string Function GetHexID(Form form) global native;; Debug
-
-; Get and return the form's identify (Debug only)
-string Function GetIdentify(Form form) global native;; Debug
-
-; Get and return the current millisecond (Debug only)
-string Function GetMilliseconds() global native;; Debug
-
-; Generate and return a random process ID (Debug only)
-string Function GetRandomProcessID() global native;; Debug

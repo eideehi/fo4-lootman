@@ -96,18 +96,18 @@ EndFunction
 
 ; Scrap items in the inventory (Internal function)
 Function _ScrapInventoryItems(ObjectReference ref, int filter, int subFilter) global
-    string prefix = ("| Utility | " + Lootman.GetRandomProcessID() + " | ");; Debug
-    Lootman.Log(prefix + "*** Start scrap process ***");; Debug
+    string prefix = ("| Utility | " + LTMN:Debug.GetRandomProcessID() + " | ");; Debug
+    LTMN:Debug.Log(prefix + "*** Start scrap process ***");; Debug
     LTMN:Quest:Properties _properties = Lootman.GetProperties()
     Form[] items = Lootman.GetInventoryItemsOfFormType(ref, filter)
-    Lootman.Log(prefix + "  Total items found: " + items.Length);; Debug
+    LTMN:Debug.Log(prefix + "  Total items found: " + items.Length);; Debug
     int itemIndex = 1;; Debug
     int i = items.Length
     While i
         i -= 1
         Form item = items[i]
-        Lootman.Log(prefix + "  [Item_" + itemIndex + "]");; Debug
-        Lootman.Log(prefix + "    Name: " + Lootman.GetIdentify(item));; Debug
+        LTMN:Debug.Log(prefix + "  [Item_" + itemIndex + "]");; Debug
+        LTMN:Debug.Log(prefix + "    Name: " + LTMN:Debug.GetIdentify(item));; Debug
         If (_IsScrapableItem(item))
             int formType = Lootman.GetFormType(item)
             int itemCount = ref.GetItemCount(item)
@@ -119,14 +119,14 @@ Function _ScrapInventoryItems(ObjectReference ref, int filter, int subFilter) gl
                     perTime = itemCount
                 EndIf
             EndIf
-            Lootman.Log(prefix + "    Form type: " + formType);; Debug
-            Lootman.Log(prefix + "    Count: " + itemCount);; Debug
-            Lootman.Log(prefix + "    ** Do scrapping **");; Debug
+            LTMN:Debug.Log(prefix + "    Form type: " + LTMN:Debug.GetFormTypeIdentify(item));; Debug
+            LTMN:Debug.Log(prefix + "    Count: " + itemCount);; Debug
+            LTMN:Debug.Log(prefix + "    ** Do scrapping **");; Debug
             int loopCount = 0;; Debug
             While itemCount
-                Lootman.Log(prefix + "      [Loop_" + loopCount + "]");; Debug
-                Lootman.Log(prefix + "        Item count remaining: " + itemCount);; Debug
-                Lootman.Log(prefix + "        Scrap limits per loop: " + perTime);; Debug
+                LTMN:Debug.Log(prefix + "      [Loop_" + loopCount + "]");; Debug
+                LTMN:Debug.Log(prefix + "        Item count remaining: " + itemCount);; Debug
+                LTMN:Debug.Log(prefix + "        Scrap limits per loop: " + perTime);; Debug
                 MiscObject:MiscComponent[] components = new MiscObject:MiscComponent[0]
                 ObjectReference obj = None
 
@@ -135,22 +135,22 @@ Function _ScrapInventoryItems(ObjectReference ref, int filter, int subFilter) gl
                 Else
                     obj = ref.DropObject(item, 1)
                     If (obj)
-                        Lootman.Log(prefix + "        Actual item: " + obj.GetDisplayName());; Debug
+                        LTMN:Debug.Log(prefix + "        Actual item: " + obj.GetDisplayName());; Debug
                         components = Lootman.GetEquipmentScrapComponents(obj)
                     EndIf
                 EndIf
 
-                Lootman.Log(prefix + "        Total components: " + components.Length);; Debug
+                LTMN:Debug.Log(prefix + "        Total components: " + components.Length);; Debug
                 int componentIndex = 1;; Debug
                 int j = components.Length
                 While j
                     j -= 1
                     MiscObject:MiscComponent miscComponent = components[j]
                     If (miscComponent)
-                        Lootman.Log(prefix + "        [Component_" + componentIndex + "]");; Debug
-                        Lootman.Log(prefix + "          Component count: " + miscComponent.count);; Debug
-                        Lootman.Log(prefix + "          Scrap item: " + Lootman.GetIdentify(miscComponent.object.GetScrapItem()));; Debug
-                        Lootman.Log(prefix + "          Scrap scaler: " + miscComponent.object.GetScrapScalar().GetValue());; Debug
+                        LTMN:Debug.Log(prefix + "        [Component_" + componentIndex + "]");; Debug
+                        LTMN:Debug.Log(prefix + "          Component count: " + miscComponent.count);; Debug
+                        LTMN:Debug.Log(prefix + "          Scrap item: " + LTMN:Debug.GetIdentify(miscComponent.object.GetScrapItem()));; Debug
+                        LTMN:Debug.Log(prefix + "          Scrap scaler: " + miscComponent.object.GetScrapScalar().GetValue());; Debug
 
                         int scrapCount = miscComponent.count
                         If (formType != _properties.FORM_TYPE_MISC)
@@ -179,7 +179,7 @@ Function _ScrapInventoryItems(ObjectReference ref, int filter, int subFilter) gl
                             int acquiredCount = scrapCount * perTime
                             _properties.TemporaryContainer.AddItem(scrapItem, acquiredCount, true)
                             _properties.TemporaryContainer.RemoveItem(scrapItem, acquiredCount, true, ref)
-                            Lootman.Log(prefix + "        Acquired components: " + Lootman.GetIdentify(scrapItem) + " x" + acquiredCount);; Debug
+                            LTMN:Debug.Log(prefix + "        Acquired components: " + LTMN:Debug.GetIdentify(scrapItem) + " x" + acquiredCount);; Debug
                         EndIf
                     EndIf
                 EndWhile
@@ -191,10 +191,10 @@ Function _ScrapInventoryItems(ObjectReference ref, int filter, int subFilter) gl
                         If (perTime > 1)
                             ref.RemoveItem(item, perTime - 1, true)
                         EndIf
-                        Lootman.Log(prefix + "        Remove item: " + obj.GetDisplayName() + " x" + perTime);; Debug
+                        LTMN:Debug.Log(prefix + "        Remove item: " + obj.GetDisplayName() + " x" + perTime);; Debug
                     Else
                         ref.RemoveItem(item, perTime, true)
-                        Lootman.Log(prefix + "        Remove item: " + Lootman.GetIdentify(item) + " x" + perTime);; Debug
+                        LTMN:Debug.Log(prefix + "        Remove item: " + LTMN:Debug.GetIdentify(item) + " x" + perTime);; Debug
                     EndIf
 
                     itemCount -= perTime
@@ -211,13 +211,13 @@ Function _ScrapInventoryItems(ObjectReference ref, int filter, int subFilter) gl
                 loopCount += 1;; Debug
             EndWhile
 
-            Lootman.Log(prefix + "    ** Done scrapping **");; Debug
+            LTMN:Debug.Log(prefix + "    ** Done scrapping **");; Debug
         Else;; Debug
-            Lootman.Log(prefix + "    ** Is not scrapable **");; Debug
+            LTMN:Debug.Log(prefix + "    ** Is not scrapable **");; Debug
         EndIf
         itemIndex += 1;; Debug
     EndWhile
-    Lootman.Log(prefix + "*** End scrap process ***");; Debug
+    LTMN:Debug.Log(prefix + "*** End scrap process ***");; Debug
 EndFunction
 
 ; Verify that the item is scrapable (Internal function)
@@ -291,110 +291,3 @@ bool Function _IsFavoriteItem(Form[] favorites, Form item) global
     EndWhile
     Return false
 EndFunction
-
-; Output the trace log of an object (Debug only)
-Function TraceObject(string prefix, ObjectReference ref) global;; Debug
-    LTMN:Quest:Properties _properties = Lootman.GetProperties();; Debug
-    Actor _player = Game.GetPlayer();; Debug
-
-    Lootman.Log(prefix + "Object: [Name: " + ref.GetDisplayName() + ", ID: " + Lootman.GetHexID(ref) + "]");; Debug
-    Lootman.Log(prefix + "  Position: [X: " + ref.X + ", Y: " + ref.Y + ", Z: " + ref.Z + "]");; Debug
-    Lootman.Log(prefix + "  Distance to player: " + ref.GetDistance(_player));; Debug
-    Lootman.Log(prefix + "  Is disabled: " + ref.IsDisabled());; Debug
-    Lootman.Log(prefix + "  Is deleted: " + ref.IsDeleted());; Debug
-    Lootman.Log(prefix + "  Is 3D loaded: " + ref.Is3DLoaded());; Debug
-    Lootman.Log(prefix + "  Is destroyed: " + ref.IsDestroyed());; Debug
-    Lootman.Log(prefix + "  Is activation blocked: " + ref.IsActivationBlocked());; Debug
-    Lootman.Log(prefix + "  Player has direct line-of-sight: " + _player.HasDirectLOS(ref));; Debug
-    Lootman.Log(prefix + "  Player has detection line-of-sight: " + _player.HasDetectionLOS(ref));; Debug
-    Lootman.Log(prefix + "  Is quest item: " + ref.IsQuestItem());; Debug
-    Lootman.Log(prefix + "  Is interaction blocked: " + ref.HasKeyword(_properties.BlockWorkshopInteraction));; Debug
-    Lootman.Log(prefix + "  Has keywords that excludes it from looting: " + ref.HasKeywordInFormList(_properties.ExcludeKeywordList));; Debug
-
-    int i = _properties.ExcludeLocationRefList.GetSize();; Debug
-    While i;; Debug
-        i -= 1;; Debug
-        Form item = _properties.ExcludeLocationRefList.GetAt(i);; Debug
-        LocationRefType locRefType = (item As LocationRefType);; Debug
-        If (locRefType && ref.HasLocRefType(locRefType));; Debug
-            Lootman.Log(prefix + "  Has location reference type that excludes it from looting: " + ref.HasLocRefType(locRefType));; Debug
-            Lootman.Log(prefix + "    Location reference type: [Name: " + Lootman.GetIdentify(locRefType) + ", ID: " + Lootman.GetHexID(locRefType) + "]");; Debug
-        EndIf;; Debug
-    EndWhile;; Debug
-
-    Lootman.Log(prefix + "  Has owner: " + ref.HasOwner());; Debug
-    Lootman.Log(prefix + "  Is owned by player: " + ref.IsOwnedBy(_player));; Debug
-
-    If (ref.GetActorRefOwner() || ref.GetActorOwner());; Debug
-        Actor ownerRef = ref.GetActorRefOwner();; Debug
-        If (ownerRef);; Debug
-            Lootman.Log(prefix + "  Owner: [Name: " + Lootman.GetIdentify(ownerRef) + ", ID: " + Lootman.GetHexID(ownerRef) + "]");; Debug
-            Lootman.Log(prefix + "    Is dead: " + ownerRef.IsDead());; Debug
-            Lootman.Log(prefix + "    Relationship rank with the player: " + ownerRef.GetRelationshipRank(_player));; Debug
-        Else;; Debug
-            ActorBase ownerBase = ref.GetActorOwner();; Debug
-            Lootman.Log(prefix + "  Owner: [Name: " + Lootman.GetIdentify(ownerBase) + ", ID: " + Lootman.GetHexID(ownerBase) + "]");; Debug
-            Lootman.Log(prefix + "    Is unique: " + ownerBase.IsUnique());; Debug
-            If (ownerBase.IsUnique());; Debug
-                Actor ownerActor = ownerBase.GetUniqueActor();; Debug
-                Lootman.Log(prefix + "    Is dead: " + ownerActor.IsDead());; Debug
-                Lootman.Log(prefix + "    Relationship rank with the player: " + ownerActor.GetRelationshipRank(_player));; Debug
-            EndIf;; Debug
-        EndIf;; Debug
-    EndIf;; Debug
-
-    If (ref.GetFactionOwner());; Debug
-        Faction factionOwner = ref.GetFactionOwner();; Debug
-        If (factionOwner);; Debug
-            Lootman.Log(prefix + "  Faction that object belongs to: [Name: " + Lootman.GetIdentify(factionOwner) + ", ID: " + Lootman.GetHexID(factionOwner) + "]");; Debug
-            Lootman.Log(prefix + "    Relationship rank with the player: " + factionOwner.GetFactionReaction(_player));; Debug
-        EndIf;; Debug
-    EndIf;; Debug
-
-    If (ref.GetParentCell());; Debug
-        Cell parentCell = ref.GetParentCell();; Debug
-        Lootman.Log(prefix + "  Parent cell: [Name: " + Lootman.GetIdentify(parentCell) + ", ID: " + Lootman.GetHexID(parentCell) + "]");; Debug
-        ActorBase owner = parentCell.GetActorOwner();; Debug
-        If (owner);; Debug
-            Lootman.Log(prefix + "    Cell owner: [Name: " + Lootman.GetIdentify(owner) + ", ID: " + Lootman.GetHexID(owner) + "]");; Debug
-            Lootman.Log(prefix + "      Is unique: " + owner.IsUnique());; Debug
-            If (owner.IsUnique());; Debug
-                Actor ownerActor = owner.GetUniqueActor();; Debug
-                Lootman.Log(prefix + "      Is dead: " + ownerActor.IsDead());; Debug
-                Lootman.Log(prefix + "      Relationship rank with the player: " + ownerActor.GetRelationshipRank(_player));; Debug
-            EndIf;; Debug
-        EndIf;; Debug
-
-        Faction factionOwner = parentCell.GetFactionOwner();; Debug
-        If (factionOwner);; Debug
-            Lootman.Log(prefix + "    Faction that cell belongs to: [Name: " + Lootman.GetIdentify(factionOwner) + ", ID: " + Lootman.GetHexID(factionOwner) + "]");; Debug
-            Lootman.Log(prefix + "      Relationship rank with the player: " + factionOwner.GetFactionReaction(_player));; Debug
-        EndIf;; Debug
-    EndIf;; Debug
-
-    Location loc = ref.GetCurrentLocation();; Debug
-    If (loc);; Debug
-        Lootman.Log(prefix + "  Current location: [Name: " + Lootman.GetIdentify(loc) + ", ID: " + Lootman.GetHexID(loc) + "]");; Debug
-        Lootman.Log(prefix + "    Is settlement: " + (loc.HasKeyword(Game.GetCommonProperties().LocTypeSettlement) || loc.HasKeyword(Game.GetCommonProperties().LocTypeWorkshopSettlement)));; Debug
-    EndIf;; Debug
-EndFunction;; Debug
-
-; Output the trace log of an form (Debug only)
-Function TraceForm(string prefix, Form base) global;; Debug
-    LTMN:Quest:Properties _properties = Lootman.GetProperties();; Debug
-    Lootman.Log(prefix + "Base item: [Name: " + Lootman.GetIdentify(base) + ", ID: " + Lootman.GetHexID(base) + "]");; Debug
-    Lootman.Log(prefix + "  Form type: " + Lootman.GetFormType(base));; Debug
-
-    Lootman.Log(prefix + "  Is featured item: " + base.HasKeyword(_properties.FeaturedItem));; Debug
-    If (base.HasKeyword(_properties.FeaturedItem));; Debug
-        Lootman.Log(prefix + "    Looting is allowed: " + _properties.AllowedFeaturedItemList.HasForm(base));; Debug
-    EndIf;; Debug
-
-    Lootman.Log(prefix + "  Is unique item: " + _properties.UniqueItemList.HasForm(base));; Debug
-    If (_properties.UniqueItemList.HasForm(base));; Debug
-        Lootman.Log(prefix + "    Looting is allowed: " + _properties.AllowedUniqueItemList.HasForm(base));; Debug
-    EndIf;; Debug
-
-    Lootman.Log(prefix + "  Excluded from the looting: " + _properties.ExcludeFormList.HasForm(base));; Debug
-    Lootman.Log(prefix + "  Has keywords that excludes it from looting: " + base.HasKeywordInFormList(_properties.ExcludeKeywordList));; Debug
-EndFunction;; Debug
