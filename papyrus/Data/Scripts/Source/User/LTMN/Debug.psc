@@ -113,7 +113,7 @@ Function TraceObject(string prefix, ObjectReference ref) global
     EndIf
 EndFunction
 
-; Output the trace log of an form (Debug only)
+; Output the trace log of an form
 Function TraceForm(string prefix, Form base) global
     LTMN:Quest:Properties _properties = LTMN:Lootman.GetProperties()
     Log(prefix + "Base item: [Name: " + GetIdentify(base) + ", ID: " + GetHexID(base) + "]")

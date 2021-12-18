@@ -5,23 +5,23 @@ int Function GetFindObjectFormType()
 EndFunction
 
 Function LootObject(ObjectReference ref)
-    string prefix = ("| Looting @ " + GetThreadID() + " | " + GetProcessID() + " |     ");; Debug
-    LTMN:Debug.Log(prefix + "Loot: [Name: " + ref.GetDisplayName() + ", ID: " + LTMN:Debug.GetHexID(ref) + "]");; Debug
-    LTMN:Debug.Log(prefix + "  Inventory status before looting: [ItemCount: " + ref.GetItemCount() + ", TotalWeight: " + ref.GetInventoryWeight() + "]");; Debug
-    LTMN:Debug.Log(prefix + "  ** Do looting **");; Debug
+    string prefix = ("| Looting @ " + GetThreadID() + " | " + GetProcessID() + " |     ")
+    LTMN:Debug.Log(prefix + "Loot: [Name: " + ref.GetDisplayName() + ", ID: " + LTMN:Debug.GetHexID(ref) + "]")
+    LTMN:Debug.Log(prefix + "  Inventory status before looting: [ItemCount: " + ref.GetItemCount() + ", TotalWeight: " + ref.GetInventoryWeight() + "]")
+    LTMN:Debug.Log(prefix + "  ** Do looting **")
     int lootCount = 0
     Form[] forms = LTMN:Lootman.GetInventoryItemsOfFormTypes(ref, GetItemFilters())
-    LTMN:Debug.Log(prefix + "    Total items found: " + forms.Length);; Debug
-    int itemIndex = 1;; Debug
+    LTMN:Debug.Log(prefix + "    Total items found: " + forms.Length)
+    int itemIndex = 1
     int j = forms.Length
     While j
         j -= 1
         Form item = forms[j]
-        LTMN:Debug.Log(prefix + "    [Item_" + itemIndex + "]");; Debug
-        LTMN:Debug.TraceForm(prefix + "      ", item);; Debug
+        LTMN:Debug.Log(prefix + "    [Item_" + itemIndex + "]")
+        LTMN:Debug.TraceForm(prefix + "      ", item)
         If (IsLootableItem(ref, item))
             lootCount += 1
-            LTMN:Debug.Log(prefix + "      Looted items count: " + ref.GetItemCount(item));; Debug
+            LTMN:Debug.Log(prefix + "      Looted items count: " + ref.GetItemCount(item))
             int count = ref.GetItemCount(item)
             While (count > 0)
                 If (count <= 65535)
@@ -32,10 +32,10 @@ Function LootObject(ObjectReference ref)
                     count -= 65535
                 EndIf
             EndWhile
-        Else;; Debug
-            LTMN:Debug.Log(prefix + "      ** Is not lootable item **");; Debug
+        Else
+            LTMN:Debug.Log(prefix + "      ** Is not lootable item **")
         EndIf
-        itemIndex += 1;; Debug
+        itemIndex += 1
     EndWhile
 
     If (lootCount > 0)
@@ -45,8 +45,8 @@ Function LootObject(ObjectReference ref)
             properties.PickupSoundNPC_.Play(player)
         EndIf
     EndIf
-    LTMN:Debug.Log(prefix + "  ** Done looting **");; Debug
-    LTMN:Debug.Log(prefix + "  Inventory status after looting: [ItemCount: " + ref.GetItemCount() + ", TotalWeight: " + ref.GetInventoryWeight() + "]");; Debug
+    LTMN:Debug.Log(prefix + "  ** Done looting **")
+    LTMN:Debug.Log(prefix + "  Inventory status after looting: [ItemCount: " + ref.GetItemCount() + ", TotalWeight: " + ref.GetInventoryWeight() + "]")
 EndFunction
 
 bool Function IsLootingTarget(ObjectReference ref)
@@ -75,30 +75,30 @@ bool Function IsLootingTarget(ObjectReference ref)
     Return !ref.IsLocked() || _TryUnlock(ref)
 EndFunction
 
-Function TraceObject(ObjectReference ref);; Debug
-    string prefix = ("| Looting @ " + GetThreadID() + " | " + GetProcessID() + " |     ");; Debug
-    LTMN:Debug.TraceObject(prefix, ref);; Debug
-    LTMN:Debug.Log(prefix + "  Is locked: " + ref.IsLocked());; Debug
-    LTMN:Debug.Log(prefix + "  Stored items count: " + ref.GetItemCount());; Debug
-    LTMN:Debug.Log(prefix + "  Is linked to workshop: " + LTMN:Lootman.IsLinkedToWorkshop(ref));; Debug
-    LTMN:Debug.Log(prefix + "  Is workshop: " + (ref Is WorkshopScript));; Debug
-    Form base = ref.GetBaseObject();; Debug
-    LTMN:Debug.TraceForm(prefix + "  ", base);; Debug
-    LTMN:Debug.Log(prefix + "    Is vendor chest: " + properties.VendorChestList.HasForm(base));; Debug
-EndFunction;; Debug
+Function TraceObject(ObjectReference ref) debugOnly
+    string prefix = ("| Looting @ " + GetThreadID() + " | " + GetProcessID() + " |     ")
+    LTMN:Debug.TraceObject(prefix, ref)
+    LTMN:Debug.Log(prefix + "  Is locked: " + ref.IsLocked())
+    LTMN:Debug.Log(prefix + "  Stored items count: " + ref.GetItemCount())
+    LTMN:Debug.Log(prefix + "  Is linked to workshop: " + LTMN:Lootman.IsLinkedToWorkshop(ref))
+    LTMN:Debug.Log(prefix + "  Is workshop: " + (ref Is WorkshopScript))
+    Form base = ref.GetBaseObject()
+    LTMN:Debug.TraceForm(prefix + "  ", base)
+    LTMN:Debug.Log(prefix + "    Is vendor chest: " + properties.VendorChestList.HasForm(base))
+EndFunction
 
 bool Function _TryUnlock(ObjectReference ref)
-    string prefix = ("| Looting @ " + GetThreadID() + " | " + GetProcessID() + " |     ");; Debug
+    string prefix = ("| Looting @ " + GetThreadID() + " | " + GetProcessID() + " |     ")
 
     If (!ref.IsLockBroken() && properties.AllowContainerUnlock.GetValueInt() == 1)
-        LTMN:Debug.Log(prefix + "*** Try to unlock ***");; Debug
-        LTMN:Debug.Log(prefix + "  Object: [Name: " + ref.GetDisplayName() + ", ID: " + LTMN:Debug.GetHexID(ref) + "]");; Debug
+        LTMN:Debug.Log(prefix + "*** Try to unlock ***")
+        LTMN:Debug.Log(prefix + "  Object: [Name: " + ref.GetDisplayName() + ", ID: " + LTMN:Debug.GetHexID(ref) + "]")
 
         ObjectReference lootman = properties.LootmanWorkshop
         int level = ref.GetLockLevel()
         int bobbyPinCount = lootman.GetItemCount(properties.BobbyPin)
 
-        LTMN:Debug.Log(prefix + "  Lock level: " + level);; Debug
+        LTMN:Debug.Log(prefix + "  Lock level: " + level)
 
         int consumeCount = -1
         If (level == 100 && player.HasPerk(properties.Locksmith03))
@@ -115,8 +115,8 @@ bool Function _TryUnlock(ObjectReference ref)
             consumeCount = 0
         EndIf
 
-        LTMN:Debug.Log(prefix + "  Consume count: " + consumeCount);; Debug
-        LTMN:Debug.Log(prefix + "  Bobby pin count: " + bobbyPinCount);; Debug
+        LTMN:Debug.Log(prefix + "  Consume count: " + consumeCount)
+        LTMN:Debug.Log(prefix + "  Bobby pin count: " + bobbyPinCount)
 
         If (consumeCount >= 0 && bobbyPinCount >= consumeCount)
             If (consumeCount > 0)
@@ -125,11 +125,11 @@ bool Function _TryUnlock(ObjectReference ref)
 
             ref.Unlock()
 
-            LTMN:Debug.Log(prefix + "*** Unlock successful ***");; Debug
+            LTMN:Debug.Log(prefix + "*** Unlock successful ***")
             Return true
         EndIf
     EndIf
 
-    LTMN:Debug.Log(prefix + "*** Unlock failure ***");; Debug
+    LTMN:Debug.Log(prefix + "*** Unlock failure ***")
     Return false
 EndFunction

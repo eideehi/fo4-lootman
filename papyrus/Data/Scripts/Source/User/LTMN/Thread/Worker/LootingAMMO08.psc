@@ -1,5 +1,5 @@
 Scriptname LTMN:Thread:Worker:LootingAMMO08 extends LTMN:Thread:LootingAMMO
 
-string Function GetThreadID();; Debug
-    Return "AMMO_08";; Debug
-EndFunction;; Debug
+string Function GetThreadID() debugOnly
+    Return "AMMO_08"
+EndFunction

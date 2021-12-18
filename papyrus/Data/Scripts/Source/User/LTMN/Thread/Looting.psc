@@ -7,7 +7,7 @@ LTMN:Quest:Properties property properties auto hidden
 
 bool threadRunning = false
 
-string processId = "0000000000";; Debug
+string processId = "0000000000"
 
 Event LTMN:Thread:Looting.CallLooting(LTMN:Thread:Looting sender, Var[] args)
     If (sender == self && IsLootingEnabled())
@@ -38,12 +38,12 @@ bool Function Busy()
 EndFunction
 
 Function Looting()
-    processId = LTMN:Debug.GetRandomProcessID();; Debug
-    string prefix = ("| Looting @ " + GetThreadID() + " | " + processId + " | ");; Debug
-    LTMN:Debug.Log(prefix + "*** Start looting ***");; Debug
-    int objectIndex = 1;; Debug
+    processId = LTMN:Debug.GetRandomProcessID()
+    string prefix = ("| Looting @ " + GetThreadID() + " | " + processId + " | ")
+    LTMN:Debug.Log(prefix + "*** Start looting ***")
+    int objectIndex = 1
     ObjectReference[] refs = LTMN:Lootman.FindAllLootingTarget(player, properties.LootingRange.GetValueInt(), GetFindObjectFormType())
-    LTMN:Debug.Log(prefix + "  Total number of objects found: " + refs.Length);; Debug
+    LTMN:Debug.Log(prefix + "  Total number of objects found: " + refs.Length)
     float time = Utility.GetCurrentRealTime()
     int i = refs.Length
     While i
@@ -51,13 +51,13 @@ Function Looting()
 
         ; Since it is not desirable to keep processing an old list of objects forever, we force the thread to be released when the processing time exceeds 2 seconds.
         If ((Utility.GetCurrentRealTime() - time) > properties.ThreadAllowedWorkingTime.GetValue())
-            LTMN:Debug.Log(prefix + "*** Force the thread to be released because the processing time of the thread has exceeded the threshold ***");; Debug
+            LTMN:Debug.Log(prefix + "*** Force the thread to be released because the processing time of the thread has exceeded the threshold ***")
             Return
         EndIf
 
         ; If the looting disabled in the middle of the loop, release the thread immediately.
         If (!IsLootingEnabled())
-            LTMN:Debug.Log(prefix + "*** Force the thread to be released because the looting disabled ***");; Debug
+            LTMN:Debug.Log(prefix + "*** Force the thread to be released because the looting disabled ***")
             Return
         EndIf
 
@@ -71,25 +71,25 @@ Function Looting()
                     ref.SetValue(properties.LastLootingTimestamp, Utility.GetCurrentRealTime())
                 EndIf
 
-                LTMN:Debug.Log(prefix + "  [Object_" + objectIndex + "]");; Debug
-                TraceObject(ref);; Debug
+                LTMN:Debug.Log(prefix + "  [Object_" + objectIndex + "]")
+                TraceObject(ref)
                 If (IsLootingTarget(ref))
                     LootObject(ref)
-                Else;; Debug
-                    LTMN:Debug.Log(prefix + "    ** Is not a target of looting **");; Debug
+                Else
+                    LTMN:Debug.Log(prefix + "    ** Is not a target of looting **")
                 EndIf
 
                 ref.ResetKeyword(properties.LootingMarker)
-            Else;; Debug
-                LTMN:Debug.Log(prefix + "  ** Object_" + objectIndex + " was skipped because it is being processed by another thread **");; Debug
+            Else
+                LTMN:Debug.Log(prefix + "  ** Object_" + objectIndex + " was skipped because it is being processed by another thread **")
             EndIf
-        Else;; Debug
-            LTMN:Debug.Log(prefix + "  ** Object_" + objectIndex + " is not a valid object **");; Debug
+        Else
+            LTMN:Debug.Log(prefix + "  ** Object_" + objectIndex + " is not a valid object **")
         EndIf
 
-        objectIndex += 1;; Debug
+        objectIndex += 1
     EndWhile
-    LTMN:Debug.Log(prefix + "*** Looting complete ***");; Debug
+    LTMN:Debug.Log(prefix + "*** Looting complete ***")
 EndFunction
 
 int Function GetFindObjectFormType()
@@ -381,16 +381,16 @@ int[] Function GetItemFilters()
     Return filters
 EndFunction
 
-; Return the process ID to be output to the log (Debug only)
-string Function GetProcessID();; Debug
-    Return processId;; Debug
-EndFunction;; Debug
+; Return the process ID to be output to the log
+string Function GetProcessID() debugOnly
+    Return processId
+EndFunction
 
-; Return the thread identifier to be output to the log. Override it in the worker's script (Debug only)
-string Function GetThreadID();; Debug
-    Return "UNKNOWN";; Debug
-EndFunction;; Debug
+; Return the thread identifier to be output to the log. Override it in the worker's script
+string Function GetThreadID() debugOnly
+    Return "UNKNOWN"
+EndFunction
 
-; Output the trace log of an object (Debug only)
-Function TraceObject(ObjectReference ref);; Debug
-EndFunction;; Debug
+; Output the trace log of an object
+Function TraceObject(ObjectReference ref) debugOnly
+EndFunction

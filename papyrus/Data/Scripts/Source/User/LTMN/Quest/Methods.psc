@@ -96,18 +96,18 @@ EndFunction
 
 ; Scrap items in the inventory (Internal function)
 Function _ScrapInventoryItems(ObjectReference ref, int filter, int subFilter) global
-    string prefix = ("| Utility | " + LTMN:Debug.GetRandomProcessID() + " | ");; Debug
-    LTMN:Debug.Log(prefix + "*** Start scrap process ***");; Debug
+    string prefix = ("| Utility | " + LTMN:Debug.GetRandomProcessID() + " | ")
+    LTMN:Debug.Log(prefix + "*** Start scrap process ***")
     LTMN:Quest:Properties _properties = LTMN:Lootman.GetProperties()
     Form[] items = LTMN:Lootman.GetInventoryItemsOfFormType(ref, filter)
-    LTMN:Debug.Log(prefix + "  Total items found: " + items.Length);; Debug
-    int itemIndex = 1;; Debug
+    LTMN:Debug.Log(prefix + "  Total items found: " + items.Length)
+    int itemIndex = 1
     int i = items.Length
     While i
         i -= 1
         Form item = items[i]
-        LTMN:Debug.Log(prefix + "  [Item_" + itemIndex + "]");; Debug
-        LTMN:Debug.Log(prefix + "    Name: " + LTMN:Debug.GetIdentify(item));; Debug
+        LTMN:Debug.Log(prefix + "  [Item_" + itemIndex + "]")
+        LTMN:Debug.Log(prefix + "    Name: " + LTMN:Debug.GetIdentify(item))
         If (_IsScrapableItem(item))
             int formType = LTMN:Lootman.GetFormType(item)
             int itemCount = ref.GetItemCount(item)
@@ -119,14 +119,14 @@ Function _ScrapInventoryItems(ObjectReference ref, int filter, int subFilter) gl
                     perTime = itemCount
                 EndIf
             EndIf
-            LTMN:Debug.Log(prefix + "    Form type: " + LTMN:Debug.GetFormTypeIdentify(item));; Debug
-            LTMN:Debug.Log(prefix + "    Count: " + itemCount);; Debug
-            LTMN:Debug.Log(prefix + "    ** Do scrapping **");; Debug
-            int loopCount = 0;; Debug
+            LTMN:Debug.Log(prefix + "    Form type: " + LTMN:Debug.GetFormTypeIdentify(item))
+            LTMN:Debug.Log(prefix + "    Count: " + itemCount)
+            LTMN:Debug.Log(prefix + "    ** Do scrapping **")
+            int loopCount = 0
             While itemCount
-                LTMN:Debug.Log(prefix + "      [Loop_" + loopCount + "]");; Debug
-                LTMN:Debug.Log(prefix + "        Item count remaining: " + itemCount);; Debug
-                LTMN:Debug.Log(prefix + "        Scrap limits per loop: " + perTime);; Debug
+                LTMN:Debug.Log(prefix + "      [Loop_" + loopCount + "]")
+                LTMN:Debug.Log(prefix + "        Item count remaining: " + itemCount)
+                LTMN:Debug.Log(prefix + "        Scrap limits per loop: " + perTime)
                 MiscObject:MiscComponent[] components = new MiscObject:MiscComponent[0]
                 ObjectReference obj = None
 
@@ -135,22 +135,22 @@ Function _ScrapInventoryItems(ObjectReference ref, int filter, int subFilter) gl
                 Else
                     obj = ref.DropObject(item, 1)
                     If (obj)
-                        LTMN:Debug.Log(prefix + "        Actual item: " + obj.GetDisplayName());; Debug
+                        LTMN:Debug.Log(prefix + "        Actual item: " + obj.GetDisplayName())
                         components = LTMN:Lootman.GetEquipmentScrapComponents(obj)
                     EndIf
                 EndIf
 
-                LTMN:Debug.Log(prefix + "        Total components: " + components.Length);; Debug
-                int componentIndex = 1;; Debug
+                LTMN:Debug.Log(prefix + "        Total components: " + components.Length)
+                int componentIndex = 1
                 int j = components.Length
                 While j
                     j -= 1
                     MiscObject:MiscComponent miscComponent = components[j]
                     If (miscComponent)
-                        LTMN:Debug.Log(prefix + "        [Component_" + componentIndex + "]");; Debug
-                        LTMN:Debug.Log(prefix + "          Component count: " + miscComponent.count);; Debug
-                        LTMN:Debug.Log(prefix + "          Scrap item: " + LTMN:Debug.GetIdentify(miscComponent.object.GetScrapItem()));; Debug
-                        LTMN:Debug.Log(prefix + "          Scrap scaler: " + miscComponent.object.GetScrapScalar().GetValue());; Debug
+                        LTMN:Debug.Log(prefix + "        [Component_" + componentIndex + "]")
+                        LTMN:Debug.Log(prefix + "          Component count: " + miscComponent.count)
+                        LTMN:Debug.Log(prefix + "          Scrap item: " + LTMN:Debug.GetIdentify(miscComponent.object.GetScrapItem()))
+                        LTMN:Debug.Log(prefix + "          Scrap scaler: " + miscComponent.object.GetScrapScalar().GetValue())
 
                         int scrapCount = miscComponent.count
                         If (formType != _properties.FORM_TYPE_MISC)
@@ -160,7 +160,7 @@ Function _ScrapInventoryItems(ObjectReference ref, int filter, int subFilter) gl
                         If ((scrapCount * perTime) > 65535)
                             perTime = 65535 / miscComponent.count
                         EndIf
-                        componentIndex += 1;; Debug
+                        componentIndex += 1
                     EndIf
                 EndWhile
 
@@ -179,7 +179,7 @@ Function _ScrapInventoryItems(ObjectReference ref, int filter, int subFilter) gl
                             int acquiredCount = scrapCount * perTime
                             _properties.TemporaryContainer.AddItem(scrapItem, acquiredCount, true)
                             _properties.TemporaryContainer.RemoveItem(scrapItem, acquiredCount, true, ref)
-                            LTMN:Debug.Log(prefix + "        Acquired components: " + LTMN:Debug.GetIdentify(scrapItem) + " x" + acquiredCount);; Debug
+                            LTMN:Debug.Log(prefix + "        Acquired components: " + LTMN:Debug.GetIdentify(scrapItem) + " x" + acquiredCount)
                         EndIf
                     EndIf
                 EndWhile
@@ -191,10 +191,10 @@ Function _ScrapInventoryItems(ObjectReference ref, int filter, int subFilter) gl
                         If (perTime > 1)
                             ref.RemoveItem(item, perTime - 1, true)
                         EndIf
-                        LTMN:Debug.Log(prefix + "        Remove item: " + obj.GetDisplayName() + " x" + perTime);; Debug
+                        LTMN:Debug.Log(prefix + "        Remove item: " + obj.GetDisplayName() + " x" + perTime)
                     Else
                         ref.RemoveItem(item, perTime, true)
-                        LTMN:Debug.Log(prefix + "        Remove item: " + LTMN:Debug.GetIdentify(item) + " x" + perTime);; Debug
+                        LTMN:Debug.Log(prefix + "        Remove item: " + LTMN:Debug.GetIdentify(item) + " x" + perTime)
                     EndIf
 
                     itemCount -= perTime
@@ -208,16 +208,16 @@ Function _ScrapInventoryItems(ObjectReference ref, int filter, int subFilter) gl
                     itemCount = 0
                 EndIf
 
-                loopCount += 1;; Debug
+                loopCount += 1
             EndWhile
 
-            LTMN:Debug.Log(prefix + "    ** Done scrapping **");; Debug
-        Else;; Debug
-            LTMN:Debug.Log(prefix + "    ** Is not scrapable **");; Debug
+            LTMN:Debug.Log(prefix + "    ** Done scrapping **")
+        Else
+            LTMN:Debug.Log(prefix + "    ** Is not scrapable **")
         EndIf
-        itemIndex += 1;; Debug
+        itemIndex += 1
     EndWhile
-    LTMN:Debug.Log(prefix + "*** End scrap process ***");; Debug
+    LTMN:Debug.Log(prefix + "*** End scrap process ***")
 EndFunction
 
 ; Verify that the item is scrapable (Internal function)

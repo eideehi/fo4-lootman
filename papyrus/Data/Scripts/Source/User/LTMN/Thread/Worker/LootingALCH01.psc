@@ -1,5 +1,5 @@
 Scriptname LTMN:Thread:Worker:LootingALCH01 extends LTMN:Thread:LootingALCH
 
-string Function GetThreadID();; Debug
-    Return "ALCH_01";; Debug
-EndFunction;; Debug
+string Function GetThreadID() debugOnly
+    Return "ALCH_01"
+EndFunction
