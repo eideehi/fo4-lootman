@@ -6,7 +6,7 @@ Function Fragment_Terminal_01(ObjectReference akTerminalRef)
 ;BEGIN CODE
 float maxValue = 10.0
 float value = 1.0
-GlobalVariable ThreadInterval = Lootman.GetProperties().ThreadInterval
+GlobalVariable ThreadInterval = LTMN:Lootman.GetProperties().ThreadInterval
 ThreadInterval.SetValue(ThreadInterval.GetValue() + value)
 If (ThreadInterval.GetValue() > maxValue)
     ThreadInterval.SetValue(maxValue)
@@ -23,7 +23,7 @@ Function Fragment_Terminal_02(ObjectReference akTerminalRef)
 ;BEGIN CODE
 float maxValue = 10.0
 float value = 0.5
-GlobalVariable ThreadInterval = Lootman.GetProperties().ThreadInterval
+GlobalVariable ThreadInterval = LTMN:Lootman.GetProperties().ThreadInterval
 ThreadInterval.SetValue(ThreadInterval.GetValue() + value)
 If (ThreadInterval.GetValue() > maxValue)
     ThreadInterval.SetValue(maxValue)
@@ -40,7 +40,7 @@ Function Fragment_Terminal_03(ObjectReference akTerminalRef)
 ;BEGIN CODE
 float maxValue = 10.0
 float value = 0.1
-GlobalVariable ThreadInterval = Lootman.GetProperties().ThreadInterval
+GlobalVariable ThreadInterval = LTMN:Lootman.GetProperties().ThreadInterval
 ThreadInterval.SetValue(ThreadInterval.GetValue() + value)
 If (ThreadInterval.GetValue() > maxValue)
     ThreadInterval.SetValue(maxValue)
@@ -57,7 +57,7 @@ Function Fragment_Terminal_04(ObjectReference akTerminalRef)
 ;BEGIN CODE
 float minValue = 0.1
 float value = 0.1
-GlobalVariable ThreadInterval = Lootman.GetProperties().ThreadInterval
+GlobalVariable ThreadInterval = LTMN:Lootman.GetProperties().ThreadInterval
 ThreadInterval.SetValue(ThreadInterval.GetValue() - value)
 If (ThreadInterval.GetValue() < minValue)
     ThreadInterval.SetValue(minValue)
@@ -74,7 +74,7 @@ Function Fragment_Terminal_05(ObjectReference akTerminalRef)
 ;BEGIN CODE
 float minValue = 0.1
 float value = 0.5
-GlobalVariable ThreadInterval = Lootman.GetProperties().ThreadInterval
+GlobalVariable ThreadInterval = LTMN:Lootman.GetProperties().ThreadInterval
 ThreadInterval.SetValue(ThreadInterval.GetValue() - value)
 If (ThreadInterval.GetValue() < minValue)
     ThreadInterval.SetValue(minValue)
@@ -91,7 +91,7 @@ Function Fragment_Terminal_06(ObjectReference akTerminalRef)
 ;BEGIN CODE
 float minValue = 0.1
 float value = 1.0
-GlobalVariable ThreadInterval = Lootman.GetProperties().ThreadInterval
+GlobalVariable ThreadInterval = LTMN:Lootman.GetProperties().ThreadInterval
 ThreadInterval.SetValue(ThreadInterval.GetValue() - value)
 If (ThreadInterval.GetValue() < minValue)
     ThreadInterval.SetValue(minValue)

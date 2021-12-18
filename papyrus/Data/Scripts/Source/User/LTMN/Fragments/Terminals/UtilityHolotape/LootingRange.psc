@@ -6,7 +6,7 @@ Function Fragment_Terminal_01(ObjectReference akTerminalRef)
 ;BEGIN CODE
 int maxValue = 32000
 int value = 500
-GlobalVariable LootingRange = Lootman.GetProperties().LootingRange
+GlobalVariable LootingRange = LTMN:Lootman.GetProperties().LootingRange
 LootingRange.SetValueInt(LootingRange.GetValueInt() + value)
 If (LootingRange.GetValueInt() > maxValue)
   LootingRange.SetValueInt(maxValue)
@@ -23,7 +23,7 @@ Function Fragment_Terminal_02(ObjectReference akTerminalRef)
 ;BEGIN CODE
 int maxValue = 32000
 int value = 100
-GlobalVariable LootingRange = Lootman.GetProperties().LootingRange
+GlobalVariable LootingRange = LTMN:Lootman.GetProperties().LootingRange
 LootingRange.SetValueInt(LootingRange.GetValueInt() + value)
 If (LootingRange.GetValueInt() > maxValue)
   LootingRange.SetValueInt(maxValue)
@@ -40,7 +40,7 @@ Function Fragment_Terminal_03(ObjectReference akTerminalRef)
 ;BEGIN CODE
 int maxValue = 32000
 int value = 50
-GlobalVariable LootingRange = Lootman.GetProperties().LootingRange
+GlobalVariable LootingRange = LTMN:Lootman.GetProperties().LootingRange
 LootingRange.SetValueInt(LootingRange.GetValueInt() + value)
 If (LootingRange.GetValueInt() > maxValue)
   LootingRange.SetValueInt(maxValue)
@@ -57,7 +57,7 @@ Function Fragment_Terminal_04(ObjectReference akTerminalRef)
 ;BEGIN CODE
 int minValue = 100
 int value = 50
-GlobalVariable LootingRange = Lootman.GetProperties().LootingRange
+GlobalVariable LootingRange = LTMN:Lootman.GetProperties().LootingRange
 LootingRange.SetValueInt(LootingRange.GetValueInt() - value)
 If (LootingRange.GetValueInt() < minValue)
   LootingRange.SetValueInt(minValue)
@@ -74,7 +74,7 @@ Function Fragment_Terminal_05(ObjectReference akTerminalRef)
 ;BEGIN CODE
 int minValue = 100
 int value = 100
-GlobalVariable LootingRange = Lootman.GetProperties().LootingRange
+GlobalVariable LootingRange = LTMN:Lootman.GetProperties().LootingRange
 LootingRange.SetValueInt(LootingRange.GetValueInt() - value)
 If (LootingRange.GetValueInt() < minValue)
   LootingRange.SetValueInt(minValue)
@@ -91,7 +91,7 @@ Function Fragment_Terminal_06(ObjectReference akTerminalRef)
 ;BEGIN CODE
 int minValue = 100
 int value = 500
-GlobalVariable LootingRange = Lootman.GetProperties().LootingRange
+GlobalVariable LootingRange = LTMN:Lootman.GetProperties().LootingRange
 LootingRange.SetValueInt(LootingRange.GetValueInt() - value)
 If (LootingRange.GetValueInt() < minValue)
   LootingRange.SetValueInt(minValue)
@@ -108,7 +108,7 @@ Function Fragment_Terminal_07(ObjectReference akTerminalRef)
 ;BEGIN CODE
 int maxValue = 32000
 int value = 5000
-GlobalVariable LootingRange = Lootman.GetProperties().LootingRange
+GlobalVariable LootingRange = LTMN:Lootman.GetProperties().LootingRange
 LootingRange.SetValueInt(LootingRange.GetValueInt() + value)
 If (LootingRange.GetValueInt() > maxValue)
   LootingRange.SetValueInt(maxValue)
@@ -125,7 +125,7 @@ Function Fragment_Terminal_08(ObjectReference akTerminalRef)
 ;BEGIN CODE
 int maxValue = 32000
 int value = 1000
-GlobalVariable LootingRange = Lootman.GetProperties().LootingRange
+GlobalVariable LootingRange = LTMN:Lootman.GetProperties().LootingRange
 LootingRange.SetValueInt(LootingRange.GetValueInt() + value)
 If (LootingRange.GetValueInt() > maxValue)
   LootingRange.SetValueInt(maxValue)
@@ -142,7 +142,7 @@ Function Fragment_Terminal_09(ObjectReference akTerminalRef)
 ;BEGIN CODE
 int minValue = 100
 int value = 1000
-GlobalVariable LootingRange = Lootman.GetProperties().LootingRange
+GlobalVariable LootingRange = LTMN:Lootman.GetProperties().LootingRange
 LootingRange.SetValueInt(LootingRange.GetValueInt() - value)
 If (LootingRange.GetValueInt() < minValue)
   LootingRange.SetValueInt(minValue)
@@ -159,7 +159,7 @@ Function Fragment_Terminal_10(ObjectReference akTerminalRef)
 ;BEGIN CODE
 int minValue = 100
 int value = 5000
-GlobalVariable LootingRange = Lootman.GetProperties().LootingRange
+GlobalVariable LootingRange = LTMN:Lootman.GetProperties().LootingRange
 LootingRange.SetValueInt(LootingRange.GetValueInt() - value)
 If (LootingRange.GetValueInt() < minValue)
   LootingRange.SetValueInt(minValue)
@@ -175,7 +175,7 @@ EndFunction
 Function Fragment_Terminal_12(ObjectReference akTerminalRef)
 ;BEGIN CODE
 int value = 100
-GlobalVariable LootingRange = Lootman.GetProperties().LootingRange
+GlobalVariable LootingRange = LTMN:Lootman.GetProperties().LootingRange
 If (LootingRange.GetValueInt() != value)
   LootingRange.SetValueInt(value)
 EndIf
@@ -190,7 +190,7 @@ EndFunction
 Function Fragment_Terminal_13(ObjectReference akTerminalRef)
 ;BEGIN CODE
 int value = 400
-GlobalVariable LootingRange = Lootman.GetProperties().LootingRange
+GlobalVariable LootingRange = LTMN:Lootman.GetProperties().LootingRange
 If (LootingRange.GetValueInt() != value)
   LootingRange.SetValueInt(value)
 EndIf
@@ -205,7 +205,7 @@ EndFunction
 Function Fragment_Terminal_14(ObjectReference akTerminalRef)
 ;BEGIN CODE
 int value = 32000
-GlobalVariable LootingRange = Lootman.GetProperties().LootingRange
+GlobalVariable LootingRange = LTMN:Lootman.GetProperties().LootingRange
 If (LootingRange.GetValueInt() != value)
   LootingRange.SetValueInt(value)
 EndIf

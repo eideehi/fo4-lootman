@@ -4,7 +4,7 @@ Scriptname LTMN:Fragments:Terminals:UtilityHolotape:System Extends Terminal Hidd
 ;BEGIN FRAGMENT Fragment_Terminal_01
 Function Fragment_Terminal_01(ObjectReference akTerminalRef)
 ;BEGIN CODE
-Lootman.GetFunctions().Install()
+LTMN:Lootman.GetFunctions().Install()
 ;END CODE
 EndFunction
 ;END FRAGMENT

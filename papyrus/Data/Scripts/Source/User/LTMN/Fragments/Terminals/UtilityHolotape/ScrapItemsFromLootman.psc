@@ -4,7 +4,7 @@ Scriptname LTMN:Fragments:Terminals:UtilityHolotape:ScrapItemsFromLootman Extend
 ;BEGIN FRAGMENT Fragment_Terminal_01
 Function Fragment_Terminal_01(ObjectReference akTerminalRef)
 ;BEGIN CODE
-Lootman.GetFunctions().ScrapItemsFromLootman(43.0, 0.0)
+LTMN:Lootman.GetFunctions().ScrapItemsFromLootman(43.0, 0.0)
 ;END CODE
 EndFunction
 ;END FRAGMENT
@@ -12,7 +12,7 @@ EndFunction
 ;BEGIN FRAGMENT Fragment_Terminal_02
 Function Fragment_Terminal_02(ObjectReference akTerminalRef)
 ;BEGIN CODE
-Lootman.GetFunctions().ScrapItemsFromLootman(29.0, 0.0)
+LTMN:Lootman.GetFunctions().ScrapItemsFromLootman(29.0, 0.0)
 ;END CODE
 EndFunction
 ;END FRAGMENT
@@ -20,7 +20,7 @@ EndFunction
 ;BEGIN FRAGMENT Fragment_Terminal_03
 Function Fragment_Terminal_03(ObjectReference akTerminalRef)
 ;BEGIN CODE
-Lootman.GetFunctions().ScrapItemsFromLootman(35.0, 0.0)
+LTMN:Lootman.GetFunctions().ScrapItemsFromLootman(35.0, 0.0)
 ;END CODE
 EndFunction
 ;END FRAGMENT

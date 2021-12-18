@@ -27,11 +27,11 @@ bool Function IsLootingTarget(ObjectReference ref)
         Return false
     EndIf
 
-    Return properties.AdvancedFilterLegendaryOnly.GetValueInt() != 1 || Lootman.IsLegendaryItem(ref)
+    Return properties.AdvancedFilterLegendaryOnly.GetValueInt() != 1 || LTMN:Lootman.IsLegendaryItem(ref)
 EndFunction
 
 Function TraceObject(ObjectReference ref);; Debug
     string prefix = ("| Looting @ " + GetThreadID() + " | " + GetProcessID() + " |     ");; Debug
     LTMN:Debug.TraceObject(prefix, ref);; Debug
-    LTMN:Debug.Log(prefix + "  Is legendary item: " + Lootman.IsLegendaryItem(ref));; Debug
+    LTMN:Debug.Log(prefix + "  Is legendary item: " + LTMN:Lootman.IsLegendaryItem(ref));; Debug
 EndFunction;; Debug

@@ -6,7 +6,7 @@ Function Fragment_Terminal_01(ObjectReference akTerminalRef)
 ;BEGIN CODE
 int maxValue = 1000000
 int value = 100000
-GlobalVariable CarryWeight = Lootman.GetProperties().CarryWeight
+GlobalVariable CarryWeight = LTMN:Lootman.GetProperties().CarryWeight
 CarryWeight.SetValueInt(CarryWeight.GetValueInt() + value)
 If (CarryWeight.GetValueInt() > maxValue)
     CarryWeight.SetValueInt(maxValue)
@@ -23,7 +23,7 @@ Function Fragment_Terminal_02(ObjectReference akTerminalRef)
 ;BEGIN CODE
 int maxValue = 1000000
 int value = 10000
-GlobalVariable CarryWeight = Lootman.GetProperties().CarryWeight
+GlobalVariable CarryWeight = LTMN:Lootman.GetProperties().CarryWeight
 CarryWeight.SetValueInt(CarryWeight.GetValueInt() + value)
 If (CarryWeight.GetValueInt() > maxValue)
     CarryWeight.SetValueInt(maxValue)
@@ -40,7 +40,7 @@ Function Fragment_Terminal_03(ObjectReference akTerminalRef)
 ;BEGIN CODE
 int maxValue = 1000000
 int value = 1000
-GlobalVariable CarryWeight = Lootman.GetProperties().CarryWeight
+GlobalVariable CarryWeight = LTMN:Lootman.GetProperties().CarryWeight
 CarryWeight.SetValueInt(CarryWeight.GetValueInt() + value)
 If (CarryWeight.GetValueInt() > maxValue)
     CarryWeight.SetValueInt(maxValue)
@@ -57,7 +57,7 @@ Function Fragment_Terminal_04(ObjectReference akTerminalRef)
 ;BEGIN CODE
 int maxValue = 1000000
 int value = 500
-GlobalVariable CarryWeight = Lootman.GetProperties().CarryWeight
+GlobalVariable CarryWeight = LTMN:Lootman.GetProperties().CarryWeight
 CarryWeight.SetValueInt(CarryWeight.GetValueInt() + value)
 If (CarryWeight.GetValueInt() > maxValue)
     CarryWeight.SetValueInt(maxValue)
@@ -74,7 +74,7 @@ Function Fragment_Terminal_05(ObjectReference akTerminalRef)
 ;BEGIN CODE
 int minValue = 500
 int value = 500
-GlobalVariable CarryWeight = Lootman.GetProperties().CarryWeight
+GlobalVariable CarryWeight = LTMN:Lootman.GetProperties().CarryWeight
 CarryWeight.SetValueInt(CarryWeight.GetValueInt() - value)
 If (CarryWeight.GetValueInt() < minValue)
     CarryWeight.SetValueInt(minValue)
@@ -91,7 +91,7 @@ Function Fragment_Terminal_06(ObjectReference akTerminalRef)
 ;BEGIN CODE
 int minValue = 500
 int value = 1000
-GlobalVariable CarryWeight = Lootman.GetProperties().CarryWeight
+GlobalVariable CarryWeight = LTMN:Lootman.GetProperties().CarryWeight
 CarryWeight.SetValueInt(CarryWeight.GetValueInt() - value)
 If (CarryWeight.GetValueInt() < minValue)
     CarryWeight.SetValueInt(minValue)
@@ -108,7 +108,7 @@ Function Fragment_Terminal_07(ObjectReference akTerminalRef)
 ;BEGIN CODE
 int minValue = 500
 int value = 10000
-GlobalVariable CarryWeight = Lootman.GetProperties().CarryWeight
+GlobalVariable CarryWeight = LTMN:Lootman.GetProperties().CarryWeight
 CarryWeight.SetValueInt(CarryWeight.GetValueInt() - value)
 If (CarryWeight.GetValueInt() < minValue)
     CarryWeight.SetValueInt(minValue)
@@ -125,7 +125,7 @@ Function Fragment_Terminal_08(ObjectReference akTerminalRef)
 ;BEGIN CODE
 int minValue = 500
 int value = 100000
-GlobalVariable CarryWeight = Lootman.GetProperties().CarryWeight
+GlobalVariable CarryWeight = LTMN:Lootman.GetProperties().CarryWeight
 CarryWeight.SetValueInt(CarryWeight.GetValueInt() - value)
 If (CarryWeight.GetValueInt() < minValue)
     CarryWeight.SetValueInt(minValue)

@@ -6,8 +6,8 @@ LTMN:Quest:System system
 
 Event OnInit()
     player = Game.GetPlayer()
-    properties = Lootman.GetProperties()
-    system = Lootman.GetSystem()
+    properties = LTMN:Lootman.GetProperties()
+    system = LTMN:Lootman.GetSystem()
 EndEvent
 
 ; Installation process of Lootman
@@ -98,8 +98,8 @@ EndFunction
 Function _ScrapInventoryItems(ObjectReference ref, int filter, int subFilter) global
     string prefix = ("| Utility | " + LTMN:Debug.GetRandomProcessID() + " | ");; Debug
     LTMN:Debug.Log(prefix + "*** Start scrap process ***");; Debug
-    LTMN:Quest:Properties _properties = Lootman.GetProperties()
-    Form[] items = Lootman.GetInventoryItemsOfFormType(ref, filter)
+    LTMN:Quest:Properties _properties = LTMN:Lootman.GetProperties()
+    Form[] items = LTMN:Lootman.GetInventoryItemsOfFormType(ref, filter)
     LTMN:Debug.Log(prefix + "  Total items found: " + items.Length);; Debug
     int itemIndex = 1;; Debug
     int i = items.Length
@@ -109,7 +109,7 @@ Function _ScrapInventoryItems(ObjectReference ref, int filter, int subFilter) gl
         LTMN:Debug.Log(prefix + "  [Item_" + itemIndex + "]");; Debug
         LTMN:Debug.Log(prefix + "    Name: " + LTMN:Debug.GetIdentify(item));; Debug
         If (_IsScrapableItem(item))
-            int formType = Lootman.GetFormType(item)
+            int formType = LTMN:Lootman.GetFormType(item)
             int itemCount = ref.GetItemCount(item)
             int perTime = 1
             If (formType == _properties.FORM_TYPE_MISC)
@@ -136,7 +136,7 @@ Function _ScrapInventoryItems(ObjectReference ref, int filter, int subFilter) gl
                     obj = ref.DropObject(item, 1)
                     If (obj)
                         LTMN:Debug.Log(prefix + "        Actual item: " + obj.GetDisplayName());; Debug
-                        components = Lootman.GetEquipmentScrapComponents(obj)
+                        components = LTMN:Lootman.GetEquipmentScrapComponents(obj)
                     EndIf
                 EndIf
 
@@ -222,13 +222,13 @@ EndFunction
 
 ; Verify that the item is scrapable (Internal function)
 bool Function _IsScrapableItem(Form item) global
-    LTMN:Quest:Properties _properties = Lootman.GetProperties()
+    LTMN:Quest:Properties _properties = LTMN:Lootman.GetProperties()
     Return !item.HasKeyword(_properties.UnscrappableObject) && !item.HasKeyword(_properties.FeaturedItem)
 EndFunction
 
 ; Move items from inventory to inventory
 Function MoveInventoryItems(ObjectReference src, ObjectReference dest, int filter, int subFilter) global
-    LTMN:Quest:Properties _properties = Lootman.GetProperties()
+    LTMN:Quest:Properties _properties = LTMN:Lootman.GetProperties()
 
     bool moveFromPlayer = (src == Game.GetPlayer())
     Actor srcAsActor = (src As Actor)
@@ -239,7 +239,7 @@ Function MoveInventoryItems(ObjectReference src, ObjectReference dest, int filte
     bool moveTheMod = !moveTheJunk
     Keyword ObjectTypeLooseMod = _properties.ObjectTypeLooseMod
 
-    Form[] items = Lootman.GetInventoryItemsOfFormType(src, filter)
+    Form[] items = LTMN:Lootman.GetInventoryItemsOfFormType(src, filter)
     int i = items.Length
     While i
         i -= 1

@@ -4,7 +4,7 @@ Scriptname LTMN:Fragments:Terminals:UtilityHolotape:GeneralSettings Extends Term
 ;BEGIN FRAGMENT Fragment_Terminal_01
 Function Fragment_Terminal_01(ObjectReference akTerminalRef)
 ;BEGIN CODE
-Lootman.GetProperties().IsEnabled.SetValueInt(0)
+LTMN:Lootman.GetProperties().IsEnabled.SetValueInt(0)
 ;END CODE
 EndFunction
 ;END FRAGMENT
@@ -12,7 +12,7 @@ EndFunction
 ;BEGIN FRAGMENT Fragment_Terminal_02
 Function Fragment_Terminal_02(ObjectReference akTerminalRef)
 ;BEGIN CODE
-Lootman.GetProperties().IsEnabled.SetValueInt(1)
+LTMN:Lootman.GetProperties().IsEnabled.SetValueInt(1)
 ;END CODE
 EndFunction
 ;END FRAGMENT
@@ -20,7 +20,7 @@ EndFunction
 ;BEGIN FRAGMENT Fragment_Terminal_03
 Function Fragment_Terminal_03(ObjectReference akTerminalRef)
 ;BEGIN CODE
-Lootman.GetProperties().LootingDisabledInSettlement.SetValueInt(0)
+LTMN:Lootman.GetProperties().LootingDisabledInSettlement.SetValueInt(0)
 ;END CODE
 EndFunction
 ;END FRAGMENT
@@ -28,7 +28,7 @@ EndFunction
 ;BEGIN FRAGMENT Fragment_Terminal_04
 Function Fragment_Terminal_04(ObjectReference akTerminalRef)
 ;BEGIN CODE
-Lootman.GetProperties().LootingDisabledInSettlement.SetValueInt(1)
+LTMN:Lootman.GetProperties().LootingDisabledInSettlement.SetValueInt(1)
 ;END CODE
 EndFunction
 ;END FRAGMENT
@@ -37,7 +37,7 @@ EndFunction
 Function Fragment_Terminal_05(ObjectReference akTerminalRef)
 ;BEGIN CODE
 If (akTerminalRef)
-    akTerminalRef.AddTextReplacementData("LootingRange", Lootman.GetProperties().LootingRange)
+    akTerminalRef.AddTextReplacementData("LootingRange", LTMN:Lootman.GetProperties().LootingRange)
 EndIf
 ;END CODE
 EndFunction
@@ -47,7 +47,7 @@ EndFunction
 Function Fragment_Terminal_06(ObjectReference akTerminalRef)
 ;BEGIN CODE
 If (akTerminalRef)
-    akTerminalRef.AddTextReplacementData("CarryWeight", Lootman.GetProperties().CarryWeight)
+    akTerminalRef.AddTextReplacementData("CarryWeight", LTMN:Lootman.GetProperties().CarryWeight)
 EndIf
 ;END CODE
 EndFunction
@@ -56,7 +56,7 @@ EndFunction
 ;BEGIN FRAGMENT Fragment_Terminal_07
 Function Fragment_Terminal_07(ObjectReference akTerminalRef)
 ;BEGIN CODE
-Lootman.GetProperties().IgnoreOverweight.SetValueInt(0)
+LTMN:Lootman.GetProperties().IgnoreOverweight.SetValueInt(0)
 ;END CODE
 EndFunction
 ;END FRAGMENT
@@ -64,7 +64,7 @@ EndFunction
 ;BEGIN FRAGMENT Fragment_Terminal_08
 Function Fragment_Terminal_08(ObjectReference akTerminalRef)
 ;BEGIN CODE
-Lootman.GetProperties().IgnoreOverweight.SetValueInt(1)
+LTMN:Lootman.GetProperties().IgnoreOverweight.SetValueInt(1)
 ;END CODE
 EndFunction
 ;END FRAGMENT
@@ -72,7 +72,7 @@ EndFunction
 ;BEGIN FRAGMENT Fragment_Terminal_09
 Function Fragment_Terminal_09(ObjectReference akTerminalRef)
 ;BEGIN CODE
-Lootman.GetProperties().PlayPickupSound.SetValueInt(0)
+LTMN:Lootman.GetProperties().PlayPickupSound.SetValueInt(0)
 ;END CODE
 EndFunction
 ;END FRAGMENT
@@ -80,7 +80,7 @@ EndFunction
 ;BEGIN FRAGMENT Fragment_Terminal_10
 Function Fragment_Terminal_10(ObjectReference akTerminalRef)
 ;BEGIN CODE
-Lootman.GetProperties().PlayPickupSound.SetValueInt(1)
+LTMN:Lootman.GetProperties().PlayPickupSound.SetValueInt(1)
 ;END CODE
 EndFunction
 ;END FRAGMENT
@@ -88,7 +88,7 @@ EndFunction
 ;BEGIN FRAGMENT Fragment_Terminal_11
 Function Fragment_Terminal_11(ObjectReference akTerminalRef)
 ;BEGIN CODE
-Lootman.GetProperties().AutomaticallyLinkOrUnlinkToWorkshop.SetValueInt(0)
+LTMN:Lootman.GetProperties().AutomaticallyLinkOrUnlinkToWorkshop.SetValueInt(0)
 ;END CODE
 EndFunction
 ;END FRAGMENT
@@ -96,7 +96,7 @@ EndFunction
 ;BEGIN FRAGMENT Fragment_Terminal_12
 Function Fragment_Terminal_12(ObjectReference akTerminalRef)
 ;BEGIN CODE
-Lootman.GetProperties().AutomaticallyLinkOrUnlinkToWorkshop.SetValueInt(1)
+LTMN:Lootman.GetProperties().AutomaticallyLinkOrUnlinkToWorkshop.SetValueInt(1)
 ;END CODE
 EndFunction
 ;END FRAGMENT
@@ -105,7 +105,7 @@ EndFunction
 Function Fragment_Terminal_13(ObjectReference akTerminalRef)
 ;BEGIN CODE
 If (akTerminalRef)
-    akTerminalRef.AddTextReplacementData("ThreadInterval", Lootman.GetProperties().ThreadInterval)
+    akTerminalRef.AddTextReplacementData("ThreadInterval", LTMN:Lootman.GetProperties().ThreadInterval)
 EndIf
 ;END CODE
 EndFunction
@@ -114,7 +114,7 @@ EndFunction
 ;BEGIN FRAGMENT Fragment_Terminal_15
 Function Fragment_Terminal_15(ObjectReference akTerminalRef)
 ;BEGIN CODE
-Lootman.GetProperties().DisplaySystemMessage.SetValueInt(0)
+LTMN:Lootman.GetProperties().DisplaySystemMessage.SetValueInt(0)
 ;END CODE
 EndFunction
 ;END FRAGMENT
@@ -122,7 +122,7 @@ EndFunction
 ;BEGIN FRAGMENT Fragment_Terminal_16
 Function Fragment_Terminal_16(ObjectReference akTerminalRef)
 ;BEGIN CODE
-Lootman.GetProperties().DisplaySystemMessage.SetValueInt(1)
+LTMN:Lootman.GetProperties().DisplaySystemMessage.SetValueInt(1)
 ;END CODE
 EndFunction
 ;END FRAGMENT
@@ -130,7 +130,7 @@ EndFunction
 ;BEGIN FRAGMENT Fragment_Terminal_17
 Function Fragment_Terminal_17(ObjectReference akTerminalRef)
 ;BEGIN CODE
-Lootman.GetProperties().PlayContainerAnimation.SetValueInt(0)
+LTMN:Lootman.GetProperties().PlayContainerAnimation.SetValueInt(0)
 ;END CODE
 EndFunction
 ;END FRAGMENT
@@ -138,7 +138,7 @@ EndFunction
 ;BEGIN FRAGMENT Fragment_Terminal_18
 Function Fragment_Terminal_18(ObjectReference akTerminalRef)
 ;BEGIN CODE
-Lootman.GetProperties().PlayContainerAnimation.SetValueInt(1)
+LTMN:Lootman.GetProperties().PlayContainerAnimation.SetValueInt(1)
 ;END CODE
 EndFunction
 ;END FRAGMENT
@@ -146,7 +146,7 @@ EndFunction
 ;BEGIN FRAGMENT Fragment_Terminal_19
 Function Fragment_Terminal_19(ObjectReference akTerminalRef)
 ;BEGIN CODE
-Lootman.GetProperties().LootInPlayerDirectly.SetValueInt(0)
+LTMN:Lootman.GetProperties().LootInPlayerDirectly.SetValueInt(0)
 ;END CODE
 EndFunction
 ;END FRAGMENT
@@ -154,7 +154,7 @@ EndFunction
 ;BEGIN FRAGMENT Fragment_Terminal_20
 Function Fragment_Terminal_20(ObjectReference akTerminalRef)
 ;BEGIN CODE
-Lootman.GetProperties().LootInPlayerDirectly.SetValueInt(1)
+LTMN:Lootman.GetProperties().LootInPlayerDirectly.SetValueInt(1)
 ;END CODE
 EndFunction
 ;END FRAGMENT
@@ -162,7 +162,7 @@ EndFunction
 ;BEGIN FRAGMENT Fragment_Terminal_21
 Function Fragment_Terminal_21(ObjectReference akTerminalRef)
 ;BEGIN CODE
-Lootman.GetProperties().AllowContainerUnlock.SetValueInt(0)
+LTMN:Lootman.GetProperties().AllowContainerUnlock.SetValueInt(0)
 ;END CODE
 EndFunction
 ;END FRAGMENT
@@ -170,7 +170,7 @@ EndFunction
 ;BEGIN FRAGMENT Fragment_Terminal_22
 Function Fragment_Terminal_22(ObjectReference akTerminalRef)
 ;BEGIN CODE
-Lootman.GetProperties().AllowContainerUnlock.SetValueInt(1)
+LTMN:Lootman.GetProperties().AllowContainerUnlock.SetValueInt(1)
 ;END CODE
 EndFunction
 ;END FRAGMENT

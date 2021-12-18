@@ -29,5 +29,5 @@ EndFunction
 Function TraceObject(ObjectReference ref);; Debug
     string prefix = ("| Looting @ " + GetThreadID() + " | " + GetProcessID() + " |     ");; Debug
     LTMN:Debug.TraceObject(prefix, ref);; Debug
-    LTMN:Debug.Log(prefix + "  Is linked to workshop: " + Lootman.IsLinkedToWorkshop(ref));; Debug
+    LTMN:Debug.Log(prefix + "  Is linked to workshop: " + LTMN:Lootman.IsLinkedToWorkshop(ref));; Debug
 EndFunction;; Debug

@@ -4,7 +4,7 @@ Scriptname LTMN:Fragments:Terminals:UtilityHolotape:AdvancedFilterWEAP Extends T
 ;BEGIN FRAGMENT Fragment_Terminal_01
 Function Fragment_Terminal_01(ObjectReference akTerminalRef)
 ;BEGIN CODE
-Lootman.GetProperties().AdvancedFilterGrenade.SetValueInt(0)
+LTMN:Lootman.GetProperties().AdvancedFilterGrenade.SetValueInt(0)
 ;END CODE
 EndFunction
 ;END FRAGMENT
@@ -12,7 +12,7 @@ EndFunction
 ;BEGIN FRAGMENT Fragment_Terminal_02
 Function Fragment_Terminal_02(ObjectReference akTerminalRef)
 ;BEGIN CODE
-Lootman.GetProperties().AdvancedFilterGrenade.SetValueInt(1)
+LTMN:Lootman.GetProperties().AdvancedFilterGrenade.SetValueInt(1)
 ;END CODE
 EndFunction
 ;END FRAGMENT
@@ -20,7 +20,7 @@ EndFunction
 ;BEGIN FRAGMENT Fragment_Terminal_03
 Function Fragment_Terminal_03(ObjectReference akTerminalRef)
 ;BEGIN CODE
-Lootman.GetProperties().AdvancedFilterMine.SetValueInt(0)
+LTMN:Lootman.GetProperties().AdvancedFilterMine.SetValueInt(0)
 ;END CODE
 EndFunction
 ;END FRAGMENT
@@ -28,7 +28,7 @@ EndFunction
 ;BEGIN FRAGMENT Fragment_Terminal_04
 Function Fragment_Terminal_04(ObjectReference akTerminalRef)
 ;BEGIN CODE
-Lootman.GetProperties().AdvancedFilterMine.SetValueInt(1)
+LTMN:Lootman.GetProperties().AdvancedFilterMine.SetValueInt(1)
 ;END CODE
 EndFunction
 ;END FRAGMENT
@@ -36,7 +36,7 @@ EndFunction
 ;BEGIN FRAGMENT Fragment_Terminal_05
 Function Fragment_Terminal_05(ObjectReference akTerminalRef)
 ;BEGIN CODE
-Lootman.GetProperties().AdvancedFilterOtherWeapon.SetValueInt(0)
+LTMN:Lootman.GetProperties().AdvancedFilterOtherWeapon.SetValueInt(0)
 ;END CODE
 EndFunction
 ;END FRAGMENT
@@ -44,7 +44,7 @@ EndFunction
 ;BEGIN FRAGMENT Fragment_Terminal_06
 Function Fragment_Terminal_06(ObjectReference akTerminalRef)
 ;BEGIN CODE
-Lootman.GetProperties().AdvancedFilterOtherWeapon.SetValueInt(1)
+LTMN:Lootman.GetProperties().AdvancedFilterOtherWeapon.SetValueInt(1)
 ;END CODE
 EndFunction
 ;END FRAGMENT

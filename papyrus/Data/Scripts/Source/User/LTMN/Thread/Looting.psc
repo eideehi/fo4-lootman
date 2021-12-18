@@ -19,7 +19,7 @@ EndEvent
 
 Function Initialize()
     player = Game.GetPlayer()
-    properties = Lootman.GetProperties()
+    properties = LTMN:Lootman.GetProperties()
     RegisterForCustomEvent(self, "CallLooting")
 EndFunction
 
@@ -42,7 +42,7 @@ Function Looting()
     string prefix = ("| Looting @ " + GetThreadID() + " | " + processId + " | ");; Debug
     LTMN:Debug.Log(prefix + "*** Start looting ***");; Debug
     int objectIndex = 1;; Debug
-    ObjectReference[] refs = Lootman.FindAllLootingTarget(player, properties.LootingRange.GetValueInt(), GetFindObjectFormType())
+    ObjectReference[] refs = LTMN:Lootman.FindAllLootingTarget(player, properties.LootingRange.GetValueInt(), GetFindObjectFormType())
     LTMN:Debug.Log(prefix + "  Total number of objects found: " + refs.Length);; Debug
     float time = Utility.GetCurrentRealTime()
     int i = refs.Length
@@ -62,7 +62,7 @@ Function Looting()
         EndIf
 
         ObjectReference ref = refs[i]
-        If (Lootman.IsValidRef(ref))
+        If (LTMN:Lootman.IsValidRef(ref))
             If (!ref.HasKeyword(properties.LootingMarker))
                 ref.AddKeyword(properties.LootingMarker)
 
@@ -127,7 +127,7 @@ bool Function IsLootingEnabled()
     If (properties.LootingDisabledInSettlement.GetValueInt() == 1 && properties.IsInSettlement.GetValueInt() == 1)
         Return false
     EndIf
-    If (!Lootman.GetSystem().IsWorldActive())
+    If (!LTMN:Lootman.GetSystem().IsWorldActive())
         Return false
     EndIf
     Return true
@@ -315,14 +315,14 @@ EndFunction
 
 ; Verify that items in inventory are lootable
 bool Function IsLootableItem(ObjectReference ref, Form item)
-    int formType = Lootman.GetFormType(item)
+    int formType = LTMN:Lootman.GetFormType(item)
 
     If (formType == properties.FORM_TYPE_ALCH)
         If (!IsLootableAlchemyItem(item))
             Return false
         EndIf
     ElseIf (formType == properties.FORM_TYPE_ARMO)
-        If (properties.AdvancedFilterLegendaryOnly.GetValueInt() == 1 && !Lootman.HasLegendaryItem(ref, item))
+        If (properties.AdvancedFilterLegendaryOnly.GetValueInt() == 1 && !LTMN:Lootman.HasLegendaryItem(ref, item))
             Return false
         EndIf
     ElseIf (formType == properties.FORM_TYPE_BOOK)
@@ -339,7 +339,7 @@ bool Function IsLootableItem(ObjectReference ref, Form item)
         EndIf
         If (properties.AdvancedFilterLegendaryOnly.GetValueInt() == 1)
             If (!item.HasKeywordInFormList(properties.WeaponTypeGrenadeKeywordList) && !item.HasKeywordInFormList(properties.WeaponTypeMineKeywordList))
-                If (!Lootman.HasLegendaryItem(ref, item))
+                If (!LTMN:Lootman.HasLegendaryItem(ref, item))
                     Return false
                 EndIf
             EndIf

@@ -834,43 +834,43 @@ bool PapyrusLootman::RegisterFunctions(VirtualMachine* vm)
 
     vm->RegisterFunction(
         new NativeFunction3<StaticFunctionTag, VMArray<TESObjectREFR*>, TESObjectREFR*, UInt32, UInt32>(
-            "FindAllLootingTarget", "Lootman", FindAllLootingTarget, vm));
+            "FindAllLootingTarget", "LTMN:Lootman", FindAllLootingTarget, vm));
     vm->RegisterFunction(
         new NativeFunction4<StaticFunctionTag, VMArray<TESObjectREFR*>, TESObjectREFR*, UInt32, float, float>(
-            "GetAllExpiredObject", "Lootman", GetAllExpiredObject, vm));
+            "GetAllExpiredObject", "LTMN:Lootman", GetAllExpiredObject, vm));
     vm->RegisterFunction(
         new NativeFunction1<StaticFunctionTag, VMArray<MiscComponent>, VMRefOrInventoryObj*>(
-            "GetEquipmentScrapComponents", "Lootman", GetEquipmentScrapComponents, vm));
+            "GetEquipmentScrapComponents", "LTMN:Lootman", GetEquipmentScrapComponents, vm));
     vm->RegisterFunction(
-        new NativeFunction1<StaticFunctionTag, UInt32, TESForm*>("GetFormType", "Lootman", GetFormType, vm));
+        new NativeFunction1<StaticFunctionTag, UInt32, TESForm*>("GetFormType", "LTMN:Lootman", GetFormType, vm));
     vm->RegisterFunction(
         new NativeFunction1<StaticFunctionTag, VMArray<TESForm*>, BSFixedString>(
-            "GetInjectionDataForList", "Lootman", GetInjectionDataForList, vm));
+            "GetInjectionDataForList", "LTMN:Lootman", GetInjectionDataForList, vm));
     vm->RegisterFunction(
         new NativeFunction2<StaticFunctionTag, VMArray<TESForm*>, TESObjectREFR*, VMArray<UInt32>>(
-            "GetInventoryItemsOfFormTypes", "Lootman", GetInventoryItemsOfFormTypes, vm));
+            "GetInventoryItemsOfFormTypes", "LTMN:Lootman", GetInventoryItemsOfFormTypes, vm));
     vm->RegisterFunction(
         new NativeFunction2<StaticFunctionTag, bool, TESObjectREFR*, TESForm*>(
-            "HasLegendaryItem", "Lootman", HasLegendaryItem, vm));
+            "HasLegendaryItem", "LTMN:Lootman", HasLegendaryItem, vm));
     vm->RegisterFunction(
         new NativeFunction1<StaticFunctionTag, bool, VMRefOrInventoryObj*>(
-            "IsLegendaryItem", "Lootman", IsLegendaryItem, vm));
+            "IsLegendaryItem", "LTMN:Lootman", IsLegendaryItem, vm));
     vm->RegisterFunction(
-        new NativeFunction1<StaticFunctionTag, bool, TESObjectREFR*>("IsLinkedToWorkshop", "Lootman",
+        new NativeFunction1<StaticFunctionTag, bool, TESObjectREFR*>("IsLinkedToWorkshop", "LTMN:Lootman",
                                                                      IsLinkedToWorkshop, vm));
     vm->RegisterFunction(
-        new NativeFunction1<StaticFunctionTag, bool, TESObjectREFR*>("IsValidRef", "Lootman", IsValidRef, vm));
+        new NativeFunction1<StaticFunctionTag, bool, TESObjectREFR*>("IsValidRef", "LTMN:Lootman", IsValidRef, vm));
 
-    vm->SetFunctionFlags("Lootman", "FindAllLootingTarget", IFunction::kFunctionFlag_NoWait);
-    vm->SetFunctionFlags("Lootman", "GetAllExpiredObject", IFunction::kFunctionFlag_NoWait);
-    vm->SetFunctionFlags("Lootman", "GetEquipmentScrapComponents", IFunction::kFunctionFlag_NoWait);
-    vm->SetFunctionFlags("Lootman", "GetFormType", IFunction::kFunctionFlag_NoWait);
-    vm->SetFunctionFlags("Lootman", "GetInjectionDataForList", IFunction::kFunctionFlag_NoWait);
-    vm->SetFunctionFlags("Lootman", "GetInventoryItemsOfFormTypes", IFunction::kFunctionFlag_NoWait);
-    vm->SetFunctionFlags("Lootman", "HasLegendaryItem", IFunction::kFunctionFlag_NoWait);
-    vm->SetFunctionFlags("Lootman", "IsLegendaryItem", IFunction::kFunctionFlag_NoWait);
-    vm->SetFunctionFlags("Lootman", "IsLinkedToWorkshop", IFunction::kFunctionFlag_NoWait);
-    vm->SetFunctionFlags("Lootman", "IsValidRef", IFunction::kFunctionFlag_NoWait);
+    vm->SetFunctionFlags("LTMN:Lootman", "FindAllLootingTarget", IFunction::kFunctionFlag_NoWait);
+    vm->SetFunctionFlags("LTMN:Lootman", "GetAllExpiredObject", IFunction::kFunctionFlag_NoWait);
+    vm->SetFunctionFlags("LTMN:Lootman", "GetEquipmentScrapComponents", IFunction::kFunctionFlag_NoWait);
+    vm->SetFunctionFlags("LTMN:Lootman", "GetFormType", IFunction::kFunctionFlag_NoWait);
+    vm->SetFunctionFlags("LTMN:Lootman", "GetInjectionDataForList", IFunction::kFunctionFlag_NoWait);
+    vm->SetFunctionFlags("LTMN:Lootman", "GetInventoryItemsOfFormTypes", IFunction::kFunctionFlag_NoWait);
+    vm->SetFunctionFlags("LTMN:Lootman", "HasLegendaryItem", IFunction::kFunctionFlag_NoWait);
+    vm->SetFunctionFlags("LTMN:Lootman", "IsLegendaryItem", IFunction::kFunctionFlag_NoWait);
+    vm->SetFunctionFlags("LTMN:Lootman", "IsLinkedToWorkshop", IFunction::kFunctionFlag_NoWait);
+    vm->SetFunctionFlags("LTMN:Lootman", "IsValidRef", IFunction::kFunctionFlag_NoWait);
 
 #ifdef _DEBUG
     vm->RegisterFunction(

@@ -4,7 +4,7 @@ Scriptname LTMN:Fragments:Terminals:UtilityHolotape:UninstallConfirm Extends Ter
 ;BEGIN FRAGMENT Fragment_Terminal_01
 Function Fragment_Terminal_01(ObjectReference akTerminalRef)
 ;BEGIN CODE
-Lootman.GetFunctions().Uninstall()
+LTMN:Lootman.GetFunctions().Uninstall()
 ;END CODE
 EndFunction
 ;END FRAGMENT

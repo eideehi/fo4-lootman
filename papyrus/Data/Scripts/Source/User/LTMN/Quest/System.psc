@@ -37,7 +37,7 @@ Event OnInit()
     LTMN:Debug.Log("| System | Lootman has been running for the first time");; Debug
 
     player = Game.GetPlayer()
-    properties = Lootman.GetProperties()
+    properties = LTMN:Lootman.GetProperties()
     modVersion = properties.ModVersion.GetValue()
 
     StartTimer(5, TIMER_TRY_INSTALL)
@@ -147,7 +147,7 @@ Event ObjectReference.OnItemAdded(ObjectReference akSender, Form akBaseItem, int
     EndIf
 EndEvent
 
-; Called by the timer function. Try to install Lootman. Returns true if there is no need to call this function any more.
+; Called by the timer function. Try to install LTMN:Lootman. Returns true if there is no need to call this function any more.
 bool Function TryInstall()
     string prefix = ("| System | " + LTMN:Debug.GetRandomProcessID() + " | ");; Debug
 
@@ -471,13 +471,13 @@ Function UpdaetState()
     EndIf
 
     LTMN:Debug.Log(prefix + "  ** Reset timestamp for expired objects **");; Debug
-    ObjectReference[] refs = Lootman.GetAllExpiredObject(player, properties.LootingRange.GetValueInt(), Utility.GetCurrentRealTime(), properties.ExpirationToSkipLooting.GetValue())
+    ObjectReference[] refs = LTMN:Lootman.GetAllExpiredObject(player, properties.LootingRange.GetValueInt(), Utility.GetCurrentRealTime(), properties.ExpirationToSkipLooting.GetValue())
     LTMN:Debug.Log(prefix + "    Object count: " + refs.Length);; Debug
     int i = refs.Length
     While i
         i -= 1
         ObjectReference ref = refs[i]
-        If (Lootman.IsValidRef(ref))
+        If (LTMN:Lootman.IsValidRef(ref))
             LTMN:Debug.TraceObject(prefix + "    ", ref);; Debug
             ref.SetValue(properties.LastLootingTimestamp, 0)
         EndIf
@@ -579,7 +579,7 @@ Function _SetupFormList(FormList list, string identify) global
     LTMN:Debug.Log(prefix + "** Add items to the form list **");; Debug
     LTMN:Debug.Log(prefix + "  Form list: [Name: " + identify + ", ID: " + LTMN:Debug.GetHexID(list) + "]");; Debug
 
-    Form[] items = Lootman.GetInjectionDataForList(identify)
+    Form[] items = LTMN:Lootman.GetInjectionDataForList(identify)
     int i = items.Length
     While i
         i -= 1

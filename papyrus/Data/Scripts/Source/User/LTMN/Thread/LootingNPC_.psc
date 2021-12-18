@@ -18,7 +18,7 @@ Function LootObject(ObjectReference ref)
     LTMN:Debug.Log(prefix + "  Inventory status before looting: [ItemCount: " + ref.GetItemCount() + ", TotalWeight: " + ref.GetInventoryWeight() + "]");; Debug
     LTMN:Debug.Log(prefix + "  ** Do looting **");; Debug
     int lootCount = 0
-    Form[] forms = Lootman.GetInventoryItemsOfFormTypes(ref, GetItemFilters())
+    Form[] forms = LTMN:Lootman.GetInventoryItemsOfFormTypes(ref, GetItemFilters())
     LTMN:Debug.Log(prefix + "    Total items found: " + forms.Length);; Debug
     int itemIndex = 1;; Debug
     int j = forms.Length

@@ -1,4 +1,4 @@
-Scriptname Lootman native hidden
+Scriptname LTMN:Lootman native hidden
 
 ; Return the system quest for Lootman
 LTMN:Quest:System Function GetSystem() global

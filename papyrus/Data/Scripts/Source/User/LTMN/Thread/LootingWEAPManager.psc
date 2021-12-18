@@ -51,7 +51,7 @@ Function Shutdown()
 EndFunction
 
 Function TryLooting()
-    int threadLimit = Lootman.GetProperties().ThreadLimitWEAP.GetValueInt()
+    int threadLimit = LTMN:Lootman.GetProperties().ThreadLimitWEAP.GetValueInt()
     If (!thread01.Busy() && threadLimit >= 1)
         thread01.Run()
     ElseIf (!thread02.Busy() && threadLimit >= 2)

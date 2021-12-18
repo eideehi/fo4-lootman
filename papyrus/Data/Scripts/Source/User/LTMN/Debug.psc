@@ -28,7 +28,7 @@ EndFunction
 
 ; Output the trace log of an object
 Function TraceObject(string prefix, ObjectReference ref) global
-    LTMN:Quest:Properties _properties = Lootman.GetProperties()
+    LTMN:Quest:Properties _properties = LTMN:Lootman.GetProperties()
     Actor _player = Game.GetPlayer()
 
     Log(prefix + "Object: [Name: " + ref.GetDisplayName() + ", ID: " + GetHexID(ref) + "]")
@@ -115,7 +115,7 @@ EndFunction
 
 ; Output the trace log of an form (Debug only)
 Function TraceForm(string prefix, Form base) global
-    LTMN:Quest:Properties _properties = Lootman.GetProperties()
+    LTMN:Quest:Properties _properties = LTMN:Lootman.GetProperties()
     Log(prefix + "Base item: [Name: " + GetIdentify(base) + ", ID: " + GetHexID(base) + "]")
     Log(prefix + "  Form type: " + GetFormTypeIdentify(base))
 
