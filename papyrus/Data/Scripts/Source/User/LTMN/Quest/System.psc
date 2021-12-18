@@ -32,6 +32,8 @@ int messageShowCount = 0
 int lastAutomaticallyLinkOrUnlinkToWorkshop = 0
 int lastLootingDisabledInSettlement = 0
 
+float[] globalCache = None
+
 Event OnInit()
     LTMN:Debug.OpenLog()
     LTMN:Debug.Log("| System | Lootman has been running for the first time")
@@ -337,6 +339,9 @@ Function Initialize()
     _SetupFormList(properties.WeaponTypeGrenadeKeywordList, properties.LIST_IDENTIFY_WEAPONTYPE_GRENADE_KEYWORD)
     _SetupFormList(properties.WeaponTypeMineKeywordList, properties.LIST_IDENTIFY_WEAPONTYPE_MINE_KEYWORD)
 
+    ; Log all values of global variables for each game load.
+    globalCache = LTMN:Debug.TraceGlobal(prefix, None)
+
     properties.IsInitializing.SetValueInt(0)
 
     LTMN:Debug.Log(prefix + "*** Lootman initialization completed ***")
@@ -375,6 +380,9 @@ Function UpdaetState()
         LTMN:Debug.Log(prefix + "*** Lootman has been uninstalled, the state update will not be executed ***")
         Return
     EndIf
+
+    ; Log the values of global variables that differ from the cache.
+    globalCache = LTMN:Debug.TraceGlobal(prefix, globalCache)
 
     If (!IsWorldActive())
         LTMN:Debug.Log(prefix + "*** World is not in active ***")
