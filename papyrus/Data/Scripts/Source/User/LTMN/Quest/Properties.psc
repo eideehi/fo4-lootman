@@ -68,6 +68,7 @@ Group FormTypes
 EndGroup
 
 Group Globals
+    ; TODO: Reuse the next time you add more globals
     GlobalVariable property ModVersion auto const mandatory
 
     ; Lootman flags

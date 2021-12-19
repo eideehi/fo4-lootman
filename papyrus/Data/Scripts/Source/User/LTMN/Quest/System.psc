@@ -16,6 +16,8 @@ Quest property LootingMISCQuest auto const mandatory
 Quest property LootingNPC_Quest auto const mandatory
 Quest property LootingWEAPQuest auto const mandatory
 
+float MOD_VERSION = 1.0308 const
+
 int TIMER_TRY_INSTALL = 1 const
 int TIMER_LOOTING = 2 const
 int TIMER_UPDATE_STATE = 3 const
@@ -36,11 +38,11 @@ float[] globalCache = None
 
 Event OnInit()
     LTMN:Debug.OpenLog()
-    LTMN:Debug.Log("| System | Lootman has been running for the first time")
+    LTMN:Debug.Log("| System | Lootman " + MOD_VERSION + " has been running for the first time")
 
     player = Game.GetPlayer()
     properties = LTMN:Lootman.GetProperties()
-    modVersion = properties.ModVersion.GetValue()
+    modVersion = MOD_VERSION
 
     StartTimer(5, TIMER_TRY_INSTALL)
 EndEvent
@@ -64,13 +66,13 @@ EndEvent
 ; An event that register to player. Process that should be performed when loading save data.
 Event Actor.OnPlayerLoadGame(Actor akSender)
     LTMN:Debug.OpenLog()
-    LTMN:Debug.Log("| System | Lootman has been running")
+    LTMN:Debug.Log("| System | Lootman " + MOD_VERSION + " has been running")
 
     ; Reset the number of times the overweight notification message is displayed for each game load
     messageShowCount = 0
 
     ; Apply the patches if the save data and the Mod version of the esp do not match due to the Lootman update.
-    If (modVersion < properties.ModVersion.GetValue())
+    If (modVersion < MOD_VERSION)
         Patch()
     EndIf
 
@@ -362,7 +364,7 @@ Function Patch()
         RegisterForRemoteEvent(properties.LootmanActor, "OnItemAdded")
     EndIf
 
-    modVersion = properties.ModVersion.GetValue()
+    modVersion = MOD_VERSION
 
     LTMN:Debug.Log(prefix + "  Update to version: " + modVersion)
     LTMN:Debug.Log(prefix + "*** Lootman patching completed ***")
