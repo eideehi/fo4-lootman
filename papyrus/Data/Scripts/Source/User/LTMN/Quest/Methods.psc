@@ -276,6 +276,7 @@ Function MoveInventoryItem(ObjectReference src, ObjectReference dest, Form item,
     If (_count < 0)
         _count = src.GetItemCount(item)
     EndIf
+    LTMN:Debug.Log("| MoveInventoryItem |  Move the item '" + LTMN:Debug.GetIdentify(item) + " x" + _count + "' from " + src.GetDisplayName() + " to " + dest.GetDisplayName())
     While (_count > 0)
         If (_count <= 65535)
             src.RemoveItem(item, -1, silent, dest)

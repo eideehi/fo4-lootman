@@ -317,28 +317,28 @@ Function Initialize()
     properties.IsInitializing.SetValueInt(1)
 
     LTMN:Debug.Log(prefix + "  ** Clear form list **")
-    _ClearFormList(properties.AllowedActivatorList)
-    _ClearFormList(properties.AllowedFeaturedItemList)
-    _ClearFormList(properties.AllowedUniqueItemList)
-    _ClearFormList(properties.ExcludeFormList)
-    _ClearFormList(properties.ExcludeKeywordList)
-    _ClearFormList(properties.ExcludeLocationRefList)
-    _ClearFormList(properties.IgnorableActivationBlockeList)
-    _ClearFormList(properties.VendorChestList)
-    _ClearFormList(properties.WeaponTypeGrenadeKeywordList)
-    _ClearFormList(properties.WeaponTypeMineKeywordList)
+    _ClearFormList(prefix + "    ", properties.AllowedActivatorList)
+    _ClearFormList(prefix + "    ", properties.AllowedFeaturedItemList)
+    _ClearFormList(prefix + "    ", properties.AllowedUniqueItemList)
+    _ClearFormList(prefix + "    ", properties.ExcludeFormList)
+    _ClearFormList(prefix + "    ", properties.ExcludeKeywordList)
+    _ClearFormList(prefix + "    ", properties.ExcludeLocationRefList)
+    _ClearFormList(prefix + "    ", properties.IgnorableActivationBlockeList)
+    _ClearFormList(prefix + "    ", properties.VendorChestList)
+    _ClearFormList(prefix + "    ", properties.WeaponTypeGrenadeKeywordList)
+    _ClearFormList(prefix + "    ", properties.WeaponTypeMineKeywordList)
 
     LTMN:Debug.Log(prefix + "  ** Setup form list **")
-    _SetupFormList(properties.AllowedActivatorList, properties.LIST_IDENTIFY_ALLOWED_ACTIVATOR)
-    _SetupFormList(properties.AllowedFeaturedItemList, properties.LIST_IDENTIFY_ALLOWED_FEATUREDITEM)
-    _SetupFormList(properties.AllowedUniqueItemList, properties.LIST_IDENTIFY_ALLOWED_UNIQUEITEM)
-    _SetupFormList(properties.ExcludeFormList, properties.LIST_IDENTIFY_EXCLUDE_FORM)
-    _SetupFormList(properties.ExcludeKeywordList, properties.LIST_IDENTIFY_EXCLUDE_KEYWORD)
-    _SetupFormList(properties.ExcludeLocationRefList, properties.LIST_IDENTIFY_EXCLUDE_LOCATIONREF)
-    _SetupFormList(properties.IgnorableActivationBlockeList, properties.LIST_IDENTIFY_IGNORABLE_ACTIVATION_BLOCKE)
-    _SetupFormList(properties.VendorChestList, properties.LIST_IDENTIFY_VENDOR_CHEST)
-    _SetupFormList(properties.WeaponTypeGrenadeKeywordList, properties.LIST_IDENTIFY_WEAPONTYPE_GRENADE_KEYWORD)
-    _SetupFormList(properties.WeaponTypeMineKeywordList, properties.LIST_IDENTIFY_WEAPONTYPE_MINE_KEYWORD)
+    _SetupFormList(prefix + "    ", properties.AllowedActivatorList, properties.LIST_IDENTIFY_ALLOWED_ACTIVATOR)
+    _SetupFormList(prefix + "    ", properties.AllowedFeaturedItemList, properties.LIST_IDENTIFY_ALLOWED_FEATUREDITEM)
+    _SetupFormList(prefix + "    ", properties.AllowedUniqueItemList, properties.LIST_IDENTIFY_ALLOWED_UNIQUEITEM)
+    _SetupFormList(prefix + "    ", properties.ExcludeFormList, properties.LIST_IDENTIFY_EXCLUDE_FORM)
+    _SetupFormList(prefix + "    ", properties.ExcludeKeywordList, properties.LIST_IDENTIFY_EXCLUDE_KEYWORD)
+    _SetupFormList(prefix + "    ", properties.ExcludeLocationRefList, properties.LIST_IDENTIFY_EXCLUDE_LOCATIONREF)
+    _SetupFormList(prefix + "    ", properties.IgnorableActivationBlockeList, properties.LIST_IDENTIFY_IGNORABLE_ACTIVATION_BLOCKE)
+    _SetupFormList(prefix + "    ", properties.VendorChestList, properties.LIST_IDENTIFY_VENDOR_CHEST)
+    _SetupFormList(prefix + "    ", properties.WeaponTypeGrenadeKeywordList, properties.LIST_IDENTIFY_WEAPONTYPE_GRENADE_KEYWORD)
+    _SetupFormList(prefix + "    ", properties.WeaponTypeMineKeywordList, properties.LIST_IDENTIFY_WEAPONTYPE_MINE_KEYWORD)
 
     ; Log all values of global variables for each game load.
     globalCache = LTMN:Debug.TraceGlobal(prefix, None)
@@ -571,8 +571,7 @@ bool Function IsWorldActive()
 EndFunction
 
 ; Clear the form list (Internal function)
-Function _ClearFormList(FormList list) global
-    string prefix = ("| System | " + LTMN:Debug.GetRandomProcessID() + " | ")
+Function _ClearFormList(string prefix, FormList list) global
     LTMN:Debug.Log(prefix + "** Delete all items in the form list **")
     LTMN:Debug.Log(prefix + "  Form list: [ID: " + LTMN:Debug.GetHexID(list) + "]")
 
@@ -588,8 +587,7 @@ Function _ClearFormList(FormList list) global
 EndFunction
 
 ; Setup the form list (Internal function)
-Function _SetupFormList(FormList list, string identify) global
-    string prefix = ("| System | " + LTMN:Debug.GetRandomProcessID() + " | ")
+Function _SetupFormList(string prefix, FormList list, string identify) global
     LTMN:Debug.Log(prefix + "** Add items to the form list **")
     LTMN:Debug.Log(prefix + "  Form list: [Name: " + identify + ", ID: " + LTMN:Debug.GetHexID(list) + "]")
 
