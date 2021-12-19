@@ -392,8 +392,8 @@ Function UpdaetState()
 
     LTMN:Debug.Log(prefix + "*** Start updating the state ***")
 
-    LTMN:Debug.Log(prefix + "  Lootman actor inventory weight: " + properties.LootmanActor.GetInventoryWeight())
-    If (properties.LootmanActor.GetInventoryWeight() > 0)
+    LTMN:Debug.Log(prefix + "  Count of items in Lootman actor's inventory: " + properties.LootmanActor.GetItemCount())
+    If (properties.LootmanActor.GetItemCount() > 0)
         If (properties.LootInPlayerDirectly.GetValueInt() == 1)
             LTMN:Debug.Log(prefix + "    ** Move items from actor to player **")
             LTMN:Quest:Methods.MoveInventoryItems(properties.LootmanActor, player, -1, 0, false)
@@ -401,10 +401,10 @@ Function UpdaetState()
             LTMN:Debug.Log(prefix + "    ** Move items from actor to workshop **")
             LTMN:Quest:Methods.MoveInventoryItems(properties.LootmanActor, properties.LootmanWorkshop, -1, 0)
         EndIf
-        LTMN:Debug.Log(prefix + "      Inventory weight after processing: " + properties.LootmanActor.GetInventoryWeight())
+        LTMN:Debug.Log(prefix + "      Count of items after processing: " + properties.LootmanActor.GetItemCount())
     EndIf
 
-    If (properties.ActivatorActor.GetInventoryWeight() > 0)
+    If (properties.ActivatorActor.GetItemCount() > 0)
         properties.ActivatorActor.RemoveAllItems()
     EndIf
 
