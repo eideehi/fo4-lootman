@@ -287,6 +287,7 @@ Function Uninstall()
     UnregisterForRemoteEvent(player, "OnPlayerLoadGame")
     UnregisterForRemoteEvent(player, "OnLocationChange")
     UnregisterForMenuOpenCloseEvent("PipboyMenu")
+    RemoveAllInventoryEventFilters()
     UnregisterForRemoteEvent(properties.LootmanActor, "OnItemAdded")
 
     self.SetObjectiveDisplayed(properties.MESSAGE_LOOTMAN_UNINSTALLED)
@@ -391,10 +392,15 @@ Function UpdaetState()
 
     LTMN:Debug.Log(prefix + "*** Start updating the state ***")
 
-    LTMN:Debug.Log(prefix + "  Lootman's (Actor) inventory weight: " + properties.LootmanActor.GetInventoryWeight())
+    LTMN:Debug.Log(prefix + "  Lootman actor inventory weight: " + properties.LootmanActor.GetInventoryWeight())
     If (properties.LootmanActor.GetInventoryWeight() > 0)
-        LTMN:Debug.Log(prefix + "    ** Move items from actor to workshop **")
-        LTMN:Quest:Methods.MoveInventoryItems(properties.LootmanActor, properties.LootmanWorkshop, -1, 0)
+        If (properties.LootInPlayerDirectly.GetValueInt() == 1)
+            LTMN:Debug.Log(prefix + "    ** Move items from actor to player **")
+            LTMN:Quest:Methods.MoveInventoryItems(properties.LootmanActor, player, -1, 0, false)
+        Else
+            LTMN:Debug.Log(prefix + "    ** Move items from actor to workshop **")
+            LTMN:Quest:Methods.MoveInventoryItems(properties.LootmanActor, properties.LootmanWorkshop, -1, 0)
+        EndIf
         LTMN:Debug.Log(prefix + "      Inventory weight after processing: " + properties.LootmanActor.GetInventoryWeight())
     EndIf
 

@@ -106,13 +106,6 @@ bool Function IsToBeSkipped(ObjectReference ref)
     Return true
 EndFunction
 
-Actor Function GetLootingActor()
-    If (properties.LootInPlayerDirectly.GetValueInt() == 1)
-        Return player
-    EndIf
-    Return properties.LootmanActor
-EndFunction
-
 ; Verify that automatic looting is enabled
 bool Function IsLootingEnabled()
     If (properties.IsInitializing.GetValueInt() == 1 || properties.IsUninstalled.GetValueInt() == 1)

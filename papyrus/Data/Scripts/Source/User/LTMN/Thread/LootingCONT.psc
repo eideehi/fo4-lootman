@@ -22,16 +22,7 @@ Function LootObject(ObjectReference ref)
         If (IsLootableItem(ref, item))
             lootCount += 1
             LTMN:Debug.Log(prefix + "      Looted items count: " + ref.GetItemCount(item))
-            int count = ref.GetItemCount(item)
-            While (count > 0)
-                If (count <= 65535)
-                    ref.RemoveItem(item, -1, properties.LootInPlayerDirectly.GetValueInt() != 1, GetLootingActor())
-                    count = 0
-                Else
-                    ref.RemoveItem(item, 65535, properties.LootInPlayerDirectly.GetValueInt() != 1, GetLootingActor())
-                    count -= 65535
-                EndIf
-            EndWhile
+            LTMN:QUEST:Methods.MoveInventoryItem(ref, properties.LootmanActor, item)
         Else
             LTMN:Debug.Log(prefix + "      ** Is not lootable item **")
         EndIf

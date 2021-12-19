@@ -227,7 +227,7 @@ bool Function _IsScrapableItem(Form item) global
 EndFunction
 
 ; Move items from inventory to inventory
-Function MoveInventoryItems(ObjectReference src, ObjectReference dest, int filter, int subFilter) global
+Function MoveInventoryItems(ObjectReference src, ObjectReference dest, int filter, int subFilter, bool silent = true) global
     LTMN:Quest:Properties _properties = LTMN:Lootman.GetProperties()
 
     bool moveFromPlayer = (src == Game.GetPlayer())
@@ -265,16 +265,24 @@ Function MoveInventoryItems(ObjectReference src, ObjectReference dest, int filte
         EndIf
 
         If (item)
-            int count = src.GetItemCount(item)
-            While (count > 0)
-                If (count <= 65535)
-                    src.RemoveItem(item, -1, true, dest)
-                    count = 0
-                Else
-                    src.RemoveItem(item, 65535, true, dest)
-                    count -= 65535
-                EndIf
-            EndWhile
+            MoveInventoryItem(src, dest, item, -1, silent)
+        EndIf
+    EndWhile
+EndFunction
+
+; Move item from inventory to inventory
+Function MoveInventoryItem(ObjectReference src, ObjectReference dest, Form item, int count = -1, bool silent = true) global
+    int _count = count
+    If (_count < 0)
+        _count = src.GetItemCount(item)
+    EndIf
+    While (_count > 0)
+        If (_count <= 65535)
+            src.RemoveItem(item, -1, silent, dest)
+            _count = 0
+        Else
+            src.RemoveItem(item, 65535, silent, dest)
+            _count -= 65535
         EndIf
     EndWhile
 EndFunction

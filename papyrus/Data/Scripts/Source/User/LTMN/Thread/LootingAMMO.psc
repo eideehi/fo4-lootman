@@ -7,7 +7,7 @@ EndFunction
 Function LootObject(ObjectReference ref)
     string prefix = ("| Looting @ " + GetThreadID() + " | " + GetProcessID() + " |     ")
     LTMN:Debug.Log(prefix + "Loot: [Name: " + ref.GetDisplayName() + ", ID: " + LTMN:Debug.GetHexID(ref) + "]")
-    GetLootingActor().AddItem(ref, 1)
+    properties.LootmanActor.AddItem(ref, 1)
     If (ref.GetBaseObject() == properties.FusionCore || (properties.PlayPickupSound.GetValueInt() == 1 && properties.LootInPlayerDirectly.GetValueInt() != 1))
         ref.Activate(properties.ActivatorActor, true)
     EndIf
