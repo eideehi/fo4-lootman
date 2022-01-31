@@ -106,7 +106,7 @@
                     <flagDependency flag="language_en" value="selected"/>
                 </dependencies>
                 <files>
-                    <folder source="files/common/en" destination="Data"/>
+                    <folder source="files/common/en" destination="."/>
                 </files>
             </pattern>
 
@@ -115,7 +115,7 @@
                     <flagDependency flag="language_ja" value="selected"/>
                 </dependencies>
                 <files>
-                    <folder source="files/common/ja" destination="Data"/>
+                    <folder source="files/common/ja"  destination="."/>
                 </files>
             </pattern>
 
@@ -125,8 +125,8 @@
                     <flagDependency flag="install_product" value="selected"/>
                 </dependencies>
                 <files>
-                    <folder source="files/product/dll/1_10_163" destination="Data/F4SE/Plugins"/>
-                    <folder source="files/product/archive" destination="Data"/>
+                    <folder source="files/product/dll/1_10_163" destination="F4SE/Plugins"/>
+                    <folder source="files/product/archive"  destination="."/>
                 </files>
             </pattern>
 
@@ -136,8 +136,8 @@
                     <flagDependency flag="install_debug" value="selected"/>
                 </dependencies>
                 <files>
-                    <folder source="files/debug/dll/1_10_163" destination="Data/F4SE/Plugins"/>
-                    <folder source="files/debug/papyrus-binary" destination="Data/Scripts"/>
+                    <folder source="files/debug/dll/1_10_163" destination="F4SE/Plugins"/>
+                    <folder source="files/debug/papyrus-binary" destination="Scripts"/>
                 </files>
             </pattern>
 
@@ -146,7 +146,7 @@
                     <flagDependency flag="install_source" value="selected"/>
                 </dependencies>
                 <files>
-                    <folder source="files/debug/papyrus-source" destination="Data/Scripts/Source/User"/>
+                    <folder source="files/debug/papyrus-source" destination="Scripts/Source/User"/>
                 </files>
             </pattern>
 
