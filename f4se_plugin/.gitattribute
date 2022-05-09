@@ -1,0 +1,4 @@
+common/**/* linguist-vendored
+lib/**/* linguist-vendored
+lootman/**/* linguist-vendored
+lootman/lootman/**/* linguist-vendored=false

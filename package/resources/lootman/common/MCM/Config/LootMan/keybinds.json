@@ -1,0 +1,45 @@
+{
+  "modName": "LootMan",
+  "keybinds": [
+    {
+      "id": "ToggleEnableLootMan",
+      "desc": "$PAGE_HOTKEY_TOGGLE_ENABLE_LOOTMAN_HELP",
+      "action": {
+        "type": "CallFunction",
+        "form": "LootMan.esp|F9B",
+        "function": "ToggleEnableLoot",
+        "params": []
+      }
+    },
+    {
+      "id": "OpenLootManInventory",
+      "desc": "$PAGE_HOTKEY_OPEN_LOOTMAN_INVENTORY_HELP",
+      "action": {
+        "type": "CallFunction",
+        "form": "LootMan.esp|F9B",
+        "function": "OpenLootManInventory",
+        "params": []
+      }
+    },
+    {
+      "id": "ToggleLinkToWorkshop",
+      "desc": "$PAGE_HOTKEY_TOGGLE_LINK_TO_WORKSHOP_HELP",
+      "action": {
+        "type": "CallFunction",
+        "form": "LootMan.esp|F9B",
+        "function": "ToggleLinkToWorkshop",
+        "params": []
+      }
+    },
+    {
+      "id": "ExecuteLooting",
+      "desc": "$PAGE_HOTKEY_EXECUTE_LOOTING_HELP",
+      "action": {
+        "type": "CallFunction",
+        "form": "LootMan.esp|F9B",
+        "function": "ExecuteLooting",
+        "params": []
+      }
+    }
+  ]
+}

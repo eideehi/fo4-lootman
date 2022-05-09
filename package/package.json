@@ -1,28 +1,26 @@
 {
   "private": true,
   "name": "lootman",
-  "version": "1.3.9",
-  "description": "A set of scripts to fetch the source code of Lootman under development in the Fallout 4 game directory, and to generate binaries for release.",
+  "version": "2.0.0",
+  "description": "A set of scripts to fetch the source code of LootMan under development in the Fallout 4 game directory, and to generate binaries for release.",
   "scripts": {
     "clean": "node scripts/clean.js",
-    "fetch:papyrus": "node scripts/fetch-papyrus.js",
-    "fetch:config-esp": "node scripts/fetch-config-esp.js",
-    "fetch": "npm run fetch:papyrus && npm run fetch:config-esp",
-    "collect:common": "node scripts/collect-common.js",
+    "collect:resources": "node scripts/collect-resources.js",
     "collect:dll": "node scripts/collect-dll.js",
     "collect:papyrus": "node scripts/collect-papyrus.js",
     "collect:fomod-files": "node scripts/collect-fomod-files.js",
-    "collect": "npm run collect:common && npm run collect:dll && npm run collect:papyrus && npm run collect:fomod-files",
+    "collect": "npm run collect:resources && npm run collect:dll && npm run collect:papyrus && npm run collect:fomod-files",
     "compile:papyrus": "node scripts/compile-papyrus.js",
     "archive2": "node scripts/archive2.js",
     "make:fomod": "node scripts/make-fomod.js",
-    "build": "npm run clean && npm run collect && npm run compile:papyrus && npm run archive2 && node scripts/make-fomod.js"
+    "build": "npm run clean && npm run collect && npm run compile:papyrus && npm run archive2 && npm run make:fomod"
   },
   "author": "EideeHi",
   "license": "MIT",
   "dependencies": {
     "dotenv": "^10.0.0",
     "fs-extra": "^10.0.0",
-    "klaw": "^4.0.1"
+    "klaw": "^4.0.1",
+    "xxhashjs": "^0.2.2"
   }
 }

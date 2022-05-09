@@ -1,0 +1,170 @@
+{
+    "include": {
+        "_comment": "Fallout4.esm|03000C = Caps Stash",
+        "_comment": "Fallout4.esm|20ABE3 = Caps(Fortune Finder)",
+        "_comment": "Fallout4.esm|2472ED = Caps(Bottle Cap Mine)",
+        "_comment": "DLCNukaWorld.esm|046B61 = Nuka-Cade Ticket Stack",
+        "_comment": "DLCNukaWorld.esm|056C22 = Nuka-Cade Ticket Roll",
+        "activation-block": [
+            "Fallout4.esm|03000C",
+            "Fallout4.esm|20ABE3",
+            "Fallout4.esm|2472ED",
+            "DLCNukaWorld.esm|046B61",
+            "DLCNukaWorld.esm|056C22"
+        ],
+
+        "_comment": "Fallout4.esm|03000C = Caps Stash",
+        "_comment": "Fallout4.esm|09F946 = Irradiated Thistle",
+        "_comment": "Fallout4.esm|0D6E56 = Noodle Cups",
+        "_comment": "Fallout4.esm|10C3E7 = Can Chimes",
+        "_comment": "Fallout4.esm|1715CD = Mirelurk Egg",
+        "_comment": "Fallout4.esm|20ABE3 = Caps(Fortune Finder)",
+        "_comment": "Fallout4.esm|2472ED = Caps(Bottle Cap Mine)",
+        "_comment": "DLCNukaWorld.esm|046B61 = Nuka-Cade Ticket Stack",
+        "_comment": "DLCNukaWorld.esm|056C22 = Nuka-Cade Ticket Roll",
+        "activator": [
+            "Fallout4.esm|03000C",
+            "Fallout4.esm|09F946",
+            "Fallout4.esm|0D6E56",
+            "Fallout4.esm|10C3E7",
+            "Fallout4.esm|1715CD",
+            "Fallout4.esm|20ABE3",
+            "Fallout4.esm|2472ED",
+            "DLCNukaWorld.esm|046B61",
+            "DLCNukaWorld.esm|056C22"
+        ],
+
+        "_comment": "Fallout4.esm|0FA2FB = Shishkebab",
+        "featured-item": [
+            "Fallout4.esm|0FA2FB"
+        ],
+
+        "_comment": "Fallout4.esm|060E77 = Military Ammo Bag",
+        "_comment": "Fallout4.esm|091FDE = Power Relay Coil",
+        "_comment": "Fallout4.esm|0BDA4F = Brotherhood of Steel Holotag",
+        "_comment": "Fallout4.esm|100E19 = Copper Bar",
+        "_comment": "Fallout4.esm|100E1C = Silver Bar",
+        "_comment": "Fallout4.esm|100E1E = Gold Bar",
+        "_comment": "Fallout4.esm|10DEE5 = Book Return Token",
+        "_comment": "Fallout4.esm|14F6AC = Cracked Deathclaw Egg",
+        "_comment": "Fallout4.esm|17CC5A = Technical Document",
+        "_comment": "Fallout4.esm|19DFF3 = Tray",
+        "_comment": "Fallout4.esm|19FCF5 = Viable Blood Sample",
+        "unique-item": [
+            "Fallout4.esm|060E77",
+            "Fallout4.esm|091FDE",
+            "Fallout4.esm|0BDA4F",
+            "Fallout4.esm|100E19",
+            "Fallout4.esm|100E1C",
+            "Fallout4.esm|100E1E",
+            "Fallout4.esm|10DEE5",
+            "Fallout4.esm|14F6AC",
+            "Fallout4.esm|17CC5A",
+            "Fallout4.esm|19DFF3",
+            "Fallout4.esm|19FCF5"
+        ]
+    },
+
+    "exclude": {
+        "_comment": "Fallout4.esm|1A62D4 = You're SPECIAL!",
+        "form": [
+            "Fallout4.esm|1A62D4"
+        ],
+
+        "_comment": "Fallout4.esm|072E0B = DummyObject",
+        "_comment": "Fallout4.esm|1BDBA6 = BlockWorkshopInteractionKeyword",
+        "keyword": [
+            "Fallout4.esm|072E0B",
+            "Fallout4.esm|1BDBA6"
+        ]
+    },
+
+    "alch-type": {
+        "_comment": "Fallout4.esm|10C416 = ObjectTypeAlcohol",
+        "alcohol": [
+            "Fallout4.esm|10C416"
+        ],
+
+        "_comment": "Fallout4.esm|0F4AE7 = ObjectTypeChem",
+        "chemistry": [
+            "Fallout4.esm|0F4AE7"
+        ],
+
+        "_comment": "Fallout4.esm|055ECC = ObjectTypeFood",
+        "food": [
+            "Fallout4.esm|055ECC"
+        ],
+
+        "_comment": "Fallout4.esm|249F30 = ObjectTypeNukaCola",
+        "nuka-cola": [
+            "Fallout4.esm|249F30"
+        ],
+
+        "_comment": "Fallout4.esm|0F4AEB = ObjectTypeStimpak",
+        "stimpak": [
+            "Fallout4.esm|0F4AEB"
+        ],
+
+        "_comment": "Fallout4.esm|18506F = ObjectTypeSyringerAmmo",
+        "syringe-ammo": [
+            "Fallout4.esm|18506F"
+        ],
+
+        "_comment": "Fallout4.esm|0F4AED = ObjectTypeWater",
+        "_comment": "Fallout4.esm|0F4AED = Institute Bottled Water",
+        "water": [
+            "Fallout4.esm|0F4AED",
+            "Fallout4.esm|21681D"
+        ]
+    },
+
+    "book-type": {
+        "_comment": "Fallout4.esm|1D4A70 = PerkMagKeyword",
+        "park-magazine": [
+            "Fallout4.esm|1D4A70"
+        ]
+    },
+
+    "misc-type": {
+        "_comment": "Fallout4.esm|135E6C = BobbleheadKeyword",
+        "bobblehead": [
+            "Fallout4.esm|135E6C"
+        ]
+    },
+
+    "weap-type": {
+        "_comment": "Fallout4.esm|10C415 = WeaponTypeGrenade",
+        "_comment": "Fallout4.esm|21968B = WeaponTypeCryoGrenade",
+        "_comment": "Fallout4.esm|21968C = WeaponTypeNukaGrenade",
+        "_comment": "Fallout4.esm|21968D = WeaponTypePlasmaGrenade",
+        "_comment": "Fallout4.esm|21968E = WeaponTypePulseGrenade",
+        "_comment": "Fallout4.esm|21A29F = WeaponTypeMolotov",
+        "_comment": "DLCNukaWorld.esm|0346FA = WeaponTypeSmartGrenade",
+        "_comment": "DLCNukaWorld.esm|048FC5 = WeaponTypeMIRVGrenade",
+        "grenade": [
+            "Fallout4.esm|10C415",
+            "Fallout4.esm|21968B",
+            "Fallout4.esm|21968C",
+            "Fallout4.esm|21968D",
+            "Fallout4.esm|21968E",
+            "Fallout4.esm|21A29F",
+            "DLCNukaWorld.esm|0346FA",
+            "DLCNukaWorld.esm|048FC5"
+        ],
+
+        "_comment": "Fallout4.esm|10C414 = WeaponTypeMine",
+        "_comment": "Fallout4.esm|219686 = WeaponTypeCryoMine",
+        "_comment": "Fallout4.esm|219687 = WeaponTypePulseMine",
+        "_comment": "Fallout4.esm|219688 = WeaponTypeNukaMine",
+        "_comment": "Fallout4.esm|219689 = WeaponTypePlasmaMine",
+        "_comment": "Fallout4.esm|21968A = WeaponTypeBottlecapMine",
+        "mine": [
+            "Fallout4.esm|10C414",
+            "Fallout4.esm|219686",
+            "Fallout4.esm|219687",
+            "Fallout4.esm|219688",
+            "Fallout4.esm|219689",
+            "Fallout4.esm|21968A"
+        ]
+    }
+}

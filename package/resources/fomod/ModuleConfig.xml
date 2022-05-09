@@ -1,8 +1,27 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://qconsulting.ca/fo3/ModConfig5.0.xsd">
-    <moduleName>Lootman</moduleName>
+    <moduleName>LootMan</moduleName>
+
+    <requiredInstallFiles>
+        <folder source="files/resources/common" destination="."/>
+    </requiredInstallFiles>
 
     <installSteps order="Explicit">
+
+        <installStep name="Notice">
+            <optionalFileGroups order="Explicit">
+                <group name="About Compatibility" type="SelectExactlyOne">
+                    <plugins order="Explicit">
+                        <plugin name="LootMan 2.x.x is not compatible with 1.x.x">
+                            <description>LootMan 2.0.0 has been stripped of 1.x.x compatibility and some features that existed in 1.x.x to improve performance and development experience. When starting to use LootMan version 2.0.0 or later with saved data in which LootMan version 1.x.x has been installed, please uninstall LootMan version 1.x.x and perform a clean save beforehand.</description>
+                            <typeDescriptor>
+                                <type name="Required"/>
+                            </typeDescriptor>
+                        </plugin>
+                    </plugins>
+                </group>
+            </optionalFileGroups>
+        </installStep>
 
         <installStep name="Choose Option">
             <optionalFileGroups order="Explicit">
@@ -106,7 +125,7 @@
                     <flagDependency flag="language_en" value="selected"/>
                 </dependencies>
                 <files>
-                    <folder source="files/common/en" destination="."/>
+                    <folder source="files/resources/en" destination="."/>
                 </files>
             </pattern>
 
@@ -115,7 +134,7 @@
                     <flagDependency flag="language_ja" value="selected"/>
                 </dependencies>
                 <files>
-                    <folder source="files/common/ja"  destination="."/>
+                    <folder source="files/resources/ja"  destination="."/>
                 </files>
             </pattern>
 
@@ -125,8 +144,8 @@
                     <flagDependency flag="install_product" value="selected"/>
                 </dependencies>
                 <files>
-                    <folder source="files/product/dll/1_10_163" destination="F4SE/Plugins"/>
-                    <folder source="files/product/archive"  destination="."/>
+                    <folder source="files/dll/product/1_10_163" destination="F4SE/Plugins"/>
+                    <folder source="files/ba2/product"  destination="."/>
                 </files>
             </pattern>
 
@@ -136,8 +155,8 @@
                     <flagDependency flag="install_debug" value="selected"/>
                 </dependencies>
                 <files>
-                    <folder source="files/debug/dll/1_10_163" destination="F4SE/Plugins"/>
-                    <folder source="files/debug/papyrus-binary" destination="Scripts"/>
+                    <folder source="files/dll/debug/1_10_163" destination="F4SE/Plugins"/>
+                    <folder source="files/ba2/debug" destination="."/>
                 </files>
             </pattern>
 
@@ -146,7 +165,7 @@
                     <flagDependency flag="install_source" value="selected"/>
                 </dependencies>
                 <files>
-                    <folder source="files/debug/papyrus-source" destination="Scripts/Source/User"/>
+                    <folder source="files/papyrus/debug/source" destination="Scripts/Source/User"/>
                 </files>
             </pattern>
 

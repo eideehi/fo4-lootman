@@ -1,53 +1,89 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <Filter Include="ソース ファイル">
+    <Filter Include="Source Files">
       <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
       <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
     </Filter>
-    <Filter Include="ヘッダー ファイル">
+    <Filter Include="Header Files">
       <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
       <Extensions>h;hpp;hxx;hm;inl;inc;xsd</Extensions>
     </Filter>
-    <Filter Include="リソース ファイル">
+    <Filter Include="Resource Files">
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
   </ItemGroup>
   <ItemGroup>
     <None Include="exports.def">
-      <Filter>ソース ファイル</Filter>
+      <Filter>Source Files</Filter>
     </None>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="debug.cpp">
+       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="form_cache.cpp">
+       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="injection_data.cpp">
+       <Filter>Source Files</Filter>
+    </ClCompile>
     <ClCompile Include="main.cpp">
-      <Filter>ソース ファイル</Filter>
+       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="PapyrusLootman.cpp">
-      <Filter>ソース ファイル</Filter>
+    <ClCompile Include="papyrus_debug.cpp">
+       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Debug.cpp">
-      <Filter>ソース ファイル</Filter>
+    <ClCompile Include="papyrus_lootman.cpp">
+       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="FormIDCache.cpp">
-      <Filter>ソース ファイル</Filter>
+    <ClCompile Include="properties.cpp">
+       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="InjectionData.cpp">
-      <Filter>ソース ファイル</Filter>
+    <ClCompile Include="utility.cpp">
+       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="vendor_chest.cpp">
+       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="virtual_function.cpp">
+       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="PapyrusLootman.h">
-      <Filter>ヘッダー ファイル</Filter>
+    <ClInclude Include="debug.hpp">
+      <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Debug.h">
-      <Filter>ヘッダー ファイル</Filter>
+    <ClInclude Include="fallout4.hpp">
+      <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="FormIDCache.h">
-      <Filter>ヘッダー ファイル</Filter>
+    <ClInclude Include="fallout4_extra.hpp">
+      <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="InjectionData.h">
-      <Filter>ヘッダー ファイル</Filter>
+    <ClInclude Include="form_cache.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="injection_data.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="papyrus_debug.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="papyrus_lootman.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="properties.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="utility.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="vendor_chest.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="virtual_function.hpp">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

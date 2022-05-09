@@ -4,8 +4,8 @@ const klaw = require("klaw");
 
 const { projectRoot, buildTempDir } = require("./properties");
 
-const outDir = path.join(buildTempDir, "files", "debug", "papyrus-source");
-const srcDirRoot = path.join(projectRoot, "papyrus", "Data", "Scripts", "Source", "User");
+const outDir = path.join(buildTempDir, "files", "papyrus", "debug", "source");
+const srcDirRoot = path.join(projectRoot, "papyrus", "Scripts", "Source", "User");
 
 fs.removeSync(outDir);
 

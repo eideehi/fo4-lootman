@@ -14,7 +14,7 @@ const outDir = path.join(process.cwd(), "dist");
 
 fs.mkdirsSync(outDir);
 
-const compressCmd = `"${process.env.SEVENZIP_PATH}" a "${outDir}/${archiveName}.7z" "${buildTempDir}" -xr!.*/`;
+const compressCmd = `"${process.env.SEVENZIP_PATH}" a "${outDir}/${archiveName}.7z" "${buildTempDir}/*"`;
 exec(compressCmd,
     (error, stdout, stderr) => {
         if (error) {

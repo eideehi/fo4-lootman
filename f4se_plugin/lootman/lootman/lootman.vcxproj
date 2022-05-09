@@ -190,19 +190,29 @@
     <None Include="exports.def" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Debug.cpp" />
-    <ClCompile Include="FormIDCache.cpp" />
-    <ClCompile Include="InjectionData.cpp" />
+    <ClCompile Include="debug.cpp" />
+    <ClCompile Include="form_cache.cpp" />
+    <ClCompile Include="injection_data.cpp" />
     <ClCompile Include="main.cpp" />
-    <ClCompile Include="PapyrusLootman.cpp" />
-    <ClCompile Include="Utility.cpp" />
+    <ClCompile Include="papyrus_debug.cpp" />
+    <ClCompile Include="papyrus_lootman.cpp" />
+    <ClCompile Include="properties.cpp" />
+    <ClCompile Include="utility.cpp" />
+    <ClCompile Include="vendor_chest.cpp" />
+    <ClCompile Include="virtual_function.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Debug.h" />
-    <ClInclude Include="FormIDCache.h" />
-    <ClInclude Include="InjectionData.h" />
-    <ClInclude Include="PapyrusLootman.h" />
-    <ClInclude Include="Utility.h" />
+    <ClInclude Include="debug.hpp" />
+    <ClInclude Include="fallout4.hpp" />
+    <ClInclude Include="fallout4_extra.hpp" />
+    <ClInclude Include="form_cache.hpp" />
+    <ClInclude Include="injection_data.hpp" />
+    <ClInclude Include="papyrus_debug.hpp" />
+    <ClInclude Include="papyrus_lootman.hpp" />
+    <ClInclude Include="properties.hpp" />
+    <ClInclude Include="utility.hpp" />
+    <ClInclude Include="vendor_chest.hpp" />
+    <ClInclude Include="virtual_function.hpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

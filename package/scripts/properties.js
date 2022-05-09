@@ -47,10 +47,9 @@ const papyrusImportDirs = ["User", /*"DLC06", "DLC05", "DLC04", "DLC03", "DLC02"
 
 const projectRoot = checkDir(path.resolve(process.env.PROJECT_ROOT));
 const resourcesRoot = checkDir(path.join(process.cwd(), "resources"));
-const buildTempRoot = path.join(process.cwd(), ".build-temp");
-const archiveName = `Lootman - ${process.env.npm_package_version}`;
-const buildTempDir = path.join(buildTempRoot, archiveName);
-fs.mkdirsSync(buildTempDir);
+const buildDirRoot = path.join(process.cwd(), "build");
+const archiveName = `LootMan - ${process.env.npm_package_version}`;
+const buildTempDir = path.join(buildDirRoot, process.env.npm_package_version);
 
 module.exports = {
     fallout4Dir,
@@ -60,7 +59,7 @@ module.exports = {
     papyrusImportDirs,
     projectRoot,
     resourcesRoot,
-    buildTempRoot,
+    buildDirRoot,
     archiveName,
     buildTempDir,
 }

@@ -1,5 +1,5 @@
 const fs = require("fs-extra");
 
-const { buildTempRoot } = require("./properties");
+const { buildTempDir } = require("./properties");
 
-fs.removeSync(buildTempRoot);
+fs.removeSync(buildTempDir);
