@@ -970,6 +970,10 @@ namespace papyrus_lootman
                     return false;
                 }
             }
+            else
+            {
+                return false;
+            }
         }
 
         return true;
