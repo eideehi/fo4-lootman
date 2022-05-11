@@ -8,6 +8,36 @@
   </Params>
   <Content>
     <String List="0">
+      <EDID>LTMN_LootManWorkshop</EDID>
+      <REC>CONT:FULL</REC>
+      <Source>LootMan</Source>
+      <Dest>LootMan</Dest>
+    </String>
+    <String List="0" Partial="2">
+      <EDID>LTMN_TemporaryContainer</EDID>
+      <REC>CONT:FULL</REC>
+      <Source>_TemporaryContainer</Source>
+      <Dest>_TemporaryContainer</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_WorkshopLootManContainerDirty</EDID>
+      <REC>DOOR:FULL</REC>
+      <Source>LootMan Trunk</Source>
+      <Dest>LootManのトランク</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_WorkshopLootManContainerDirty</EDID>
+      <REC>DOOR:ONAM</REC>
+      <Source>Open</Source>
+      <Dest>開く</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_WorkshopLootManContainerDirty</EDID>
+      <REC>DOOR:CNAM</REC>
+      <Source>Open</Source>
+      <Dest>開く</Dest>
+    </String>
+    <String List="0">
       <EDID>LTMN_WorkshopLootManContainerClean</EDID>
       <REC>DOOR:FULL</REC>
       <Source>LootMan Trunk</Source>
@@ -15,51 +45,69 @@
     </String>
     <String List="0">
       <EDID>LTMN_WorkshopLootManContainerClean</EDID>
-      <REC>DOOR:CNAM</REC>
+      <REC>DOOR:ONAM</REC>
       <Source>Open</Source>
       <Dest>開く</Dest>
     </String>
     <String List="0">
-      <EDID>LTMN_WorkshopLootManContainerDirty</EDID>
-      <REC>DOOR:FULL</REC>
-      <Source>LootMan Trunk</Source>
-      <Dest>LootManのトランク</Dest>
-    </String>
-    <String List="0">
-      <EDID>LTMN_WorkshopLootManContainerDirty</EDID>
+      <EDID>LTMN_WorkshopLootManContainerClean</EDID>
       <REC>DOOR:CNAM</REC>
       <Source>Open</Source>
       <Dest>開く</Dest>
+    </String>
+    <String List="0" Partial="2">
+      <EDID>LTMN_LootMan</EDID>
+      <REC>NPC_:FULL</REC>
+      <Source>_LootMan</Source>
+      <Dest>_LootMan</Dest>
+    </String>
+    <String List="0" Partial="2">
+      <EDID>LTMN_LootMan</EDID>
+      <REC>NPC_:SHRT</REC>
+      <Source>_LootMan</Source>
+      <Dest>_LootMan</Dest>
+    </String>
+    <String List="0" Partial="2">
+      <EDID>LTMN_Activator</EDID>
+      <REC>NPC_:FULL</REC>
+      <Source>_Activator</Source>
+      <Dest>_Activator</Dest>
+    </String>
+    <String List="0" Partial="2">
+      <EDID>LTMN_Activator</EDID>
+      <REC>NPC_:SHRT</REC>
+      <Source>_Activator</Source>
+      <Dest>_Activator</Dest>
     </String>
     <String List="0">
       <EDID>LTMN_System</EDID>
       <REC id="0">QUST:NNAM</REC>
-      <Source>[LootMan] Utility processing is complete.</Source>
-      <Dest>[LootMan] ユーティリティの処理が完了しました。</Dest>
+      <Source>[LootMan] Installation is complete.</Source>
+      <Dest>[LootMan] インストールが完了しました。</Dest>
     </String>
     <String List="0">
       <EDID>LTMN_System</EDID>
       <REC id="1">QUST:NNAM</REC>
-      <Source>[LootMan] Locked container ignored because there is no Bobby pin.</Source>
-      <Dest>[LootMan] ヘアピンがないため、施錠されたコンテナは無視されます。</Dest>
+      <Source>[LootMan] Uninstallation is complete.</Source>
+      <Dest>[LootMan] アンインストールが完了しました。</Dest>
     </String>
     <String List="0">
       <EDID>LTMN_System</EDID>
       <REC id="2">QUST:NNAM</REC>
-      <Source>[LootMan] Unlinked to the workshop.</Source>
-      <Dest>[LootMan] ワークショップとのリンクを解除しました。</Dest>
+      <Source>[LootMan] LootMan is enabled.</Source>
+      <Dest>[LootMan] LootManが有効化されました。</Dest>
     </String>
     <String List="0">
       <EDID>LTMN_System</EDID>
       <REC id="3">QUST:NNAM</REC>
-      <Source>[LootMan] Linked to the workshop.</Source>
-      <Dest>[LootMan] ワークショップとリンクしました。</Dest>
+      <Source>[LootMan] LootMan is disabled.</Source>
+      <Dest>[LootMan] LootManが無効化されました。</Dest>
     </String>
     <String List="0">
       <EDID>LTMN_System</EDID>
       <REC id="4">QUST:NNAM</REC>
-      <Source>[LootMan] Could not find the workshop.</Source>
-      <Dest>[LootMan] ワークショップが見つかりません。</Dest>
+      <Source>[LootMan] Maximum carry-weight has been exceeded.</Source>
+      <Dest>[LootMan] 重量オーバーです。</Dest>
     </String>
     <String List="0">
       <EDID>LTMN_System</EDID>
@@ -70,32 +118,38 @@
     <String List="0">
       <EDID>LTMN_System</EDID>
       <REC id="6">QUST:NNAM</REC>
-      <Source>[LootMan] Maximum carry-weight has been exceeded.</Source>
-      <Dest>[LootMan] 重量オーバーです。</Dest>
+      <Source>[LootMan] Could not find the workshop.</Source>
+      <Dest>[LootMan] ワークショップが見つかりません。</Dest>
     </String>
     <String List="0">
       <EDID>LTMN_System</EDID>
       <REC id="7">QUST:NNAM</REC>
-      <Source>[LootMan] LootMan is disabled.</Source>
-      <Dest>[LootMan] LootManが無効化されました。</Dest>
+      <Source>[LootMan] Linked to the workshop.</Source>
+      <Dest>[LootMan] ワークショップとリンクしました。</Dest>
     </String>
     <String List="0">
       <EDID>LTMN_System</EDID>
       <REC id="8">QUST:NNAM</REC>
-      <Source>[LootMan] LootMan is enabled.</Source>
-      <Dest>[LootMan] LootManが有効化されました。</Dest>
+      <Source>[LootMan] Unlinked to the workshop.</Source>
+      <Dest>[LootMan] ワークショップとのリンクを解除しました。</Dest>
     </String>
     <String List="0">
       <EDID>LTMN_System</EDID>
       <REC id="9">QUST:NNAM</REC>
-      <Source>[LootMan] Uninstallation is complete.</Source>
-      <Dest>[LootMan] アンインストールが完了しました。</Dest>
+      <Source>[LootMan] Locked container ignored because there is no Bobby pin.</Source>
+      <Dest>[LootMan] ヘアピンがないため、施錠されたコンテナは無視されます。</Dest>
     </String>
     <String List="0">
       <EDID>LTMN_System</EDID>
       <REC id="10">QUST:NNAM</REC>
-      <Source>[LootMan] Installation is complete.</Source>
-      <Dest>[LootMan] インストールが完了しました。</Dest>
+      <Source>[LootMan] Utility processing is complete.</Source>
+      <Dest>[LootMan] ユーティリティの処理が完了しました。</Dest>
+    </String>
+    <String List="0" Partial="2">
+      <EDID>LTMN_LootManLocation</EDID>
+      <REC>LCTN:FULL</REC>
+      <Source>_LootManLocation</Source>
+      <Dest>_LootManLocation</Dest>
     </String>
   </Content>
 </SSTXMLRessources>
