@@ -7,7 +7,7 @@
       "action": {
         "type": "CallFunction",
         "form": "LootMan.esp|F9B",
-        "function": "ToggleEnableLoot",
+        "function": "ToggleEnableLootMan",
         "params": []
       }
     },

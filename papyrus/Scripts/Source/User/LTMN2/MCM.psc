@@ -295,11 +295,10 @@ Function ToggleEnableLootMan()
         Return
     EndIf
 
-    If (!properties.EnableLootMan)
-        properties.EnableLootMan = true
+    properties.EnableLootMan = !properties.EnableLootMan
+    If (properties.EnableLootMan)
         system.ShowMessage(system.MESSAGE_ENABLED)
     Else
-        properties.EnableLootMan = false
         system.ShowMessage(system.MESSAGE_DISABLED)
     EndIf
 EndFunction
