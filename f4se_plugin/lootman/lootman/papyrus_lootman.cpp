@@ -956,22 +956,16 @@ namespace papyrus_lootman
         {
             if (IsFormTypeMatch(form->formType, kFormType_BOOK))
             {
-                if ((GetInt(properties::lootable_book_item_type) & perkmagazine) == 0)
-                {
-                    return false;
-                }
-                if (!HasKeyword(form, keyword::perkMagazine))
+                if (MatchesAny(form, injection_data::book_type_perk_magazine)
+                    && (GetInt(properties::lootable_book_item_type) & perkmagazine) == 0)
                 {
                     return false;
                 }
             }
             else if (IsFormTypeMatch(form->formType, kFormType_MISC))
             {
-                if ((GetInt(properties::lootable_misc_item_type) & bobblehead) == 0)
-                {
-                    return false;
-                }
-                if (!HasKeyword(form, keyword::bobblehead))
+                if (MatchesAny(form, injection_data::misc_type_bobblehead)
+                    && (GetInt(properties::lootable_misc_item_type) & bobblehead) == 0)
                 {
                     return false;
                 }

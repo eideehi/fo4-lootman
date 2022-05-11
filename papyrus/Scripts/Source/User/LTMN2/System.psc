@@ -13,7 +13,7 @@ EndFunction
 ; Version as int.
 ; syntax: Major{1}.Minor{2}.Patch{2}
 ; example: 10234 // 1.2.34
-int MOD_VERSION = 20000 const
+int MOD_VERSION = 20001 const
 
 ; Timer id list
 int TIMER_INSTALL = 1 const
@@ -354,6 +354,9 @@ Function Patch()
     LTMN2:Debug.Log(prefix + "  Current version: " + GetVersionString(CurrentModVersion))
 
     ; Apply the patches if the save data and the Mod version of the esp do not match due to the LootMan update.
+    If (CurrentModVersion < 20001)
+        LTMN2:Patch.v2_0_1()
+    EndIf
 
     CurrentModVersion = MOD_VERSION
 

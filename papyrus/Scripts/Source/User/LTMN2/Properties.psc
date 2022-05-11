@@ -95,7 +95,7 @@ Group Status
     int property LootableInventoryItemType = 255 auto hidden
     int property LootableALCHItemType = 255 auto hidden
     int property LootableBOOKItemType = 3 auto hidden
-    int property LootableMISCItemType = 3 auto hidden
+    int property LootableMISCItemType = 2 auto hidden
     int property LootableWEAPItemType = 7 auto hidden
 EndGroup
 
@@ -159,7 +159,7 @@ Group Config
     bool property EnableALCHItemWater = true auto hidden
     bool property EnableALCHItemOther = true auto hidden
 
-    bool property EnableBOOKItemPerkMagazine = false auto hidden
+    bool property EnableBOOKItemPerkMagazine = true auto hidden
     bool property EnableBOOKItemOther = true auto hidden
 
     bool property EnableMISCItemBobblehead = false auto hidden

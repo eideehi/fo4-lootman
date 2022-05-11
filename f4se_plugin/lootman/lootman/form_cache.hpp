@@ -9,9 +9,7 @@ namespace form_cache
 {
     namespace keyword
     {
-        extern BGSKeyword* bobblehead;
         extern BGSKeyword* featuredItem;
-        extern BGSKeyword* perkMagazine;
         extern BGSKeyword* unscrappableObject;
         extern BGSKeyword* workshop;
         extern BGSKeyword* lootingMarker;

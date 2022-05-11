@@ -8,9 +8,7 @@ namespace form_cache
 {
     namespace keyword
     {
-        BGSKeyword* bobblehead;
         BGSKeyword* featuredItem;
-        BGSKeyword* perkMagazine;
         BGSKeyword* unscrappableObject;
         BGSKeyword* workshop;
         BGSKeyword* lootingMarker;
@@ -30,9 +28,7 @@ namespace form_cache
 
     void Initialize()
     {
-        keyword::bobblehead = DYNAMIC_CAST(utility::LookupForm("Fallout4.esm|135E6C"), TESForm, BGSKeyword);
         keyword::featuredItem = DYNAMIC_CAST(utility::LookupForm("Fallout4.esm|1B3FAC"), TESForm, BGSKeyword);
-        keyword::perkMagazine = DYNAMIC_CAST(utility::LookupForm("Fallout4.esm|1D4A70"), TESForm, BGSKeyword);
         keyword::unscrappableObject = DYNAMIC_CAST(utility::LookupForm("Fallout4.esm|1CC46A"), TESForm, BGSKeyword);
         keyword::workshop = DYNAMIC_CAST(utility::LookupForm("Fallout4.esm|54BA7"), TESForm, BGSKeyword);
         keyword::lootingMarker = DYNAMIC_CAST(utility::LookupForm("LootMan.esp|2686"), TESForm, BGSKeyword);
