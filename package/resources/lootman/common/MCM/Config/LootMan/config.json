@@ -894,6 +894,33 @@
         },
         { "type": "spacer", "groupCondition": { "AND": [1, 6] } },
 
+        { "type": "text", "text": "$PAGE_LOOTING_WORKER_ADVANCED_FILTER_MISC_SECTION", "groupCondition": { "AND": [1, 6] } },
+        {
+          "id": "EnableMISCItemBobblehead",
+          "text": "$PAGE_LOOTING_WORKER_ADVANCED_FILTER_MISC_BOBBLE_HEAD",
+          "type": "switcher",
+          "help": "$PAGE_LOOTING_WORKER_ADVANCED_FILTER_MISC_BOBBLE_HEAD_HELP",
+          "valueOptions": {
+            "sourceType": "PropertyValueBool",
+            "sourceForm": "LootMan.esp|F9A",
+            "propertyName": "EnableMISCItemBobblehead"
+          },
+          "groupCondition": { "AND": [1, 6] }
+        },
+        {
+          "id": "EnableMISCItemOther",
+          "text": "$PAGE_LOOTING_WORKER_ADVANCED_FILTER_MISC_OTHER",
+          "type": "switcher",
+          "help": "$PAGE_LOOTING_WORKER_ADVANCED_FILTER_MISC_OTHER_HELP",
+          "valueOptions": {
+            "sourceType": "PropertyValueBool",
+            "sourceForm": "LootMan.esp|F9A",
+            "propertyName": "EnableMISCItemOther"
+          },
+          "groupCondition": { "AND": [1, 6] }
+        },
+        { "type": "spacer", "groupCondition": { "AND": [1, 6] } },
+
         { "type": "text", "text": "$PAGE_LOOTING_WORKER_ADVANCED_FILTER_WEAP_SECTION", "groupCondition": { "AND": [1, 6] } },
         {
           "id": "EnableWEAPItemGrenade",
