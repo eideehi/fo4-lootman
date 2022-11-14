@@ -1042,7 +1042,7 @@ namespace papyrus_lootman
             return false;
         }
 
-        if (info.featured && !MatchesAny(form, injection_data::include_featured_item))
+        if (info.featured && !info.legendary && !MatchesAny(form, injection_data::include_featured_item))
         {
             return false;
         }
