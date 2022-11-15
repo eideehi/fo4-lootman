@@ -253,13 +253,11 @@ namespace papyrus_lootman
                     continue;
                 }
 
-                const UInt32 flags = data.alias->aliasId >> 32;
-
                 QuestAliasInfo info = {};
                 info.questId = data.quest->formID;
                 info.flags = data.quest->flags;
-                info.isEssential = (flags >> 6) & 1;
-                info.isQuestItem = (flags >> 2) & 1;
+                info.isEssential = (data.alias->flags >> 6) & 1;
+                info.isQuestItem = (data.alias->flags >> 2) & 1;
                 result.push_back(info);
             }
 
@@ -625,13 +623,13 @@ namespace papyrus_lootman
         return encounterZone ? encounterZone->data.zoneOwner : nullptr;
     }
 
-    bool IsTrackedInQuest(ExtraDataList* extraDataList)
+    bool IsQuestItem(ExtraDataList* extraDataList)
     {
         const auto list = GetAllQuestAliasInfo(extraDataList);
         const auto it = std::find_if(list.begin(), list.end(), [](const QuestAliasInfo& info) {
-            if (info.flags & QuestAliasInfo::completed) return false;
-            if (info.flags & QuestAliasInfo::failed) return false;
-            return true;
+            if (info.isQuestItem) return true;
+            if ((info.flags & QuestAliasInfo::enabled) == 0) return false;
+            return (info.flags & (QuestAliasInfo::completed | QuestAliasInfo::failed)) == 0;
         });
         return it != list.end();
     }
@@ -836,10 +834,10 @@ namespace papyrus_lootman
         if (!IsFormTypeMatch(form->formType, kFormType_CONT)
             && !IsFormTypeMatch(form->formType, kFormType_NPC_))
         {
-            if (IsTrackedInQuest(ref->extraDataList))
+            if (IsQuestItem(ref->extraDataList))
             {
 #ifdef _DEBUG
-                TraceOnce(ref, "object is tracked in quest");
+                TraceOnce(ref, "object is quest item");
 #endif
                 return false;
             }
@@ -986,7 +984,7 @@ namespace papyrus_lootman
         bool unscrappable;
         bool equipped;
         bool legendary;
-        bool trackedInQuest;
+        bool questItem;
     };
 
     InventoryItemInfo GetInventoryItemInfo(const BGSInventoryItem& item)
@@ -1024,9 +1022,9 @@ namespace papyrus_lootman
                 result.legendary = true;
             }
 
-            if (IsTrackedInQuest(entry->extraData))
+            if (IsQuestItem(entry->extraData))
             {
-                result.trackedInQuest = true;
+                result.questItem = true;
             }
 
             return true;
@@ -1047,7 +1045,7 @@ namespace papyrus_lootman
             return false;
         }
 
-        if (info.trackedInQuest)
+        if (info.questItem)
         {
             return false;
         }
@@ -1900,7 +1898,7 @@ namespace papyrus_lootman
                 }
 
                 const auto info = GetInventoryItemInfo(item);
-                
+
                 if (info.equipped && !isDead)
                 {
 #ifdef _DEBUG
@@ -1909,7 +1907,7 @@ namespace papyrus_lootman
                     continue;
                 }
 
-                if (info.featured || info.unscrappable || info.trackedInQuest)
+                if (info.featured || info.unscrappable || info.questItem)
                 {
 #ifdef _DEBUG
                     _MESSAGE("| %s |       [ Item is cannot be scrapped ]", processId);
