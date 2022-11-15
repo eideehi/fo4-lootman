@@ -774,9 +774,6 @@ namespace papyrus_lootman
             if (virtual_function::HasKeyword(keywordBase, keyword::settlement) ||
                 virtual_function::HasKeyword(keywordBase, keyword::workshopSettlement))
             {
-#ifdef _DEBUG
-                _MESSAGE("location is in settlement");
-#endif
                 return true;
             }
         }
