@@ -88,6 +88,10 @@ Event Actor.OnPlayerLoadGame(Actor akSender)
     LTMN2:Debug.OpenLog()
     LTMN2:Debug.Log("| System | ---------- | LootMan " + GetVersionString(MOD_VERSION) + " has been running")
 
+    ; Reset properties that need to be reset each load
+    properties.IsInitialized = false
+    properties.IsNotInitialized = true
+
     CancelTimer(TIMER_INSTALL)
     CancelTimer(TIMER_INITIALIZE)
     CancelTimer(TIMER_UPDATE)
@@ -95,10 +99,6 @@ Event Actor.OnPlayerLoadGame(Actor akSender)
 
     messageDisplayCount = new int[MESSAGE_COUNT]
     lastMessageDisplayTime = new float[MESSAGE_COUNT]
-
-    ; Reset properties that need to be reset each load
-    properties.IsInitialized = false
-    properties.IsNotInitialized = true
 
     ; Apply the patches if the save data and the Mod version of the esp do not match due to the LootMan update.
     If (CurrentModVersion != MOD_VERSION)
