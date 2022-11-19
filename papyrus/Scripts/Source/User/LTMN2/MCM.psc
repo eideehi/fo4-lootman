@@ -15,19 +15,19 @@ Group Constants
     int property INVENTORY_WORKSHOP = 2 autoreadonly hidden
 
     int property MOVE_ITEM_ALL = 0 autoreadonly hidden
-    int property MOVE_ITEM_WEAPON = 0 autoreadonly hidden
-    int property MOVE_ITEM_ARMOR = 1 autoreadonly hidden
-    int property MOVE_ITEM_CONSUMABLE = 2 autoreadonly hidden
-    int property MOVE_ITEM_JUNK = 3 autoreadonly hidden
-    int property MOVE_ITEM_MODS = 4 autoreadonly hidden
-    int property MOVE_ITEM_AMMO = 5 autoreadonly hidden
-    int property MOVE_ITEM_BOOK = 6 autoreadonly hidden
-    int property MOVE_ITEM_KEY = 7 autoreadonly hidden
+    int property MOVE_ITEM_WEAPON = 1 autoreadonly hidden
+    int property MOVE_ITEM_ARMOR = 2 autoreadonly hidden
+    int property MOVE_ITEM_CONSUMABLE = 3 autoreadonly hidden
+    int property MOVE_ITEM_JUNK = 4 autoreadonly hidden
+    int property MOVE_ITEM_MODS = 5 autoreadonly hidden
+    int property MOVE_ITEM_AMMO = 6 autoreadonly hidden
+    int property MOVE_ITEM_BOOK = 7 autoreadonly hidden
+    int property MOVE_ITEM_KEY = 8 autoreadonly hidden
 
     int property SCRAP_ITEM_ALL = 0 autoreadonly hidden
-    int property SCRAP_ITEM_WEAPON = 0 autoreadonly hidden
-    int property SCRAP_ITEM_ARMOR = 1 autoreadonly hidden
-    int property SCRAP_ITEM_JUNK = 2 autoreadonly hidden
+    int property SCRAP_ITEM_WEAPON = 1 autoreadonly hidden
+    int property SCRAP_ITEM_ARMOR = 2 autoreadonly hidden
+    int property SCRAP_ITEM_JUNK = 3 autoreadonly hidden
 EndGroup
 
 Group Status
