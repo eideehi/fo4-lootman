@@ -338,7 +338,9 @@ Function Initialize()
     LTMN2:MCM.GetInstance().Initialize()
 
     StartTimer(1, TIMER_UPDATE)
-    StartTimer(3, TIMER_LOOTING)
+    If (properties.WorkerInvokeInterval > 0)
+        StartTimer(3, TIMER_LOOTING)
+    EndIf
 
     LTMN2:Debug.Log(prefix + "  [ LootMan initialization completed ]")
 
