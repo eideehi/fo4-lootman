@@ -7,6 +7,7 @@
 #include "f4se/PapyrusNativeFunctions.h"
 #include "f4se/GameData.h"
 #include "f4se/GameExtraData.h"
+#include "f4se/GameMenus.h"
 #include "f4se/GameReferences.h"
 #include "f4se/GameRTTI.h"
 
@@ -1260,6 +1261,10 @@ namespace papyrus_lootman
         _MESSAGE("| %s | [ Start FindNearbyReferencesWithFormType ]", processId);
 #endif
         VMArray<TESObjectREFR*> result;
+        if ((*g_ui)->numPauseGame)
+        {
+            return result;
+        }
 
         if (!ref)
         {
