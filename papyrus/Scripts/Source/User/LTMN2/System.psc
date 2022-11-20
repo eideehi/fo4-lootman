@@ -147,7 +147,8 @@ Event Actor.OnLocationChange(Actor akSender, Location akOldLoc, Location akNewLo
         EndIf
 
         LTMN2:Debug.Log(prefix + "    Workshops exist in the new location: " + (properties.WorkshopParent.GetWorkshopFromLocation(akNewLoc) != None))
-        If (properties.WorkshopParent.GetWorkshopFromLocation(akNewLoc))
+        WorkshopScript workshop = properties.WorkshopParent.GetWorkshopFromLocation(akNewLoc)
+        If (workshop && workshop.OwnedByPlayer)
             LTMN2:Debug.Log(prefix + "      Linked to LootMan: " + akNewLoc.IsLinkedLocation(properties.LootManLocation, properties.WorkshopCaravan))
             If (!akNewLoc.IsLinkedLocation(properties.LootManLocation, properties.WorkshopCaravan))
                 LTMN2:Debug.Log(prefix + "      [ Added link to LootMan ]")

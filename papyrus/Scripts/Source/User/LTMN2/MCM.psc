@@ -90,7 +90,8 @@ Function OnMCMSettingChange(string modName, string id)
         LTMN2:Debug.Log(prefix + "    Workshop exists at the current location: " + (properties.WorkshopParent.GetWorkshopFromLocation(player.GetCurrentLocation()) != none))
 
         Location currentLocation = player.GetCurrentLocation()
-        If (properties.WorkshopParent.GetWorkshopFromLocation(currentLocation))
+        WorkshopScript workshop = properties.WorkshopParent.GetWorkshopFromLocation(currentLocation)
+        If (workshop && workshop.OwnedByPlayer)
             LTMN2:Debug.Log(prefix + "    LootMan is linked to the current location: " + currentLocation.IsLinkedLocation(properties.LootManLocation, properties.WorkshopCaravan))
 
             bool linkToCurrentLocation = currentLocation.IsLinkedLocation(properties.LootManLocation, properties.WorkshopCaravan)
