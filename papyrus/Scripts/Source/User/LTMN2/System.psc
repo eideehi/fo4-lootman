@@ -473,6 +473,12 @@ EndFunction
 
 ; Display the message set in Quest Objectives
 Function ShowMessage(int messageId, float interval = 30.0, int maxDisplayCount = 3)
+    If (properties.IsNotInstalled || properties.IsNotInitialized || properties.IsUninstalled)
+        Return
+    EndIf
+    If (!properties.EnableLootMan)
+        Return
+    EndIf
     If (!properties.DisplaySystemMessage)
         Return
     EndIf
