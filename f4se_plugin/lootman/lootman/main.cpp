@@ -30,6 +30,10 @@ void OnMessaging(F4SEMessagingInterface::Message* msg)
         injection_data::LoadInjectionData();
         vendor_chest::Initialize();
     }
+    else if (msg->type == F4SEMessagingInterface::kMessage_PreLoadGame)
+    {
+        papyrus_lootman::OnPreLoadGame();
+    }
 }
 
 extern "C" {

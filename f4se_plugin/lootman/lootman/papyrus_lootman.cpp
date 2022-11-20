@@ -634,14 +634,14 @@ namespace papyrus_lootman
         return it != list.end();
     }
 
-    SimpleLock lock;
+    SimpleLock objectsLock;
     std::unordered_set<UInt32> lockedObjects;
 
     inline bool TryLockObject(const UInt32 formId)
     {
         bool success = false;
         {
-            SimpleLocker locker(&lock);
+            SimpleLocker locker(&objectsLock);
             if (lockedObjects.find(formId) == lockedObjects.end())
             {
                 lockedObjects.emplace(formId);
@@ -654,7 +654,7 @@ namespace papyrus_lootman
     inline void ReleaseObject(const UInt32 formId)
     {
         {
-            SimpleLocker locker(&lock);
+            SimpleLocker locker(&objectsLock);
             lockedObjects.erase(formId);
         }
     }
@@ -663,7 +663,7 @@ namespace papyrus_lootman
     {
         bool result;
         {
-            SimpleLocker locker(&lock);
+            SimpleLocker locker(&objectsLock);
             result = lockedObjects.find(formId) != lockedObjects.end();
         }
         return result;
@@ -1985,4 +1985,12 @@ bool papyrus_lootman::Register(VirtualMachine* vm)
 
     _MESSAGE("| INITIALIZE |   Papyrus functions binding is complete");
     return true;
+}
+
+void papyrus_lootman::OnPreLoadGame()
+{
+    {
+        SimpleLocker locker(&papyrus_lootman::objectsLock);
+        papyrus_lootman::lockedObjects.clear();
+    }
 }
