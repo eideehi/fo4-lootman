@@ -107,6 +107,36 @@ Function LootObject(ObjectReference ref)
     properties.LootManRef.AddItem(ref, 1, true)
 EndFunction
 
+bool Function IsLootableOwnership(ObjectReference ref)
+    If (ref.IsOwnedBy(player))
+        Return true
+    EndIf
+
+    If (ref.HasActorRefOwner())
+        Actor ownerRef = ref.GetActorRefOwner()
+        If (!ownerRef.IsDead() && ownerRef.GetRelationshipRank(player) != 1)
+            Return false
+        EndIf
+    Else
+        ActorBase ownerBase = ref.GetActorOwner()
+        If (ownerBase && ownerBase.IsUnique())
+            Actor ownerRef = ownerBase.GetUniqueActor()
+            If (!ownerRef.IsDead() && ownerRef.GetRelationshipRank(player) != 1)
+                Return false
+            EndIf
+        EndIf
+    EndIf
+
+    If (ref.GetFactionOwner())
+        Faction factionOwner = ref.GetFactionOwner()
+        If (factionOwner.GetFactionReaction(player) != 3)
+            Return false
+        EndIf
+    EndIf
+
+    Return true
+EndFunction
+
 ; Return the process id to be output to the log
 string Function GetProcessId() debugOnly
     Return processId

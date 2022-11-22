@@ -17,7 +17,7 @@ Function SetTurboMode()
 EndFunction
 
 bool Function IsLootingTarget(ObjectReference ref)
-    If (!ref.Is3DLoaded())
+    If (!ref.Is3DLoaded() || !IsLootableOwnership(ref))
         Return false
     EndIf
 
