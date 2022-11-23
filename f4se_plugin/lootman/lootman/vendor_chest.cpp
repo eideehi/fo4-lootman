@@ -6,6 +6,7 @@
 #include "f4se/GameForms.h"
 #include "f4se/GameObjects.h"
 #include "f4se/GameReferences.h"
+#include "f4se/GameRTTI.h"
 
 #include "fallout4.hpp"
 
@@ -16,39 +17,34 @@ namespace vendor_chest
 
     void Initialize()
     {
-        const auto allNpc = (*g_dataHandler)->arrNPC_;
-        for (UInt32 i = 0; i < allNpc.count; ++i)
+        const auto prefix = "| INITIALIZE |";
+        _MESSAGE("%s   [ Start caching vendor chest IDs ]", prefix);
+
+        const auto allFaction = (*g_dataHandler)->arrFACT;
+        for (UInt32 i = 0; i < allFaction.count; ++i)
         {
-            TESNPC* npc = nullptr;
-            if (!allNpc.GetNthItem(i, npc))
+            TESForm* form = nullptr;
+            if (!allFaction.GetNthItem(i, form))
             {
                 continue;
             }
 
-            const auto actorData = reinterpret_cast<TESActorBaseDataAlt*>(&npc->actorData);
-            if (actorData && actorData->factions.count)
+            const auto faction = reinterpret_cast<TESFaction*>(Runtime_DynamicCast(form, RTTI_TESForm, RTTI_TESFaction));
+            if (!faction || (faction->factionData.flags & TESFaction::FACTION_DATA::vendor) == 0)
             {
-                for (UInt32 j = 0; j < actorData->factions.count; ++j)
-                {
-                    TESActorBaseDataAlt::FACTION_DATA factionData = {};
-                    if (!actorData->factions.GetNthItem(j, factionData))
-                    {
-                        continue;
-                    }
-
-                    const auto faction = factionData.faction;
-                    if (!faction || (faction->factionData.flags & TESFaction::FACTION_DATA::vendor) == 0)
-                    {
-                        continue;
-                    }
-
-                    if (faction->vendorData.vendorChest)
-                    {
-                        SimpleLocker locker(&vendorChestsLock);
-                        vendorChests.emplace(faction->vendorData.vendorChest->baseForm->formID);
-                    }
-                }
+                continue;
             }
+
+            if (faction->vendorData.vendorChest)
+            {
+                SimpleLocker locker(&vendorChestsLock);
+                vendorChests.emplace(faction->vendorData.vendorChest->baseForm->formID);
+            }
+        }
+
+        for (const auto& formID : vendorChests)
+        {
+            _MESSAGE("%s     %08X", prefix, formID);
         }
     }
 
