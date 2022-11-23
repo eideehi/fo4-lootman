@@ -46,7 +46,7 @@ bool F4SEPlugin_Query(const F4SEInterface* f4se, PluginInfo* info)
 
     info->infoVersion = PluginInfo::kInfoVersion;
     info->name = "LootMan";
-    info->version = 11016310; // FO4 1.10.163-10
+    info->version = 11016314; // FO4 1.10.163-14
 
     if (f4se->isEditor)
     {
