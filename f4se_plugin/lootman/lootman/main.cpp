@@ -3,6 +3,7 @@
 #include "f4se/PluginAPI.h"
 #include "f4se_common/f4se_version.h"
 
+#include "constructible_object.hpp"
 #include "form_cache.hpp"
 #include "injection_data.hpp"
 #include "papyrus_lootman.hpp"
@@ -29,6 +30,7 @@ void OnMessaging(F4SEMessagingInterface::Message* msg)
         properties::Initialize();
         injection_data::LoadInjectionData();
         vendor_chest::Initialize();
+        constructible_object::Initialize();
     }
     else if (msg->type == F4SEMessagingInterface::kMessage_PreLoadGame)
     {

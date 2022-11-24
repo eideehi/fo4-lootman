@@ -11,6 +11,7 @@
 #include "f4se/GameReferences.h"
 #include "f4se/GameRTTI.h"
 
+#include "constructible_object.hpp"
 #include "fallout4.hpp"
 #include "fallout4_extra.hpp"
 #include "form_cache.hpp"
@@ -1480,9 +1481,15 @@ namespace papyrus_lootman
         {
             if (!obj)
             {
+#ifdef _DEBUG
+                _MESSAGE("| %s |       ConstructibleObject not found", processId);
+#endif
                 return;
             }
 
+#ifdef _DEBUG
+            bool foundComponent = false;
+#endif
             for (UInt32 i = 0; i < obj->components->count; ++i)
             {
                 BGSConstructibleObject::Component objComponent = {};
@@ -1504,6 +1511,7 @@ namespace papyrus_lootman
                                 continue;
                             }
 #ifdef _DEBUG
+                            foundComponent = true;
                             _MESSAGE("| %s |       Found component: [ Id: %08X, Name: %s, Count: %d, Scale: %.1f ] x%d", processId, miscComponent.component->formID, debug::GetName(miscComponent.component), miscComponent.count, miscComponent.component->scrapScalar->value, objComponent.count);
 #endif
                             data[miscComponent.component] += static_cast<UInt32>(miscComponent.count * objComponent.count);
@@ -1517,61 +1525,35 @@ namespace papyrus_lootman
                     continue;
                 }
 #ifdef _DEBUG
+                foundComponent = true;
                 _MESSAGE("| %s |       Found component: [ Id: %08X, Name: %s, Count: %d, Scale: %.1f ]", processId, objComponent.component->formID, debug::GetName(objComponent.component), objComponent.count, objComponent.component->scrapScalar->value);
 #endif
                 data[objComponent.component] += objComponent.count;
             }
-        };
-
-        tArray<BGSConstructibleObject*> allObj = (*g_dataHandler)->arrCOBJ;
-        auto findConstructibleObject = [=](TESForm* form)
-        {
 #ifdef _DEBUG
-            _MESSAGE("| %s |   [ Extract components ]", processId);
-            _MESSAGE("| %s |     Scrap target: [ Id: %08X, Name: %s ]", processId, form->formID, debug::GetName(form));
-#endif
-            for (UInt32 i = 0; i < allObj.count; ++i)
+            if (!foundComponent)
             {
-                BGSConstructibleObject* obj = nullptr;
-
-                if (!allObj.GetNthItem(i, obj) || !obj->createdObject || !obj->components)
-                {
-                    continue;
-                }
-
-                if (form->formID == obj->createdObject->formID)
-                {
-                    return obj;
-                }
-
-                const auto formList = DYNAMIC_CAST(obj->createdObject, TESForm, BGSListForm);
-                if (!formList)
-                {
-                    continue;
-                }
-
-                for (UInt32 j = 0; j < formList->forms.count; ++j)
-                {
-                    TESForm* item = nullptr;
-                    if (formList->forms.GetNthItem(j, item) && form->formID == item->formID)
-                    {
-                        return obj;
-                    }
-                }
+                _MESSAGE("| %s |       Component not found", processId);
             }
-
-            return static_cast<BGSConstructibleObject*>(nullptr);
+#endif
         };
+
+#ifdef _DEBUG
+        _MESSAGE("| %s |   [ Extract components ]", processId);
+        _MESSAGE("| %s |     Base item: [ Id: %08X, Name: %s ]", processId, baseForm->formID, debug::GetName(baseForm));
+#endif
+        extractComponents(constructible_object::FromCreatedObjectId(baseForm->formID));
 
         std::vector<BGSMod::Attachment::Mod*> list;
         GetMods(extraDataList, &list);
-
         for (const auto& objectMod : list)
         {
-            extractComponents(findConstructibleObject(objectMod));
+#ifdef _DEBUG
+            _MESSAGE("| %s |   [ Extract components ]", processId);
+            _MESSAGE("| %s |     Module: [ Id: %08X, Name: %s ]", processId, objectMod->formID, debug::GetName(objectMod));
+#endif
+            extractComponents(constructible_object::FromCreatedObjectId(objectMod->formID));
         }
-
-        extractComponents(findConstructibleObject(baseForm));
 
         for (const auto& pair : data)
         {

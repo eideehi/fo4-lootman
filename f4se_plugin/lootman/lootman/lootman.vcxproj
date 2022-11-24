@@ -190,6 +190,7 @@
     <None Include="exports.def" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="constructible_object.cpp" />
     <ClCompile Include="debug.cpp" />
     <ClCompile Include="form_cache.cpp" />
     <ClCompile Include="injection_data.cpp" />
@@ -202,6 +203,7 @@
     <ClCompile Include="virtual_function.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="constructible_object.hpp" />
     <ClInclude Include="debug.hpp" />
     <ClInclude Include="fallout4.hpp" />
     <ClInclude Include="fallout4_extra.hpp" />
