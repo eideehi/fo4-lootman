@@ -58,13 +58,12 @@ Function ScrapInventoryItems(ObjectReference ref, int itemType) global
     LTMN2:Debug.Log(prefix + "[ Start scrapping inventory items ]")
 
     LTMN2:Properties properties = LTMN2:Properties.GetInstance()
-    Form[] items = LTMN2:LootMan.GetInventoryItemsWithItemType(ref, itemType)
+    Form[] items = LTMN2:LootMan.GetScrappableItems(ref, itemType)
 
     LTMN2:Debug.Log(prefix + "  Inventory owner: " + ref.GetDisplayName())
     LTMN2:Debug.Log(prefix + "  Target item type: " + LTMN2:Debug.GetItemTypeIdentifier(itemType))
     LTMN2:Debug.Log(prefix + "  Total number of items found: " + items.Length)
 
-    bool isPlayerInventory = (ref == Game.GetPlayer())
     int itemIndex = 1
     int i = items.Length
     While i
@@ -100,7 +99,8 @@ Function ScrapInventoryItems(ObjectReference ref, int itemType) global
             If (isMiscItem)
                 components = (item As MiscObject).GetMiscComponents()
             Else
-                obj = ref.DropObject(item, 1)
+                ref.RemoveItem(item, i, true, properties.TemporaryContainerRef)
+                obj = properties.TemporaryContainerRef.DropObject(item, 1)
                 If (obj)
                     LTMN2:Debug.Log(prefix + "        Actual item: " + obj.GetDisplayName())
                     If (!obj.IsQuestItem())
@@ -135,6 +135,7 @@ Function ScrapInventoryItems(ObjectReference ref, int itemType) global
                 EndIf
             EndWhile
 
+            bool scrapped = false
             j = components.Length
             While j
                 j -= 1
@@ -147,6 +148,7 @@ Function ScrapInventoryItems(ObjectReference ref, int itemType) global
                     EndIf
 
                     If (scrapItem && scrapCount)
+                        scrapped = true
                         int acquiredCount = scrapCount * scrapPerTime
                         properties.TemporaryContainerRef.AddItem(scrapItem, acquiredCount, true)
                         properties.TemporaryContainerRef.RemoveItem(scrapItem, acquiredCount, true, ref)
@@ -155,7 +157,7 @@ Function ScrapInventoryItems(ObjectReference ref, int itemType) global
                 EndIf
             EndWhile
 
-            If (components.Length > 0)
+            If (scrapped)
                 If (obj)
                     obj.Drop(true)
                     obj.Delete()
@@ -174,7 +176,7 @@ Function ScrapInventoryItems(ObjectReference ref, int itemType) global
                 EndIf
             Else
                 If (obj)
-                    ref.AddItem(obj, 1, !isPlayerInventory)
+                    ref.AddItem(obj, 1, true)
                 EndIf
                 itemCount = 0
             EndIf
