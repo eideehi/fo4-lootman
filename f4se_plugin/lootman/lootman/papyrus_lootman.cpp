@@ -1482,35 +1482,39 @@ namespace papyrus_lootman
             for (UInt32 i = 0; i < obj->components->count; ++i)
             {
                 BGSConstructibleObject::Component objComponent = {};
-                if (!obj->components->GetNthItem(i, objComponent))
+                if (!obj->components->GetNthItem(i, objComponent) || objComponent.count == 0)
                 {
                     continue;
                 }
 
                 const auto misc = DYNAMIC_CAST(objComponent.component, TESForm, TESObjectMISC);
-                if (!misc)
+                if (misc)
                 {
-#ifdef _DEBUG
-                    _MESSAGE("| %s |       Found component: [ Id: %08X, Name: %s, Count: %d ]", processId, objComponent.component->formID, debug::GetName(objComponent.component), objComponent.count);
-#endif
-                    data[objComponent.component] += objComponent.count;
-                    continue;
-                }
-
-                for (UInt32 j = 0; j < objComponent.count; ++j)
-                {
-                    for (UInt32 k = 0; k < misc->components->count; ++k)
+                    for (UInt32 j = 0; j < misc->components->count; ++j)
                     {
                         TESObjectMISC::Component miscComponent = {};
-                        if (misc->components->GetNthItem(k, miscComponent))
+                        if (misc->components->GetNthItem(j, miscComponent))
                         {
 #ifdef _DEBUG
                             _MESSAGE("| %s |       Found component: [ Id: %08X, Name: %s, Count: %d ]", processId, miscComponent.component->formID, debug::GetName(miscComponent.component), miscComponent.count);
 #endif
-                            data[miscComponent.component] += static_cast<UInt32>(miscComponent.count);
+                            if (miscComponent.count == 0 || miscComponent.component->scrapScalar->value <= 0.0f)
+                            {
+                                continue;
+                            }
+                            data[miscComponent.component] += static_cast<UInt32>(miscComponent.count * objComponent.count);
                         }
                     }
+                    continue;
                 }
+#ifdef _DEBUG
+                _MESSAGE("| %s |       Found component: [ Id: %08X, Name: %s, Count: %d ]", processId, objComponent.component->formID, debug::GetName(objComponent.component), objComponent.count);
+#endif
+                if (objComponent.component->scrapScalar->value <= 0.0f)
+                {
+                    continue;
+                }
+                data[objComponent.component] += objComponent.count;
             }
         };
 
