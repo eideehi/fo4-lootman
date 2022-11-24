@@ -37,6 +37,8 @@ namespace debug
 
     const char* GetItemTypeIdentifier(UInt32 itemType);
 
+    const char* GetDisplayName(TESForm* form, ExtraDataList* extraDataList);
+
     const char* GetName(TESForm* form);
 
     const char* Form2S(TESForm* form);

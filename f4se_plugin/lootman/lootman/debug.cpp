@@ -225,6 +225,33 @@ namespace debug
         return BSFixedString(result.c_str());
     }
 
+    const char* GetDisplayName(TESForm* form, ExtraDataList* extraDataList)
+    {
+        if (form)
+        {
+            if (extraDataList)
+            {
+                BSExtraData* extraData = extraDataList->GetByType(ExtraDataType::kExtraData_TextDisplayData);
+                if (extraData)
+                {
+                    const auto displayText = DYNAMIC_CAST(extraData, BSExtraData, ExtraTextDisplayData);
+                    if (displayText)
+                    {
+                        return *CALL_MEMBER_FN(displayText, GetReferenceName)(form);
+                    }
+                }
+            }
+
+            const auto fullName = DYNAMIC_CAST(form, TESForm, TESFullName);
+            if (fullName)
+            {
+                return fullName->name;
+            }
+        }
+
+        return BSFixedString();
+    }
+
     const char* GetName(TESForm* form)
     {
         const auto fullName = DYNAMIC_CAST(form, TESForm, TESFullName);

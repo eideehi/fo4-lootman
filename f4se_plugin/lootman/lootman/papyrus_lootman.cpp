@@ -1454,19 +1454,23 @@ namespace papyrus_lootman
         if (!baseForm || !extraDataList)
         {
 #ifdef _DEBUG
-            _MESSAGE("| %s |   [ Object is invalid ]", processId);
+            _MESSAGE("| %s |   [ VMRefOrInventoryObj is invalid ]", processId);
             _MESSAGE("| %s |     Base form is null: %s", processId, Bool2S(!baseForm));
             _MESSAGE("| %s |     Extra data is null: %s", processId, Bool2S(!extraDataList));
 #endif
             return result;
         }
 
+#ifdef _DEBUG
+        _MESSAGE("| %s |   Item: %s", processId, debug::GetDisplayName(baseForm, extraDataList));
+#endif
+
         if (baseForm->formType != kFormType_ARMO && baseForm->formType != kFormType_WEAP)
         {
 #ifdef _DEBUG
-            _MESSAGE("| %s |   [ Object is invalid ]", processId);
-            _MESSAGE("| %s |     item is not armor: %s", processId, Bool2S(baseForm->formType != kFormType_ARMO));
-            _MESSAGE("| %s |     item is not weapon: %s", processId, Bool2S(baseForm->formType != kFormType_WEAP));
+            _MESSAGE("| %s |   [ Item is invalid ]", processId);
+            _MESSAGE("| %s |     Is not armor: %s", processId, Bool2S(baseForm->formType != kFormType_ARMO));
+            _MESSAGE("| %s |     Is not weapon: %s", processId, Bool2S(baseForm->formType != kFormType_WEAP));
 #endif
             return result;
         }
@@ -1495,25 +1499,26 @@ namespace papyrus_lootman
                         TESObjectMISC::Component miscComponent = {};
                         if (misc->components->GetNthItem(j, miscComponent))
                         {
-#ifdef _DEBUG
-                            _MESSAGE("| %s |       Found component: [ Id: %08X, Name: %s, Count: %d ]", processId, miscComponent.component->formID, debug::GetName(miscComponent.component), miscComponent.count);
-#endif
                             if (miscComponent.count == 0 || miscComponent.component->scrapScalar->value <= 0.0f)
                             {
                                 continue;
                             }
+#ifdef _DEBUG
+                            _MESSAGE("| %s |       Found component: [ Id: %08X, Name: %s, Count: %d, Scale: %.1f ] x%d", processId, miscComponent.component->formID, debug::GetName(miscComponent.component), miscComponent.count, miscComponent.component->scrapScalar->value, objComponent.count);
+#endif
                             data[miscComponent.component] += static_cast<UInt32>(miscComponent.count * objComponent.count);
                         }
                     }
                     continue;
                 }
-#ifdef _DEBUG
-                _MESSAGE("| %s |       Found component: [ Id: %08X, Name: %s, Count: %d ]", processId, objComponent.component->formID, debug::GetName(objComponent.component), objComponent.count);
-#endif
+
                 if (objComponent.component->scrapScalar->value <= 0.0f)
                 {
                     continue;
                 }
+#ifdef _DEBUG
+                _MESSAGE("| %s |       Found component: [ Id: %08X, Name: %s, Count: %d, Scale: %.1f ]", processId, objComponent.component->formID, debug::GetName(objComponent.component), objComponent.count, objComponent.component->scrapScalar->value);
+#endif
                 data[objComponent.component] += objComponent.count;
             }
         };
