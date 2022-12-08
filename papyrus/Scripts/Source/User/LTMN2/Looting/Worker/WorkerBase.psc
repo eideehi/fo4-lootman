@@ -95,7 +95,7 @@ Function SetTurboMode()
 EndFunction
 
 bool Function IsLootingTarget(ObjectReference ref)
-    Return ref.Is3DLoaded()
+    Return ref.Is3DLoaded() && IsLootableOwnership(ref)
 EndFunction
 
 Function LootObject(ObjectReference ref)
@@ -130,6 +130,22 @@ bool Function IsLootableOwnership(ObjectReference ref)
     If (ref.GetFactionOwner())
         Faction factionOwner = ref.GetFactionOwner()
         If (factionOwner.GetFactionReaction(player) != 3)
+            Return false
+        EndIf
+    EndIf
+
+    Cell parentCell = ref.GetParentCell()
+    If (parentCell)
+        ActorBase ownerBase = parentCell.GetActorOwner()
+        If (ownerBase && ownerBase.IsUnique())
+            Actor ownerRef = ownerBase.GetUniqueActor()
+            If (!ownerRef.IsDead() && ownerRef.GetRelationshipRank(player) != 1)
+                Return false
+            EndIf
+        EndIf
+
+        Faction factionOwner = parentCell.GetFactionOwner()
+        If (factionOwner && factionOwner.GetFactionReaction(player) != 3)
             Return false
         EndIf
     EndIf
