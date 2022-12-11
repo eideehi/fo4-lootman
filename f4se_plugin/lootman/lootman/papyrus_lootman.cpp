@@ -503,11 +503,6 @@ namespace papyrus_lootman
         return false;
     }
 
-    inline bool IsMarked(const TESObjectREFR* ref)
-    {
-        return HasKeyword(ref, keyword::lootingMarker, GetInstanceData(ref));
-    }
-
     bool MatchesAny(const TESForm* form, const injection_data::Key& key)
     {
         bool match = false;

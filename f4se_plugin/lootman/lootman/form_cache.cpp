@@ -31,7 +31,6 @@ namespace form_cache
         keyword::featuredItem = DYNAMIC_CAST(utility::LookupForm("Fallout4.esm|1B3FAC"), TESForm, BGSKeyword);
         keyword::unscrappableObject = DYNAMIC_CAST(utility::LookupForm("Fallout4.esm|1CC46A"), TESForm, BGSKeyword);
         keyword::workshop = DYNAMIC_CAST(utility::LookupForm("Fallout4.esm|54BA7"), TESForm, BGSKeyword);
-        keyword::lootingMarker = DYNAMIC_CAST(utility::LookupForm("LootMan.esp|2686"), TESForm, BGSKeyword);
         keyword::settlement = DYNAMIC_CAST(utility::LookupForm("Fallout4.esm|22611"), TESForm, BGSKeyword);
         keyword::workshopSettlement = DYNAMIC_CAST(utility::LookupForm("Fallout4.esm|83C9A"), TESForm, BGSKeyword);
 

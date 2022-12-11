@@ -12,7 +12,6 @@ namespace form_cache
         extern BGSKeyword* featuredItem;
         extern BGSKeyword* unscrappableObject;
         extern BGSKeyword* workshop;
-        extern BGSKeyword* lootingMarker;
         extern BGSKeyword* settlement;
         extern BGSKeyword* workshopSettlement;
     }
