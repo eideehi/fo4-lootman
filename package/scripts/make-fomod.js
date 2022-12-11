@@ -11,10 +11,14 @@ const { exec } = require("child_process");
 
 const { archiveName, buildTempDir } = require("./properties");
 const outDir = path.join(process.cwd(), "dist");
+const outFile = path.join(outDir, `${archiveName}.7z`);
 
 fs.mkdirsSync(outDir);
+if (fs.existsSync(outFile)) {
+    fs.removeSync(outFile);
+}
 
-const compressCmd = `"${process.env.SEVENZIP_PATH}" a "${outDir}/${archiveName}.7z" "${buildTempDir}/*"`;
+const compressCmd = `"${process.env.SEVENZIP_PATH}" a "${outFile}" "${buildTempDir}/*"`;
 exec(compressCmd,
     (error, stdout, stderr) => {
         if (error) {
