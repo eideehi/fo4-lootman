@@ -6,6 +6,7 @@
 #include "constructible_object.hpp"
 #include "form_cache.hpp"
 #include "injection_data.hpp"
+#include "logging.hpp"
 #include "papyrus_lootman.hpp"
 #include "properties.hpp"
 #include "vendor_chest.hpp"
@@ -23,7 +24,7 @@ F4SEMessagingInterface* messaging = nullptr;
 void OnMessaging(F4SEMessagingInterface::Message* msg)
 {
     const auto prefix = "| SYSTEM     |";
-    _MESSAGE("%s F4SE messaging: %d", prefix, msg->type);
+    logging::Message("%s F4SE messaging: %d", prefix, msg->type);
     if (msg->type == F4SEMessagingInterface::kMessage_GameLoaded)
     {
         form_cache::Initialize();
@@ -44,7 +45,7 @@ bool F4SEPlugin_Query(const F4SEInterface* f4se, PluginInfo* info)
     gLog.OpenRelative(CSIDL_MYDOCUMENTS, "\\My Games\\Fallout4\\F4SE\\lootman.log");
 
     const auto prefix = "| INITIALIZE |";
-    _MESSAGE("%s [ Start plugin query phase ]", prefix);
+    logging::Message("%s [ Start plugin query phase ]", prefix);
 
     info->infoVersion = PluginInfo::kInfoVersion;
     info->name = "LootMan";
@@ -52,20 +53,20 @@ bool F4SEPlugin_Query(const F4SEInterface* f4se, PluginInfo* info)
 
     if (f4se->isEditor)
     {
-        _FATALERROR("%s   Loaded in editor, marking as incompatible", prefix);
+        logging::Fatal("%s   Loaded in editor, marking as incompatible", prefix);
         return false;
     }
 
     if (f4se->runtimeVersion != RUNTIME_VERSION_1_10_163)
     {
-        _FATALERROR("%s   Unsupported runtime version: %08X", prefix, f4se->runtimeVersion);
+        logging::Fatal("%s   Unsupported runtime version: %08X", prefix, f4se->runtimeVersion);
         return false;
     }
 
     papyrus = static_cast<F4SEPapyrusInterface*>(f4se->QueryInterface(kInterface_Papyrus));
     if (!papyrus)
     {
-        _FATALERROR("%s   Couldn't get papyrus interface", prefix);
+        logging::Fatal("%s   Couldn't get papyrus interface", prefix);
         return false;
     }
 
@@ -73,46 +74,46 @@ bool F4SEPlugin_Query(const F4SEInterface* f4se, PluginInfo* info)
     messaging = static_cast<F4SEMessagingInterface*>(f4se->QueryInterface(kInterface_Messaging));
     if (!messaging)
     {
-        _FATALERROR("%s   Couldn't get message interface", prefix);
+        logging::Fatal("%s   Couldn't get message interface", prefix);
         return false;
     }
 
-    _MESSAGE("%s   Complete the plugin query phase", prefix);
+    logging::Message("%s   Complete the plugin query phase", prefix);
     return true;
 }
 
 bool F4SEPlugin_Load(const F4SEInterface* f4se)
 {
     const auto prefix = "| INITIALIZE |";
-    _MESSAGE("%s [ Start plugin load phase ]", prefix);
+    logging::Message("%s [ Start plugin load phase ]", prefix);
 
     if (!injection_data::Initialize())
     {
-        _FATALERROR("%s   Failed to initialization for injection data", prefix);
+        logging::Fatal("%s   Failed to initialization for injection data", prefix);
         return false;
     }
 
     if (!papyrus->Register(papyrus_lootman::Register))
     {
-        _FATALERROR("%s   Failed to register papyrus functions for lootman", prefix);
+        logging::Fatal("%s   Failed to register papyrus functions for lootman", prefix);
         return false;
     }
 
 #ifdef _DEBUG
     if (!papyrus->Register(papyrus_debug::Register))
     {
-        _FATALERROR("%s   Failed to register papyrus functions for debug", prefix);
+        logging::Fatal("%s   Failed to register papyrus functions for debug", prefix);
         return false;
     }
 #endif
 
     if (!messaging->RegisterListener(pluginHandle, "F4SE", OnMessaging))
     {
-        _FATALERROR("%s   Failed to messaging functions", prefix);
+        logging::Fatal("%s   Failed to messaging functions", prefix);
         return false;
     }
 
-    _MESSAGE("%s   Complete the plugin load phase", prefix);
+    logging::Message("%s   Complete the plugin load phase", prefix);
     return true;
 }
 }

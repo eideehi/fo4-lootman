@@ -7,6 +7,7 @@
 #include "f4se/PapyrusNativeFunctions.h"
 
 #include "debug.hpp"
+#include "logging.hpp"
 
 namespace papyrus_debug
 {
@@ -55,7 +56,7 @@ namespace papyrus_debug
 
 bool papyrus_debug::Register(VirtualMachine* vm)
 {
-    _MESSAGE("| INITIALIZE | [ Started binding papyrus functions for Debug ]");
+    logging::Message("| INITIALIZE | [ Started binding papyrus functions for Debug ]");
 
     vm->RegisterFunction(new NativeFunction1<StaticFunctionTag, BSFixedString, TESForm*>("GetFormTypeIdentifier", "LTMN2:Debug", GetFormTypeIdentifier, vm));
     vm->RegisterFunction(new NativeFunction1<StaticFunctionTag, BSFixedString, TESForm*>("GetHexId", "LTMN2:Debug", GetHexId, vm));
@@ -71,6 +72,6 @@ bool papyrus_debug::Register(VirtualMachine* vm)
     vm->SetFunctionFlags("LTMN2:Debug", "GetName", IFunction::kFunctionFlag_NoWait);
     vm->SetFunctionFlags("LTMN2:Debug", "GetRandomProcessId", IFunction::kFunctionFlag_NoWait);
 
-    _MESSAGE("| INITIALIZE |   Papyrus functions binding is complete");
+    logging::Message("| INITIALIZE |   Papyrus functions binding is complete");
     return true;
 }

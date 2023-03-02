@@ -194,6 +194,7 @@
     <ClCompile Include="debug.cpp" />
     <ClCompile Include="form_cache.cpp" />
     <ClCompile Include="injection_data.cpp" />
+    <ClCompile Include="logging.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="papyrus_debug.cpp" />
     <ClCompile Include="papyrus_lootman.cpp" />
@@ -209,6 +210,7 @@
     <ClInclude Include="fallout4_extra.hpp" />
     <ClInclude Include="form_cache.hpp" />
     <ClInclude Include="injection_data.hpp" />
+    <ClInclude Include="logging.hpp" />
     <ClInclude Include="papyrus_debug.hpp" />
     <ClInclude Include="papyrus_lootman.hpp" />
     <ClInclude Include="properties.hpp" />

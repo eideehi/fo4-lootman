@@ -9,6 +9,7 @@
 #include "f4se/GameRTTI.h"
 
 #include "fallout4.hpp"
+#include "logging.hpp"
 
 namespace vendor_chest
 {
@@ -18,7 +19,7 @@ namespace vendor_chest
     void Initialize()
     {
         const auto prefix = "| INITIALIZE |";
-        _MESSAGE("%s   [ Start caching vendor chest IDs ]", prefix);
+        logging::Message("%s   [ Start caching vendor chest IDs ]", prefix);
 
         const auto allFaction = (*g_dataHandler)->arrFACT;
         for (UInt32 i = 0; i < allFaction.count; ++i)
@@ -44,7 +45,7 @@ namespace vendor_chest
 
         for (const auto& formID : vendorChests)
         {
-            _MESSAGE("%s     %08X", prefix, formID);
+            logging::Message("%s     %08X", prefix, formID);
         }
     }
 

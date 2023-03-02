@@ -16,6 +16,7 @@
 #include "fallout4_extra.hpp"
 #include "form_cache.hpp"
 #include "injection_data.hpp"
+#include "logging.hpp"
 #include "properties.hpp"
 #include "vendor_chest.hpp"
 #include "virtual_function.hpp"
@@ -27,19 +28,6 @@
 namespace papyrus_lootman
 {
 #ifdef _DEBUG
-    SimpleLock logLock;
-    inline void _MESSAGE(const char * fmt, ...)
-    {
-        {
-            SimpleLocker locker(&logLock);
-            va_list args;
-
-            va_start(args, fmt);
-            gLog.Log(IDebugLog::kLevel_Message, fmt, args);
-            va_end(args);
-        }
-    }
-
     std::unordered_map<UInt32, std::vector<std::string>> knownTitle;
     void TraceOnce(TESObjectREFR* ref, const char* title)
     {
@@ -54,8 +42,8 @@ namespace papyrus_lootman
         if (std::find(titles.begin(), titles.end(), key) == titles.end())
         {
             titles.emplace_back(key);
-            _MESSAGE("| ---------- | [ %s ]", title);
-            _MESSAGE("| ---------- |   %s", debug::Ref2S(ref));
+            logging::Message("| ---------- | [ %s ]", title);
+            logging::Message("| ---------- |   %s", debug::Ref2S(ref));
         }
     }
 
@@ -72,8 +60,8 @@ namespace papyrus_lootman
         if (std::find(titles.begin(), titles.end(), key) == titles.end())
         {
             titles.emplace_back(key);
-            _MESSAGE("| ---------- | [ %s ]", title);
-            _MESSAGE("| ---------- |   %s", debug::Form2S(form));
+            logging::Message("| ---------- | [ %s ]", title);
+            logging::Message("| ---------- |   %s", debug::Form2S(form));
         }
     }
 #endif
@@ -707,7 +695,7 @@ namespace papyrus_lootman
             if (!IsFriendFaction(factionOwner))
             {
 #ifdef _DEBUG
-                _MESSAGE("| ---------- | faction owner is not friend");
+                logging::Message("| ---------- | faction owner is not friend");
 #endif
                 return false;
             }
@@ -718,7 +706,7 @@ namespace papyrus_lootman
         if (actorOwner)
         {
 #ifdef _DEBUG
-            _MESSAGE("| ---------- | have actor owner");
+            logging::Message("| ---------- | have actor owner");
 #endif
             //TODO: Check to see if they ever pass through here.
         }
@@ -748,7 +736,7 @@ namespace papyrus_lootman
                 if (!hasFriendFaction)
                 {
 #ifdef _DEBUG
-                    _MESSAGE("| ---------- | npc owner is not friend");
+                    logging::Message("| ---------- | npc owner is not friend");
 #endif
                     return false;
                 }
@@ -778,7 +766,7 @@ namespace papyrus_lootman
         if (zone->data.flags & BGSEncounterZoneAlt::DATA::workshop_zone)
         {
 #ifdef _DEBUG
-            _MESSAGE("location is in workshop zone");
+            logging::Message("location is in workshop zone");
 #endif
             return true;
         }
@@ -1254,7 +1242,7 @@ namespace papyrus_lootman
     {
 #ifdef _DEBUG
         const char* processId = debug::GetRandomProcessId();
-        _MESSAGE("| %s | [ Start FindNearbyReferencesWithFormType ]", processId);
+        logging::Message("| %s | [ Start FindNearbyReferencesWithFormType ]", processId);
 #endif
         VMArray<TESObjectREFR*> result;
         if ((*g_ui)->numPauseGame)
@@ -1273,9 +1261,9 @@ namespace papyrus_lootman
         const std::size_t maxItemsProcessedPerThread = GetInt(properties::Key::max_items_processed_per_thread);
 
 #ifdef _DEBUG
-        _MESSAGE("| %s |   Origin: [ X: %f, Y: %f, Z: %f ]", processId, origin.x, origin.y, origin.z);  // NOLINT(clang-diagnostic-double-promotion)
-        _MESSAGE("| %s |   Looting Range: %.1fm", processId, GetFloat(properties::Key::looting_range));  // NOLINT(clang-diagnostic-double-promotion)
-        _MESSAGE("| %s |   Form Type: %s", processId, debug::GetFormTypeIdentifier(formType));  // NOLINT(clang-diagnostic-implicit-int-conversion)
+        logging::Message("| %s |   Origin: [ X: %f, Y: %f, Z: %f ]", processId, origin.x, origin.y, origin.z);  // NOLINT(clang-diagnostic-double-promotion)
+        logging::Message("| %s |   Looting Range: %.1fm", processId, GetFloat(properties::Key::looting_range));  // NOLINT(clang-diagnostic-double-promotion)
+        logging::Message("| %s |   Form Type: %s", processId, debug::GetFormTypeIdentifier(formType));  // NOLINT(clang-diagnostic-implicit-int-conversion)
 #endif
 
         typedef std::pair<TESObjectREFR*, float> object;
@@ -1291,7 +1279,7 @@ namespace papyrus_lootman
             if (cell->cellState != TESObjectCELLAlt::attached)
             {
 #ifdef _DEBUG
-                _MESSAGE("| %s |     [ Cell is not attached ]", processId);
+                logging::Message("| %s |     [ Cell is not attached ]", processId);
 #endif
                 return;
             }
@@ -1299,7 +1287,7 @@ namespace papyrus_lootman
             if (!IsOwnerEmptyOrFriend(GetCellOwner(cell)))
             {
 #ifdef _DEBUG
-                _MESSAGE("| %s |     [ Cell owner is invalid ]", processId);
+                logging::Message("| %s |     [ Cell owner is invalid ]", processId);
 #endif
                 return;
             }
@@ -1309,7 +1297,7 @@ namespace papyrus_lootman
                 if (IsSettlement(GetCellEncounterZone(cell)))
                 {
 #ifdef _DEBUG
-                    _MESSAGE("| %s |     [ Cell is settlement ]", processId);
+                    logging::Message("| %s |     [ Cell is settlement ]", processId);
 #endif
                     return;
                 }
@@ -1379,7 +1367,7 @@ namespace papyrus_lootman
         });
 
 #ifdef _DEBUG
-        _MESSAGE("| %s |     Found objects: %d", processId, buffer.size());
+        logging::Message("| %s |     Found objects: %d", processId, buffer.size());
 #endif
 
         std::vector<TESObjectREFR*> tmp;
@@ -1432,14 +1420,14 @@ namespace papyrus_lootman
     {
 #ifdef _DEBUG
         const char* processId = debug::GetRandomProcessId();
-        _MESSAGE("| %s | [ Start GetEquipmentComponents ]", processId);
+        logging::Message("| %s | [ Start GetEquipmentComponents ]", processId);
 #endif
         VMArray<MiscComponent> result;
         if (!inventoryItem)
         {
 #ifdef _DEBUG
-            _MESSAGE("| %s |   [ Illegal argument error ]", processId);
-            _MESSAGE("| %s |     inventoryItem is null: %s", processId, Bool2S(!inventoryItem));
+            logging::Message("| %s |   [ Illegal argument error ]", processId);
+            logging::Message("| %s |     inventoryItem is null: %s", processId, Bool2S(!inventoryItem));
 #endif
             return result;
         }
@@ -1450,23 +1438,23 @@ namespace papyrus_lootman
         if (!baseForm || !extraDataList)
         {
 #ifdef _DEBUG
-            _MESSAGE("| %s |   [ VMRefOrInventoryObj is invalid ]", processId);
-            _MESSAGE("| %s |     Base form is null: %s", processId, Bool2S(!baseForm));
-            _MESSAGE("| %s |     Extra data is null: %s", processId, Bool2S(!extraDataList));
+            logging::Message("| %s |   [ VMRefOrInventoryObj is invalid ]", processId);
+            logging::Message("| %s |     Base form is null: %s", processId, Bool2S(!baseForm));
+            logging::Message("| %s |     Extra data is null: %s", processId, Bool2S(!extraDataList));
 #endif
             return result;
         }
 
 #ifdef _DEBUG
-        _MESSAGE("| %s |   Item: %s", processId, debug::GetDisplayName(baseForm, extraDataList));
+        logging::Message("| %s |   Item: %s", processId, debug::GetDisplayName(baseForm, extraDataList));
 #endif
 
         if (baseForm->formType != kFormType_ARMO && baseForm->formType != kFormType_WEAP)
         {
 #ifdef _DEBUG
-            _MESSAGE("| %s |   [ Item is invalid ]", processId);
-            _MESSAGE("| %s |     Is not armor: %s", processId, Bool2S(baseForm->formType != kFormType_ARMO));
-            _MESSAGE("| %s |     Is not weapon: %s", processId, Bool2S(baseForm->formType != kFormType_WEAP));
+            logging::Message("| %s |   [ Item is invalid ]", processId);
+            logging::Message("| %s |     Is not armor: %s", processId, Bool2S(baseForm->formType != kFormType_ARMO));
+            logging::Message("| %s |     Is not weapon: %s", processId, Bool2S(baseForm->formType != kFormType_WEAP));
 #endif
             return result;
         }
@@ -1477,7 +1465,7 @@ namespace papyrus_lootman
             if (!obj)
             {
 #ifdef _DEBUG
-                _MESSAGE("| %s |       ConstructibleObject not found", processId);
+                logging::Message("| %s |       ConstructibleObject not found", processId);
 #endif
                 return;
             }
@@ -1507,7 +1495,7 @@ namespace papyrus_lootman
                             }
 #ifdef _DEBUG
                             foundComponent = true;
-                            _MESSAGE("| %s |       Found component: [ Id: %08X, Name: %s, Count: %d, Scale: %.1f ] x%d", processId, miscComponent.component->formID, debug::GetName(miscComponent.component), miscComponent.count, miscComponent.component->scrapScalar->value, objComponent.count);
+                            logging::Message("| %s |       Found component: [ Id: %08X, Name: %s, Count: %d, Scale: %.1f ] x%d", processId, miscComponent.component->formID, debug::GetName(miscComponent.component), miscComponent.count, miscComponent.component->scrapScalar->value, objComponent.count);
 #endif
                             data[miscComponent.component] += static_cast<UInt32>(miscComponent.count * objComponent.count);
                         }
@@ -1521,21 +1509,21 @@ namespace papyrus_lootman
                 }
 #ifdef _DEBUG
                 foundComponent = true;
-                _MESSAGE("| %s |       Found component: [ Id: %08X, Name: %s, Count: %d, Scale: %.1f ]", processId, objComponent.component->formID, debug::GetName(objComponent.component), objComponent.count, objComponent.component->scrapScalar->value);
+                logging::Message("| %s |       Found component: [ Id: %08X, Name: %s, Count: %d, Scale: %.1f ]", processId, objComponent.component->formID, debug::GetName(objComponent.component), objComponent.count, objComponent.component->scrapScalar->value);
 #endif
                 data[objComponent.component] += objComponent.count;
             }
 #ifdef _DEBUG
             if (!foundComponent)
             {
-                _MESSAGE("| %s |       Component not found", processId);
+                logging::Message("| %s |       Component not found", processId);
             }
 #endif
         };
 
 #ifdef _DEBUG
-        _MESSAGE("| %s |   [ Extract components ]", processId);
-        _MESSAGE("| %s |     Base item: [ Id: %08X, Name: %s ]", processId, baseForm->formID, debug::GetName(baseForm));
+        logging::Message("| %s |   [ Extract components ]", processId);
+        logging::Message("| %s |     Base item: [ Id: %08X, Name: %s ]", processId, baseForm->formID, debug::GetName(baseForm));
 #endif
         extractComponents(constructible_object::FromCreatedObjectId(baseForm->formID));
 
@@ -1544,8 +1532,8 @@ namespace papyrus_lootman
         for (const auto& objectMod : list)
         {
 #ifdef _DEBUG
-            _MESSAGE("| %s |   [ Extract components ]", processId);
-            _MESSAGE("| %s |     Module: [ Id: %08X, Name: %s ]", processId, objectMod->formID, debug::GetName(objectMod));
+            logging::Message("| %s |   [ Extract components ]", processId);
+            logging::Message("| %s |     Module: [ Id: %08X, Name: %s ]", processId, objectMod->formID, debug::GetName(objectMod));
 #endif
             extractComponents(constructible_object::FromCreatedObjectId(objectMod->formID));
         }
@@ -1572,44 +1560,44 @@ namespace papyrus_lootman
     {
 #ifdef _DEBUG
         const char* processId = debug::GetRandomProcessId();
-        _MESSAGE("| %s | [ Start GetInventoryItemsWithItemType ]", processId);
+        logging::Message("| %s | [ Start GetInventoryItemsWithItemType ]", processId);
 #endif
         VMArray<TESForm*> result;
 
         if (!inventoryOwner || (itemType < 0 || itemType > all_item))
         {
 #ifdef _DEBUG
-            _MESSAGE("| %s |   [ Illegal argument error ]", processId);
-            _MESSAGE("| %s |     inventoryOwner is null: %s", processId, Bool2S(!inventoryOwner));
-            _MESSAGE("| %s |     itemType is out of range: %d", processId, itemType);
+            logging::Message("| %s |   [ Illegal argument error ]", processId);
+            logging::Message("| %s |     inventoryOwner is null: %s", processId, Bool2S(!inventoryOwner));
+            logging::Message("| %s |     itemType is out of range: %d", processId, itemType);
 #endif
             return result;
         }
 
 #ifdef _DEBUG
-        _MESSAGE("| %s |   InventoryOwner is essential: %s", processId, Bool2S(IsEssential(inventoryOwner)));
+        logging::Message("| %s |   InventoryOwner is essential: %s", processId, Bool2S(IsEssential(inventoryOwner)));
 #endif
         const bool isPlayer = (inventoryOwner->formID == (*g_player)->formID);
         const bool isDead = virtual_function::IsDead(inventoryOwner, IsEssential(inventoryOwner));
 
 #ifdef _DEBUG
-        _MESSAGE("| %s |   Inventory owner: [ Name: %s, Id: %08X ]", processId, CALL_MEMBER_FN(inventoryOwner, GetReferenceName)(), inventoryOwner->formID);
-        _MESSAGE("| %s |   Is player: %s", processId, Bool2S(isPlayer));
-        _MESSAGE("| %s |   Is dead: %s", processId, Bool2S(isDead));
-        _MESSAGE("| %s |   Form type of item to look for: %s", processId, debug::GetItemTypeIdentifier(itemType));
+        logging::Message("| %s |   Inventory owner: [ Name: %s, Id: %08X ]", processId, CALL_MEMBER_FN(inventoryOwner, GetReferenceName)(), inventoryOwner->formID);
+        logging::Message("| %s |   Is player: %s", processId, Bool2S(isPlayer));
+        logging::Message("| %s |   Is dead: %s", processId, Bool2S(isDead));
+        logging::Message("| %s |   Form type of item to look for: %s", processId, debug::GetItemTypeIdentifier(itemType));
 #endif
 
         BGSInventoryList* inventoryList = inventoryOwner->inventoryList;
         if (!inventoryList)
         {
 #ifdef _DEBUG
-            _MESSAGE("| %s |   [ Inventory does not exist ]", processId);
+            logging::Message("| %s |   [ Inventory does not exist ]", processId);
 #endif
             return result;
         }
 
 #ifdef _DEBUG
-        _MESSAGE("| %s |   [ Start searching for items ]", processId);
+        logging::Message("| %s |   [ Start searching for items ]", processId);
 #endif
         {
             inventoryList->inventoryLock.LockForRead();
@@ -1629,14 +1617,14 @@ namespace papyrus_lootman
                 }
 
 #ifdef _DEBUG
-                _MESSAGE("| %s |     [ Item %d ]", processId, i);
-                _MESSAGE("| %s |       %s", processId, debug::InvItem2S(&item));
+                logging::Message("| %s |     [ Item %d ]", processId, i);
+                logging::Message("| %s |       %s", processId, debug::InvItem2S(&item));
 #endif
 
                 if (!IsPlayable(form))
                 {
 #ifdef _DEBUG
-                    _MESSAGE("| %s |       [ Item is not playable ]", processId);
+                    logging::Message("| %s |       [ Item is not playable ]", processId);
 #endif
                     continue;
                 }
@@ -1644,7 +1632,7 @@ namespace papyrus_lootman
                 if (!IsFormTypeMatchesItemType(form->formType, itemType))
                 {
 #ifdef _DEBUG
-                    _MESSAGE("| %s |       [ Mismatch item type ]", processId);
+                    logging::Message("| %s |       [ Mismatch item type ]", processId);
 #endif
                     continue;
                 }
@@ -1654,7 +1642,7 @@ namespace papyrus_lootman
                     if (form->formID == 0x0F)
                     {
 #ifdef _DEBUG
-                        _MESSAGE("| %s |       [ Item is caps ]", processId);
+                        logging::Message("| %s |       [ Item is caps ]", processId);
 #endif
                         continue;
                     }
@@ -1662,7 +1650,7 @@ namespace papyrus_lootman
                     if (IsFavorite(item.form))
                     {
 #ifdef _DEBUG
-                        _MESSAGE("| %s |       [ Item is favorite ]", processId);
+                        logging::Message("| %s |       [ Item is favorite ]", processId);
 #endif
                         continue;
                     }
@@ -1683,13 +1671,13 @@ namespace papyrus_lootman
                 if (!pickable)
                 {
 #ifdef _DEBUG
-                    _MESSAGE("| %s |       [ Item is equipped or dropped item ]", processId);
+                    logging::Message("| %s |       [ Item is equipped or dropped item ]", processId);
 #endif
                     continue;
                 }
 
 #ifdef _DEBUG
-                _MESSAGE("| %s |     [ Add to result ]", processId);
+                logging::Message("| %s |     [ Add to result ]", processId);
 #endif
                 result.Push(&form);
             }
@@ -1705,16 +1693,16 @@ namespace papyrus_lootman
     {
 #ifdef _DEBUG
         const char* processId = debug::GetRandomProcessId();
-        _MESSAGE("| %s | [ Start GetLootableItems ]", processId);
+        logging::Message("| %s | [ Start GetLootableItems ]", processId);
 #endif
         VMArray<TESForm*> result;
 
         if (!inventoryOwner || (itemType < 0 || itemType > all_item))
         {
 #ifdef _DEBUG
-            _MESSAGE("| %s |   [ Illegal argument error ]", processId);
-            _MESSAGE("| %s |     inventoryOwner is null: %s", processId, Bool2S(!inventoryOwner));
-            _MESSAGE("| %s |     itemType is out of range: %d", processId, itemType);
+            logging::Message("| %s |   [ Illegal argument error ]", processId);
+            logging::Message("| %s |     inventoryOwner is null: %s", processId, Bool2S(!inventoryOwner));
+            logging::Message("| %s |     itemType is out of range: %d", processId, itemType);
 #endif
             return result;
         }
@@ -1723,13 +1711,13 @@ namespace papyrus_lootman
         if (!inventoryList)
         {
 #ifdef _DEBUG
-            _MESSAGE("| %s |   [ Inventory does not exist ]", processId);
+            logging::Message("| %s |   [ Inventory does not exist ]", processId);
 #endif
             return result;
         }
 
 #ifdef _DEBUG
-        _MESSAGE("| %s |   [ Start searching for items ]", processId);
+        logging::Message("| %s |   [ Start searching for items ]", processId);
 #endif
         {
             inventoryList->inventoryLock.LockForRead();
@@ -1749,14 +1737,14 @@ namespace papyrus_lootman
                 }
 
 #ifdef _DEBUG
-                _MESSAGE("| %s |     [ Item %d ]", processId, i);
-                _MESSAGE("| %s |       %s", processId, debug::InvItem2S(&item));
+                logging::Message("| %s |     [ Item %d ]", processId, i);
+                logging::Message("| %s |       %s", processId, debug::InvItem2S(&item));
 #endif
 
                 if (!IsFormTypeMatchesItemType(form->formType, itemType))
                 {
 #ifdef _DEBUG
-                    _MESSAGE("| %s |       [ Mismatch item type ]", processId);
+                    logging::Message("| %s |       [ Mismatch item type ]", processId);
 #endif
                     continue;
                 }
@@ -1764,7 +1752,7 @@ namespace papyrus_lootman
                 if (!IsValidForm(form) || !IsLootableForm(form))
                 {
 #ifdef _DEBUG
-                    _MESSAGE("| %s |       [ Item form is invalid ]", processId);
+                    logging::Message("| %s |       [ Item form is invalid ]", processId);
 #endif
                     continue;
                 }
@@ -1773,7 +1761,7 @@ namespace papyrus_lootman
                 if (!IsValidInventoryItem(form, info) || !IsLootableInventoryItem(form, info))
                 {
 #ifdef _DEBUG
-                    _MESSAGE("| %s |       [ Inventory item is invalid ]", processId);
+                    logging::Message("| %s |       [ Inventory item is invalid ]", processId);
 #endif
                     continue;
                 }
@@ -1791,16 +1779,16 @@ namespace papyrus_lootman
     {
 #ifdef _DEBUG
         const char* processId = debug::GetRandomProcessId();
-        _MESSAGE("| %s | [ Start GetScrappableItems ]", processId);
+        logging::Message("| %s | [ Start GetScrappableItems ]", processId);
 #endif
         VMArray<TESForm*> result;
 
         if (!inventoryOwner || (itemType < 0 || itemType > all_item))
         {
 #ifdef _DEBUG
-            _MESSAGE("| %s |   [ Illegal argument error ]", processId);
-            _MESSAGE("| %s |     inventoryOwner is null: %s", processId, Bool2S(!inventoryOwner));
-            _MESSAGE("| %s |     itemType is out of range: %d", processId, itemType);
+            logging::Message("| %s |   [ Illegal argument error ]", processId);
+            logging::Message("| %s |     inventoryOwner is null: %s", processId, Bool2S(!inventoryOwner));
+            logging::Message("| %s |     itemType is out of range: %d", processId, itemType);
 #endif
             return result;
         }
@@ -1812,13 +1800,13 @@ namespace papyrus_lootman
         if (!inventoryList)
         {
 #ifdef _DEBUG
-            _MESSAGE("| %s |   [ Inventory does not exist ]", processId);
+            logging::Message("| %s |   [ Inventory does not exist ]", processId);
 #endif
             return result;
         }
 
 #ifdef _DEBUG
-        _MESSAGE("| %s |   [ Start searching for items ]", processId);
+        logging::Message("| %s |   [ Start searching for items ]", processId);
 #endif
         {
             inventoryList->inventoryLock.LockForRead();
@@ -1838,14 +1826,14 @@ namespace papyrus_lootman
                 }
 
 #ifdef _DEBUG
-                _MESSAGE("| %s |     [ Item %d ]", processId, i);
-                _MESSAGE("| %s |       %s", processId, debug::InvItem2S(&item));
+                logging::Message("| %s |     [ Item %d ]", processId, i);
+                logging::Message("| %s |       %s", processId, debug::InvItem2S(&item));
 #endif
 
                 if (!IsPlayable(form))
                 {
 #ifdef _DEBUG
-                    _MESSAGE("| %s |       [ Item is not playable ]", processId);
+                    logging::Message("| %s |       [ Item is not playable ]", processId);
 #endif
                     continue;
                 }
@@ -1853,7 +1841,7 @@ namespace papyrus_lootman
                 if (!IsFormTypeMatchesItemType(form->formType, itemType))
                 {
 #ifdef _DEBUG
-                    _MESSAGE("| %s |       [ Mismatch item type ]", processId);
+                    logging::Message("| %s |       [ Mismatch item type ]", processId);
 #endif
                     continue;
                 }
@@ -1861,7 +1849,7 @@ namespace papyrus_lootman
                 if (HasKeyword(form, keyword::featuredItem))
                 {
 #ifdef _DEBUG
-                    _MESSAGE("| %s |       [ Form is featured item ]", processId);
+                    logging::Message("| %s |       [ Form is featured item ]", processId);
 #endif
                     continue;
                 }
@@ -1871,7 +1859,7 @@ namespace papyrus_lootman
                     if (form->formID == 0x0F)
                     {
 #ifdef _DEBUG
-                        _MESSAGE("| %s |       [ Item is caps ]", processId);
+                        logging::Message("| %s |       [ Item is caps ]", processId);
 #endif
                         continue;
                     }
@@ -1879,7 +1867,7 @@ namespace papyrus_lootman
                     if (IsFavorite(item.form))
                     {
 #ifdef _DEBUG
-                        _MESSAGE("| %s |       [ Item is favorite ]", processId);
+                        logging::Message("| %s |       [ Item is favorite ]", processId);
 #endif
                         continue;
                     }
@@ -1890,7 +1878,7 @@ namespace papyrus_lootman
                 if (info.equipped && !isDead)
                 {
 #ifdef _DEBUG
-                    _MESSAGE("| %s |       [ Item is equipped ]", processId);
+                    logging::Message("| %s |       [ Item is equipped ]", processId);
 #endif
                     continue;
                 }
@@ -1898,7 +1886,7 @@ namespace papyrus_lootman
                 if (info.featured || info.unscrappable || info.questItem)
                 {
 #ifdef _DEBUG
-                    _MESSAGE("| %s |       [ Item is cannot be scrapped ]", processId);
+                    logging::Message("| %s |       [ Item is cannot be scrapped ]", processId);
 #endif
                     continue;
                 }
@@ -1950,7 +1938,7 @@ namespace papyrus_lootman
 
 bool papyrus_lootman::Register(VirtualMachine* vm)
 {
-    _MESSAGE("| INITIALIZE | [ Started binding papyrus functions for LootMan ]");
+    logging::Message("| INITIALIZE | [ Started binding papyrus functions for LootMan ]");
 
     vm->RegisterFunction(new NativeFunction2<StaticFunctionTag, VMArray<TESObjectREFR*>, TESObjectREFR*, UInt32>("FindNearbyReferencesWithFormType", "LTMN2:LootMan", FindNearbyReferencesWithFormType, vm));
     vm->RegisterFunction(new NativeFunction1<StaticFunctionTag, VMArray<MiscComponent>, VMRefOrInventoryObj*>("GetEquipmentComponents", "LTMN2:LootMan", GetEquipmentComponents, vm));
@@ -1974,7 +1962,7 @@ bool papyrus_lootman::Register(VirtualMachine* vm)
     //vm->SetFunctionFlags("LTMN2:LootMan", "OnUpdateLootManProperty", IFunction::kFunctionFlag_NoWait);
     //vm->SetFunctionFlags("LTMN2:LootMan", "ReleaseObject", IFunction::kFunctionFlag_NoWait);
 
-    _MESSAGE("| INITIALIZE |   Papyrus functions binding is complete");
+    logging::Message("| INITIALIZE |   Papyrus functions binding is complete");
     return true;
 }
 

@@ -15,6 +15,7 @@
 #include "lib/rapidjson/prettywriter.h"
 #include "lib/rapidjson/stringbuffer.h"
 
+#include "logging.hpp"
 #include "utility.hpp"
 
 template <>
@@ -184,16 +185,16 @@ namespace injection_data
     bool Initialize()
     {
         const auto prefix = "| INITIALIZE |";
-        _MESSAGE("%s   [ Start initialization of injection data ]", prefix);
+        logging::Message("%s   [ Start initialization of injection data ]", prefix);
 
         const std::tr2::sys::path dir = (GetRuntimeDirectory() + "DATA\\LootMan");
         if (!exists(dir))
         {
-            _FATALERROR("%s     Couldn't get the directory for data injection: \"%s\"", prefix, dir.string().c_str());
+            logging::Fatal("%s     Couldn't get the directory for data injection: \"%s\"", prefix, dir.string().c_str());
             return false;
         }
 
-        _MESSAGE("%s     Search for a json file for data injection from \"%s\"", prefix, dir.string().c_str());
+        logging::Message("%s     Search for a json file for data injection from \"%s\"", prefix, dir.string().c_str());
 
         // Web page that referred to: https://qiita.com/sukakako/items/c329878ce8d622bfd801
         for (std::tr2::sys::directory_iterator dit(dir); dit != std::tr2::sys::directory_iterator(); ++dit)
@@ -204,7 +205,7 @@ namespace injection_data
                 continue;
             }
 
-            _MESSAGE("%s     Load injection data from \"%s\"", prefix, file.string().c_str());
+            logging::Message("%s     Load injection data from \"%s\"", prefix, file.string().c_str());
 
             std::ifstream ifs(file);
             rapidjson::IStreamWrapper isw(ifs);
@@ -214,7 +215,7 @@ namespace injection_data
 
             if (src.HasParseError())
             {
-                _FATALERROR("%s       Json parse error: [ Error code: %d ]", prefix, src.GetParseError());
+                logging::Fatal("%s       Json parse error: [ Error code: %d ]", prefix, src.GetParseError());
                 return false;
             }
 
@@ -223,7 +224,7 @@ namespace injection_data
                 auto path = info.path;
                 if (rapidjson::Value* value = rapidjson::Pointer(path).Get(src))
                 {
-                    _MESSAGE("%s       Load: \"%s\"", prefix, path);
+                    logging::Message("%s       Load: \"%s\"", prefix, path);
 
                     if (tmp.find(path) == tmp.end())
                     {
@@ -257,14 +258,14 @@ namespace injection_data
             }
         }
 
-        _MESSAGE("%s     Initialization of injection data is complete", prefix);
+        logging::Message("%s     Initialization of injection data is complete", prefix);
         return true;
     }
 
     void LoadInjectionData()
     {
         const auto prefix = "| INITIALIZE |";
-        _MESSAGE("%s   [ Start loading injection data ]", prefix);
+        logging::Message("%s   [ Start loading injection data ]", prefix);
 
         for (const auto info : info_list)
         {
@@ -276,12 +277,12 @@ namespace injection_data
                 data.emplace(key, set);
             }
 
-            _MESSAGE("%s     Load: \"%s\"", prefix, info.path);
+            logging::Message("%s     Load: \"%s\"", prefix, info.path);
 
             auto it = tmp.find(info.path);
             if (it == tmp.end())
             {
-                _MESSAGE("%s       Is Empty", prefix);
+                logging::Message("%s       Is Empty", prefix);
                 continue;
             }
 
@@ -305,7 +306,7 @@ namespace injection_data
                         value.type = Type::location_ref_type;
                         value.data.location_ref_type = locationRefType;
                         data[key].emplace(value);
-                        _MESSAGE("%s       LocationRefType: %08X", prefix, form->formID);
+                        logging::Message("%s       LocationRefType: %08X", prefix, form->formID);
                         continue;
                     }
                 }
@@ -319,7 +320,7 @@ namespace injection_data
                         value.type = Type::keyword;
                         value.data.keyword = keyword;
                         data[key].emplace(value);
-                        _MESSAGE("%s       Keyword: %08X", prefix, form->formID);
+                        logging::Message("%s       Keyword: %08X", prefix, form->formID);
                         continue;
                     }
                 }
@@ -334,11 +335,11 @@ namespace injection_data
                 value.type = Type::form;
                 value.data.form = form;
                 data[key].emplace(value);
-                _MESSAGE("%s       Form: %08X", prefix, form->formID);
+                logging::Message("%s       Form: %08X", prefix, form->formID);
             }
         }
 
         tmp.clear();
-        _MESSAGE("%s     Loading of injection data is complete", prefix);
+        logging::Message("%s     Loading of injection data is complete", prefix);
     }
 }

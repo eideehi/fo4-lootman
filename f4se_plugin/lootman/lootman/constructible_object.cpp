@@ -3,6 +3,8 @@
 #include "f4se/GameData.h"
 #include "f4se/GameRTTI.h"
 
+#include "logging.hpp"
+
 namespace constructible_object
 {
     std::unordered_map<UInt32, BGSConstructibleObject*> cache;
@@ -34,7 +36,7 @@ namespace constructible_object
     void Initialize()
     {
         const auto prefix = "| INITIALIZE |";
-        _MESSAGE("%s   [ Start a ConstructibleObject cache associated with the object ID ]", prefix);
+        logging::Message("%s   [ Start a ConstructibleObject cache associated with the object ID ]", prefix);
 
         const auto allCObj = (*g_dataHandler)->arrCOBJ;
         for (UInt32 i = 0; i < allCObj.count; ++i)
@@ -47,7 +49,7 @@ namespace constructible_object
             _cacheCObj(cobj->createdObject, cobj);
         }
 
-        _MESSAGE("%s     Cache size: %d", prefix, cache.size());
+        logging::Message("%s     Cache size: %d", prefix, cache.size());
     }
 
     BGSConstructibleObject* FromCreatedObjectId(UInt32 formId)
