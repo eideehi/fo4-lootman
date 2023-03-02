@@ -13,7 +13,8 @@ EndFunction
 ; Version as int.
 ; syntax: Major{1}.Minor{2}.Patch{2}
 ; example: 10234 // 1.2.34
-int MOD_VERSION = 20006 const
+; current: 2.0.7
+int MOD_VERSION = 20007 const
 
 ; Timer id list
 int TIMER_INSTALL = 1 const
