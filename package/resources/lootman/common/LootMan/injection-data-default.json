@@ -1,12 +1,14 @@
 {
     "include": {
         "_comment": "Fallout4.esm|03000C = Caps Stash",
+        "_comment": "Fallout4.esm|08FCA8 = Bobby Pin Box",
         "_comment": "Fallout4.esm|20ABE3 = Caps(Fortune Finder)",
         "_comment": "Fallout4.esm|2472ED = Caps(Bottle Cap Mine)",
         "_comment": "DLCNukaWorld.esm|046B61 = Nuka-Cade Ticket Stack",
         "_comment": "DLCNukaWorld.esm|056C22 = Nuka-Cade Ticket Roll",
         "activation-block": [
             "Fallout4.esm|03000C",
+            "Fallout4.esm|08FCA8",
             "Fallout4.esm|20ABE3",
             "Fallout4.esm|2472ED",
             "DLCNukaWorld.esm|046B61",
