@@ -1963,16 +1963,16 @@ bool papyrus_lootman::Register(VirtualMachine* vm)
     vm->RegisterFunction(new NativeFunction1<StaticFunctionTag, void, BSFixedString>("OnUpdateLootManProperty", "LTMN2:LootMan", OnUpdateLootManProperty, vm));
     vm->RegisterFunction(new NativeFunction1<StaticFunctionTag, void, UInt32>("ReleaseObject", "LTMN2:LootMan", ReleaseObject, vm));
 
-    vm->SetFunctionFlags("LTMN2:LootMan", "FindNearbyReferencesWithFormType", IFunction::kFunctionFlag_NoWait);
-    vm->SetFunctionFlags("LTMN2:LootMan", "GetEquipmentComponents", IFunction::kFunctionFlag_NoWait);
+    //vm->SetFunctionFlags("LTMN2:LootMan", "FindNearbyReferencesWithFormType", IFunction::kFunctionFlag_NoWait);
+    //vm->SetFunctionFlags("LTMN2:LootMan", "GetEquipmentComponents", IFunction::kFunctionFlag_NoWait);
     vm->SetFunctionFlags("LTMN2:LootMan", "GetFormType", IFunction::kFunctionFlag_NoWait);
-    vm->SetFunctionFlags("LTMN2:LootMan", "GetInventoryItemsWithItemType", IFunction::kFunctionFlag_NoWait);
-    vm->SetFunctionFlags("LTMN2:LootMan", "GetLootableItems", IFunction::kFunctionFlag_NoWait);
-    vm->SetFunctionFlags("LTMN2:LootMan", "GetScrappableItems", IFunction::kFunctionFlag_NoWait);
+    //vm->SetFunctionFlags("LTMN2:LootMan", "GetInventoryItemsWithItemType", IFunction::kFunctionFlag_NoWait);
+    //vm->SetFunctionFlags("LTMN2:LootMan", "GetLootableItems", IFunction::kFunctionFlag_NoWait);
+    //vm->SetFunctionFlags("LTMN2:LootMan", "GetScrappableItems", IFunction::kFunctionFlag_NoWait);
     vm->SetFunctionFlags("LTMN2:LootMan", "IsFormTypeEquals", IFunction::kFunctionFlag_NoWait);
-    vm->SetFunctionFlags("LTMN2:LootMan", "PlayPickUpSound", IFunction::kFunctionFlag_NoWait);
-    vm->SetFunctionFlags("LTMN2:LootMan", "OnUpdateLootManProperty", IFunction::kFunctionFlag_NoWait);
-    vm->SetFunctionFlags("LTMN2:LootMan", "ReleaseObject", IFunction::kFunctionFlag_NoWait);
+    //vm->SetFunctionFlags("LTMN2:LootMan", "PlayPickUpSound", IFunction::kFunctionFlag_NoWait);
+    //vm->SetFunctionFlags("LTMN2:LootMan", "OnUpdateLootManProperty", IFunction::kFunctionFlag_NoWait);
+    //vm->SetFunctionFlags("LTMN2:LootMan", "ReleaseObject", IFunction::kFunctionFlag_NoWait);
 
     _MESSAGE("| INITIALIZE |   Papyrus functions binding is complete");
     return true;
