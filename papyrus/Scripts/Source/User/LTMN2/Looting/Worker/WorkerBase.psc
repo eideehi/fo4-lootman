@@ -38,6 +38,11 @@ Event LTMN2:Looting:Worker:WorkerBase.CallLooting(LTMN2:Looting:Worker:WorkerBas
     EndIf
 EndEvent
 
+Function Initialize()
+    LTMN2:Debug.Log("| Looting Worker @ " + GetThreadId() + " | ---------- |     Initialize worker")
+    threadRunning = false
+EndFunction
+
 Function Run()
     SendCustomEvent("CallLooting")
 EndFunction

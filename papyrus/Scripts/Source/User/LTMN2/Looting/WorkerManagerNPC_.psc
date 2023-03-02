@@ -24,6 +24,18 @@ Event OnInit()
     worker08 = WorkerManagerNPC_ As LTMN2:Looting:Worker:Impl:WorkerNPC_08
 EndEvent
 
+Function Initialize()
+    worker01.Initialize()
+    worker02.Initialize()
+    worker03.Initialize()
+    worker04.Initialize()
+    worker05.Initialize()
+    worker06.Initialize()
+    worker07.Initialize()
+    worker08.Initialize()
+    properties.ActiveWorkerThreadsNPC_ = 0
+EndFunction
+
 Function Looting()
     If (!properties.EnableObjectLootingOfNPC_)
         Return

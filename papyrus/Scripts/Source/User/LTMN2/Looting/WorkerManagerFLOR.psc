@@ -24,6 +24,18 @@ Event OnInit()
     worker08 = WorkerManagerFLOR As LTMN2:Looting:Worker:Impl:WorkerFLOR08
 EndEvent
 
+Function Initialize()
+    worker01.Initialize()
+    worker02.Initialize()
+    worker03.Initialize()
+    worker04.Initialize()
+    worker05.Initialize()
+    worker06.Initialize()
+    worker07.Initialize()
+    worker08.Initialize()
+    properties.ActiveWorkerThreadsFLOR = 0
+EndFunction
+
 Function Looting()
     If (!properties.EnableObjectLootingOfFLOR)
         Return

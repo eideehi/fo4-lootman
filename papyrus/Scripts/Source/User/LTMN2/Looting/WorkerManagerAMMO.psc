@@ -24,6 +24,18 @@ Event OnInit()
     worker08 = WorkerManagerAMMO As LTMN2:Looting:Worker:Impl:WorkerAMMO08
 EndEvent
 
+Function Initialize()
+    worker01.Initialize()
+    worker02.Initialize()
+    worker03.Initialize()
+    worker04.Initialize()
+    worker05.Initialize()
+    worker06.Initialize()
+    worker07.Initialize()
+    worker08.Initialize()
+    properties.ActiveWorkerThreadsAMMO = 0
+EndFunction
+
 Function Looting()
     If (!properties.EnableObjectLootingOfAMMO)
         Return
