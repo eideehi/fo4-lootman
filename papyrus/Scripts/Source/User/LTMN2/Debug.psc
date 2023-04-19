@@ -35,6 +35,7 @@ Function TraceObject(string prefix, ObjectReference ref) global
     Actor _player = Game.GetPlayer()
 
     Log(prefix + "Object: [ Name: \"" + ref.GetDisplayName() + "\", Id: " + GetHexId(ref) + " ]")
+    Log(prefix + "  Is near player: " + ref.IsNearPlayer())
     Log(prefix + "  Position: [ X: " + ref.X + ", Y: " + ref.Y + ", Z: " + ref.Z + " ]")
     Log(prefix + "  Distance to player: " + (ref.GetDistance(_player) / 100) + "m")
     Log(prefix + "  Is disabled: " + ref.IsDisabled())
@@ -77,6 +78,7 @@ Function TraceObject(string prefix, ObjectReference ref) global
     If (ref.GetParentCell())
         Cell parentCell = ref.GetParentCell()
         Log(prefix + "  Parent cell: [ Name: \"" + GetName(parentCell) + "\", Id: " + GetHexId(parentCell) + " ]")
+        Log(prefix + "    Is attached: " + parentCell.IsAttached())
         ActorBase owner = parentCell.GetActorOwner()
         If (owner)
             Log(prefix + "    Cell owner: [ Name: \"" + GetName(owner) + "\", Id: " + GetHexId(owner) + " ]")
@@ -98,6 +100,7 @@ Function TraceObject(string prefix, ObjectReference ref) global
     Location loc = ref.GetCurrentLocation()
     If (loc)
         Log(prefix + "  Current location: [ Name: \"" + GetName(loc) + "\", Id: " + GetHexId(loc) + " ]")
+        Log(prefix + "    Is loaded: " + loc.IsLoaded())
         Log(prefix + "    Is settlement: " + (loc.HasKeyword(Game.GetCommonProperties().LocTypeSettlement) || loc.HasKeyword(Game.GetCommonProperties().LocTypeWorkshopSettlement)))
     EndIf
 EndFunction
