@@ -17,7 +17,10 @@ Function SetTurboMode()
 EndFunction
 
 bool Function IsLootingTarget(ObjectReference ref)
-    Return ref.GetParentCell().IsLoaded()
+    If (Utility.IsInMenuMode())
+        Return false
+    EndIf
+    Return ref.IsNearPlayer() && ref.GetParentCell().IsAttached()
 EndFunction
 
 Function LootObject(ObjectReference ref)

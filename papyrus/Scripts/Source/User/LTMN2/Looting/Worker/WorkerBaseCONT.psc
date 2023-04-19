@@ -17,10 +17,15 @@ Function SetTurboMode()
 EndFunction
 
 bool Function IsLootingTarget(ObjectReference ref)
-    If (!ref.Is3DLoaded() || !IsLootableOwnership(ref))
+    If (Utility.IsInMenuMode())
         Return false
     EndIf
-
+    If (!ref.IsNearPlayer() || !ref.GetParentCell().IsAttached() || !ref.Is3DLoaded())
+        Return false
+    EndIf
+    If (!IsLootableOwnership(ref))
+        Return false
+    EndIf
     Return !ref.IsLocked() || TryUnlock(ref)
 EndFunction
 
