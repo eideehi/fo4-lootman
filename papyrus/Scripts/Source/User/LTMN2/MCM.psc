@@ -234,7 +234,7 @@ Function MoveItemsInternal()
         type = properties.ITEM_TYPE_KEYM
     EndIf
 
-    LTMN2:Utils.MoveInventoryItems(fromInventory, toInventory, type, 0)
+    LTMN2:Utils.MoveInventoryItems(fromInventory, toInventory, type, sub)
 EndFunction
 
 Function ScrapItems()
