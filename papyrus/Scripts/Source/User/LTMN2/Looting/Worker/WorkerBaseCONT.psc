@@ -30,6 +30,10 @@ bool Function IsLootingTarget(ObjectReference ref)
 EndFunction
 
 Function LootObject(ObjectReference ref)
+    If (properties.IsNotInitialized)
+        Return
+    EndIf
+
     string prefix = GetLogPrefix(2)
     LTMN2:Debug.Log(prefix + "Loot: [ Name: \"" + ref.GetDisplayName() + "\", Id: " + LTMN2:Debug.GetHexID(ref) + " ]")
     LTMN2:Debug.Log(prefix + "  Inventory status before looting: [ Item count: " + ref.GetItemCount() + ", Total weight: " + ref.GetInventoryWeight() + " ]")
@@ -60,6 +64,10 @@ Function LootObject(ObjectReference ref)
 EndFunction
 
 bool Function TryUnlock(ObjectReference ref)
+    If (properties.IsNotInitialized)
+        Return false
+    EndIf
+
     string prefix = GetLogPrefix(2)
 
     If (!ref.IsLockBroken() && properties.UnlockLockedContainer)

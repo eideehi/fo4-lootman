@@ -1260,6 +1260,11 @@ namespace papyrus_lootman
         const bool notLootingFromSettlement = GetBool(properties::Key::not_looting_from_settlement);
         const std::size_t maxItemsProcessedPerThread = GetInt(properties::Key::max_items_processed_per_thread);
 
+        if (maxDistance < 1.0f)
+        {
+            return result;
+        }
+
 #ifdef _DEBUG
         logging::Message("| %s |   Origin: [ X: %f, Y: %f, Z: %f ]", processId, origin.x, origin.y, origin.z);  // NOLINT(clang-diagnostic-double-promotion)
         logging::Message("| %s |   Looting Range: %.1fm", processId, GetFloat(properties::Key::looting_range));  // NOLINT(clang-diagnostic-double-promotion)

@@ -26,7 +26,7 @@ EndEvent
 
 ; If the looting is possible, the looting process is called
 Event LTMN2:Looting:Worker:WorkerBase.CallLooting(LTMN2:Looting:Worker:WorkerBase sender, Var[] args)
-    If (sender == self)
+    If (sender == self && properties.IsInitialized)
         IncreaseActiveThreadCount()
         threadRunning = true
 
@@ -52,6 +52,10 @@ bool Function Busy()
 EndFunction
 
 Function Looting()
+    If (properties.IsNotInitialized)
+        Return
+    EndIf
+
     string prefix = GetLogPrefix()
     LTMN2:Debug.Log(prefix + "[ Start looting ]")
 
@@ -110,6 +114,10 @@ bool Function IsLootingTarget(ObjectReference ref)
 EndFunction
 
 Function LootObject(ObjectReference ref)
+    If (properties.IsNotInitialized)
+        Return
+    EndIf
+
     string prefix = GetLogPrefix(2)
     LTMN2:Debug.Log(prefix + "Loot: [ Name: " + ref.GetDisplayName() + ", Id: " + LTMN2:Debug.GetHexID(ref) + " ]")
     If (properties.PlayPickupSound)

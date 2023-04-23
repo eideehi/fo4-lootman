@@ -24,6 +24,10 @@ bool Function IsLootingTarget(ObjectReference ref)
 EndFunction
 
 Function LootObject(ObjectReference ref)
+    If (properties.IsNotInitialized)
+        Return
+    EndIf
+
     string prefix = GetLogPrefix(2)
     LTMN2:Debug.Log(prefix + "Loot: [ Name: \"" + ref.GetDisplayName() + "\", Id: " + LTMN2:Debug.GetHexID(ref) + " ]")
     LTMN2:Debug.Log(prefix + "  Inventory status before looting: [ Item count: " + ref.GetItemCount() + ", Total weight: " + ref.GetInventoryWeight() + " ]")

@@ -97,7 +97,8 @@ namespace properties
     Value Get(const Key key)
     {
         SimpleLocker locker(&lock);
-        return papyrusProperties.at(key);
+        const auto it = papyrusProperties.find(key);
+        return it != std::end(papyrusProperties) ? it->second : Value();
     }
 
     bool GetBool(const Key key, const bool defaultValue)

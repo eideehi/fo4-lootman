@@ -34,6 +34,7 @@ Function Initialize()
     worker07.Initialize()
     worker08.Initialize()
     properties.ActiveWorkerThreadsAMMO = 0
+    properties.TurboModeAMMO = false
 EndFunction
 
 Function Looting()

@@ -17,6 +17,10 @@ Function SetTurboMode()
 EndFunction
 
 Function LootObject(ObjectReference ref)
+    If (properties.IsNotInitialized)
+        Return
+    EndIf
+
     string prefix = GetLogPrefix(2)
     LTMN2:Debug.Log(prefix + "Loot: [ Name: \"" + ref.GetDisplayName() + "\", Id: " + LTMN2:Debug.GetHexID(ref) + " ]")
     If (ref.Activate(properties.LootManRef) && properties.PlayPickupSound)
