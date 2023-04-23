@@ -46,6 +46,7 @@ Function TraceObject(string prefix, ObjectReference ref) global
     Log(prefix + "  Player has direct line-of-sight: " + _player.HasDirectLOS(ref))
     Log(prefix + "  Player has detection line-of-sight: " + _player.HasDetectionLOS(ref))
     Log(prefix + "  Is quest item: " + ref.IsQuestItem())
+    Log(prefix + "  Would be stealing: " + _player.WouldBeStealing(ref))
     Log(prefix + "  Has owner: " + ref.HasOwner())
     Log(prefix + "  Is owned by player: " + ref.IsOwnedBy(_player))
 

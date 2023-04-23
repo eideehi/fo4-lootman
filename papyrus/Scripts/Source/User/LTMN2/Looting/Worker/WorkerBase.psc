@@ -106,7 +106,7 @@ bool Function IsLootingTarget(ObjectReference ref)
     If (!ref.IsNearPlayer() || !ref.GetParentCell().IsAttached() || !ref.Is3DLoaded())
         Return false
     EndIf
-    Return IsLootableOwnership(ref)
+    Return !player.WouldBeStealing(ref)
 EndFunction
 
 Function LootObject(ObjectReference ref)
@@ -116,52 +116,6 @@ Function LootObject(ObjectReference ref)
         LTMN2:LootMan.PlayPickUpSound(player, ref)
     EndIf
     properties.LootManRef.AddItem(ref, 1, true)
-EndFunction
-
-bool Function IsLootableOwnership(ObjectReference ref)
-    If (ref.IsOwnedBy(player))
-        Return true
-    EndIf
-
-    If (ref.HasActorRefOwner())
-        Actor ownerRef = ref.GetActorRefOwner()
-        If (!ownerRef.IsDead() && ownerRef.GetRelationshipRank(player) != 1)
-            Return false
-        EndIf
-    Else
-        ActorBase ownerBase = ref.GetActorOwner()
-        If (ownerBase && ownerBase.IsUnique())
-            Actor ownerRef = ownerBase.GetUniqueActor()
-            If (!ownerRef.IsDead() && ownerRef.GetRelationshipRank(player) != 1)
-                Return false
-            EndIf
-        EndIf
-    EndIf
-
-    If (ref.GetFactionOwner())
-        Faction factionOwner = ref.GetFactionOwner()
-        If (factionOwner.GetFactionReaction(player) != 3)
-            Return false
-        EndIf
-    EndIf
-
-    Cell parentCell = ref.GetParentCell()
-    If (parentCell)
-        ActorBase ownerBase = parentCell.GetActorOwner()
-        If (ownerBase && ownerBase.IsUnique())
-            Actor ownerRef = ownerBase.GetUniqueActor()
-            If (!ownerRef.IsDead() && ownerRef.GetRelationshipRank(player) != 1)
-                Return false
-            EndIf
-        EndIf
-
-        Faction factionOwner = parentCell.GetFactionOwner()
-        If (factionOwner && factionOwner.GetFactionReaction(player) != 3)
-            Return false
-        EndIf
-    EndIf
-
-    Return true
 EndFunction
 
 ; Return the process id to be output to the log

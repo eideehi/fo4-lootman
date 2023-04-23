@@ -23,7 +23,7 @@ bool Function IsLootingTarget(ObjectReference ref)
     If (!ref.IsNearPlayer() || !ref.GetParentCell().IsAttached() || !ref.Is3DLoaded())
         Return false
     EndIf
-    If (!IsLootableOwnership(ref))
+    If (player.WouldBeStealing(ref))
         Return false
     EndIf
     Return !ref.IsLocked() || TryUnlock(ref)
