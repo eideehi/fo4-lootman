@@ -20,7 +20,7 @@ bool Function IsLootingTarget(ObjectReference ref)
     If (Utility.IsInMenuMode())
         Return false
     EndIf
-    If (!ref.IsNearPlayer() || !ref.GetParentCell().IsAttached() || !ref.Is3DLoaded())
+    If (!IsLootableDistance(ref) || !ref.Is3DLoaded())
         Return false
     EndIf
     If (player.WouldBeStealing(ref))

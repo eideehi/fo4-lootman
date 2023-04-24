@@ -20,7 +20,7 @@ bool Function IsLootingTarget(ObjectReference ref)
     If (Utility.IsInMenuMode())
         Return false
     EndIf
-    Return ref.IsNearPlayer() && ref.GetParentCell().IsAttached() && !player.WouldBeStealing(ref)
+    Return IsLootableDistance(ref) && !player.WouldBeStealing(ref)
 EndFunction
 
 Function LootObject(ObjectReference ref)

@@ -74,14 +74,16 @@ Function Looting()
         If (ref)
             int id = ref.GetFormID()
 
-            LTMN2:Debug.Log(prefix + "  [ Object " + objectIndex + " ]")
-            TraceObject(prefix + "    ", ref)
-            TraceForm(prefix + "    ", ref.GetBaseObject())
+            If (!Utility.IsInMenuMode())
+                LTMN2:Debug.Log(prefix + "  [ Object " + objectIndex + " ]")
+                TraceObject(prefix + "    ", ref)
+                TraceForm(prefix + "    ", ref.GetBaseObject())
 
-            If (IsLootingTarget(ref))
-                LootObject(ref)
-            Else
-                LTMN2:Debug.Log(prefix + "    [ Is not a target of looting ]")
+                If (IsLootingTarget(ref))
+                    LootObject(ref)
+                Else
+                    LTMN2:Debug.Log(prefix + "    [ Is not a target of looting ]")
+                EndIf
             EndIf
 
             LTMN2:LootMan.ReleaseObject(id)
@@ -103,11 +105,27 @@ EndFunction
 Function SetTurboMode()
 EndFunction
 
+bool Function IsLootableDistance(ObjectReference ref)
+    Cell playerCell = player.GetParentCell()
+    Cell objCell = ref.GetParentCell()
+    If (!objCell || !objCell.IsAttached() || !playerCell || !playerCell.IsAttached())
+        Return false
+    EndIf
+    If (playerCell != objCell)
+        If (objCell.IsInterior() || playerCell.IsInterior())
+            Return false
+        ElseIf (player.GetDistance(ref) > 25600)
+            Return false
+        EndIf
+    EndIf
+    Return true
+EndFunction
+
 bool Function IsLootingTarget(ObjectReference ref)
     If (Utility.IsInMenuMode())
         Return false
     EndIf
-    If (!ref.IsNearPlayer() || !ref.GetParentCell().IsAttached() || !ref.Is3DLoaded())
+    If (!IsLootableDistance(ref) || !ref.Is3DLoaded())
         Return false
     EndIf
     Return !player.WouldBeStealing(ref)
