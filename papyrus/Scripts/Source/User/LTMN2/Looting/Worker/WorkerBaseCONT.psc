@@ -58,7 +58,10 @@ Function LootObject(ObjectReference ref)
 
     If (itemCount > 0)
         If (properties.PlayContainerAnimation && player.HasDetectionLoS(ref))
-            ref.Activate(properties.ActivatorRef, true)
+            MakeActivatorFriend(ref)
+            If (!properties.ActivatorRef.WouldBeStealing(ref))
+                ref.Activate(properties.ActivatorRef, true)
+            EndIf
         EndIf
     EndIf
 EndFunction
@@ -115,6 +118,25 @@ bool Function TryUnlock(ObjectReference ref)
 
     LTMN2:Debug.Log(prefix + "  [ Unlock failure ]")
     Return false
+EndFunction
+
+Function MakeActivatorFriend(ObjectReference ref)
+    If (!properties.ActivatorRef.WouldBeStealing(ref))
+        Return
+    EndIf
+
+    Faction ownerAsFaction = ref.GetFactionOwner()
+    If (ownerAsFaction)
+        properties.ActivatorRef.AddToFaction(ownerAsFaction)
+    EndIf
+    Actor ownerAsActorRef = ref.GetActorRefOwner()
+    If (ownerAsActorRef)
+        properties.ActivatorRef.SetRelationshipRank(ownerAsActorRef, 1)
+    EndIf
+    ActorBase ownerAsActor = ref.GetActorOwner()
+    If (ownerAsActor && ownerAsActor.IsUnique())
+        properties.ActivatorRef.SetRelationshipRank(ownerAsActor.GetUniqueActor(), 1)
+    EndIf
 EndFunction
 
 Function TraceObject(string logPrefix, ObjectReference ref) debugOnly
