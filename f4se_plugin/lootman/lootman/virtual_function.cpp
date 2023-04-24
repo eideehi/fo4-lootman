@@ -12,6 +12,7 @@ namespace virtual_function
     typedef bool (*TESForm_IsWater)(TESForm* form);
     typedef bool (*TESObjectREFR_IsDead)(TESObjectREFR* ref, bool essential);
     typedef bool (*Actor_PlayPickUpSound)(Actor* actor, TESBoundObject* obj, bool pickUp, bool use);
+    typedef bool (*Actor_IsInFaction)(Actor* actor, TESFaction* faction);
 
     bool HasKeyword(IKeywordFormBase* base, BGSKeyword* keyword, TBO_InstanceData* data)
     {
@@ -35,5 +36,11 @@ namespace virtual_function
     {
         const auto function = GetVirtualFunction<Actor_PlayPickUpSound>(actor, 0xC6);
         function(actor, obj, true, false);
+    }
+
+    bool IsInFaction(Actor* actor, TESFaction* faction)
+    {
+        const auto function = GetVirtualFunction<Actor_IsInFaction>(actor, 0x10A);
+        return function(actor, faction);
     }
 }

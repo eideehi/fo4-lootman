@@ -5,6 +5,7 @@ class BGSKeyword;
 class IKeywordFormBase;
 class TBO_InstanceData;
 class TESBoundObject;
+class TESFaction;
 class TESForm;
 class TESObjectREFR;
 
@@ -23,4 +24,6 @@ namespace virtual_function
     bool IsDead(TESObjectREFR* ref, bool essential);
 
     void PlayPickUpSound(Actor* actor, TESBoundObject* obj);
+
+    bool IsInFaction(Actor* actor, TESFaction* faction);
 }

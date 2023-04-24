@@ -688,7 +688,7 @@ namespace papyrus_lootman
         const auto factionOwner = DYNAMIC_CAST(owner, TESForm, TESFaction);
         if (factionOwner)
         {
-            if (factionOwner->formID == faction::playerFaction->formID)
+            if (virtual_function::IsInFaction((*g_player), factionOwner))
             {
                 return true;
             }
