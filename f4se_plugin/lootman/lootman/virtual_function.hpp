@@ -21,7 +21,7 @@ namespace virtual_function
 
     bool IsWater(TESForm* form);
 
-    bool IsDead(TESObjectREFR* ref, bool essential);
+    bool IsDead(TESObjectREFR* ref, bool notEssential);
 
     void PlayPickUpSound(Actor* actor, TESBoundObject* obj);
 

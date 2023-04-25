@@ -10,7 +10,7 @@ namespace virtual_function
 {
     typedef bool (*IKeywordFormBase_HasKeyword)(IKeywordFormBase* base, BGSKeyword* keyword, TBO_InstanceData* data);
     typedef bool (*TESForm_IsWater)(TESForm* form);
-    typedef bool (*TESObjectREFR_IsDead)(TESObjectREFR* ref, bool essential);
+    typedef bool (*TESObjectREFR_IsDead)(TESObjectREFR* ref, bool notEssential);
     typedef bool (*Actor_PlayPickUpSound)(Actor* actor, TESBoundObject* obj, bool pickUp, bool use);
     typedef bool (*Actor_IsInFaction)(Actor* actor, TESFaction* faction);
 
@@ -26,10 +26,10 @@ namespace virtual_function
         return function(form);
     }
 
-    bool IsDead(TESObjectREFR* ref, bool essential)
+    bool IsDead(TESObjectREFR* ref, bool notEssential)
     {
         const auto function = GetVirtualFunction<TESObjectREFR_IsDead>(ref, 0xC0);
-        return function(ref, essential);
+        return function(ref, notEssential);
     }
 
     void PlayPickUpSound(Actor* actor, TESBoundObject* obj)

@@ -1211,10 +1211,11 @@ namespace papyrus_lootman
         }
         else if (IsFormTypeMatch(form->formType, kFormType_NPC_))
         {
-            if (!virtual_function::IsDead(ref, IsEssential(ref)))
+            if (!virtual_function::IsDead(ref, !IsEssential(ref)))
             {
                 return false;
             }
+            //TODO: Add logic to detect bleedout
             if (!HasLootableItem(ref->inventoryList))
             {
                 return false;
@@ -1583,7 +1584,7 @@ namespace papyrus_lootman
         logging::Message("| %s |   InventoryOwner is essential: %s", processId, Bool2S(IsEssential(inventoryOwner)));
 #endif
         const bool isPlayer = (inventoryOwner->formID == (*g_player)->formID);
-        const bool isDead = virtual_function::IsDead(inventoryOwner, IsEssential(inventoryOwner));
+        const bool isDead = virtual_function::IsDead(inventoryOwner, !IsEssential(inventoryOwner));
 
 #ifdef _DEBUG
         logging::Message("| %s |   Inventory owner: [ Name: %s, Id: %08X ]", processId, CALL_MEMBER_FN(inventoryOwner, GetReferenceName)(), inventoryOwner->formID);
@@ -1799,7 +1800,7 @@ namespace papyrus_lootman
         }
 
         const bool isPlayer = (inventoryOwner->formID == (*g_player)->formID);
-        const bool isDead = virtual_function::IsDead(inventoryOwner, IsEssential(inventoryOwner));
+        const bool isDead = virtual_function::IsDead(inventoryOwner, !IsEssential(inventoryOwner));
 
         BGSInventoryList* inventoryList = inventoryOwner->inventoryList;
         if (!inventoryList)
