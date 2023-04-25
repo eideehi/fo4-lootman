@@ -69,8 +69,10 @@
 
     "exclude": {
         "_comment": "Fallout4.esm|1A62D4 = You're SPECIAL!",
+        "_comment": "DLCCoast.esm|01E3F7 = Data",
         "form": [
-            "Fallout4.esm|1A62D4"
+            "Fallout4.esm|1A62D4",
+            "DLCCoast.esm|01E3F7"
         ],
 
         "_comment": "Fallout4.esm|072E0B = DummyObject",
