@@ -1192,7 +1192,7 @@ namespace papyrus_lootman
         const auto form = ref->baseForm;
         if (IsFormTypeMatch(form->formType, kFormType_CONT))
         {
-            if (GetBool(properties::not_looting_from_settlement) && IsLinkedToWorkshop(ref))
+            if (IsLinkedToWorkshop(ref))
             {
                 return false;
             }
