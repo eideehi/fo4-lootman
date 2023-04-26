@@ -16,6 +16,13 @@ Function SetTurboMode()
     properties.TurboModeFLOR = true
 EndFunction
 
+bool Function IsLootingTarget(ObjectReference ref)
+    If (Utility.IsInMenuMode())
+        Return false
+    EndIf
+    Return IsLootableDistance(ref) && ref.Is3DLoaded()
+EndFunction
+
 Function LootObject(ObjectReference ref)
     If (properties.IsNotInitialized)
         Return
