@@ -1495,13 +1495,19 @@ namespace papyrus_lootman
                         TESObjectMISC::Component miscComponent = {};
                         if (misc->components->GetNthItem(j, miscComponent))
                         {
-                            if (miscComponent.count == 0 || miscComponent.component->scrapScalar->value <= 0.0f)
+                            if (miscComponent.count == 0)
+                            {
+                                continue;
+                            }
+                            const auto scalar = miscComponent.component->scrapScalar;
+                            const auto scale = !scalar ? 1.0f : scalar->value;
+                            if (scale <= 0.0f)
                             {
                                 continue;
                             }
 #ifdef _DEBUG
                             foundComponent = true;
-                            logging::Message("| %s |       Found component: [ Id: %08X, Name: %s, Count: %d, Scale: %.1f ] x%d", processId, miscComponent.component->formID, debug::GetName(miscComponent.component), miscComponent.count, miscComponent.component->scrapScalar->value, objComponent.count);
+                            logging::Message("| %s |       Found component: [ Id: %08X, Name: %s, Count: %d, Scale: %.1f ] x%d", processId, miscComponent.component->formID, debug::GetName(miscComponent.component), miscComponent.count, scale, objComponent.count);
 #endif
                             data[miscComponent.component] += static_cast<UInt32>(miscComponent.count * objComponent.count);
                         }
@@ -1509,13 +1515,15 @@ namespace papyrus_lootman
                     continue;
                 }
 
-                if (objComponent.component->scrapScalar->value <= 0.0f)
+                const auto scalar = objComponent.component->scrapScalar;
+                const auto scale = !scalar ? 1.0f : scalar->value;
+                if (scale <= 0.0f)
                 {
                     continue;
                 }
 #ifdef _DEBUG
                 foundComponent = true;
-                logging::Message("| %s |       Found component: [ Id: %08X, Name: %s, Count: %d, Scale: %.1f ]", processId, objComponent.component->formID, debug::GetName(objComponent.component), objComponent.count, objComponent.component->scrapScalar->value);
+                logging::Message("| %s |       Found component: [ Id: %08X, Name: %s, Count: %d, Scale: %.1f ]", processId, objComponent.component->formID, debug::GetName(objComponent.component), objComponent.count, scale);
 #endif
                 data[objComponent.component] += objComponent.count;
             }

@@ -121,11 +121,16 @@ Function ScrapInventoryItems(ObjectReference ref, int itemType) global
                     LTMN2:Debug.Log(prefix + "        [Component " + componentIndex + "]")
                     LTMN2:Debug.Log(prefix + "          Component count: " + miscComponent.count)
                     LTMN2:Debug.Log(prefix + "          Scrap item: " + LTMN2:Debug.GetName(miscComponent.object.GetScrapItem()))
-                    LTMN2:Debug.Log(prefix + "          Scrap scaler: " + miscComponent.object.GetScrapScalar().GetValue())
 
                     int scrapCount = miscComponent.count
                     If (!isMiscItem)
-                        scrapCount = (scrapCount * miscComponent.object.GetScrapScalar().GetValue()) As int
+                        float scale = 1.0
+                        GlobalVariable scrapScalar = miscComponent.object.GetScrapScalar()
+                        If (scrapScalar)
+                            scale = scrapScalar.GetValue()
+                        EndIf
+                        LTMN2:Debug.Log(prefix + "          Scrap scale: " + scale)
+                        scrapCount = (scrapCount * scale) As int
                     EndIf
 
                     If ((scrapCount * scrapPerTime) > 65535)
@@ -144,7 +149,12 @@ Function ScrapInventoryItems(ObjectReference ref, int itemType) global
                     MiscObject scrapItem = miscComponent.object.GetScrapItem()
                     int scrapCount = miscComponent.count
                     If (!isMiscItem)
-                        scrapCount = (scrapCount * miscComponent.object.GetScrapScalar().GetValue()) As int
+                        float scale = 1.0
+                        GlobalVariable scrapScalar = miscComponent.object.GetScrapScalar()
+                        If (scrapScalar)
+                            scale = scrapScalar.GetValue()
+                        EndIf
+                        scrapCount = (scrapCount * scale) As int
                     EndIf
 
                     If (scrapItem && scrapCount)
