@@ -1487,9 +1487,9 @@ namespace papyrus_lootman
                     continue;
                 }
 
-                const auto misc = DYNAMIC_CAST(objComponent.component, TESForm, TESObjectMISC);
-                if (misc)
+                if (objComponent.component->formType == kFormType_MISC)
                 {
+                    const auto misc = DYNAMIC_CAST(objComponent.component, TESForm, TESObjectMISC);
                     for (UInt32 j = 0; j < misc->components->count; ++j)
                     {
                         TESObjectMISC::Component miscComponent = {};
