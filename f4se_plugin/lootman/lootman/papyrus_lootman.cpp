@@ -1852,6 +1852,14 @@ namespace papyrus_lootman
                     continue;
                 }
 
+                if (HasKeyword(form, keyword::unscrappableObject))
+                {
+#ifdef _DEBUG
+                    logging::Message("| %s |       [ Form is unscrappable object ]", processId);
+#endif
+                    continue;
+                }
+
                 if (HasKeyword(form, keyword::featuredItem))
                 {
 #ifdef _DEBUG
