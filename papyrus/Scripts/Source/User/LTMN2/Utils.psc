@@ -154,6 +154,9 @@ Function ScrapInventoryItems(ObjectReference ref, int itemType) global
                         If (scrapScalar)
                             scale = scrapScalar.GetValue()
                         EndIf
+                        If (components.Length == 1 && scrapCount == 1 && scale < 1.0)
+                            scale = 1.0
+                        EndIf
                         scrapCount = (scrapCount * scale) As int
                     EndIf
 
