@@ -1670,22 +1670,11 @@ namespace papyrus_lootman
                     }
                 }
 
-                bool pickable = true;
-                // ReSharper disable once CppMsExtBindingRValueToLvalueReference
-                item.stack->Visit([=, &pickable](const BGSInventoryItem::Stack* stack)
-                {
-                    if ((stack->flags >> 5) & 1 || ((stack->flags & BGSInventoryItem::Stack::kFlagEquipped) != 0 && !isDead))
-                    {
-                        pickable = false;
-                        return false;
-                    }
-                    return true;
-                });
-
-                if (!pickable)
+                const auto info = GetInventoryItemInfo(item);
+                if (info.questItem || info.dropped || (info.equipped && !isDead))
                 {
 #ifdef _DEBUG
-                    logging::Message("| %s |       [ Item is equipped or dropped item ]", processId);
+                    logging::Message("| %s |       [ Item is should not be moved ]", processId);
 #endif
                     continue;
                 }
