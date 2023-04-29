@@ -41,6 +41,11 @@
             "Fallout4.esm|0FA2FB"
         ],
 
+        "_comment": "Fallout4.esm|135E6C = BobbleheadKeyword",
+        "quest-item": [
+            "Fallout4.esm|135E6C"
+        ],
+
         "_comment": "Fallout4.esm|060E77 = Military Ammo Bag",
         "_comment": "Fallout4.esm|091FDE = Power Relay Coil",
         "_comment": "Fallout4.esm|0BDA4F = Brotherhood of Steel Holotag",

@@ -53,6 +53,7 @@ namespace injection_data
         {"/include/activation-block", include_activation_block, Type::form | Type::keyword},
         {"/include/activator", include_activator, Type::form | Type::keyword},
         {"/include/featured-item", include_featured_item, Type::form | Type::keyword},
+        {"/include/quest-item", include_quest_item, Type::form | Type::keyword},
         {"/include/unique-item", include_unique_item, Type::form | Type::keyword},
         {"/exclude/form", exclude_form, Type::form},
         {"/exclude/keyword", exclude_keyword, Type::keyword},

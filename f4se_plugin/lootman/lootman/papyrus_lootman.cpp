@@ -816,7 +816,7 @@ namespace papyrus_lootman
         if (!IsFormTypeMatch(form->formType, kFormType_CONT)
             && !IsFormTypeMatch(form->formType, kFormType_NPC_))
         {
-            if (IsQuestItem(ref->extraDataList))
+            if (IsQuestItem(ref->extraDataList) && !MatchesAny(form, injection_data::include_quest_item))
             {
 #ifdef _DEBUG
                 TraceOnce(ref, "object is quest item");
@@ -1027,7 +1027,7 @@ namespace papyrus_lootman
             return false;
         }
 
-        if (info.questItem)
+        if (info.questItem && !MatchesAny(form, injection_data::include_quest_item))
         {
             return false;
         }
@@ -1671,7 +1671,7 @@ namespace papyrus_lootman
                 }
 
                 const auto info = GetInventoryItemInfo(item);
-                if (info.questItem || info.dropped || (info.equipped && !isDead))
+                if ((info.questItem && !MatchesAny(item.form, injection_data::include_quest_item)) || info.dropped || (info.equipped && !isDead))
                 {
 #ifdef _DEBUG
                     logging::Message("| %s |       [ Item is should not be moved ]", processId);

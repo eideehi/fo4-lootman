@@ -15,6 +15,7 @@ namespace injection_data
         include_activation_block,
         include_activator,
         include_featured_item,
+        include_quest_item,
         include_unique_item,
         exclude_form,
         exclude_keyword,
