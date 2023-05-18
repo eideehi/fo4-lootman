@@ -121,7 +121,7 @@ Event Actor.OnLocationChange(Actor akSender, Location akOldLoc, Location akNewLo
     LTMN2:Debug.Log(prefix + "  New location: [ Name: \"" + LTMN2:Debug.GetName(akNewLoc) + "\", Id: " + LTMN2:Debug.GetHexID(akNewLoc) + " ]")
 
     LTMN2:Debug.Log(prefix + "  [ Not looting from settlement: " + properties.NotLootingFromSettlement + " ]")
-    If (properties.NotLootingFromSettlement)
+    If (properties.NotLootingFromSettlement && akNewLoc != None)
         LTMN2:Debug.Log(prefix + "    New location is a settlement: " + akNewLoc.HasKeyword(Game.GetCommonProperties().LocTypeSettlement))
         LTMN2:Debug.Log(prefix + "    New location is a workshop settlement: " + akNewLoc.HasKeyword(Game.GetCommonProperties().LocTypeWorkshopSettlement))
 
@@ -137,24 +137,28 @@ Event Actor.OnLocationChange(Actor akSender, Location akOldLoc, Location akNewLo
 
     LTMN2:Debug.Log(prefix + "  [ Automatically link / unlink to workshop: " + properties.AutomaticallyLinkAndUnlinkToWorkshop + " ]")
     If (properties.AutomaticallyLinkAndUnlinkToWorkshop)
-        LTMN2:Debug.Log(prefix + "    Workshops exist in the old location: " + (properties.WorkshopParent.GetWorkshopFromLocation(akOldLoc) != None))
-        If (properties.WorkshopParent.GetWorkshopFromLocation(akOldLoc))
-            LTMN2:Debug.Log(prefix + "      Linked to LootMan: " + akOldLoc.IsLinkedLocation(properties.LootManLocation, properties.WorkshopCaravan))
-            If (akOldLoc.IsLinkedLocation(properties.LootManLocation, properties.WorkshopCaravan))
-                LTMN2:Debug.Log(prefix + "      [ Removed link with LootMan ]")
-                akOldLoc.RemoveLinkedLocation(properties.LootManLocation, properties.WorkshopCaravan)
-                ShowMessage(MESSAGE_UNLINKED_TO_WORKSHOP)
+        If (akOldLoc != None)
+            LTMN2:Debug.Log(prefix + "    Workshops exist in the old location: " + (properties.WorkshopParent.GetWorkshopFromLocation(akOldLoc) != None))
+            If (properties.WorkshopParent.GetWorkshopFromLocation(akOldLoc))
+                LTMN2:Debug.Log(prefix + "      Linked to LootMan: " + akOldLoc.IsLinkedLocation(properties.LootManLocation, properties.WorkshopCaravan))
+                If (akOldLoc.IsLinkedLocation(properties.LootManLocation, properties.WorkshopCaravan))
+                    LTMN2:Debug.Log(prefix + "      [ Removed link with LootMan ]")
+                    akOldLoc.RemoveLinkedLocation(properties.LootManLocation, properties.WorkshopCaravan)
+                    ShowMessage(MESSAGE_UNLINKED_TO_WORKSHOP)
+                EndIf
             EndIf
         EndIf
 
-        LTMN2:Debug.Log(prefix + "    Workshops exist in the new location: " + (properties.WorkshopParent.GetWorkshopFromLocation(akNewLoc) != None))
-        WorkshopScript workshop = properties.WorkshopParent.GetWorkshopFromLocation(akNewLoc)
-        If (workshop && workshop.OwnedByPlayer)
-            LTMN2:Debug.Log(prefix + "      Linked to LootMan: " + akNewLoc.IsLinkedLocation(properties.LootManLocation, properties.WorkshopCaravan))
-            If (!akNewLoc.IsLinkedLocation(properties.LootManLocation, properties.WorkshopCaravan))
-                LTMN2:Debug.Log(prefix + "      [ Added link to LootMan ]")
-                akNewLoc.AddLinkedLocation(properties.LootManLocation, properties.WorkshopCaravan)
-                ShowMessage(MESSAGE_LINKED_TO_WORKSHOP)
+        If (akNewLoc != None)
+            LTMN2:Debug.Log(prefix + "    Workshops exist in the new location: " + (properties.WorkshopParent.GetWorkshopFromLocation(akNewLoc) != None))
+            WorkshopScript workshop = properties.WorkshopParent.GetWorkshopFromLocation(akNewLoc)
+            If (workshop && workshop.OwnedByPlayer)
+                LTMN2:Debug.Log(prefix + "      Linked to LootMan: " + akNewLoc.IsLinkedLocation(properties.LootManLocation, properties.WorkshopCaravan))
+                If (!akNewLoc.IsLinkedLocation(properties.LootManLocation, properties.WorkshopCaravan))
+                    LTMN2:Debug.Log(prefix + "      [ Added link to LootMan ]")
+                    akNewLoc.AddLinkedLocation(properties.LootManLocation, properties.WorkshopCaravan)
+                    ShowMessage(MESSAGE_LINKED_TO_WORKSHOP)
+                EndIf
             EndIf
         EndIf
     EndIf

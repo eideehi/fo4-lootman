@@ -14,15 +14,19 @@ namespace papyrus_debug
     // Get the form type identifier.
     BSFixedString GetFormTypeIdentifier(StaticFunctionTag*, TESForm* form)
     {
-        return debug::GetFormTypeIdentifier(form->formType);
+        return form ? debug::GetFormTypeIdentifier(form->formType) : "";
     }
 
     // Convert the form id to a hexadecimal string.
     BSFixedString GetHexId(StaticFunctionTag*, TESForm* form)
     {
-        std::stringstream ss;
-        ss << std::setfill('0') << std::setw(8) << std::uppercase << std::hex << form->formID;
-        return ss.str().c_str();
+        if (form)
+        {
+            std::stringstream ss;
+            ss << std::setfill('0') << std::setw(8) << std::uppercase << std::hex << form->formID;
+            return ss.str().c_str();
+        }
+        return "";
     }
 
     // Get the item type identifier.

@@ -254,12 +254,17 @@ namespace debug
 
     const char* GetName(TESForm* form)
     {
-        const auto fullName = DYNAMIC_CAST(form, TESForm, TESFullName);
-        if (fullName && strlen(fullName->name))
+        if (form)
         {
-            return fullName->name;
+            const auto fullName = DYNAMIC_CAST(form, TESForm, TESFullName);
+            if (fullName && strlen(fullName->name))
+            {
+                return fullName->name;
+            }
+            return form->GetEditorID();
         }
-        return form->GetEditorID();
+
+        return BSFixedString();
     }
 
     const char* Form2S(TESForm* form)
