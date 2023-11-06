@@ -160,6 +160,12 @@ namespace properties
             papyrusProperties[looting_legendary_only] = GetBoolProperty(propertyName);
         }
 
+        propertyName = "AlwaysLootingExplosives";
+        if (updateAll || propertyName == updateProperty)
+        {
+            papyrusProperties[always_looting_explosives] = GetBoolProperty(propertyName);
+        }
+
         propertyName = "LootableALCHItemType";
         if (updateAll || updateProperty.rfind("EnableALCHItem", 0) == 0)
         {

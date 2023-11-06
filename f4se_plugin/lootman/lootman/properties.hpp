@@ -9,6 +9,7 @@ namespace properties
         not_looting_from_settlement,
         lootable_inventory_item_type,
         looting_legendary_only,
+        always_looting_explosives,
         lootable_alch_item_type,
         lootable_book_item_type,
         lootable_misc_item_type,

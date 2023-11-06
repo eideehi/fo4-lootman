@@ -149,6 +149,7 @@ Group Config
     bool property EnableInventoryLootingOfWEAP = true auto hidden
 
     bool property LootingLegendaryOnly = false auto hidden
+    bool property AlwaysLootingExplosives = false auto hidden
 
     bool property EnableALCHItemAlcohol = true auto hidden
     bool property EnableALCHItemChemistry = true auto hidden

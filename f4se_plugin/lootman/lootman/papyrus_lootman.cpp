@@ -1042,6 +1042,11 @@ namespace papyrus_lootman
         {
             if (GetBool(properties::looting_legendary_only) && !info.legendary)
             {
+                if (GetBool(properties::always_looting_explosives))
+                {
+                    const auto type = GetWEAPType(form);
+                    return type == WEAP::grenade || type == WEAP::mine;
+                }
                 return false;
             }
         }
@@ -1228,6 +1233,11 @@ namespace papyrus_lootman
             const auto data = GetEquipmentData(ref->extraDataList, &buffer);
             if (GetBool(properties::looting_legendary_only) && !data.isLegendary)
             {
+                if (GetBool(properties::always_looting_explosives))
+                {
+                    const auto type = GetWEAPType(form);
+                    return type == WEAP::grenade || type == WEAP::mine;
+                }
 #ifdef _DEBUG
                 TraceOnce(form, "looting legendary only enabled, but item is not legendary");
 #endif

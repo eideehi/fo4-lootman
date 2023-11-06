@@ -766,6 +766,18 @@
           },
           "groupCondition": { "AND": [1, 6] }
         },
+        {
+          "id": "AlwaysLootingExplosives",
+          "text": "$PAGE_LOOTING_WORKER_ADVANCED_FILTER_EQUIPMENT_ALWAYS_LOOTING_EXPLOSIVES",
+          "type": "switcher",
+          "help": "$PAGE_LOOTING_WORKER_ADVANCED_FILTER_EQUIPMENT_ALWAYS_LOOTING_EXPLOSIVES_HELP",
+          "valueOptions": {
+            "sourceType": "PropertyValueBool",
+            "sourceForm": "LootMan.esp|F9A",
+            "propertyName": "AlwaysLootingExplosives"
+          },
+          "groupCondition": { "AND": [1, 6] }
+        },
         { "type": "spacer", "groupCondition": { "AND": [1, 6] } },
 
         { "type": "text", "text": "$PAGE_LOOTING_WORKER_ADVANCED_FILTER_ALCH_SECTION", "groupCondition": { "AND": [1, 6] } },
