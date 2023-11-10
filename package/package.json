@@ -1,8 +1,8 @@
 {
   "private": true,
   "name": "lootman",
-  "version": "2.0.9",
-  "description": "A set of scripts to fetch the source code of LootMan under development in the Fallout 4 game directory, and to generate binaries for release.",
+  "version": "2.1.0",
+  "description": "A set of scripts designed to gather the requisite resources for the release of LootMan and package them.",
   "scripts": {
     "clean": "node scripts/clean.js",
     "collect:resources": "node scripts/collect-resources.js",

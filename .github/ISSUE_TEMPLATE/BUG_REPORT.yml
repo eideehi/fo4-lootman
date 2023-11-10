@@ -5,13 +5,14 @@ body:
   - type: markdown
     attributes:
       value: |
-        ## Please read this first
-        ### About this "Issues"
-        The Issues in this repository are purely used as a bug tracker. Please post questions, requests, and suggestions on the [Discord server](https://discord.gg/DDQqxkK7s6). Please note that posts other than bug reports posted on this Issues are often ignored and closed as is.
-        ### About Bug Reports
-        - Bug reports should be written in English. If, like me, English is not your first language and you are not confident in your English skills, we recommend using tools such as Google Translate, Deepl Translate, ChatGPT, etc. for translation.
-        - Unless it is a very simple bug (such as the game not starting when installed), please describe the bug in detail. In particular, attaching an error log is very effective. Even if you just say "This feature doesn't work" without an error log, there is not much I can do.
-        - Before reporting a bug, please make sure that the bug is really caused by this mod. Please enable only this mod (if additional content added by other mods is involved, enable that mod too) and confirm that the bug occurs. There are often cases where "Mod A" added causes "Mod B" to not work, but the cause was "Mod C".
+        ## Please read first
+        ### About "Issues"
+        This Issues section is operated solely as a bug tracker. For questions, requests, and suggestions, please post them on our [Discord server](https://discord.gg/DDQqxkK7s6). Posts other than bug reports submitted in Issues will generally be ignored and closed without further consideration.
+        ### Regarding Bug Reports
+        - Bug reports must be written in English. If you are not proficient in English, we recommend using translation services such as Google Translate, DeepL, ChatGPT, or similar.
+        - Unless it's an exceptionally straightforward bug (e.g., the game doesn't start after installing the mod), please provide a detailed description of the bug.
+        - If possible, attach the logs from when the bug occurred.
+        - Be precise in describing the bug report. I will attempt to reproduce the bug based on your report. If your report is inaccurate, I can only respond with, "It works in my environment."
         ## Forms
 
   - type: checkboxes
@@ -30,6 +31,7 @@ body:
       description: |
         **NOTE: With a few exceptions, bug fixes are always done for the latest version. Although it is not prohibited to report bugs for older versions as a means of sharing information with other users, submitted bug reports will be closed with the labels "older version" and "wontfix", and no fixes will be made for the bugs, so please be aware of that.**
       options:
+        - 2.1.0
         - 2.0.9
         - 2.0.8
         - 2.0.7
@@ -76,17 +78,27 @@ body:
     validations:
       required: true
 
+  - type: dropdown
+    id: standalone-bug
+    attributes:
+      label: Does the bug occur even when only this Mod is enabled?
+      description: |
+        Please check whether the bug occurs when other mods (excluding mods in dependencies) are disabled.
+      options:
+        - Yes, the bug occurs even when other Mods are disabled
+        - No, the bug does not occur if other Mods are disabled
+    validations:
+      required: true
+
   - type: textarea
     id: mods-to-reproduce-bug
     attributes:
       label: List of Mods required to reproduce the bug
-      description: Please tell me the minimum required Mod list to reproduce the bug.
+      description: Please provide the minimal list of Mods required to reproduce this bug. Do not submit a list of dozens or hundreds of Mods.
       placeholder: |
         Awecome Config Manager v1.2.3
         Awesome NPC Core v4.5.6
         Awesome NPC v4.5.6
-    validations:
-      required: true
 
   - type: textarea
     id: steps-to-reproduce-bug
