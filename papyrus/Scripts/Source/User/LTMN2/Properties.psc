@@ -109,6 +109,7 @@ Group Config
     int property CarryWeight = 1000 auto hidden
     bool property IgnoreOverweight = true auto hidden
     bool property LootIsDeliverToPlayer = false auto hidden
+    bool property DeliveredToPlayerWithoutLogs = false auto hidden
     bool property NotLootingFromSettlement = true auto hidden
     bool property AutomaticallyLinkAndUnlinkToWorkshop = false auto hidden
     bool property UnlockLockedContainer = true auto hidden
