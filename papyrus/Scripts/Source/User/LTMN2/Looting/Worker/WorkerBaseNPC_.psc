@@ -17,9 +17,6 @@ Function SetTurboMode()
 EndFunction
 
 bool Function IsLootingTarget(ObjectReference ref)
-    If (Utility.IsInMenuMode())
-        Return false
-    EndIf
     Actor refAsActor = ref as Actor
     If (refAsActor && !refAsActor.IsDead())
         Return false

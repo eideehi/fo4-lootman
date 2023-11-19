@@ -469,6 +469,9 @@ Function Looting()
     If (properties.IsInSettlement && properties.NotLootingFromSettlement)
         Return
     EndIf
+    If (!LTMN2:Utils.IsLootingSafe())
+        Return
+    EndIf
 
     (WorkerManagerACTI As LTMN2:Looting:WorkerManagerACTI).Looting()
     (WorkerManagerALCH As LTMN2:Looting:WorkerManagerALCH).Looting()

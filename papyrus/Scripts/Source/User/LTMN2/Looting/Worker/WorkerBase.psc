@@ -52,7 +52,7 @@ bool Function Busy()
 EndFunction
 
 Function Looting()
-    If (properties.IsNotInitialized)
+    If (properties.IsNotInitialized || !LTMN2:Utils.IsLootingSafe())
         Return
     EndIf
 
@@ -74,7 +74,7 @@ Function Looting()
         If (ref)
             int id = ref.GetFormID()
 
-            If (!Utility.IsInMenuMode())
+            If (LTMN2:Utils.IsLootingSafe())
                 LTMN2:Debug.Log(prefix + "  [ Object " + objectIndex + " ]")
                 TraceObject(prefix + "    ", ref)
                 TraceForm(prefix + "    ", ref.GetBaseObject())
@@ -122,9 +122,6 @@ bool Function IsLootableDistance(ObjectReference ref)
 EndFunction
 
 bool Function IsLootingTarget(ObjectReference ref)
-    If (Utility.IsInMenuMode())
-        Return false
-    EndIf
     If (!IsLootableDistance(ref) || !ref.Is3DLoaded())
         Return false
     EndIf

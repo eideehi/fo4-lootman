@@ -17,9 +17,6 @@ Function SetTurboMode()
 EndFunction
 
 bool Function IsLootingTarget(ObjectReference ref)
-    If (Utility.IsInMenuMode())
-        Return false
-    EndIf
     If (!IsLootableDistance(ref) || !ref.Is3DLoaded())
         Return false
     EndIf

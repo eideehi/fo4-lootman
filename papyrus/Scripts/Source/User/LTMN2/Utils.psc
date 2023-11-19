@@ -200,3 +200,7 @@ Function ScrapInventoryItems(ObjectReference ref, int itemType) global
         itemIndex += 1
     EndWhile
 EndFunction
+
+bool Function IsLootingSafe() global
+    Return !Utility.IsInMenuMode() && !Game.IsVATSPlaybackActive()
+EndFunction
