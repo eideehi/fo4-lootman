@@ -23,7 +23,7 @@ bool Function IsLootingTarget(ObjectReference ref)
     If (player.WouldBeStealing(ref))
         Return false
     EndIf
-    Return !ref.IsLocked() || TryUnlock(ref)
+    Return !ref.IsLocked() || TryUnlock(ref, player) || TryUnlock(ref, properties.LootManWorkshopRef)
 EndFunction
 
 Function LootObject(ObjectReference ref)
@@ -63,7 +63,7 @@ Function LootObject(ObjectReference ref)
     EndIf
 EndFunction
 
-bool Function TryUnlock(ObjectReference ref)
+bool Function TryUnlock(ObjectReference ref, ObjectReference bobbyPinContainerRef)
     If (properties.IsNotInitialized)
         Return false
     EndIf
@@ -72,11 +72,11 @@ bool Function TryUnlock(ObjectReference ref)
 
     If (!ref.IsLockBroken() && properties.UnlockLockedContainer)
         LTMN2:Debug.Log(prefix + "[ Try to unlock ]")
-        LTMN2:Debug.Log(prefix + "  Object: [ Name: \"" + ref.GetDisplayName() + "\", Id: " + LTMN2:Debug.GetHexID(ref) + " ]")
+        LTMN2:Debug.Log(prefix + "  Container: [ Name: \"" + ref.GetDisplayName() + "\", Id: " + LTMN2:Debug.GetHexID(ref) + " ]")
+        LTMN2:Debug.Log(prefix + "  BobbyPinContainer: [ Name: \"" + bobbyPinContainerRef.GetDisplayName() + "\", Id: " + LTMN2:Debug.GetHexID(bobbyPinContainerRef) + " ]")
 
-        ObjectReference lootman = properties.LootManWorkshopRef
         int level = ref.GetLockLevel()
-        int bobbyPinCount = lootman.GetItemCount(properties.BobbyPin)
+        int bobbyPinCount = bobbyPinContainerRef.GetItemCount(properties.BobbyPin)
 
         LTMN2:Debug.Log(prefix + "  Lock level: " + level)
 
@@ -100,7 +100,7 @@ bool Function TryUnlock(ObjectReference ref)
 
         If (consumeCount >= 0 && bobbyPinCount >= consumeCount)
             If (consumeCount > 0)
-                lootman.RemoveItem(properties.BobbyPin, consumeCount, true)
+                bobbyPinContainerRef.RemoveItem(properties.BobbyPin, consumeCount, true)
             EndIf
 
             ref.Unlock()
