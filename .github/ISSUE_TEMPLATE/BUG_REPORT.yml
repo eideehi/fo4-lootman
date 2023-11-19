@@ -31,6 +31,7 @@ body:
       description: |
         **NOTE: With a few exceptions, bug fixes are always done for the latest version. Although it is not prohibited to report bugs for older versions as a means of sharing information with other users, submitted bug reports will be closed with the labels "older version" and "wontfix", and no fixes will be made for the bugs, so please be aware of that.**
       options:
+        - 2.2.0
         - 2.1.0
         - 2.0.9
         - 2.0.8
