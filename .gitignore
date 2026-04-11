@@ -1,0 +1,26 @@
+# dot folders
+.agents/
+.cache/
+.claude/
+.cursor/
+.idea/
+.review/
+.worktrees/
+.vs/
+.vscode/
+.xmake/
+
+# folders
+build*/
+vs*/
+
+# packaging
+packaging/node_modules/
+packaging/build/
+packaging/dist/
+packaging/.env
+.pnpm-store/
+
+# files
+*.zip
+compile_commands.json

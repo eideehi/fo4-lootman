@@ -1,0 +1,15 @@
+LootMan CommonLibF4 Plugin
+
+SPDX-License-Identifier: GPL-3.0-only
+
+This directory contains the native plugin source and build files derived from
+the CommonLibF4 template.
+
+Unless a nested dependency provides its own license, files in this directory
+are distributed under the terms of the GNU General Public License version 3.
+
+You should have received a copy of the GNU General Public License with this
+source tree. If not, see <https://www.gnu.org/licenses/gpl-3.0.txt>.
+
+Additional permissions for modding and library linkage used by this project
+are documented in `../EXCEPTIONS`.

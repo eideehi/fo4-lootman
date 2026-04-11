@@ -1,0 +1,3 @@
+[submodule "commonlibf4-plugin/lib/commonlibf4"]
+	path = commonlibf4-plugin/lib/commonlibf4
+	url = https://github.com/libxse/commonlibf4.git
