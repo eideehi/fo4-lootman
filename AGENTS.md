@@ -52,6 +52,21 @@ vm->CreateStruct(typeName, st);
 // Set fields with st->Find("fieldName"sv)->Pack(...).
 ```
 
+## Native DLL builds must go through packaging
+
+When building or verifying the CommonLibF4 native plugin from WSL, do not run
+`xmake` directly from `commonlibf4-plugin/` as the primary workflow. Use the
+packaging CLI from `packaging/` so the repository's staged WSL-to-Windows build
+path is exercised consistently.
+
+- Run build commands from `packaging/` only
+- Prefer `pnpm run build -- --no-papyrus` for native DLL verification
+- Use `pnpm run build` only when Papyrus/archive outputs are also required
+- If the staged Windows build tree needs to be reset, use
+  `pnpm run clean:wsl-build`
+- Assume `packaging/.env`, `pnpm install`, and Windows tool reachability are
+  prerequisites for DLL builds
+
 ## xEdit VMAD Cleanup Workflow
 
 When editing staged plugin VMAD data, do not improvise. Use the staged xEdit
