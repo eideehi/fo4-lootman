@@ -11,6 +11,139 @@ namespace papyrus_lootman
 	using namespace form_cache;
 	using namespace RE;
 
+	// Safely pack a TESForm-derived pointer into a Papyrus Variable, bypassing
+	// CommonLibF4's broken `PackVariable<object T>(Variable&, const volatile T*)`
+	// which dispatches to `IVirtualMachine::CreateObject(BSFixedString&, BSTSmartPointer<Object>&)`
+	// at a vtable slot that does not match the game binary (the interface
+	// header declares the two CreateObject overloads in an order that fights
+	// MSVC's reverse-declaration virtual overload placement) and CTDs the
+	// game. We use `ObjectBindPolicy::bindInterface->CreateObjectWithProperties`
+	// and drive `BindObject` ourselves, which is the equivalent of v1's
+	// `BindID` / `PackHandle` helper in `PapyrusArgs.cpp`.
+	//
+	// `a_vmTypeID` is the type ID the VM should use to look up the Papyrus
+	// script class. For `TESObjectREFR*` callers pass `kREFR`. For a generic
+	// `TESForm*` we can't rely on the static `FORM_ID` (which is `kNONE`
+	// because `TESForm::FORM_ID == ENUM_FORM_ID::kNONE`); v1 uses the runtime
+	// `form->formType` instead so each inventory item gets its proper Papyrus
+	// subclass (Weapon, Armor, Alchemy, ...).
+	bool PackFormSafe(BSScript::Variable& a_var, TESForm* form, std::uint32_t vmTypeID)
+	{
+		if (!form)
+		{
+			a_var = nullptr;
+			return true;
+		}
+
+		const auto success = [&]()
+		{
+			auto* game = GameVM::GetSingleton();
+			auto vm = game ? game->GetVM() : nullptr;
+			if (!vm)
+			{
+				return false;
+			}
+
+			BSTSmartPointer<BSScript::ObjectTypeInfo> typeInfo;
+			if (!vm->GetScriptObjectType(vmTypeID, typeInfo) || !typeInfo)
+			{
+				return false;
+			}
+
+			auto& handles = vm->GetObjectHandlePolicy();
+			const auto handle = handles.GetHandleForObject(
+				vmTypeID, static_cast<const void*>(form));
+			if (handle == handles.EmptyHandle())
+			{
+				return false;
+			}
+
+			BSTSmartPointer<BSScript::Object> object;
+			if (!vm->FindBoundObject(handle, typeInfo->name.c_str(), false, object, false) || !object)
+			{
+				auto& binding = vm->GetObjectBindPolicy();
+				auto* bindInterface = binding.bindInterface;
+				if (!bindInterface ||
+					!bindInterface->CreateObjectWithProperties(typeInfo->name, 0, object) ||
+					!object)
+				{
+					return false;
+				}
+
+				binding.BindObject(object, handle);
+			}
+
+			if (!object)
+			{
+				return false;
+			}
+
+			a_var = std::move(object);
+			return true;
+		}();
+
+		if (!success)
+		{
+			assert(false);
+			REX::ERROR("failed to pack Form"sv);
+			a_var = nullptr;
+		}
+
+		return success;
+	}
+
+	inline bool PackObjectReferenceSafe(BSScript::Variable& a_var, TESObjectREFR* ref)
+	{
+		return PackFormSafe(a_var, ref, static_cast<std::uint32_t>(TESObjectREFR::FORM_ID));
+	}
+}
+
+// CommonLibF4's generic `PackVariable<object T>(Variable&, const volatile T*)`
+// for TESForm-derived pointer types calls `IVirtualMachine::CreateObject`,
+// which in the current pinned submodule dispatches to the wrong vtable slot
+// (MSVC places the two `CreateObject` overloads in the opposite order from the
+// annotations in the interface header) and CTDs the game.
+//
+// We can't intercept `BSScript::PackVariable` directly because it's a
+// concept-constrained overload set (no primary template to specialize), and
+// because the array-overload's inner call is `detail::PackVariable(...)` which
+// is a qualified call — phase-1 lookup in the template definition only sees
+// declarations visible in `BSScriptUtil.h` at that point, so a non-template
+// overload added later in our TU would be invisible.
+//
+// `BSScript::detail::PackVariable<T>` IS a primary function template. We
+// specialize it for `TESObjectREFR*`. Function-template specializations are
+// considered at instantiation time (phase 2) and therefore override the
+// primary even though they are declared later in the TU. Specialization
+// placement must occur before the first use, which in this file is the
+// `BindNativeMethod(... &FindNearbyReferencesWithFormType ...)` call inside
+// `Register()` near the bottom.
+namespace RE::BSScript::detail
+{
+	// For `std::vector<TESObjectREFR*>` returns (FindNearbyReferencesWithFormType).
+	template <>
+	inline void PackVariable<TESObjectREFR*>(Variable& a_var, TESObjectREFR*&& a_val)
+	{
+		(void)papyrus_lootman::PackObjectReferenceSafe(a_var, a_val);
+	}
+
+	// For `std::vector<TESForm*>` returns (GetInventoryItemsWithItemType,
+	// GetLootableItems, GetScrappableItems). v1's `PackHandle` used the
+	// per-form runtime `formType` instead of a static type ID so each form
+	// gets marshalled as its correct Papyrus subclass (Weapon, Armor, etc).
+	// We mirror that behaviour.
+	template <>
+	inline void PackVariable<TESForm*>(Variable& a_var, TESForm*&& a_val)
+	{
+		const auto vmTypeID = a_val
+			? static_cast<std::uint32_t>(a_val->GetFormType())
+			: static_cast<std::uint32_t>(TESForm::FORM_ID);
+		(void)papyrus_lootman::PackFormSafe(a_var, a_val, vmTypeID);
+	}
+}
+
+namespace papyrus_lootman
+{
 	// ---- Item type enums (matching v2.2.0 Papyrus bitmasks) ----
 
 	enum Generic : std::uint32_t
@@ -322,7 +455,10 @@ namespace papyrus_lootman
 	EquipmentData GetEquipmentData(ExtraDataList* extraDataList, std::vector<BGSMod::Attachment::Mod*>* buffer)
 	{
 		EquipmentData equipmentData;
-		if (!GetMods(extraDataList, buffer)) return equipmentData;
+		if (!GetMods(extraDataList, buffer))
+		{
+			return equipmentData;
+		}
 
 		for (const auto& mod : *buffer)
 		{
@@ -331,13 +467,17 @@ namespace papyrus_lootman
 				equipmentData.isLegendary = true;
 			}
 
-			BGSMod::Attachment::Mod::Data containerData;
-			mod->GetData(containerData);
-			if (!containerData.propertyMods) continue;
-
-			for (std::uint32_t i = 0; i < containerData.propertyModCount; ++i)
+			// Read the property-mod block directly out of the BSTDataBuffer<2> that
+			// BGSMod::Container inherits from, instead of going through
+			// `BGSMod::Attachment::Mod::GetData(Data&)`. The REL::Relocation behind
+			// that member function crashes in the currently targeted game build,
+			// while `GetBuffer<T>(id)` is a pure in-memory template helper so it
+			// stays safe even if the game function address has shifted. Block id 1
+			// (`BLOCKIDS::kPMOD`) is the property-mod list.
+			const auto propModSpan = mod->GetBuffer<const BGSMod::Property::Mod>(
+				static_cast<std::uint8_t>(BGSMod::Property::BLOCKIDS::kPMOD));
+			for (const auto& propMod : propModSpan)
 			{
-				const auto& propMod = containerData.propertyMods[i];
 				if (propMod.op != BGSMod::Property::OP::kAdd) continue;
 				if (propMod.type != BGSMod::Property::TYPE::kForm) continue;
 
@@ -571,10 +711,11 @@ namespace papyrus_lootman
 		if (ref->IsPlayerRef()) return false;
 		if (ref->IsWater()) return false;
 
+		auto* instanceDataPtr = GetInstanceData(ref);
 		const bool hasExcludeKeyword = HasKeyword(
 			ref,
 			injection_data::GetKeywordListRef(injection_data::exclude_keyword),
-			GetInstanceData(ref));
+			instanceDataPtr);
 		if (hasExcludeKeyword)
 		{
 			return false;
@@ -840,9 +981,11 @@ namespace papyrus_lootman
 		const auto lootableInventoryItemType = properties::GetInt(properties::lootable_inventory_item_type);
 		ReadLockGuard guard(inventoryList->rwLock);
 
+		std::uint32_t idx = 0;
 		for (auto& item : inventoryList->data)
 		{
 			auto form = item.object;
+			++idx;
 			if (!form) continue;
 
 			if (!IsFormTypeMatchesItemType(form->GetFormType(), lootableInventoryItemType))
@@ -974,6 +1117,8 @@ namespace papyrus_lootman
 		{
 			if (!cell) return;
 			if (cell->cellState != TESObjectCELL::CELL_STATE::kAttached) return;
+			// Only cells that pass the cheap attached-state check get a probe, to
+			// cut log volume from thousands of unattached cells in the cellMap scan.
 
 			// v2.2.0 GetCellOwner: check extraDataList first, fall back to encounter zone owner
 			TESForm* cellOwner = nullptr;
@@ -1124,7 +1269,7 @@ namespace papyrus_lootman
 
 			if (TryLockObject(formId))
 			{
-				tmp.emplace_back(obj);
+				tmp.push_back(obj);
 				if (tmp.size() >= maxItemsProcessedPerThread)
 				{
 					break;
@@ -1135,6 +1280,7 @@ namespace papyrus_lootman
 		// Reverse for Papyrus loop ordering (closest items processed last = first in Papyrus reverse loop)
 		std::reverse(tmp.begin(), tmp.end());
 		result = std::move(tmp);
+
 		return result;
 	}
 
@@ -1331,9 +1477,11 @@ namespace papyrus_lootman
 		std::vector<BGSMod::Attachment::Mod*> modBuffer;
 		ReadLockGuard guard(inventoryList->rwLock);
 
+		std::uint32_t idx = 0;
 		for (auto& item : inventoryList->data)
 		{
 			auto form = item.object;
+			++idx;
 			if (!form) continue;
 
 			if (!IsFormTypeMatchesItemType(form->GetFormType(), itemType)) continue;
