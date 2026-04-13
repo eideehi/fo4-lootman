@@ -52,6 +52,135 @@ vm->CreateStruct(typeName, st);
 // Set fields with st->Find("fieldName"sv)->Pack(...).
 ```
 
+## CommonLibF4 -- do not call `BGSMod::Attachment::Mod::GetData()`
+
+The member helper `mod->GetData(containerData)` will jump to a garbage
+address and CTD.
+
+Cause:
+
+- In `include/RE/IDs.h`, `BGSMod::Attachment::Mod::GetData` is pinned to
+  `REL::ID{ 0 }` with a `// 33658 - inlined?` comment. The upstream maintainer
+  could not locate a callable address because the game binary inlined the
+  function, and left a placeholder.
+- `Mod::GetData(Data&)` calls `REL::Relocation<...>{ ID::BGSMod::Attachment::Mod::GetData }`
+  which resolves to that placeholder and dispatches into random code.
+- Still broken on upstream `main` (as of `05652a75` / April 2026).
+
+Workaround:
+
+- Read the property-mod block directly out of `BSTDataBuffer<2>` that
+  `BGSMod::Container` inherits from. `GetBuffer<T>(blockId)` is a pure
+  in-memory template helper, so it is safe regardless of relocation IDs.
+- Block id `1` (`BGSMod::Property::BLOCKIDS::kPMOD`) holds the property mod
+  list; block id `0` (`kOMOD`) holds attachment instances.
+
+```cpp
+// Bad: crashes because ID::BGSMod::Attachment::Mod::GetData == 0.
+BGSMod::Attachment::Mod::Data containerData;
+mod->GetData(containerData);
+for (std::uint32_t i = 0; i < containerData.propertyModCount; ++i) {
+    const auto& propMod = containerData.propertyMods[i];
+    // ...
+}
+
+// Good: parse the container's BSTDataBuffer<2> directly.
+const auto propModSpan = mod->GetBuffer<const BGSMod::Property::Mod>(
+    static_cast<std::uint8_t>(BGSMod::Property::BLOCKIDS::kPMOD));
+for (const auto& propMod : propModSpan) {
+    // ...
+}
+```
+
+## CommonLibF4 -- `PackVariable` for TESForm pointers dispatches to the wrong vtable slot
+
+Returning `std::vector<TESObjectREFR*>`, `std::vector<TESForm*>`, or any other
+`std::vector<TESForm-derived*>` from a `BindNativeMethod` function CTDs the
+game the moment the native function returns.
+
+Cause:
+
+- `RE::BSScript::PackVariable<object T>(Variable&, const volatile T*)` calls
+  `vm->CreateObject(typeInfo->name, object)` (the 2-arg overload).
+- `include/RE/B/BSScript_IVirtualMachine.h` declares the two `CreateObject`
+  overloads in this order: 3-arg first (slot annotated `// 16`), 2-arg second
+  (slot annotated `// 17`).
+- MSVC places overloaded virtual functions in the vtable in REVERSE declaration
+  order, so the plugin-side vtable has the 2-arg overload at slot 16 and the
+  3-arg overload at slot 17 — the opposite of the comments.
+- The game binary's actual slot 16 is an unrelated function; our 2-arg call
+  lands on it with a garbage signature and crashes.
+- The sibling overload set in `BSScript_Internal_VirtualMachine.h` is declared
+  in the correct (reversed) order, confirming this is a header-level bug in
+  the interface declaration. Still present on upstream `main` (`05652a75`).
+
+Workaround:
+
+- Do not let the default `PackVariable<object T>` path run for TESForm-derived
+  return types. Instead, specialize `RE::BSScript::detail::PackVariable<T>` for
+  the pointer types your native function returns and call a local helper that
+  builds the `BSScript::Object` via `ObjectBindPolicy::bindInterface->CreateObjectWithProperties`
+  (which is at a working vtable slot) and then `binding.BindObject(object, handle)`.
+- `detail::PackVariable` is a primary function template in
+  `RE::BSScript::detail`, so explicit specializations are legal. Declare them
+  in the same TU as the native function definitions, before the
+  `BindNativeMethod(...)` calls that instantiate `NativeFunction`.
+- For a generic `TESForm*` return, use the runtime `form->GetFormType()` as
+  the VM type ID (not the static `TESForm::FORM_ID`, which is `kNONE`) so each
+  element marshals as its correct Papyrus subclass. This mirrors v1's
+  `PapyrusArgs::PackHandle` behaviour.
+
+```cpp
+// Safe packer used by the specializations below.
+bool PackFormSafe(BSScript::Variable& a_var, TESForm* form, std::uint32_t vmTypeID)
+{
+    if (!form) { a_var = nullptr; return true; }
+    auto* game = GameVM::GetSingleton();
+    auto vm = game ? game->GetVM() : nullptr;
+    if (!vm) return false;
+
+    BSTSmartPointer<BSScript::ObjectTypeInfo> typeInfo;
+    if (!vm->GetScriptObjectType(vmTypeID, typeInfo) || !typeInfo) return false;
+
+    auto& handles = vm->GetObjectHandlePolicy();
+    const auto handle = handles.GetHandleForObject(vmTypeID, form);
+    if (handle == handles.EmptyHandle()) return false;
+
+    BSTSmartPointer<BSScript::Object> object;
+    if (!vm->FindBoundObject(handle, typeInfo->name.c_str(), false, object, false) || !object) {
+        auto& binding = vm->GetObjectBindPolicy();
+        if (!binding.bindInterface ||
+            !binding.bindInterface->CreateObjectWithProperties(typeInfo->name, 0, object) ||
+            !object) return false;
+        binding.BindObject(object, handle);
+    }
+    if (!object) return false;
+    a_var = std::move(object);
+    return true;
+}
+
+// Route the generic array packer through the safe helper for the exact
+// pointer types our native functions return.
+namespace RE::BSScript::detail
+{
+    template <>
+    inline void PackVariable<TESObjectREFR*>(Variable& a_var, TESObjectREFR*&& a_val)
+    {
+        (void)PackFormSafe(a_var, a_val,
+            static_cast<std::uint32_t>(TESObjectREFR::FORM_ID));
+    }
+
+    template <>
+    inline void PackVariable<TESForm*>(Variable& a_var, TESForm*&& a_val)
+    {
+        const auto vmTypeID = a_val
+            ? static_cast<std::uint32_t>(a_val->GetFormType())
+            : static_cast<std::uint32_t>(TESForm::FORM_ID);
+        (void)PackFormSafe(a_var, a_val, vmTypeID);
+    }
+}
+```
+
 ## Native DLL builds must go through packaging
 
 When building or verifying the CommonLibF4 native plugin from WSL, do not run
