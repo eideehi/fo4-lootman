@@ -1,10 +1,29 @@
 #include "papyrus_lootman.h"
 
+#include <cstdint>
+#include <format>
+#include <mutex>
+#include <optional>
+#include <string>
+#include <string_view>
+#if defined(_MSC_VER)
+#include <intrin.h>
+#endif
+
+#include <REL/Relocation.h>
+#include <REX/FModule.h>
+
 #include "constructible_object.h"
 #include "form_cache.h"
 #include "injection_data.h"
 #include "properties.h"
 #include "vendor_chest.h"
+
+#if defined(_MSC_VER)
+#define LTMN_CAPTURE_RETURN_ADDRESS() reinterpret_cast<std::uintptr_t>(_ReturnAddress())
+#else
+#define LTMN_CAPTURE_RETURN_ADDRESS() static_cast<std::uintptr_t>(0)
+#endif
 
 namespace papyrus_lootman
 {
@@ -256,6 +275,13 @@ namespace papyrus_lootman
 		BGSEncounterZone* encounterZone;
 	};
 
+	struct ExtraCellDetachTimeCompat :
+		public BSExtraData
+	{
+		static constexpr auto TYPE = EXTRA_DATA_TYPE::kCellDetachTime;
+		std::uint32_t detachTime;
+	};
+
 	struct ExtraOwnershipCompat :
 		public BSExtraData
 	{
@@ -281,6 +307,384 @@ namespace papyrus_lootman
 
 		T& lock;
 	};
+
+	namespace
+	{
+		inline constexpr std::uintptr_t kLoadChangeEncounterZoneAttachCallRva = 0x4D2311;
+		inline constexpr std::uintptr_t kLoadChangeEncounterZoneResetElapsedCallRva = 0x4D23B5;
+		inline constexpr std::uintptr_t kLoadChangeCellBeforeZoneResetCallRva = 0x4D23C4;
+		inline constexpr std::uintptr_t kEncounterZoneResetElapsedFromDetachRva = 0x4D2E20;
+		inline constexpr std::uintptr_t kCurrentEncounterZoneDetachCallRva = 0xD9AEDF;
+		inline constexpr std::uintptr_t kCurrentEncounterZoneAttachCallRva = 0xD9AEEE;
+		inline constexpr std::uintptr_t kLocationEncounterZoneDetachCallRva = 0x49D553;
+		inline constexpr std::uintptr_t kClearEncounterZoneDetachCallRva = 0x110E611;
+
+		using UpdateEncounterZoneDetachFn = void (*)(BGSEncounterZone*, std::uint32_t);
+		using UpdateEncounterZoneAttachFn = void (*)(BGSEncounterZone*, std::uint32_t);
+		using CheckEncounterZoneResetElapsedFn = bool (*)(BGSEncounterZone*);
+		using CheckCellBeforeEncounterZoneResetFn = bool (*)(BGSEncounterZone*, TESObjectCELL*);
+		using CheckResetElapsedFromDetachTimeFn =
+			bool (*)(std::uint32_t, std::uint32_t, bool);
+
+		UpdateEncounterZoneDetachFn originalUpdateEncounterZoneDetach = nullptr;
+		UpdateEncounterZoneAttachFn originalUpdateEncounterZoneAttach = nullptr;
+		CheckEncounterZoneResetElapsedFn originalCheckEncounterZoneResetElapsed = nullptr;
+		CheckCellBeforeEncounterZoneResetFn originalCheckCellBeforeEncounterZoneReset = nullptr;
+		CheckResetElapsedFromDetachTimeFn checkResetElapsedFromDetachTime = nullptr;
+
+		std::uintptr_t GetFalloutExecutableRva(std::uintptr_t absoluteAddress)
+		{
+			static const auto baseAddress = REX::FModule::GetExecutingModule().GetBaseAddress();
+			if (baseAddress == 0 || absoluteAddress < baseAddress)
+			{
+				return 0;
+			}
+
+			return absoluteAddress - baseAddress;
+		}
+
+		std::optional<std::uint32_t> GetCellDetachTimeForDiagnostics(const TESObjectCELL* cell)
+		{
+			if (!cell)
+			{
+				return std::nullopt;
+			}
+
+			if (auto* extraList = cell->extraList.get())
+			{
+				if (auto* detachTime = extraList->GetByType<ExtraCellDetachTimeCompat>())
+				{
+					return detachTime->detachTime;
+				}
+			}
+
+			return std::nullopt;
+		}
+
+		bool ShouldLogEncounterZoneFlow(const BGSEncounterZone* zone)
+		{
+			return zone && zone->formID == 0x000585B8;
+		}
+
+		std::string FormatEncounterZoneFlowDiagnostics(
+			const BGSEncounterZone* zone,
+			const TESObjectCELL* cell = nullptr)
+		{
+			const auto currentDays = []()
+			{
+				auto* calendar = Calendar::GetSingleton();
+				return calendar ? calendar->rawDaysPassed : -1.0f;
+			}();
+			const bool hasGameDays = currentDays >= 0.0f;
+
+			std::uint32_t locationFormID = 0;
+			std::string_view locationName;
+			bool locationCleared = false;
+			bool locationEverCleared = false;
+			if (zone && zone->data.location)
+			{
+				locationFormID = zone->data.location->formID;
+				locationName = TESFullName::GetFullName(*zone->data.location);
+				locationCleared = zone->data.location->cleared;
+				locationEverCleared = zone->data.location->everCleared;
+			}
+
+			std::uint32_t cellFormID = 0;
+			std::int32_t cellState = -1;
+			bool cellInterior = false;
+			bool cellDetached = false;
+			std::optional<std::uint32_t> cellDetachTime;
+			if (cell)
+			{
+				cellFormID = cell->formID;
+				cellState = static_cast<std::int32_t>(cell->cellState.get());
+				cellInterior = cell->IsInterior();
+				cellDetached = cell->cellDetached;
+				cellDetachTime = GetCellDetachTimeForDiagnostics(cell);
+			}
+
+			const std::uint32_t zoneDetachTime = zone ? zone->gameData.detachTime : 0;
+			const std::uint32_t zoneAttachTime = zone ? zone->gameData.attachTime : 0;
+			const std::uint32_t zoneResetTime = zone ? zone->gameData.resetTime : 0;
+			const auto cellDetachTimeForReset = cellDetachTime.value_or(0);
+			const bool cellDetachBeforeZoneReset =
+				zoneResetTime != 0 && cellDetachTimeForReset < zoneResetTime;
+
+			return std::format(
+				"zone={{ptr=0x{:016X}, formID={:08X}, neverResets={}, workshop={}, detachTime={}, attachTime={}, resetTime={}, zoneLevel={}}}, "
+				"location={{formID={:08X}, name=\"{}\", cleared={}, everCleared={}}}, "
+				"cell={{ptr=0x{:016X}, formID={:08X}, state={}, interior={}, detached={}, detachTimePresent={}, detachTime={}, detachBeforeZoneReset={}}}, "
+				"game={{daysAvailable={}, rawDaysPassed={:.3f}}}",
+				static_cast<std::uint64_t>(reinterpret_cast<std::uintptr_t>(zone)),
+				zone ? zone->formID : 0,
+				zone ? zone->NeverResets() : false,
+				zone ? zone->IsWorkshop() : false,
+				zoneDetachTime,
+				zoneAttachTime,
+				zoneResetTime,
+				zone ? zone->gameData.zoneLevel : 0,
+				locationFormID,
+				locationName,
+				locationCleared,
+				locationEverCleared,
+				static_cast<std::uint64_t>(reinterpret_cast<std::uintptr_t>(cell)),
+				cellFormID,
+				cellState,
+				cellInterior,
+				cellDetached,
+				cellDetachTime.has_value(),
+				cellDetachTimeForReset,
+				cellDetachBeforeZoneReset,
+				hasGameDays,
+				currentDays);
+		}
+
+		std::string_view ClassifyEncounterZoneAttachCaller(std::uintptr_t callerRva)
+		{
+			switch (callerRva)
+			{
+			case kLoadChangeEncounterZoneAttachCallRva + 5:
+				return "load-change-zone-attach";
+			case kCurrentEncounterZoneAttachCallRva + 5:
+				return "current-zone-attach";
+			default:
+				return "unknown";
+			}
+		}
+
+		std::string_view ClassifyEncounterZoneDetachCaller(std::uintptr_t callerRva)
+		{
+			switch (callerRva)
+			{
+			case kCurrentEncounterZoneDetachCallRva + 5:
+				return "current-zone-detach";
+			case kLocationEncounterZoneDetachCallRva + 5:
+				return "location-zone-detach-sentinel";
+			case kClearEncounterZoneDetachCallRva + 5:
+				return "clear-zone-detach-sentinel";
+			default:
+				return "unknown";
+			}
+		}
+
+		void HookedUpdateEncounterZoneDetach(BGSEncounterZone* zone, std::uint32_t detachDay)
+		{
+			const auto callerReturnAddress = LTMN_CAPTURE_RETURN_ADDRESS();
+			const auto callerRva = GetFalloutExecutableRva(callerReturnAddress);
+			const bool shouldLog = ShouldLogEncounterZoneFlow(zone);
+			if (shouldLog)
+			{
+				REX::INFO(
+					"EncounterZoneFlow: stage=\"detach-update-before\", detachDay={}, callerRVA=0x{:X}, callerKind=\"{}\", diagnostics={{{}}}",
+					detachDay,
+					static_cast<std::uint64_t>(callerRva),
+					ClassifyEncounterZoneDetachCaller(callerRva),
+					FormatEncounterZoneFlowDiagnostics(zone));
+			}
+
+			originalUpdateEncounterZoneDetach(zone, detachDay);
+
+			if (shouldLog)
+			{
+				REX::INFO(
+					"EncounterZoneFlow: stage=\"detach-update-after\", detachDay={}, callerRVA=0x{:X}, callerKind=\"{}\", diagnostics={{{}}}",
+					detachDay,
+					static_cast<std::uint64_t>(callerRva),
+					ClassifyEncounterZoneDetachCaller(callerRva),
+					FormatEncounterZoneFlowDiagnostics(zone));
+			}
+		}
+
+		void HookedUpdateEncounterZoneAttach(BGSEncounterZone* zone, std::uint32_t currentDay)
+		{
+			const auto callerReturnAddress = LTMN_CAPTURE_RETURN_ADDRESS();
+			const auto callerRva = GetFalloutExecutableRva(callerReturnAddress);
+			const bool shouldLog = ShouldLogEncounterZoneFlow(zone);
+			if (shouldLog)
+			{
+				REX::INFO(
+					"EncounterZoneFlow: stage=\"attach-update-before\", currentDay={}, callerRVA=0x{:X}, callerKind=\"{}\", diagnostics={{{}}}",
+					currentDay,
+					static_cast<std::uint64_t>(callerRva),
+					ClassifyEncounterZoneAttachCaller(callerRva),
+					FormatEncounterZoneFlowDiagnostics(zone));
+			}
+
+			originalUpdateEncounterZoneAttach(zone, currentDay);
+
+			if (shouldLog)
+			{
+				REX::INFO(
+					"EncounterZoneFlow: stage=\"attach-update-after\", currentDay={}, callerRVA=0x{:X}, callerKind=\"{}\", diagnostics={{{}}}",
+					currentDay,
+					static_cast<std::uint64_t>(callerRva),
+					ClassifyEncounterZoneAttachCaller(callerRva),
+					FormatEncounterZoneFlowDiagnostics(zone));
+			}
+		}
+
+		bool HookedCheckEncounterZoneResetElapsed(BGSEncounterZone* zone)
+		{
+			const bool result = originalCheckEncounterZoneResetElapsed(zone);
+			if (ShouldLogEncounterZoneFlow(zone))
+			{
+				REX::INFO(
+					"EncounterZoneFlow: stage=\"reset-elapsed-check\", result={}, diagnostics={{{}}}",
+					result,
+					FormatEncounterZoneFlowDiagnostics(zone));
+			}
+			return result;
+		}
+
+		std::string FormatCellDetachResetProjection(
+			BGSEncounterZone* zone,
+			TESObjectCELL* cell,
+			bool originalResult,
+			bool* candidateWouldSuppressOut = nullptr)
+		{
+			if (candidateWouldSuppressOut)
+			{
+				*candidateWouldSuppressOut = false;
+			}
+
+			if (!zone || !cell || !checkResetElapsedFromDetachTime)
+			{
+				return "projectionAvailable=false";
+			}
+
+			const auto cellDetachTime = GetCellDetachTimeForDiagnostics(cell);
+			if (!cellDetachTime)
+			{
+				return "projectionAvailable=false, reason=\"missing-cell-detach-time\"";
+			}
+
+			const auto currentDay = zone->gameData.attachTime;
+			if (currentDay == 0)
+			{
+				return "projectionAvailable=false, reason=\"missing-zone-attach-time\"";
+			}
+
+			const bool locationCleared =
+				zone->data.location ? zone->data.location->cleared : false;
+			const bool cellDetachResetElapsed = checkResetElapsedFromDetachTime(
+				currentDay,
+				*cellDetachTime,
+				locationCleared);
+			const bool zoneDetachLooksUninitialized = zone->gameData.detachTime == 0;
+			const bool resetTimeFromCurrentAttach =
+				zone->gameData.resetTime != 0 && zone->gameData.resetTime == currentDay;
+			const bool candidateWouldSuppress =
+				originalResult &&
+				zoneDetachLooksUninitialized &&
+				resetTimeFromCurrentAttach &&
+				!cellDetachResetElapsed;
+			if (candidateWouldSuppressOut)
+			{
+				*candidateWouldSuppressOut = candidateWouldSuppress;
+			}
+
+			return std::format(
+				"projectionAvailable=true, currentDay={}, cellDetachTime={}, locationCleared={}, "
+				"cellDetachResetElapsed={}, zoneDetachLooksUninitialized={}, "
+				"resetTimeFromCurrentAttach={}, candidateWouldSuppress={}",
+				currentDay,
+				*cellDetachTime,
+				locationCleared,
+				cellDetachResetElapsed,
+				zoneDetachLooksUninitialized,
+				resetTimeFromCurrentAttach,
+				candidateWouldSuppress);
+		}
+
+		bool HookedCheckCellBeforeEncounterZoneReset(BGSEncounterZone* zone, TESObjectCELL* cell)
+		{
+			const bool result = originalCheckCellBeforeEncounterZoneReset(zone, cell);
+			bool suppressReset = false;
+			const auto projection =
+				FormatCellDetachResetProjection(zone, cell, result, &suppressReset);
+			if (ShouldLogEncounterZoneFlow(zone))
+			{
+				REX::INFO(
+					"EncounterZoneFlow: stage=\"cell-before-reset-check\", result={}, finalResult={}, suppressed={}, projection={{{}}}, diagnostics={{{}}}",
+					result,
+					suppressReset ? false : result,
+					suppressReset,
+					projection,
+					FormatEncounterZoneFlowDiagnostics(zone, cell));
+			}
+			return suppressReset ? false : result;
+		}
+
+		void InstallEncounterZoneResetSuppressionHooks()
+		{
+			static std::once_flag installOnce;
+			std::call_once(installOnce, []()
+			{
+				REL::Relocation<std::uintptr_t> loadChangeAttachCallSite{
+					REL::Offset(kLoadChangeEncounterZoneAttachCallRva)
+				};
+				REL::Relocation<std::uintptr_t> currentAttachCallSite{
+					REL::Offset(kCurrentEncounterZoneAttachCallRva)
+				};
+				REL::Relocation<std::uintptr_t> currentDetachCallSite{
+					REL::Offset(kCurrentEncounterZoneDetachCallRva)
+				};
+				REL::Relocation<std::uintptr_t> locationDetachCallSite{
+					REL::Offset(kLocationEncounterZoneDetachCallRva)
+				};
+				REL::Relocation<std::uintptr_t> clearDetachCallSite{
+					REL::Offset(kClearEncounterZoneDetachCallRva)
+				};
+				REL::Relocation<std::uintptr_t> resetElapsedCallSite{
+					REL::Offset(kLoadChangeEncounterZoneResetElapsedCallRva)
+				};
+				REL::Relocation<std::uintptr_t> cellBeforeResetCallSite{
+					REL::Offset(kLoadChangeCellBeforeZoneResetCallRva)
+				};
+				REL::Relocation<CheckResetElapsedFromDetachTimeFn> resetElapsedFromDetach{
+					REL::Offset(kEncounterZoneResetElapsedFromDetachRva)
+				};
+
+				originalUpdateEncounterZoneAttach = reinterpret_cast<UpdateEncounterZoneAttachFn>(
+					loadChangeAttachCallSite.write_call<5>(HookedUpdateEncounterZoneAttach));
+				(void)currentAttachCallSite.write_call<5>(HookedUpdateEncounterZoneAttach);
+				originalUpdateEncounterZoneDetach = reinterpret_cast<UpdateEncounterZoneDetachFn>(
+					currentDetachCallSite.write_call<5>(HookedUpdateEncounterZoneDetach));
+				(void)locationDetachCallSite.write_call<5>(HookedUpdateEncounterZoneDetach);
+				(void)clearDetachCallSite.write_call<5>(HookedUpdateEncounterZoneDetach);
+				originalCheckEncounterZoneResetElapsed =
+					reinterpret_cast<CheckEncounterZoneResetElapsedFn>(
+						resetElapsedCallSite.write_call<5>(HookedCheckEncounterZoneResetElapsed));
+				originalCheckCellBeforeEncounterZoneReset =
+					reinterpret_cast<CheckCellBeforeEncounterZoneResetFn>(
+						cellBeforeResetCallSite.write_call<5>(
+							HookedCheckCellBeforeEncounterZoneReset));
+				checkResetElapsedFromDetachTime = resetElapsedFromDetach.get();
+
+				REX::INFO(
+					"InventoryRebuildHook: installed encounter-zone reset suppression, encounterDetachOriginal=0x{:016X}, encounterAttachOriginal=0x{:016X}, encounterResetElapsedOriginal=0x{:016X}, cellBeforeResetOriginal=0x{:016X}, resetElapsedFromDetach=0x{:016X}, encounterDetachCallRVA=0x{:X}, encounterAttachCallRVA=0x{:X}, currentEncounterDetachCallRVA=0x{:X}, currentEncounterAttachCallRVA=0x{:X}, locationEncounterDetachCallRVA=0x{:X}, clearEncounterDetachCallRVA=0x{:X}, encounterResetElapsedCallRVA=0x{:X}, cellBeforeResetCallRVA=0x{:X}, resetElapsedFromDetachRVA=0x{:X}",
+					static_cast<std::uint64_t>(
+						reinterpret_cast<std::uintptr_t>(originalUpdateEncounterZoneDetach)),
+					static_cast<std::uint64_t>(
+						reinterpret_cast<std::uintptr_t>(originalUpdateEncounterZoneAttach)),
+					static_cast<std::uint64_t>(
+						reinterpret_cast<std::uintptr_t>(originalCheckEncounterZoneResetElapsed)),
+					static_cast<std::uint64_t>(
+						reinterpret_cast<std::uintptr_t>(originalCheckCellBeforeEncounterZoneReset)),
+					static_cast<std::uint64_t>(
+						reinterpret_cast<std::uintptr_t>(checkResetElapsedFromDetachTime)),
+					static_cast<std::uint64_t>(kCurrentEncounterZoneDetachCallRva),
+					static_cast<std::uint64_t>(kLoadChangeEncounterZoneAttachCallRva),
+					static_cast<std::uint64_t>(kCurrentEncounterZoneDetachCallRva),
+					static_cast<std::uint64_t>(kCurrentEncounterZoneAttachCallRva),
+					static_cast<std::uint64_t>(kLocationEncounterZoneDetachCallRva),
+					static_cast<std::uint64_t>(kClearEncounterZoneDetachCallRva),
+					static_cast<std::uint64_t>(kLoadChangeEncounterZoneResetElapsedCallRva),
+					static_cast<std::uint64_t>(kLoadChangeCellBeforeZoneResetCallRva),
+					static_cast<std::uint64_t>(kEncounterZoneResetElapsedFromDetachRva));
+			});
+		}
+	}
 
 	// ---- Distance helpers ----
 
@@ -1574,6 +1978,11 @@ namespace papyrus_lootman
 	// ================================================================
 	// Registration and lifecycle
 	// ================================================================
+
+	void InstallInventoryRebuildDiagnosticsHooks()
+	{
+		InstallEncounterZoneResetSuppressionHooks();
+	}
 
 	bool Register(RE::BSScript::IVirtualMachine* vm)
 	{
