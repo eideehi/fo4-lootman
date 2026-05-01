@@ -17,9 +17,6 @@ Function SetTurboMode()
 EndFunction
 
 bool Function IsLootingTarget(ObjectReference ref)
-    If (!IsLootableDistance(ref) || !ref.Is3DLoaded())
-        Return false
-    EndIf
     If (player.WouldBeStealing(ref))
         Return false
     EndIf
@@ -33,25 +30,15 @@ Function LootObject(ObjectReference ref)
 
     string prefix = GetLogPrefix(2)
     LTMN2:Debug.Log(prefix + "Loot: [ Name: \"" + ref.GetDisplayName() + "\", Id: " + LTMN2:Debug.GetHexID(ref) + " ]")
-    LTMN2:Debug.Log(prefix + "  Inventory status before looting: [ Item count: " + ref.GetItemCount() + ", Total weight: " + ref.GetInventoryWeight() + " ]")
+    int beforeCount = ref.GetItemCount()
+    LTMN2:Debug.Log(prefix + "  Inventory status before looting: [ Item count: " + beforeCount + ", Total weight: " + ref.GetInventoryWeight() + " ]")
     LTMN2:Debug.Log(prefix + "  [ Start looting ]")
 
-    Form[] forms = LTMN2:LootMan.GetLootableItems(ref, properties.LootableInventoryItemType)
-    LTMN2:Debug.Log(prefix + "    Total found items: " + forms.Length)
+    int itemCount = LTMN2:LootMan.TransferLootableInventoryItems(ref, properties.LootManRef, properties.LootableInventoryItemType)
+    LTMN2:Debug.Log(prefix + "    Total moved item stacks: " + itemCount)
 
-    int itemCount = 0
-    int i = forms.Length
-    While i
-        i -= 1
-        itemCount += 1
-
-        LTMN2:Debug.Log(prefix + "    [ Item " + itemCount + " ]")
-        LTMN2:Debug.TraceForm(prefix + "      ", forms[i])
-
-        LTMN2:Utils.MoveInventoryItem(ref, properties.LootManRef, forms[i])
-    EndWhile
-
-    LTMN2:Debug.Log(prefix + "  Inventory status after looting: [ Item count: " + ref.GetItemCount() + ", Total weight: " + ref.GetInventoryWeight() + " ]")
+    int afterCount = ref.GetItemCount()
+    LTMN2:Debug.Log(prefix + "  Inventory status after looting: [ Item count: " + afterCount + ", Total weight: " + ref.GetInventoryWeight() + " ]")
 
     If (itemCount > 0)
         If (properties.PlayContainerAnimation && player.HasDetectionLoS(ref))

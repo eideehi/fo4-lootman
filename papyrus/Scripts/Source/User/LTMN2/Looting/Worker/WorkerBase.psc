@@ -57,39 +57,14 @@ Function Looting()
     EndIf
 
     string prefix = GetLogPrefix()
+    int formType = GetFormTypeOfAssignment()
     LTMN2:Debug.Log(prefix + "[ Start looting ]")
 
-    ObjectReference[] refs = LTMN2:LootMan.FindNearbyReferencesWithFormType(player, GetFormTypeOfAssignment())
+    int refCount = LTMN2:LootMan.LootNearbyReferences(player, properties.LootManRef, properties.ActivatorRef, properties.LootManWorkshopRef, formType, properties.LootableInventoryItemType, properties.PlayPickupSound, properties.PlayContainerAnimation, properties.UnlockLockedContainer, properties.BobbyPin, properties.Locksmith01, properties.Locksmith02, properties.Locksmith03, properties.Locksmith04)
 
-    If (properties.WorkerInvokeInterval > 0 && refs.Length >= properties.MaxItemsProcessedPerThread)
+    If (properties.WorkerInvokeInterval > 0 && refCount >= properties.MaxItemsProcessedPerThread)
         SetTurboMode()
     EndIf
-
-    int objectIndex = 1
-    int i = refs.Length
-    While i
-        i -= 1
-
-        ObjectReference ref = refs[i]
-        If (ref)
-            int id = ref.GetFormID()
-
-            If (LTMN2:Utils.IsLootingSafe())
-                LTMN2:Debug.Log(prefix + "  [ Object " + objectIndex + " ]")
-                TraceObject(prefix + "    ", ref)
-                TraceForm(prefix + "    ", ref.GetBaseObject())
-
-                If (IsLootingTarget(ref))
-                    LootObject(ref)
-                Else
-                    LTMN2:Debug.Log(prefix + "    [ Is not a target of looting ]")
-                EndIf
-            EndIf
-
-            LTMN2:LootMan.ReleaseObject(id)
-            objectIndex += 1
-        EndIf
-    EndWhile
 EndFunction
 
 Function IncreaseActiveThreadCount()
@@ -105,26 +80,7 @@ EndFunction
 Function SetTurboMode()
 EndFunction
 
-bool Function IsLootableDistance(ObjectReference ref)
-    Cell playerCell = player.GetParentCell()
-    Cell objCell = ref.GetParentCell()
-    If (!objCell || !objCell.IsAttached() || !playerCell || !playerCell.IsAttached())
-        Return false
-    EndIf
-    If (playerCell != objCell)
-        If (objCell.IsInterior() || playerCell.IsInterior())
-            Return false
-        ElseIf (player.GetDistance(ref) > 25600)
-            Return false
-        EndIf
-    EndIf
-    Return true
-EndFunction
-
 bool Function IsLootingTarget(ObjectReference ref)
-    If (!IsLootableDistance(ref) || !ref.Is3DLoaded())
-        Return false
-    EndIf
     Return !player.WouldBeStealing(ref)
 EndFunction
 
@@ -135,10 +91,24 @@ Function LootObject(ObjectReference ref)
 
     string prefix = GetLogPrefix(2)
     LTMN2:Debug.Log(prefix + "Loot: [ Name: " + ref.GetDisplayName() + ", Id: " + LTMN2:Debug.GetHexID(ref) + " ]")
+    Form baseForm = ref.GetBaseObject()
+    int beforeCount = 0
+    If (baseForm)
+        beforeCount = properties.LootManRef.GetItemCount(baseForm)
+    EndIf
+
     If (properties.PlayPickupSound)
         LTMN2:LootMan.PlayPickUpSound(player, ref)
     EndIf
     properties.LootManRef.AddItem(ref, 1, true)
+
+    int afterCount = beforeCount
+    If (baseForm)
+        afterCount = properties.LootManRef.GetItemCount(baseForm)
+        If (afterCount > beforeCount)
+            LTMN2:LootMan.FinalizeWorldPickup(ref)
+        EndIf
+    EndIf
 EndFunction
 
 ; Return the process id to be output to the log

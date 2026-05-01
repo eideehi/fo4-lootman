@@ -36,7 +36,7 @@ F4SE_PLUGIN_LOAD(const F4SE::LoadInterface* a_f4se)
 	F4SE::Init(a_f4se, initInfo);
 
 	REX::INFO("LootMan plugin loading...");
-	papyrus_lootman::InstallInventoryRebuildDiagnosticsHooks();
+	papyrus_lootman::InstallInventoryRebuildHooks();
 
 	if (!injection_data::Initialize())
 	{

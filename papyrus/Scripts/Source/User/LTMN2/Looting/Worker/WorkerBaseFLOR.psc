@@ -17,7 +17,7 @@ Function SetTurboMode()
 EndFunction
 
 bool Function IsLootingTarget(ObjectReference ref)
-    Return IsLootableDistance(ref) && ref.Is3DLoaded()
+    Return true
 EndFunction
 
 Function LootObject(ObjectReference ref)

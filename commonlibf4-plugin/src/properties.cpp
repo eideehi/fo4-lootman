@@ -172,6 +172,24 @@ namespace properties
 			updates[always_looting_explosives] = GetBoolProperty(propertyName);
 		}
 
+		propertyName = "CarryWeight";
+		if (updateAll || propertyName == updateProperty)
+		{
+			updates[carry_weight] = GetIntProperty(propertyName);
+		}
+
+		propertyName = "IgnoreOverweight";
+		if (updateAll || propertyName == updateProperty)
+		{
+			updates[ignore_overweight] = GetBoolProperty(propertyName);
+		}
+
+		propertyName = "LootIsDeliverToPlayer";
+		if (updateAll || propertyName == updateProperty)
+		{
+			updates[loot_is_deliver_to_player] = GetBoolProperty(propertyName);
+		}
+
 		propertyName = "LootableALCHItemType";
 		if (updateAll || updateProperty.rfind("EnableALCHItem", 0) == 0)
 		{

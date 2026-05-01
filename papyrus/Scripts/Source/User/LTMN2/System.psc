@@ -412,14 +412,16 @@ Function Update()
     LTMN2:Debug.Log(prefix + "  [ Check LootMan (Actor) inventory ]")
     LTMN2:Debug.Log(prefix + "    Item count: " + properties.LootManRef.GetItemCount())
     If (properties.LootManRef.GetItemCount() > 0)
+        int movedItems = 0
         If (properties.LootIsDeliverToPlayer)
             LTMN2:Debug.Log(prefix + "    [ Move items from LootMan to player ]")
-            LTMN2:Debug.Log(prefix + "      Without logs: " + properties.DeliveredToPlayerWithoutLogs)
-            LTMN2:Utils.MoveInventoryItems(properties.LootManRef, player, properties.ITEM_TYPE_ALL, -1, properties.DeliveredToPlayerWithoutLogs)
+            LTMN2:Debug.Log(prefix + "      Suppress pickup messages: " + properties.DeliveredToPlayerWithoutLogs)
+            movedItems = LTMN2:LootMan.TransferInventoryItems(properties.LootManRef, player, properties.ITEM_TYPE_ALL, -1, properties.ObjectTypeLooseMod, properties.DeliveredToPlayerWithoutLogs)
         Else
             LTMN2:Debug.Log(prefix + "    [ Move items from LootMan to workshop ]")
-            LTMN2:Utils.MoveInventoryItems(properties.LootManRef, properties.LootManWorkshopRef, properties.ITEM_TYPE_ALL)
+            movedItems = LTMN2:LootMan.TransferInventoryItems(properties.LootManRef, properties.LootManWorkshopRef, properties.ITEM_TYPE_ALL, -1, properties.ObjectTypeLooseMod, false)
         EndIf
+        LTMN2:Debug.Log(prefix + "      Moved item forms: " + movedItems)
         LTMN2:Debug.Log(prefix + "      Item count of after processing: " + properties.LootManRef.GetItemCount())
     EndIf
 
