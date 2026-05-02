@@ -51,11 +51,22 @@ int Function TransferLootableInventoryItems(ObjectReference src, ObjectReference
 ; Transfer inventory items of the specified item type from one inventory to another.
 int Function TransferInventoryItems(ObjectReference src, ObjectReference dest, int itemType, int subType, Keyword looseModKeyword, bool suppressPlayerMessages) global native
 
+; Gating helpers for the looting pipeline.
+bool Function IsLootingSafe() global native
+
+; Move inventory items for utility actions.
+Function MoveInventoryItem(ObjectReference src, ObjectReference dest, Form item, int count = -1, bool silent = true) global native
+Function MoveInventoryItems(ObjectReference src, ObjectReference dest, int itemType, int subType = -1, bool silent = true) global native
+
 ; Loot nearby references of the specified form type in native code.
 int Function LootNearbyReferences(ObjectReference player, ObjectReference dest, ObjectReference activator, ObjectReference workshop, int formType, int itemType, bool playPickupSound, bool playContainerAnimation, bool unlockLockedContainer, Form bobbyPin, Perk locksmith01, Perk locksmith02, Perk locksmith03, Perk locksmith04) global native
 
 ; Get scrappable items of the specified item type in the inventory.
 Form[] Function GetScrappableItems(ObjectReference inventoryOwner, int itemType) global native
+
+; Scrap helpers.
+Function ScrapInventoryItems(ObjectReference inventoryOwner, ObjectReference componentReceiver, int itemType) global native
+int[] Function ScrapInventoryItemsWithResults(ObjectReference inventoryOwner, ObjectReference componentReceiver, int itemType) global native
 
 ; Verify that the item's form type matches the specified value.
 bool Function IsFormTypeEquals(Form form, int formType) global native
