@@ -6,11 +6,38 @@ ObjectReference[] Function FindNearbyReferencesWithFormType(ObjectReference ref,
 ; Find nearby reference IDs of the specified form type. Returned IDs remain locked in native code until released.
 int[] Function FindNearbyReferenceIdsWithFormType(ObjectReference ref, int formType) global native
 
+; Find the current valid workshop through the game workshop system.
+int Function FindNearestValidWorkshopId(ObjectReference ref) global native
+
 ; Get components of specified equipment.
 MiscObject:MiscComponent[] Function GetEquipmentComponents(ObjectReference inventoryItem) global native
 
 ; Get form's type.
 int Function GetFormType(Form form) global native
+
+; Output a diagnostic message to the native LootMan log.
+Function Log(string msg) global native
+
+; Get the form type identifier.
+string Function GetFormTypeIdentifier(Form form) global native
+
+; Convert the form id to a hexadecimal string.
+string Function GetHexID(Form form) global native
+
+; Get the simple name of the Form.
+string Function GetName(Form form) global native
+
+; Output raw inventory diagnostics to the native LootMan log.
+Function LogInventoryDiagnostics(ObjectReference inventoryOwner, string prefix) global native
+
+; Output native workshop supply-line diagnostics to the native LootMan log.
+Function LogWorkshopSupplyDiagnostics(ObjectReference targetWorkshop, ObjectReference lootManWorkshop, string prefix) global native
+
+; Remember a workshop link for the native shared-workshop-container hook.
+Function RememberWorkshopSupplyLink(Form targetLocation, ObjectReference lootManWorkshop, string prefix) global native
+
+; Remove a remembered workshop link from the native shared-workshop-container hook.
+Function ForgetWorkshopSupplyLink(Form targetLocation, string prefix) global native
 
 ; Get items of the specified item type in the inventory.
 Form[] Function GetInventoryItemsWithItemType(ObjectReference inventoryOwner, int itemType) global native

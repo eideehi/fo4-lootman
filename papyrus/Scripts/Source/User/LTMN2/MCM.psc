@@ -87,21 +87,32 @@ Function OnMCMSettingChange(string modName, string id)
     If (id == "AutomaticallyLinkAndUnlinkToWorkshop")
         LTMN2:Debug.Log(prefix + "  [ Adjust the link status between LootMan and the workshop because LootMan's configuration has been changed ]")
         LTMN2:Debug.Log(prefix + "    Automatically link LootMan to workshops: " + properties.AutomaticallyLinkAndUnlinkToWorkshop)
-        LTMN2:Debug.Log(prefix + "    Workshop exists at the current location: " + (properties.WorkshopParent.GetWorkshopFromLocation(player.GetCurrentLocation()) != none))
 
-        Location currentLocation = player.GetCurrentLocation()
-        WorkshopScript workshop = properties.WorkshopParent.GetWorkshopFromLocation(currentLocation)
+        WorkshopScript workshop = LTMN2:Utils.GetCurrentWorkshop(player)
+        Location workshopLocation = none
+        If (workshop)
+            workshopLocation = workshop.myLocation
+        EndIf
+
+        LTMN2:Debug.Log(prefix + "    Workshop exists near the player: " + (workshop != none))
         If (workshop && workshop.OwnedByPlayer)
-            LTMN2:Debug.Log(prefix + "    LootMan is linked to the current location: " + currentLocation.IsLinkedLocation(properties.LootManLocation, properties.WorkshopCaravan))
-
-            bool linkToCurrentLocation = currentLocation.IsLinkedLocation(properties.LootManLocation, properties.WorkshopCaravan)
-            If (!linkToCurrentLocation && properties.AutomaticallyLinkAndUnlinkToWorkshop)
-                LTMN2:Debug.Log(prefix + "    [ Add the link to the current location ]")
-                currentLocation.AddLinkedLocation(properties.LootManLocation, properties.WorkshopCaravan)
-                system.ShowMessage(system.MESSAGE_LINKED_TO_WORKSHOP)
-            ElseIf (linkToCurrentLocation && properties.AutomaticallyLinkAndUnlinkToWorkshop)
-                LTMN2:Debug.Log(prefix + "    [ Remove the link to the current location ]")
-                currentLocation.RemoveLinkedLocation(properties.LootManLocation, properties.WorkshopCaravan)
+            If (properties.AutomaticallyLinkAndUnlinkToWorkshop)
+                If (system.LinkWorkshop(workshop, prefix))
+                    system.ShowMessage(system.MESSAGE_LINKED_TO_WORKSHOP)
+                EndIf
+                workshopLocation = workshop.myLocation
+                system.SetAutoLinkedWorkshopLocation(workshopLocation)
+            Else
+                bool removedLink = system.UnlinkAutoLinkedWorkshopLocation(prefix)
+                If (!removedLink)
+                    removedLink = system.UnlinkWorkshopLocation(workshopLocation, prefix)
+                EndIf
+                If (removedLink)
+                    system.ShowMessage(system.MESSAGE_UNLINKED_TO_WORKSHOP)
+                EndIf
+            EndIf
+        ElseIf (!properties.AutomaticallyLinkAndUnlinkToWorkshop)
+            If (system.UnlinkAutoLinkedWorkshopLocation(prefix))
                 system.ShowMessage(system.MESSAGE_UNLINKED_TO_WORKSHOP)
             Else
                 LTMN2:Debug.Log(prefix + "    [ No need to adjust the link status ]")
@@ -112,13 +123,15 @@ Function OnMCMSettingChange(string modName, string id)
 
     ElseIf (id == "NotLootingFromSettlement")
         Location currentLocation = player.GetCurrentLocation()
+        WorkshopScript currentWorkshop = LTMN2:Utils.GetCurrentWorkshop(player)
 
         LTMN2:Debug.Log(prefix + "  [ Adjust the flag whether you are staying in the settlement because LootMan's configuration has been changed ]")
         LTMN2:Debug.Log(prefix + "    Not looting from settlement: " + properties.NotLootingFromSettlement)
         LTMN2:Debug.Log(prefix + "    Current location is a settlement (LocTypeSettlement): " + currentLocation.HasKeyword(Game.GetCommonProperties().LocTypeSettlement))
         LTMN2:Debug.Log(prefix + "    Current location is a settlement (LocTypeWorkshopSettlement): " + currentLocation.HasKeyword(Game.GetCommonProperties().LocTypeWorkshopSettlement))
+        LTMN2:Debug.Log(prefix + "    Workshop exists near the player: " + (currentWorkshop != None))
 
-        If (currentLocation.HasKeyword(Game.GetCommonProperties().LocTypeSettlement) || currentLocation.HasKeyword(Game.GetCommonProperties().LocTypeWorkshopSettlement))
+        If (currentLocation.HasKeyword(Game.GetCommonProperties().LocTypeSettlement) || currentLocation.HasKeyword(Game.GetCommonProperties().LocTypeWorkshopSettlement) || currentWorkshop != None)
             properties.IsInSettlement = true
         Else
             properties.IsInSettlement = false
@@ -317,14 +330,23 @@ Function ToggleLinkToWorkshop()
         Return
     EndIf
 
-    WorkshopScript workshop = properties.WorkshopParent.GetWorkshopFromLocation(player.GetCurrentLocation())
-    If (workshop && workshop.myLocation)
-        If (workshop.myLocation.IsLinkedLocation(properties.LootManLocation, properties.WorkshopCaravan))
-            workshop.myLocation.RemoveLinkedLocation(properties.LootManLocation, properties.WorkshopCaravan)
+    string prefix = ("| MCM | " + LTMN2:Debug.GetRandomProcessId() + " | ")
+    WorkshopScript workshop = LTMN2:Utils.GetCurrentWorkshop(player)
+    If (workshop)
+        Location workshopLocation = workshop.myLocation
+        If (!workshopLocation)
+            workshopLocation = workshop.GetCurrentLocation()
+            workshop.myLocation = workshopLocation
+        EndIf
+
+        If (system.IsWorkshopLinkedToLootMan(workshopLocation, prefix))
+            system.LogWorkshopDiagnostics(workshop, prefix, "MCM current")
+            system.UnlinkWorkshopLocation(workshopLocation, prefix)
             system.ShowMessage(system.MESSAGE_UNLINKED_TO_WORKSHOP)
         Else
-            workshop.myLocation.AddLinkedLocation(properties.LootManLocation, properties.WorkshopCaravan)
-            system.ShowMessage(system.MESSAGE_LINKED_TO_WORKSHOP)
+            If (system.LinkWorkshop(workshop, prefix))
+                system.ShowMessage(system.MESSAGE_LINKED_TO_WORKSHOP)
+            EndIf
         EndIf
     Else
         system.ShowMessage(system.MESSAGE_WORKSHOP_NOT_FOUND)
@@ -350,7 +372,7 @@ ObjectReference Function GetTargetInventory(int target)
     ElseIf (target == INVENTORY_LOOTMAN)
         Return properties.LootManWorkshopRef
     ElseIf (target == INVENTORY_WORKSHOP)
-        Return properties.WorkshopParent.GetWorkshopFromLocation(player.GetCurrentLocation())
+        Return LTMN2:Utils.GetCurrentWorkshop(player)
     EndIf
     Return none
 EndFunction

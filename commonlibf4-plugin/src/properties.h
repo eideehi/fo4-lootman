@@ -1,5 +1,10 @@
 #pragma once
 
+namespace RE
+{
+	class TESObjectREFR;
+}
+
 namespace properties
 {
 	// Subset of `LTMN2:Properties` mirrored into native code for hot-path reads.
@@ -50,6 +55,7 @@ namespace properties
 	bool GetBool(Key key, bool defaultValue = false);
 	int GetInt(Key key, int defaultValue = 0);
 	float GetFloat(Key key, float defaultValue = 0.0f);
+	RE::TESObjectREFR* GetLootManWorkshopRef();
 
 	// Resolves the `LTMN_Properties` quest once forms are available.
 	void Initialize();

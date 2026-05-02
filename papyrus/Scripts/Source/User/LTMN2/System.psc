@@ -66,6 +66,7 @@ Actor player
 LTMN2:Properties properties
 int[] messageDisplayCount
 float[] lastMessageDisplayTime
+Location autoLinkedWorkshopLocation
 
 ; LootMan's system initialization
 Event OnInit()
@@ -120,12 +121,19 @@ Event Actor.OnLocationChange(Actor akSender, Location akOldLoc, Location akNewLo
     LTMN2:Debug.Log(prefix + "  Old location: [ Name: \"" + LTMN2:Debug.GetName(akOldLoc) + "\", Id: " + LTMN2:Debug.GetHexID(akOldLoc) + " ]")
     LTMN2:Debug.Log(prefix + "  New location: [ Name: \"" + LTMN2:Debug.GetName(akNewLoc) + "\", Id: " + LTMN2:Debug.GetHexID(akNewLoc) + " ]")
 
+    WorkshopScript currentWorkshop = LTMN2:Utils.GetCurrentWorkshop(player)
+    Location currentWorkshopLocation = none
+    If (currentWorkshop)
+        currentWorkshopLocation = currentWorkshop.myLocation
+    EndIf
+
     LTMN2:Debug.Log(prefix + "  [ Not looting from settlement: " + properties.NotLootingFromSettlement + " ]")
     If (properties.NotLootingFromSettlement && akNewLoc != None)
         LTMN2:Debug.Log(prefix + "    New location is a settlement: " + akNewLoc.HasKeyword(Game.GetCommonProperties().LocTypeSettlement))
         LTMN2:Debug.Log(prefix + "    New location is a workshop settlement: " + akNewLoc.HasKeyword(Game.GetCommonProperties().LocTypeWorkshopSettlement))
+        LTMN2:Debug.Log(prefix + "    Workshop exists near the player: " + (currentWorkshop != None))
 
-        If (akNewLoc.HasKeyword(Game.GetCommonProperties().LocTypeSettlement) || akNewLoc.HasKeyword(Game.GetCommonProperties().LocTypeWorkshopSettlement))
+        If (akNewLoc.HasKeyword(Game.GetCommonProperties().LocTypeSettlement) || akNewLoc.HasKeyword(Game.GetCommonProperties().LocTypeWorkshopSettlement) || currentWorkshop != None)
             properties.IsInSettlement = true
             ShowMessage(MESSAGE_REMIND_NOT_LOOTING_IN_SETTLEMENT)
             LTMN2:Debug.Log(prefix + "      [ Player entered the settlement ]")
@@ -137,32 +145,225 @@ Event Actor.OnLocationChange(Actor akSender, Location akOldLoc, Location akNewLo
 
     LTMN2:Debug.Log(prefix + "  [ Automatically link / unlink to workshop: " + properties.AutomaticallyLinkAndUnlinkToWorkshop + " ]")
     If (properties.AutomaticallyLinkAndUnlinkToWorkshop)
-        If (akOldLoc != None)
-            LTMN2:Debug.Log(prefix + "    Workshops exist in the old location: " + (properties.WorkshopParent.GetWorkshopFromLocation(akOldLoc) != None))
-            If (properties.WorkshopParent.GetWorkshopFromLocation(akOldLoc))
-                LTMN2:Debug.Log(prefix + "      Linked to LootMan: " + akOldLoc.IsLinkedLocation(properties.LootManLocation, properties.WorkshopCaravan))
-                If (akOldLoc.IsLinkedLocation(properties.LootManLocation, properties.WorkshopCaravan))
-                    LTMN2:Debug.Log(prefix + "      [ Removed link with LootMan ]")
-                    akOldLoc.RemoveLinkedLocation(properties.LootManLocation, properties.WorkshopCaravan)
+        If (autoLinkedWorkshopLocation != None && autoLinkedWorkshopLocation != currentWorkshopLocation)
+            If (UnlinkWorkshopLocation(autoLinkedWorkshopLocation, prefix))
+                ShowMessage(MESSAGE_UNLINKED_TO_WORKSHOP)
+            EndIf
+            autoLinkedWorkshopLocation = none
+        EndIf
+
+        If (autoLinkedWorkshopLocation == None && akOldLoc != None)
+            WorkshopScript oldWorkshop = properties.WorkshopParent.GetWorkshopFromLocation(akOldLoc)
+            If (oldWorkshop && oldWorkshop.myLocation && oldWorkshop.myLocation != currentWorkshopLocation)
+                If (UnlinkWorkshopLocation(oldWorkshop.myLocation, prefix))
                     ShowMessage(MESSAGE_UNLINKED_TO_WORKSHOP)
                 EndIf
             EndIf
         EndIf
 
-        If (akNewLoc != None)
-            LTMN2:Debug.Log(prefix + "    Workshops exist in the new location: " + (properties.WorkshopParent.GetWorkshopFromLocation(akNewLoc) != None))
-            WorkshopScript workshop = properties.WorkshopParent.GetWorkshopFromLocation(akNewLoc)
-            If (workshop && workshop.OwnedByPlayer)
-                LTMN2:Debug.Log(prefix + "      Linked to LootMan: " + akNewLoc.IsLinkedLocation(properties.LootManLocation, properties.WorkshopCaravan))
-                If (!akNewLoc.IsLinkedLocation(properties.LootManLocation, properties.WorkshopCaravan))
-                    LTMN2:Debug.Log(prefix + "      [ Added link to LootMan ]")
-                    akNewLoc.AddLinkedLocation(properties.LootManLocation, properties.WorkshopCaravan)
-                    ShowMessage(MESSAGE_LINKED_TO_WORKSHOP)
-                EndIf
+        LTMN2:Debug.Log(prefix + "    Workshop exists near the player: " + (currentWorkshop != None))
+        If (currentWorkshop && currentWorkshop.OwnedByPlayer)
+            If (LinkWorkshop(currentWorkshop, prefix))
+                ShowMessage(MESSAGE_LINKED_TO_WORKSHOP)
             EndIf
+            currentWorkshopLocation = currentWorkshop.myLocation
+            autoLinkedWorkshopLocation = currentWorkshopLocation
         EndIf
     EndIf
 EndEvent
+
+bool Function LinkWorkshop(WorkshopScript workshop, string prefix)
+    If (!workshop)
+        Return false
+    EndIf
+
+    bool lootManRegistered = EnsureWorkshopRegistered(properties.LootManWorkshopRef, prefix, "LootMan")
+    bool targetRegistered = EnsureWorkshopRegistered(workshop, prefix, "Target")
+    If (!lootManRegistered || !targetRegistered)
+        DiagnosticLog(prefix + "      [ Location link can be created, but workshop material sharing may not use this link ]")
+    EndIf
+
+    Location workshopLocation = workshop.myLocation
+    If (!workshopLocation)
+        workshopLocation = workshop.GetCurrentLocation()
+        workshop.myLocation = workshopLocation
+    EndIf
+
+    bool linked = LinkWorkshopLocation(workshopLocation, prefix)
+    LTMN2:LootMan.RememberWorkshopSupplyLink(workshopLocation, properties.LootManWorkshopRef, prefix)
+    Return linked
+EndFunction
+
+Function LogWorkshopDiagnostics(WorkshopScript workshop, string prefix, string label)
+    ; Investigation-only diagnostics. Keep empty for release builds; restore
+    ; workshop/ref/inventory logging here only while debugging workshop links.
+EndFunction
+
+Function DiagnosticLog(string msg)
+    ; Investigation-only diagnostics. Keep empty for release builds; restore
+    ; LTMN2:LootMan.Log(msg) here only while debugging workshop links.
+EndFunction
+
+bool Function EnsureWorkshopRegistered(WorkshopScript workshop, string prefix, string label)
+    If (!workshop)
+        DiagnosticLog(prefix + "      " + label + " workshop is missing")
+        Return false
+    EndIf
+
+    If (!workshop.myLocation)
+        workshop.myLocation = workshop.GetCurrentLocation()
+    EndIf
+    If (!workshop.myLocation)
+        DiagnosticLog(prefix + "      " + label + " workshop location is missing")
+        Return false
+    EndIf
+
+    int workshopIndex = properties.WorkshopParent.Workshops.Find(workshop)
+    int locationIndex = properties.WorkshopParent.WorkshopLocations.Find(workshop.myLocation)
+    bool allowCaravan = workshop.myLocation && workshop.myLocation.HasKeyword(properties.WorkshopParent.WorkshopAllowCaravan)
+
+    DiagnosticLog(prefix + "      " + label + " workshop index: " + workshopIndex)
+    DiagnosticLog(prefix + "      " + label + " workshop location index: " + locationIndex)
+    DiagnosticLog(prefix + "      " + label + " workshop allows caravan: " + allowCaravan)
+
+    If (workshopIndex >= 0 && locationIndex >= 0)
+        Return true
+    EndIf
+
+    If (workshopIndex < 0)
+        DiagnosticLog(prefix + "      [ Register " + label + " workshop in WorkshopParent ]")
+        properties.WorkshopParent.Workshops.Add(workshop)
+        workshopIndex = properties.WorkshopParent.Workshops.Length - 1
+        workshop.InitWorkshopID(workshopIndex)
+    EndIf
+
+    If (locationIndex < 0 && workshopIndex >= 0)
+        While (properties.WorkshopParent.WorkshopLocations.Length < workshopIndex)
+            properties.WorkshopParent.WorkshopLocations.Add(None)
+        EndWhile
+
+        If (properties.WorkshopParent.WorkshopLocations.Length == workshopIndex)
+            properties.WorkshopParent.WorkshopLocations.Add(workshop.myLocation)
+        Else
+            properties.WorkshopParent.WorkshopLocations[workshopIndex] = workshop.myLocation
+        EndIf
+
+        locationIndex = properties.WorkshopParent.WorkshopLocations.Find(workshop.myLocation)
+    EndIf
+
+    DiagnosticLog(prefix + "      " + label + " workshop index after registration: " + workshopIndex)
+    DiagnosticLog(prefix + "      " + label + " workshop location index after registration: " + locationIndex)
+
+    If (workshopIndex < 0 || locationIndex < 0)
+        DiagnosticLog(prefix + "      [ Failed to register " + label + " workshop ]")
+        Return false
+    EndIf
+
+    Return true
+EndFunction
+
+Location Function GetLootManWorkshopLocation(string prefix)
+    WorkshopScript lootManWorkshop = properties.LootManWorkshopRef
+    If (!lootManWorkshop)
+        Return none
+    EndIf
+
+    If (!lootManWorkshop.myLocation)
+        lootManWorkshop.myLocation = lootManWorkshop.GetCurrentLocation()
+    EndIf
+
+    Location workshopLocation = lootManWorkshop.myLocation
+    DiagnosticLog(prefix + "      LootMan configured location: " + LTMN2:LootMan.GetName(properties.LootManLocation))
+    DiagnosticLog(prefix + "      LootMan registered location: " + LTMN2:LootMan.GetName(workshopLocation))
+
+    If (workshopLocation)
+        Return workshopLocation
+    EndIf
+
+    Return properties.LootManLocation
+EndFunction
+
+bool Function IsWorkshopLinkedToLootMan(Location workshopLocation, string prefix)
+    If (!workshopLocation)
+        Return false
+    EndIf
+
+    Location lootManWorkshopLocation = GetLootManWorkshopLocation(prefix)
+    If (lootManWorkshopLocation && workshopLocation.IsLinkedLocation(lootManWorkshopLocation, properties.WorkshopCaravan))
+        Return true
+    EndIf
+
+    Return false
+EndFunction
+
+bool Function LinkWorkshopLocation(Location workshopLocation, string prefix)
+    If (!workshopLocation)
+        Return false
+    EndIf
+
+    Location lootManWorkshopLocation = GetLootManWorkshopLocation(prefix)
+    If (!lootManWorkshopLocation)
+        Return false
+    EndIf
+
+    bool linkedToRegisteredLocation = workshopLocation.IsLinkedLocation(lootManWorkshopLocation, properties.WorkshopCaravan)
+    bool linkedToConfiguredLocation = properties.LootManLocation != None && workshopLocation.IsLinkedLocation(properties.LootManLocation, properties.WorkshopCaravan)
+    DiagnosticLog(prefix + "      Linked to LootMan registered location: " + linkedToRegisteredLocation)
+    DiagnosticLog(prefix + "      Linked to LootMan configured location: " + linkedToConfiguredLocation)
+
+    If (!linkedToRegisteredLocation)
+        DiagnosticLog(prefix + "      [ Added link to LootMan ]")
+        workshopLocation.AddLinkedLocation(lootManWorkshopLocation, properties.WorkshopCaravan)
+        If (linkedToConfiguredLocation && properties.LootManLocation != lootManWorkshopLocation)
+            workshopLocation.RemoveLinkedLocation(properties.LootManLocation, properties.WorkshopCaravan)
+        EndIf
+        Return true
+    EndIf
+
+    Return false
+EndFunction
+
+bool Function UnlinkWorkshopLocation(Location workshopLocation, string prefix)
+    If (!workshopLocation)
+        Return false
+    EndIf
+
+    bool removed = false
+    Location lootManWorkshopLocation = GetLootManWorkshopLocation(prefix)
+    If (lootManWorkshopLocation && workshopLocation.IsLinkedLocation(lootManWorkshopLocation, properties.WorkshopCaravan))
+        DiagnosticLog(prefix + "      [ Removed link with LootMan registered location ]")
+        workshopLocation.RemoveLinkedLocation(lootManWorkshopLocation, properties.WorkshopCaravan)
+        removed = true
+    EndIf
+
+    If (properties.LootManLocation != None && properties.LootManLocation != lootManWorkshopLocation && workshopLocation.IsLinkedLocation(properties.LootManLocation, properties.WorkshopCaravan))
+        DiagnosticLog(prefix + "      [ Removed link with LootMan configured location ]")
+        workshopLocation.RemoveLinkedLocation(properties.LootManLocation, properties.WorkshopCaravan)
+        removed = true
+    EndIf
+
+    If (removed)
+        LTMN2:LootMan.ForgetWorkshopSupplyLink(workshopLocation, prefix)
+        DiagnosticLog(prefix + "      [ Skipped immediate workshop resource recalculation after removing runtime workshop link ]")
+        Return true
+    EndIf
+
+    Return false
+EndFunction
+
+Function SetAutoLinkedWorkshopLocation(Location workshopLocation)
+    autoLinkedWorkshopLocation = workshopLocation
+EndFunction
+
+bool Function UnlinkAutoLinkedWorkshopLocation(string prefix)
+    If (autoLinkedWorkshopLocation && UnlinkWorkshopLocation(autoLinkedWorkshopLocation, prefix))
+        autoLinkedWorkshopLocation = none
+        Return true
+    EndIf
+
+    autoLinkedWorkshopLocation = none
+    Return false
+EndFunction
 
 ; Called when a specific item is added to LootMan's inventory. The item is moved to the workbench in an appropriate manner so that it does not cause a glitch.
 Event ObjectReference.OnItemAdded(ObjectReference akSender, Form akBaseItem, int aiItemCount, ObjectReference akItemReference, ObjectReference akSourceContainer)

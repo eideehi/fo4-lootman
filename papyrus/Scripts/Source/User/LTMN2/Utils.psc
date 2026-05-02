@@ -1,5 +1,27 @@
 Scriptname LTMN2:Utils native hidden
 
+WorkshopScript Function GetCurrentWorkshop(ObjectReference ref) global
+    If (!ref)
+        Return none
+    EndIf
+
+    LTMN2:Properties properties = LTMN2:Properties.GetInstance()
+    Location currentLocation = ref.GetCurrentLocation()
+    If (currentLocation)
+        WorkshopScript locationWorkshop = properties.WorkshopParent.GetWorkshopFromLocation(currentLocation)
+        If (locationWorkshop)
+            Return locationWorkshop
+        EndIf
+    EndIf
+
+    int workshopId = LTMN2:LootMan.FindNearestValidWorkshopId(ref)
+    If (workshopId != 0)
+        Return Game.GetForm(workshopId) As WorkshopScript
+    EndIf
+
+    Return none
+EndFunction
+
 ; Move all items of a given form type from inventory to inventory.
 Function MoveInventoryItems(ObjectReference src, ObjectReference dest, int itemType, int subType = -1, bool silent = true) global
     LTMN2:Properties properties = LTMN2:Properties.Getinstance()

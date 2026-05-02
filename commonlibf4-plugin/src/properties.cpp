@@ -4,6 +4,7 @@
 namespace properties
 {
 	RE::TESForm* propertiesQuest = nullptr;
+	RE::TESObjectREFR* lootManWorkshopRef = nullptr;
 	std::mutex lock;
 	std::unordered_map<Key, Value> papyrusProperties;
 
@@ -93,6 +94,17 @@ namespace properties
 		return result;
 	}
 
+	RE::TESObjectREFR* GetObjectReferenceProperty(const char* propertyName)
+	{
+		RE::BSScript::Variable value;
+		if (!GetPapyrusProperty(propertyName, value))
+		{
+			return nullptr;
+		}
+
+		return RE::BSScript::UnpackVariable<RE::TESObjectREFR>(value);
+	}
+
 	Value Get(const Key key)
 	{
 		std::lock_guard<std::mutex> guard(lock);
@@ -118,10 +130,20 @@ namespace properties
 		return value.type == decimal ? value.data.f : defaultValue;
 	}
 
+	RE::TESObjectREFR* GetLootManWorkshopRef()
+	{
+		std::lock_guard<std::mutex> guard(lock);
+		return lootManWorkshopRef;
+	}
+
 	void Initialize()
 	{
 		// LTMN_Properties is a fixed quest record in LootMan.esp; native code reads its script properties directly.
 		propertiesQuest = utility::LookupForm("LootMan.esp|000F9A");
+		{
+			std::lock_guard<std::mutex> guard(lock);
+			lootManWorkshopRef = nullptr;
+		}
 		if (!propertiesQuest)
 		{
 			REX::WARN("Failed to resolve properties quest LootMan.esp|000F9A");
@@ -134,6 +156,8 @@ namespace properties
 		const bool updateAll = updateProperty.empty();
 		// Collect first, then publish under lock so readers never observe partially refreshed settings.
 		std::unordered_map<Key, Value> updates;
+		RE::TESObjectREFR* updatedLootManWorkshopRef = nullptr;
+		bool updateLootManWorkshopRef = false;
 
 		auto propertyName = "MaxItemsProcessedPerThread";
 		if (updateAll || propertyName == updateProperty)
@@ -214,7 +238,18 @@ namespace properties
 			updates[lootable_weap_item_type] = GetIntProperty(propertyName);
 		}
 
-		if (updates.empty())
+		propertyName = "LootManWorkshopRef";
+		if (updateAll || propertyName == updateProperty)
+		{
+			updateLootManWorkshopRef = true;
+			updatedLootManWorkshopRef = GetObjectReferenceProperty(propertyName);
+			if (!updatedLootManWorkshopRef)
+			{
+				REX::WARN("Failed to resolve native property LTMN2:Properties.{}", propertyName);
+			}
+		}
+
+		if (updates.empty() && !updateLootManWorkshopRef)
 		{
 			// Unknown property names are ignored so Papyrus can call the hook for every MCM setting safely.
 			return;
@@ -224,6 +259,10 @@ namespace properties
 		for (auto& [propertyKey, value] : updates)
 		{
 			papyrusProperties[propertyKey] = value;
+		}
+		if (updateLootManWorkshopRef)
+		{
+			lootManWorkshopRef = updatedLootManWorkshopRef;
 		}
 	}
 }
