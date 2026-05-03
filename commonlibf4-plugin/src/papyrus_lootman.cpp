@@ -22,6 +22,7 @@
 #include "constructible_object.h"
 #include "form_cache.h"
 #include "injection_data.h"
+#include "log_settings.h"
 #include "message_queue.h"
 #include "properties.h"
 #include "vendor_chest.h"
@@ -6972,6 +6973,16 @@ namespace papyrus_lootman
 		REX::INFO("[Papyrus] {}", message.c_str());
 	}
 
+	std::int32_t GetLogLevel(std::monostate)
+	{
+		return log_settings::GetLogLevel();
+	}
+
+	void SetLogLevel(std::monostate, std::int32_t logLevel)
+	{
+		log_settings::SetLogLevel(logLevel);
+	}
+
 	std::string GetFormTypeIdentifier(std::monostate, TESForm* form)
 	{
 		if (!form)
@@ -10285,6 +10296,10 @@ namespace papyrus_lootman
 			&GetFormType, true, false);
 		vm->BindNativeMethod("LTMN2:LootMan"sv, "Log"sv,
 			&Log, false, false);
+		vm->BindNativeMethod("LTMN2:LootMan"sv, "GetLogLevel"sv,
+			&GetLogLevel, true, false);
+		vm->BindNativeMethod("LTMN2:LootMan"sv, "SetLogLevel"sv,
+			&SetLogLevel, false, false);
 		vm->BindNativeMethod("LTMN2:LootMan"sv, "GetFormTypeIdentifier"sv,
 			&GetFormTypeIdentifier, true, false);
 		vm->BindNativeMethod("LTMN2:LootMan"sv, "GetHexID"sv,

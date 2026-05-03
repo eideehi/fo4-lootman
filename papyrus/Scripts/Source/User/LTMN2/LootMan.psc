@@ -18,6 +18,12 @@ int Function GetFormType(Form form) global native
 ; Output a diagnostic message to the native LootMan log.
 Function Log(string msg) global native
 
+; Get the native LootMan log level. Values match trace=0 through off=6.
+int Function GetLogLevel() global native
+
+; Set the native LootMan log level. Values match trace=0 through off=6.
+Function SetLogLevel(int logLevel) global native
+
 ; Get the form type identifier.
 string Function GetFormTypeIdentifier(Form form) global native
 

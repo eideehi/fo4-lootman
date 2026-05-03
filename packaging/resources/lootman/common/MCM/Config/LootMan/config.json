@@ -109,6 +109,27 @@
           "groupCondition": { "AND": [1, 6] }
         },
         {
+          "id": "LogLevel",
+          "text": "$PAGE_GENERAL_SETTINGS_LOG_LEVEL",
+          "type": "dropdown",
+          "help": "$PAGE_GENERAL_SETTINGS_LOG_LEVEL_HELP",
+          "valueOptions": {
+            "options": [
+              "$PAGE_GENERAL_SETTINGS_LOG_LEVEL_TRACE",
+              "$PAGE_GENERAL_SETTINGS_LOG_LEVEL_DEBUG",
+              "$PAGE_GENERAL_SETTINGS_LOG_LEVEL_INFO",
+              "$PAGE_GENERAL_SETTINGS_LOG_LEVEL_WARN",
+              "$PAGE_GENERAL_SETTINGS_LOG_LEVEL_ERROR",
+              "$PAGE_GENERAL_SETTINGS_LOG_LEVEL_CRITICAL",
+              "$PAGE_GENERAL_SETTINGS_LOG_LEVEL_OFF"
+            ],
+            "sourceType": "PropertyValueInt",
+            "sourceForm": "LootMan.esp|F9B",
+            "propertyName": "LogLevel"
+          },
+          "groupCondition": { "AND": [1, 6] }
+        },
+        {
           "id": "PlayPickupSound",
           "text": "$PAGE_GENERAL_SETTINGS_PLAY_PICKUP_SOUND",
           "type": "switcher",

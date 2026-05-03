@@ -1,6 +1,7 @@
 #include "constructible_object.h"
 #include "form_cache.h"
 #include "injection_data.h"
+#include "log_settings.h"
 #include "message_queue.h"
 #include "papyrus_lootman.h"
 #include "properties.h"
@@ -36,6 +37,7 @@ F4SE_PLUGIN_LOAD(const F4SE::LoadInterface* a_f4se)
 	initInfo.trampolineSize = 1024;
 	F4SE::Init(a_f4se, initInfo);
 
+	log_settings::Initialize();
 	REX::INFO("LootMan plugin loading...");
 	papyrus_lootman::InstallInventoryRebuildHooks();
 

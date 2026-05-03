@@ -40,6 +40,8 @@ Group Status
 
     int property ScrapItemsFrom = 0 auto hidden
     int property ScrapItemsType = 0 auto hidden
+
+    int property LogLevel = 2 auto hidden
 EndGroup
 
 ; Local variables
@@ -72,6 +74,7 @@ EndEvent
 Function Initialize()
     ; Reset properties that need to be reset each load
     SetUtilityBusy(false)
+    LogLevel = LTMN2:LootMan.GetLogLevel()
 
     RegisterForExternalEvent("OnMCMSettingChange|LootMan", "OnMCMSettingChange")
 EndFunction
@@ -141,6 +144,9 @@ Function OnMCMSettingChange(string modName, string id)
 
     ElseIf (id == "WorkerInvokeInterval")
         system.ResetLootingTimer()
+
+    ElseIf (id == "LogLevel")
+        LTMN2:LootMan.SetLogLevel(LogLevel)
 
     ElseIf (id == "EnableInventoryLootingOfALCH")
         properties.LootableInventoryItemType = Math.LogicalXor(properties.LootableInventoryItemType, properties.ITEM_TYPE_ALCH)
