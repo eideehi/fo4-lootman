@@ -7020,6 +7020,8 @@ namespace papyrus_lootman
 		std::uint32_t stackIndex = 0;
 		std::int32_t count = 0;
 		float unitWeight = 0.0F;
+		BSTSmartPointer<ExtraDataList> extra;
+		bool preserveStackExtra = false;
 	};
 
 	struct InventoryFormTransferRequest
@@ -7028,7 +7030,17 @@ namespace papyrus_lootman
 		std::int32_t count = 0;
 		float unitWeight = 0.0F;
 		std::optional<std::uint32_t> stackIndex;
+		BSTSmartPointer<ExtraDataList> extra;
+		bool preserveStackExtra = false;
 	};
+
+	struct ExtraCountData : BSExtraData
+	{
+		static constexpr auto TYPE{ EXTRA_DATA_TYPE::kCount };
+
+		std::uint16_t count;  // 18
+	};
+	static_assert(sizeof(BSExtraData) == 0x18);
 
 	void PlayPickUpSound(std::monostate, TESObjectREFR* player, TESObjectREFR* obj);
 	void FinalizeWorldPickup(std::monostate, TESObjectREFR* ref);
@@ -7053,9 +7065,27 @@ namespace papyrus_lootman
 			ITEM_REMOVE_REASON::kStoreContainer);
 	}
 
-	bool TryAddWorldReferenceToContainerSafe(TESObjectREFR* dest, TESObjectREFR* ref)
+	std::int32_t GetWorldReferenceItemCount(TESObjectREFR* ref)
 	{
-		if (!dest || !ref || dest == ref)
+		auto* extraList = ref ? ref->extraList.get() : nullptr;
+		if (!extraList)
+		{
+			return ref ? 1 : 0;
+		}
+
+		auto* extraCount = static_cast<ExtraCountData*>(
+			extraList->GetByType(EXTRA_DATA_TYPE::kCount));
+		if (!extraCount || extraCount->count == 0)
+		{
+			return 1;
+		}
+
+		return static_cast<std::int32_t>(extraCount->count);
+	}
+
+	bool TryAddWorldReferenceToContainerSafe(TESObjectREFR* dest, TESObjectREFR* ref, std::int32_t count)
+	{
+		if (!dest || !ref || dest == ref || count <= 0)
 		{
 			return false;
 		}
@@ -7071,9 +7101,49 @@ namespace papyrus_lootman
 			object,
 			ref->extraList,
 			ref,
-			1
+			count
 		};
 		return ExecuteSehCallSafe(&InvokeWorldReferenceAddCall, &context);
+	}
+
+	struct AddInventoryItemCallContext
+	{
+		TESObjectREFR* dest = nullptr;
+		TESBoundObject* object = nullptr;
+		BSTSmartPointer<ExtraDataList> extra;
+		std::uint32_t count = 0;
+	};
+
+	void InvokeAddInventoryItemCall(void* opaque)
+	{
+		auto* context = static_cast<AddInventoryItemCallContext*>(opaque);
+		context->dest->AddInventoryItem(
+			context->object,
+			context->extra,
+			context->count,
+			nullptr,
+			nullptr,
+			nullptr);
+	}
+
+	bool TryAddInventoryItemSafe(
+		TESObjectREFR* dest,
+		TESBoundObject* object,
+		std::uint32_t count,
+		BSTSmartPointer<ExtraDataList> extra = {})
+	{
+		if (!dest || !object || count == 0)
+		{
+			return count == 0;
+		}
+
+		AddInventoryItemCallContext context{
+			dest,
+			object,
+			std::move(extra),
+			count
+		};
+		return ExecuteSehCallSafe(&InvokeAddInventoryItemCall, &context);
 	}
 
 	struct ActivateRefCallContext
@@ -7139,35 +7209,6 @@ namespace papyrus_lootman
 			count
 		};
 		return ExecuteSehCallSafe(&InvokeRemoveItemsCall, &context);
-	}
-
-	struct AddInventoryItemCallContext
-	{
-		TESObjectREFR* dest = nullptr;
-		TESBoundObject* object = nullptr;
-		std::uint32_t count = 0;
-	};
-
-	void InvokeAddInventoryItemCall(void* opaque)
-	{
-		auto* context = static_cast<AddInventoryItemCallContext*>(opaque);
-		BSTSmartPointer<ExtraDataList> extra{};
-		context->dest->AddInventoryItem(context->object, extra, context->count, nullptr, nullptr, nullptr);
-	}
-
-	bool TryAddInventoryItemSafe(TESObjectREFR* dest, TESBoundObject* object, std::uint32_t count)
-	{
-		if (!dest || !object || count == 0)
-		{
-			return count == 0;
-		}
-
-		AddInventoryItemCallContext context{
-			dest,
-			object,
-			count
-		};
-		return ExecuteSehCallSafe(&InvokeAddInventoryItemCall, &context);
 	}
 
 	struct MoveInventoryItemCallContext
@@ -7251,6 +7292,97 @@ namespace papyrus_lootman
 			stackIndex
 		};
 		return ExecuteSehCallSafe(&InvokeRemoveScrapSourceCall, &context);
+	}
+
+	struct TransferExtraPresenceCallContext
+	{
+		ExtraDataList* extra = nullptr;
+		bool hasObjectInstance = false;
+		bool hasInstanceData = false;
+	};
+
+	void InvokeTransferExtraPresenceCall(void* opaque)
+	{
+		auto* context = static_cast<TransferExtraPresenceCallContext*>(opaque);
+		if (!context->extra)
+		{
+			return;
+		}
+
+		context->hasObjectInstance = context->extra->HasType(EXTRA_DATA_TYPE::kObjectInstance);
+		context->hasInstanceData = context->extra->HasType(EXTRA_DATA_TYPE::kInstanceData);
+	}
+
+	bool TryHasTransferRelevantExtraSafe(ExtraDataList* extra, bool& outResult)
+	{
+		outResult = false;
+		if (!extra)
+		{
+			return true;
+		}
+
+		TransferExtraPresenceCallContext context{ extra };
+		if (!ExecuteSehCallSafe(&InvokeTransferExtraPresenceCall, &context))
+		{
+			return false;
+		}
+
+		outResult = context.hasObjectInstance || context.hasInstanceData;
+		return true;
+	}
+
+	bool ShouldPreserveStackExtraForTransfer(
+		TESBoundObject* object,
+		const BGSInventoryItem::Stack& stack,
+		std::int32_t movingCount,
+		std::int32_t stackCount)
+	{
+		if (!object || movingCount <= 0 || movingCount != stackCount)
+		{
+			return false;
+		}
+
+		const auto formType = object->GetFormType();
+		if (formType != ENUM_FORM_ID::kWEAP && formType != ENUM_FORM_ID::kARMO)
+		{
+			return false;
+		}
+
+		bool hasRelevantExtra = false;
+		return TryHasTransferRelevantExtraSafe(stack.extra.get(), hasRelevantExtra) && hasRelevantExtra;
+	}
+
+	bool TryMoveInventoryItemPreservingStackExtraSafe(
+		TESObjectREFR* src,
+		TESObjectREFR* dest,
+		TESBoundObject* object,
+		std::int32_t count,
+		std::optional<std::uint32_t> stackIndex,
+		BSTSmartPointer<ExtraDataList> extra)
+	{
+		if (!src || !dest || !object || count <= 0 || !extra)
+		{
+			return false;
+		}
+
+		if (!TryAddInventoryItemSafe(dest, object, static_cast<std::uint32_t>(count), std::move(extra)))
+		{
+			return false;
+		}
+
+		if (!TryRemoveScrapSourceSafe(src, object, count, stackIndex))
+		{
+			REX::WARN(
+				"Inventory transfer: source removal failed after instance-preserving add, src={:08X}, dest={:08X}, item={:08X}, count={}, stack={}",
+				src->formID,
+				dest->formID,
+				object->formID,
+				count,
+				stackIndex ? static_cast<std::int32_t>(*stackIndex) : -1);
+			return false;
+		}
+
+		return true;
 	}
 
 	struct UnlockReferenceCallContext
@@ -7434,12 +7566,18 @@ namespace papyrus_lootman
 			return false;
 		}
 
+		const auto worldCount = GetWorldReferenceItemCount(ref);
+		if (worldCount <= 0)
+		{
+			return false;
+		}
+
 		float acceptedWeight = 0.0F;
 		float unitWeight = 0.0F;
 		if (capacity && capacity->enabled)
 		{
 			if (!TryGetItemUnitWeightSafe(object, GetInstanceData(ref), unitWeight) ||
-				!capacity->CanAccept(unitWeight, 1, acceptedWeight))
+				!capacity->CanAccept(unitWeight, worldCount, acceptedWeight))
 			{
 				return false;
 			}
@@ -7452,12 +7590,13 @@ namespace papyrus_lootman
 			PlayPickUpSound(std::monostate{}, player, ref);
 		}
 
-		if (!TryAddWorldReferenceToContainerSafe(dest, ref))
+		if (!TryAddWorldReferenceToContainerSafe(dest, ref, worldCount))
 		{
 			REX::WARN(
-				"LootNearbyReferences: failed to add world ref={:08X}, base={:08X} to dest={:08X}",
+				"LootNearbyReferences: failed to add world ref={:08X}, base={:08X}, count={} to dest={:08X}",
 				ref->formID,
 				object->formID,
+				worldCount,
 				dest->formID);
 			return false;
 		}
@@ -7475,9 +7614,10 @@ namespace papyrus_lootman
 		}
 
 		REX::WARN(
-			"LootNearbyReferences: no observed world transfer for ref={:08X}, base={:08X}, before={}, after={}, gotBefore={}, gotAfter={}",
+			"LootNearbyReferences: no observed world transfer for ref={:08X}, base={:08X}, count={}, before={}, after={}, gotBefore={}, gotAfter={}",
 			ref->formID,
 			object->formID,
+			worldCount,
 			beforeCount,
 			afterCount,
 			gotBefore,
@@ -7652,7 +7792,13 @@ namespace papyrus_lootman
 							form,
 							movableCount,
 							unitWeight,
-							stackIndex
+							stackIndex,
+							stack->extra,
+							ShouldPreserveStackExtraForTransfer(
+								form,
+								*stack,
+								movableCount,
+								stackInfo.totalCount)
 						});
 					}
 
@@ -7663,27 +7809,50 @@ namespace papyrus_lootman
 					continue;
 				}
 
-				auto info = GetInventoryItemInfo(item, modBuffer, inventory_info_quest);
-				if ((info.questItem && !MatchesAnyCached(form, injection_data::include_quest_item, &matchCache)) ||
-					info.dropped ||
-					(info.equipped && !sourceIsDead) ||
-					info.totalCount <= 0)
+				std::vector<InventoryFormTransferRequest> itemRequests;
+				itemRequests.reserve(4);
+				std::uint32_t stackIndex = 0;
+				for (auto stack = item.stackData.get(); stack; stack = stack->nextStack.get(), ++stackIndex)
 				{
-					continue;
+					InventoryItemInfo stackInfo{};
+					if (!TryGetInventoryStackInfoSafe(*stack, modBuffer, inventory_info_quest, stackInfo))
+					{
+						REX::WARN("TransferInventoryItems: skip stack for {:08X}: stack-info-exception", form->formID);
+						continue;
+					}
+					if ((stackInfo.questItem && !MatchesAnyCached(form, injection_data::include_quest_item, &matchCache)) ||
+						stackInfo.dropped ||
+						(stackInfo.equipped && !sourceIsDead) ||
+						stackInfo.totalCount <= 0)
+					{
+						continue;
+					}
+
+					float unitWeight = 0.0F;
+					if (capacity && capacity->enabled &&
+						!TryGetItemUnitWeightSafe(form, GetInstanceData(stack->extra.get()), unitWeight))
+					{
+						continue;
+					}
+
+					itemRequests.push_back(InventoryFormTransferRequest{
+						form,
+						stackInfo.totalCount,
+						unitWeight,
+						stackIndex,
+						stack->extra,
+						ShouldPreserveStackExtraForTransfer(
+							form,
+							*stack,
+							stackInfo.totalCount,
+							stackInfo.totalCount)
+					});
 				}
 
-				float unitWeight = 0.0F;
-				if (capacity && capacity->enabled && !TryGetItemUnitWeightSafe(form, nullptr, unitWeight))
+				for (auto it = itemRequests.rbegin(); it != itemRequests.rend(); ++it)
 				{
-					continue;
+					requests.push_back(*it);
 				}
-
-				requests.push_back(InventoryFormTransferRequest{
-					form,
-					info.totalCount,
-					unitWeight,
-					std::nullopt
-				});
 			}
 		}
 
@@ -7707,10 +7876,40 @@ namespace papyrus_lootman
 			const bool gotDestBefore = TryGetReferenceItemCountSafe(dest, request.object, destBefore);
 
 			auto remaining = request.count;
-			while (remaining > 0)
+			bool transferFailed = false;
+			if (request.preserveStackExtra)
+			{
+				if (!TryMoveInventoryItemPreservingStackExtraSafe(
+						src,
+						dest,
+						request.object,
+						request.count,
+						request.stackIndex,
+						request.extra))
+				{
+					REX::WARN(
+						"TransferInventoryItems: instance-preserving transfer failed, src={:08X}, dest={:08X}, item={:08X}, count={}, stack={}",
+						src->formID,
+						dest->formID,
+						request.object->formID,
+						request.count,
+						request.stackIndex ? static_cast<std::int32_t>(*request.stackIndex) : -1);
+					transferFailed = true;
+				}
+				else
+				{
+					remaining = 0;
+				}
+			}
+			while (remaining > 0 && !request.preserveStackExtra)
 			{
 				const auto chunk = std::min<std::int32_t>(remaining, 65535);
-				if (!TryMoveInventoryItemSafe(src, dest, request.object, chunk, request.stackIndex))
+				if (!TryMoveInventoryItemSafe(
+						src,
+						dest,
+						request.object,
+						chunk,
+						request.stackIndex))
 				{
 					REX::WARN(
 						"TransferInventoryItems: transfer failed, src={:08X}, dest={:08X}, item={:08X}, remaining={}, stack={}",
@@ -7722,6 +7921,10 @@ namespace papyrus_lootman
 					break;
 				}
 				remaining -= chunk;
+			}
+			if (transferFailed)
+			{
+				continue;
 			}
 
 			std::int32_t srcAfter = 0;
@@ -7875,11 +8078,20 @@ namespace papyrus_lootman
 						continue;
 					}
 
+					const auto preservationStackCount = stackInfo.totalCount > 0 ?
+						stackInfo.totalCount :
+						resolvedCount;
 					itemRequests.push_back(InventoryTransferRequest{
 						form,
 						stackIndex,
 						resolvedCount,
-						unitWeight
+						unitWeight,
+						stack->extra,
+						ShouldPreserveStackExtraForTransfer(
+							form,
+							*stack,
+							resolvedCount,
+							preservationStackCount)
 					});
 				}
 
@@ -7909,11 +8121,57 @@ namespace papyrus_lootman
 			const bool gotSrcBefore = TryGetReferenceItemCountSafe(src, request.object, srcBefore);
 			const bool gotDestBefore = TryGetReferenceItemCountSafe(dest, request.object, destBefore);
 
-			TESObjectREFR::RemoveItemData removeData(request.object, request.count);
-			removeData.reason = ITEM_REMOVE_REASON::kStoreContainer;
-			removeData.a_otherContainer = dest;
-			removeData.stackData.push_back(request.stackIndex);
-			src->RemoveItem(removeData);
+			auto remaining = request.count;
+			bool transferFailed = false;
+			if (request.preserveStackExtra)
+			{
+				if (!TryMoveInventoryItemPreservingStackExtraSafe(
+						src,
+						dest,
+						request.object,
+						request.count,
+						request.stackIndex,
+						request.extra))
+				{
+					REX::WARN(
+						"TransferLootableInventoryItems: instance-preserving transfer failed, src={:08X}, dest={:08X}, item={:08X}, count={}, stack={}",
+						src->formID,
+						dest->formID,
+						request.object->formID,
+						request.count,
+						request.stackIndex);
+					transferFailed = true;
+				}
+				else
+				{
+					remaining = 0;
+				}
+			}
+			while (remaining > 0 && !request.preserveStackExtra)
+			{
+				const auto chunk = std::min<std::int32_t>(remaining, 65535);
+				if (!TryMoveInventoryItemSafe(
+						src,
+						dest,
+						request.object,
+						chunk,
+						request.stackIndex))
+				{
+					REX::WARN(
+						"TransferLootableInventoryItems: transfer failed, src={:08X}, dest={:08X}, item={:08X}, remaining={}, stack={}",
+						src->formID,
+						dest->formID,
+						request.object->formID,
+						remaining,
+						request.stackIndex);
+					break;
+				}
+				remaining -= chunk;
+			}
+			if (transferFailed)
+			{
+				continue;
+			}
 
 			std::int32_t srcAfter = 0;
 			std::int32_t destAfter = 0;
@@ -8093,7 +8351,13 @@ namespace papyrus_lootman
 							object,
 							requestCount,
 							0.0F,
-							stackIndex
+							stackIndex,
+							stack->extra,
+							ShouldPreserveStackExtraForTransfer(
+								object,
+								*stack,
+								requestCount,
+								stackInfo.totalCount)
 						});
 						remainingRequested -= requestCount;
 					}
@@ -8108,12 +8372,70 @@ namespace papyrus_lootman
 		}
 		else
 		{
-			requests.push_back(InventoryFormTransferRequest{
-				object,
-				resolvedCount,
-				0.0F,
-				std::nullopt
-			});
+			auto inventoryList = src->inventoryList;
+			if (!inventoryList)
+			{
+				return;
+			}
+
+			std::vector<BGSMod::Attachment::Mod*> modBuffer;
+			std::int32_t remainingRequested = resolvedCount;
+			{
+				ReadLockGuard guard(inventoryList->rwLock);
+				for (auto& inventoryItem : inventoryList->data)
+				{
+					if (!inventoryItem.object || inventoryItem.object->formID != object->formID)
+					{
+						continue;
+					}
+
+					std::vector<InventoryFormTransferRequest> itemRequests;
+					itemRequests.reserve(4);
+					std::uint32_t stackIndex = 0;
+					for (auto stack = inventoryItem.stackData.get();
+					     stack && remainingRequested > 0;
+					     stack = stack->nextStack.get(), ++stackIndex)
+					{
+						InventoryItemInfo stackInfo{};
+						std::int32_t stackCount = 0;
+						if (TryGetInventoryStackInfoSafe(*stack, modBuffer, inventory_info_basic, stackInfo))
+						{
+							stackCount = stackInfo.totalCount;
+						}
+						else
+						{
+							stackCount = static_cast<std::int32_t>(std::min<std::uint32_t>(
+								stack->count,
+								static_cast<std::uint32_t>(std::numeric_limits<std::int32_t>::max())));
+						}
+						if (stackCount <= 0)
+						{
+							continue;
+						}
+
+						const auto requestCount = std::min(stackCount, remainingRequested);
+						itemRequests.push_back(InventoryFormTransferRequest{
+							object,
+							requestCount,
+							0.0F,
+							stackIndex,
+							stack->extra,
+							ShouldPreserveStackExtraForTransfer(
+								object,
+								*stack,
+								requestCount,
+								stackCount)
+						});
+						remainingRequested -= requestCount;
+					}
+
+					for (auto it = itemRequests.rbegin(); it != itemRequests.rend(); ++it)
+					{
+						requests.push_back(*it);
+					}
+					break;
+				}
+			}
 		}
 
 		if (requests.empty())
@@ -8126,10 +8448,39 @@ namespace papyrus_lootman
 			for (const auto& request : requests)
 			{
 				auto remaining = request.count;
-				while (remaining > 0)
+				if (request.preserveStackExtra)
+				{
+					if (!TryMoveInventoryItemPreservingStackExtraSafe(
+							src,
+							dest,
+							request.object,
+							request.count,
+							request.stackIndex,
+							request.extra))
+					{
+						REX::WARN(
+							"MoveInventoryItem: instance-preserving transfer failed, src={:08X}, dest={:08X}, item={:08X}, count={}, stack={}",
+							src->formID,
+							dest->formID,
+							request.object->formID,
+							request.count,
+							request.stackIndex ? static_cast<std::int32_t>(*request.stackIndex) : -1);
+						remaining = request.count;
+					}
+					else
+					{
+						remaining = 0;
+					}
+				}
+				while (remaining > 0 && !request.preserveStackExtra)
 				{
 					const auto chunk = std::min<std::int32_t>(remaining, 65535);
-					if (!TryMoveInventoryItemSafe(src, dest, request.object, chunk, request.stackIndex))
+					if (!TryMoveInventoryItemSafe(
+							src,
+							dest,
+							request.object,
+							chunk,
+							request.stackIndex))
 					{
 						REX::WARN(
 							"MoveInventoryItem: transfer failed, src={:08X}, dest={:08X}, item={:08X}, remaining={}, stack={}",
