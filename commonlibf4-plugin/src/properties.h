@@ -20,6 +20,7 @@ namespace properties
 		carry_weight,
 		ignore_overweight,
 		loot_is_deliver_to_player,
+		looting_without_logs,
 		lootable_alch_item_type,
 		lootable_book_item_type,
 		lootable_misc_item_type,

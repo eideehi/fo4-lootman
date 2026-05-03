@@ -88,6 +88,23 @@
         ]
     },
 
+    "notify": {
+        "_comment": "Native pickup HUD messages are shown only when at least one notify filter matches.",
+        "_comment": "Use item for ModName|FormID entries. FormIDs and keywords may be mixed in the same array, like other injection-data lists.",
+        "_comment": "Use category for ALCH, AMMO, ARMO, BOOK, INGR, KEYM, MISC, or WEAP. If item and category are empty and legendary-equipment is false, no native pickup messages are shown. INGR is disabled by default.",
+        "item": [],
+        "category": [
+            "ALCH",
+            "AMMO",
+            "ARMO",
+            "BOOK",
+            "KEYM",
+            "MISC",
+            "WEAP"
+        ],
+        "legendary-equipment": true
+    },
+
     "alch-type": {
         "_comment": "Fallout4.esm|10C416 = ObjectTypeAlcohol",
         "alcohol": [

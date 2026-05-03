@@ -12,6 +12,7 @@ namespace injection_data
 		include_unique_item,
 		exclude_form,
 		exclude_keyword,
+		notify_item,
 		alch_type_alcohol,
 		alch_type_chemistry,
 		alch_type_food,
@@ -30,6 +31,18 @@ namespace injection_data
 		kForm = 1 << 0,
 		kKeyword = 1 << 1,
 		kLocationRefType = 1 << 2,
+	};
+
+	enum NotifyCategory : std::uint32_t
+	{
+		notify_alch = 1 << 0,
+		notify_ammo = 1 << 1,
+		notify_armo = 1 << 2,
+		notify_book = 1 << 3,
+		notify_ingr = 1 << 4,
+		notify_keym = 1 << 5,
+		notify_misc = 1 << 6,
+		notify_weap = 1 << 7,
 	};
 
 	struct Value
@@ -79,6 +92,9 @@ namespace injection_data
 	const std::vector<RE::BGSLocationRefType*>& GetAsLocationRefTypeListRef(Key key);
 	const std::unordered_set<RE::TESFormID>& GetFormIDSet(Key key);
 	const std::vector<RE::BGSKeyword*>& GetKeywordListRef(Key key);
+	std::uint32_t GetNotifyCategoryMask();
+	bool GetNotifyLegendaryEquipment();
+	bool HasNotifyFilters();
 
 	// Initialize reads and normalizes JSON values; LoadInjectionData resolves forms.
 	bool Initialize();

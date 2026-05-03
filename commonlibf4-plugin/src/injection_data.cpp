@@ -2,6 +2,7 @@
 #include "utility.h"
 
 #include <cctype>
+#include <string_view>
 
 namespace injection_data
 {
@@ -21,6 +22,7 @@ namespace injection_data
 		{"/include/unique-item", include_unique_item, Type::kForm | Type::kKeyword},
 		{"/exclude/form", exclude_form, Type::kForm},
 		{"/exclude/keyword", exclude_keyword, Type::kKeyword},
+		{"/notify/item", notify_item, Type::kForm | Type::kKeyword},
 		{"/alch-type/alcohol", alch_type_alcohol, Type::kForm | Type::kKeyword},
 		{"/alch-type/chemistry", alch_type_chemistry, Type::kForm | Type::kKeyword},
 		{"/alch-type/food", alch_type_food, Type::kForm | Type::kKeyword},
@@ -42,6 +44,8 @@ namespace injection_data
 	std::unordered_map<Key, std::vector<RE::BGSKeyword*>> keywordListByKey;
 	std::unordered_map<Key, std::vector<RE::BGSLocationRefType*>> locationRefTypeListByKey;
 	std::unordered_map<Key, std::unordered_set<RE::TESFormID>> formIDSetByKey;
+	std::uint32_t notifyCategoryMask = 0;
+	bool notifyLegendaryEquipment = false;
 	// True when some sources fail to load/parse, while still allowing best-effort operation.
 	bool degradedMode = false;
 
@@ -49,6 +53,83 @@ namespace injection_data
 	const std::vector<RE::BGSKeyword*> emptyKeywordList;
 	const std::vector<RE::BGSLocationRefType*> emptyLocationRefTypeList;
 	const std::unordered_set<RE::TESFormID> emptyFormIDSet;
+	constexpr std::string_view kNotifyCategoryPath = "/notify/category"sv;
+	constexpr std::string_view kNotifyLegendaryEquipmentPath = "/notify/legendary-equipment"sv;
+
+	std::string NormalizeNotifyCategoryName(std::string value)
+	{
+		const auto first = value.find_first_not_of(" \t\r\n");
+		if (first == std::string::npos)
+		{
+			return {};
+		}
+		const auto last = value.find_last_not_of(" \t\r\n");
+		value = value.substr(first, last - first + 1);
+		std::transform(value.begin(), value.end(), value.begin(), [](unsigned char c) {
+			return static_cast<char>(std::toupper(c));
+		});
+		return value;
+	}
+
+	std::uint32_t GetNotifyCategoryBit(std::string value)
+	{
+		value = NormalizeNotifyCategoryName(std::move(value));
+		if (value == "ALCH") return notify_alch;
+		if (value == "AMMO") return notify_ammo;
+		if (value == "ARMO") return notify_armo;
+		if (value == "BOOK") return notify_book;
+		if (value == "INGR") return notify_ingr;
+		if (value == "KEYM") return notify_keym;
+		if (value == "MISC") return notify_misc;
+		if (value == "WEAP") return notify_weap;
+		return 0;
+	}
+
+	void LoadNotifyCategory(const nlohmann::json& value, const std::filesystem::path& file)
+	{
+		std::uint32_t mask = 0;
+
+		if (value.is_array())
+		{
+			for (const auto& item : value)
+			{
+				if (!item.is_string())
+				{
+					degradedMode = true;
+					REX::WARN("Non-string entry ignored in {} from {}", kNotifyCategoryPath, file.string());
+					continue;
+				}
+
+				const auto category = item.get<std::string>();
+				const auto bit = GetNotifyCategoryBit(category);
+				if (bit == 0)
+				{
+					degradedMode = true;
+					REX::WARN("Unknown notify category \"{}\" ignored in {}", category, file.string());
+					continue;
+				}
+				mask |= bit;
+			}
+			notifyCategoryMask = mask;
+			return;
+		}
+
+		if (value.is_string())
+		{
+			const auto category = value.get<std::string>();
+			const auto bit = GetNotifyCategoryBit(category);
+			if (bit == 0 && !NormalizeNotifyCategoryName(category).empty())
+			{
+				degradedMode = true;
+				REX::WARN("Unknown notify category \"{}\" ignored in {}", category, file.string());
+			}
+			notifyCategoryMask = bit;
+			return;
+		}
+
+		degradedMode = true;
+		REX::WARN("Entry type is illegal and ignored for {} from {}", kNotifyCategoryPath, file.string());
+	}
 
 	RE::TESForm* ValueAsForm(const Value& value)
 	{
@@ -139,11 +220,31 @@ namespace injection_data
 		return it == keywordListByKey.end() ? emptyKeywordList : it->second;
 	}
 
+	std::uint32_t GetNotifyCategoryMask()
+	{
+		return notifyCategoryMask;
+	}
+
+	bool GetNotifyLegendaryEquipment()
+	{
+		return notifyLegendaryEquipment;
+	}
+
+	bool HasNotifyFilters()
+	{
+		return notifyCategoryMask != 0 ||
+		       notifyLegendaryEquipment ||
+		       !GetFormIDSet(notify_item).empty() ||
+		       !GetKeywordListRef(notify_item).empty();
+	}
+
 	bool Initialize()
 	{
 		REX::DEBUG("[ Start initialization of injection data ]");
 		degradedMode = false;
 		tmp.clear();
+		notifyCategoryMask = 0;
+		notifyLegendaryEquipment = false;
 
 		wchar_t modulePath[REX::W32::MAX_PATH]{};
 		REX::W32::GetModuleFileNameW(nullptr, modulePath, REX::W32::MAX_PATH);
@@ -235,6 +336,27 @@ namespace injection_data
 					REX::WARN("Entry type is illegal and ignored: {}", value.dump());
 				}
 			}
+
+			nlohmann::json::json_pointer notifyCategoryPtr{ std::string(kNotifyCategoryPath) };
+			if (src.contains(notifyCategoryPtr))
+			{
+				LoadNotifyCategory(src[notifyCategoryPtr], file);
+			}
+
+			nlohmann::json::json_pointer notifyLegendaryEquipmentPtr{ std::string(kNotifyLegendaryEquipmentPath) };
+			if (src.contains(notifyLegendaryEquipmentPtr))
+			{
+				const auto& value = src[notifyLegendaryEquipmentPtr];
+				if (value.is_boolean())
+				{
+					notifyLegendaryEquipment = value.get<bool>();
+				}
+				else
+				{
+					degradedMode = true;
+					REX::WARN("Entry type is illegal and ignored for {} from {}", kNotifyLegendaryEquipmentPath, file.string());
+				}
+			}
 		}
 
 		REX::DEBUG("  Initialization of injection data is complete (degraded_mode={})", degradedMode);
@@ -244,6 +366,11 @@ namespace injection_data
 	void LoadInjectionData()
 	{
 		REX::DEBUG("[ Start loading injection data ]");
+		data.clear();
+		formListByKey.clear();
+		keywordListByKey.clear();
+		locationRefTypeListByKey.clear();
+		formIDSetByKey.clear();
 
 		for (const auto& info : info_list)
 		{

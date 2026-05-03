@@ -31,3 +31,14 @@ Function v2_0_1() global
     properties.EnableWEAPItemMine = Math.LogicalAnd(properties.LootableWEAPItemType, properties.WEAP_ITEM_TYPE_MINE) != 0
     properties.EnableWEAPItemOther = Math.LogicalAnd(properties.LootableWEAPItemType, properties.WEAP_ITEM_TYPE_OTHER) != 0
 EndFunction
+
+Function v3_0_0() global
+    LTMN2:Properties properties = LTMN2:Properties.GetInstance()
+
+    If (properties.LootIsDeliverToPlayer)
+        properties.LootingWithoutLogs = properties.DeliveredToPlayerWithoutLogs
+    Else
+        properties.LootingWithoutLogs = true
+    EndIf
+    properties.DeliveredToPlayerWithoutLogs = false
+EndFunction

@@ -109,6 +109,8 @@ Group Config
     int property CarryWeight = 1000 auto hidden
     bool property IgnoreOverweight = true auto hidden
     bool property LootIsDeliverToPlayer = false auto hidden
+    bool property LootingWithoutLogs = true auto hidden
+    ; Legacy property kept so existing saves can migrate their setting.
     bool property DeliveredToPlayerWithoutLogs = false auto hidden
     bool property NotLootingFromSettlement = true auto hidden
     bool property AutomaticallyLinkAndUnlinkToWorkshop = false auto hidden

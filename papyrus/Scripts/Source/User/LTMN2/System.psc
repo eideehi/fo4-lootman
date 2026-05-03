@@ -13,8 +13,8 @@ EndFunction
 ; Version as int.
 ; syntax: Major{1}.Minor{2}.Patch{2}
 ; example: 10234 // 1.2.34
-; current: 2.2.0
-int MOD_VERSION = 20200 const
+; current: 3.0.0
+int MOD_VERSION = 30000 const
 
 ; Timer id list
 int TIMER_INSTALL = 1 const
@@ -579,6 +579,9 @@ Function Patch()
     If (CurrentModVersion < 20001)
         LTMN2:Patch.v2_0_1()
     EndIf
+    If (CurrentModVersion < 30000)
+        LTMN2:Patch.v3_0_0()
+    EndIf
 
     CurrentModVersion = MOD_VERSION
 
@@ -616,11 +619,11 @@ Function Update()
         int movedItems = 0
         If (properties.LootIsDeliverToPlayer)
             LTMN2:Debug.Log(prefix + "    [ Move items from LootMan to player ]")
-            LTMN2:Debug.Log(prefix + "      Suppress pickup messages: " + properties.DeliveredToPlayerWithoutLogs)
-            movedItems = LTMN2:LootMan.TransferInventoryItems(properties.LootManRef, player, properties.ITEM_TYPE_ALL, -1, properties.ObjectTypeLooseMod, properties.DeliveredToPlayerWithoutLogs)
+            LTMN2:Debug.Log(prefix + "      Suppress pickup messages: " + properties.LootingWithoutLogs)
+            movedItems = LTMN2:LootMan.TransferInventoryItems(properties.LootManRef, player, properties.ITEM_TYPE_ALL, -1, properties.ObjectTypeLooseMod, properties.LootingWithoutLogs)
         Else
             LTMN2:Debug.Log(prefix + "    [ Move items from LootMan to workshop ]")
-            movedItems = LTMN2:LootMan.TransferInventoryItems(properties.LootManRef, properties.LootManWorkshopRef, properties.ITEM_TYPE_ALL, -1, properties.ObjectTypeLooseMod, false)
+            movedItems = LTMN2:LootMan.TransferInventoryItems(properties.LootManRef, properties.LootManWorkshopRef, properties.ITEM_TYPE_ALL, -1, properties.ObjectTypeLooseMod, properties.LootingWithoutLogs)
         EndIf
         LTMN2:Debug.Log(prefix + "      Moved item forms: " + movedItems)
         LTMN2:Debug.Log(prefix + "      Item count of after processing: " + properties.LootManRef.GetItemCount())

@@ -187,14 +187,14 @@
           "groupCondition": { "AND": [1, 6] }
         },
         {
-          "id": "DeliveredToPlayerWithoutLogs",
-          "text": "$PAGE_GENERAL_SETTINGS_DELIVERED_TO_PLAYER_WITHOUT_LOGS",
+          "id": "LootingWithoutLogs",
+          "text": "$PAGE_GENERAL_SETTINGS_LOOTING_WITHOUT_LOGS",
           "type": "switcher",
-          "help": "$PAGE_GENERAL_SETTINGS_DELIVERED_TO_PLAYER_WITHOUT_LOGS_HELP",
+          "help": "$PAGE_GENERAL_SETTINGS_LOOTING_WITHOUT_LOGS_HELP",
           "valueOptions": {
             "sourceType": "PropertyValueBool",
             "sourceForm": "LootMan.esp|F9A",
-            "propertyName": "DeliveredToPlayerWithoutLogs"
+            "propertyName": "LootingWithoutLogs"
           },
           "groupCondition": { "AND": [1, 6] }
         },

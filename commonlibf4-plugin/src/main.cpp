@@ -1,6 +1,7 @@
 #include "constructible_object.h"
 #include "form_cache.h"
 #include "injection_data.h"
+#include "message_queue.h"
 #include "papyrus_lootman.h"
 #include "properties.h"
 #include "vendor_chest.h"
@@ -43,6 +44,8 @@ F4SE_PLUGIN_LOAD(const F4SE::LoadInterface* a_f4se)
 		REX::ERROR("Failed to initialize injection data");
 		return false;
 	}
+
+	message_queue::Initialize();
 
 	auto messaging = F4SE::GetMessagingInterface();
 	if (!messaging || !messaging->RegisterListener(OnMessage))

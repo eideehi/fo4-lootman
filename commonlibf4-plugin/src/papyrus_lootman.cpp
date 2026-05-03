@@ -22,6 +22,7 @@
 #include "constructible_object.h"
 #include "form_cache.h"
 #include "injection_data.h"
+#include "message_queue.h"
 #include "properties.h"
 #include "vendor_chest.h"
 
@@ -4494,6 +4495,42 @@ namespace papyrus_lootman
 		return editorID ? editorID : "";
 	}
 
+	struct InventoryItemDisplayNameCallContext
+	{
+		const BGSInventoryItem* item = nullptr;
+		std::uint32_t stackIndex = 0;
+		std::string name;
+	};
+
+	void InvokeInventoryItemDisplayNameCall(void* opaque)
+	{
+		auto* context = static_cast<InventoryItemDisplayNameCallContext*>(opaque);
+		auto* name = context->item->GetDisplayFullName(context->stackIndex);
+		if (name && name[0] != '\0')
+		{
+			context->name = name;
+		}
+	}
+
+	std::string GetInventoryItemDisplayNameSafe(
+		const BGSInventoryItem& item,
+		TESForm* fallbackForm,
+		std::uint32_t stackIndex)
+	{
+		InventoryItemDisplayNameCallContext context{
+			&item,
+			stackIndex,
+			{}
+		};
+		(void)ExecuteSehCallSafe(&InvokeInventoryItemDisplayNameCall, &context);
+		if (!context.name.empty())
+		{
+			return context.name;
+		}
+
+		return GetFormName(fallbackForm);
+	}
+
 	bool IsSpecialContainerEditorID(const char* editorID)
 	{
 		return StartsWithAscii(editorID, "WorkshopResourceContainer") ||
@@ -4722,6 +4759,116 @@ namespace papyrus_lootman
 		const bool matched = MatchesAny(form, key);
 		cache->results.emplace(cacheKey, matched);
 		return matched;
+	}
+
+	std::uint32_t GetNotifyCategoryBit(ENUM_FORM_ID formType)
+	{
+		switch (formType)
+		{
+		case ENUM_FORM_ID::kALCH:
+			return injection_data::notify_alch;
+		case ENUM_FORM_ID::kAMMO:
+			return injection_data::notify_ammo;
+		case ENUM_FORM_ID::kARMO:
+			return injection_data::notify_armo;
+		case ENUM_FORM_ID::kBOOK:
+			return injection_data::notify_book;
+		case ENUM_FORM_ID::kINGR:
+			return injection_data::notify_ingr;
+		case ENUM_FORM_ID::kKEYM:
+			return injection_data::notify_keym;
+		case ENUM_FORM_ID::kMISC:
+			return injection_data::notify_misc;
+		case ENUM_FORM_ID::kWEAP:
+			return injection_data::notify_weap;
+		default:
+			return 0;
+		}
+	}
+
+	bool IsEquipmentFormType(ENUM_FORM_ID formType)
+	{
+		return formType == ENUM_FORM_ID::kARMO || formType == ENUM_FORM_ID::kWEAP;
+	}
+
+	bool ShouldNotifyLootItem(const TESForm* form, const InventoryItemInfo& info, MatchCache* matchCache = nullptr)
+	{
+		if (!form || !injection_data::HasNotifyFilters())
+		{
+			return false;
+		}
+
+		if (MatchesAnyCached(form, injection_data::notify_item, matchCache))
+		{
+			return true;
+		}
+
+		const auto formType = form->GetFormType();
+		const auto categoryMask = injection_data::GetNotifyCategoryMask();
+		if ((categoryMask & GetNotifyCategoryBit(formType)) != 0)
+		{
+			return true;
+		}
+
+		return injection_data::GetNotifyLegendaryEquipment() &&
+		       IsEquipmentFormType(formType) &&
+		       info.legendary;
+	}
+
+	void QueueLootItemNotification(
+		TESForm* form,
+		const std::string& itemName,
+		std::int32_t count,
+		const InventoryItemInfo& info,
+		MatchCache* matchCache = nullptr)
+	{
+		if (!ShouldNotifyLootItem(form, info, matchCache))
+		{
+			return;
+		}
+
+		message_queue::Enqueue(form ? form->formID : 0, itemName.empty() ? GetFormName(form) : itemName, count);
+	}
+
+	bool ShouldNotifyLootDestination(TESObjectREFR* dest)
+	{
+		if (!dest)
+		{
+			return false;
+		}
+		if (properties::GetBool(properties::looting_without_logs, true))
+		{
+			return false;
+		}
+		if (dest->IsPlayerRef())
+		{
+			return true;
+		}
+
+		return !properties::GetBool(properties::loot_is_deliver_to_player, false);
+	}
+
+	InventoryItemInfo BuildWorldReferenceNotificationInfo(
+		TESObjectREFR* ref,
+		TESBoundObject* object,
+		std::int32_t count)
+	{
+		InventoryItemInfo info{};
+		info.totalCount = count;
+		if (!ref || !object || !IsEquipmentFormType(object->GetFormType()) || !ref->extraList)
+		{
+			return info;
+		}
+
+		std::vector<BGSMod::Attachment::Mod*> modBuffer;
+		EquipmentData equipmentData{};
+		if (TryGetEquipmentDataSafe(ref->extraList.get(), &modBuffer, equipmentData))
+		{
+			info.legendary = equipmentData.isLegendary;
+			info.featured = equipmentData.isFeaturedItem;
+			info.unscrappable = equipmentData.isUnscrappable;
+		}
+		return info;
 	}
 
 	// ---- Item type classification ----
@@ -5446,6 +5593,42 @@ namespace papyrus_lootman
 			context.count,
 			static_cast<std::uint32_t>(std::numeric_limits<std::int32_t>::max())));
 		return true;
+	}
+
+	std::int32_t GetObservedMovedCount(
+		std::int32_t beforeCount,
+		std::int32_t afterCount,
+		bool gotBefore,
+		bool gotAfter,
+		std::int32_t fallbackCount)
+	{
+		if (gotBefore && gotAfter && afterCount > beforeCount)
+		{
+			return afterCount - beforeCount;
+		}
+		return std::max<std::int32_t>(fallbackCount, 1);
+	}
+
+	std::int32_t GetObservedTransferCount(
+		std::int32_t srcBefore,
+		std::int32_t srcAfter,
+		bool gotSrcBefore,
+		bool gotSrcAfter,
+		std::int32_t destBefore,
+		std::int32_t destAfter,
+		bool gotDestBefore,
+		bool gotDestAfter,
+		std::int32_t fallbackCount)
+	{
+		if (gotDestBefore && gotDestAfter && destAfter > destBefore)
+		{
+			return destAfter - destBefore;
+		}
+		if (gotSrcBefore && gotSrcAfter && srcAfter < srcBefore)
+		{
+			return srcBefore - srcAfter;
+		}
+		return std::max<std::int32_t>(fallbackCount, 1);
 	}
 
 	struct ContainerWeightCallContext
@@ -7022,6 +7205,8 @@ namespace papyrus_lootman
 		float unitWeight = 0.0F;
 		BSTSmartPointer<ExtraDataList> extra;
 		bool preserveStackExtra = false;
+		InventoryItemInfo info;
+		std::string itemName;
 	};
 
 	struct InventoryFormTransferRequest
@@ -7032,6 +7217,8 @@ namespace papyrus_lootman
 		std::optional<std::uint32_t> stackIndex;
 		BSTSmartPointer<ExtraDataList> extra;
 		bool preserveStackExtra = false;
+		InventoryItemInfo info;
+		std::string itemName;
 	};
 
 	struct ExtraCountData : BSExtraData
@@ -7565,12 +7752,16 @@ namespace papyrus_lootman
 		{
 			return false;
 		}
-
+		const bool notifyMovedItems = ShouldNotifyLootDestination(dest);
 		const auto worldCount = GetWorldReferenceItemCount(ref);
 		if (worldCount <= 0)
 		{
 			return false;
 		}
+		const auto itemName = notifyMovedItems ? GetFormName(ref) : std::string{};
+		auto notificationInfo = notifyMovedItems
+			? BuildWorldReferenceNotificationInfo(ref, object, worldCount)
+			: InventoryItemInfo{};
 
 		float acceptedWeight = 0.0F;
 		float unitWeight = 0.0F;
@@ -7590,7 +7781,16 @@ namespace papyrus_lootman
 			PlayPickUpSound(std::monostate{}, player, ref);
 		}
 
-		if (!TryAddWorldReferenceToContainerSafe(dest, ref, worldCount))
+		const auto moved = [&]()
+		{
+			if (dest->IsPlayerRef())
+			{
+				PlayerCharacter::ScopedInventoryChangeMessageContext context(true, false);
+				return TryAddWorldReferenceToContainerSafe(dest, ref, worldCount);
+			}
+			return TryAddWorldReferenceToContainerSafe(dest, ref, worldCount);
+		}();
+		if (!moved)
 		{
 			REX::WARN(
 				"LootNearbyReferences: failed to add world ref={:08X}, base={:08X}, count={} to dest={:08X}",
@@ -7606,9 +7806,20 @@ namespace papyrus_lootman
 		if (gotBefore && gotAfter && afterCount > beforeCount)
 		{
 			FinalizeWorldPickup(std::monostate{}, ref);
+			const auto movedCount = GetObservedMovedCount(
+				beforeCount,
+				afterCount,
+				gotBefore,
+				gotAfter,
+				worldCount);
 			if (capacity)
 			{
 				capacity->Accept(acceptedWeight);
+			}
+			if (notifyMovedItems)
+			{
+				notificationInfo.totalCount = movedCount;
+				QueueLootItemNotification(object, itemName, movedCount, notificationInfo);
 			}
 			return true;
 		}
@@ -7633,13 +7844,17 @@ namespace papyrus_lootman
 		LootCapacityContext* capacity = nullptr)
 	{
 		TESBoundObject* expectedItem = nullptr;
+		auto* baseObject = ref ? ref->GetObjectReference() : nullptr;
+		auto* flora = baseObject ? baseObject->As<TESFlora>() : nullptr;
+		expectedItem = flora ? flora->produceItem : nullptr;
+		const bool notifyMovedItems = expectedItem && ShouldNotifyLootDestination(actionRef);
+		InventoryItemInfo notificationInfo{};
+		notificationInfo.totalCount = 1;
+		const auto itemName = notifyMovedItems ? GetFormName(expectedItem) : std::string{};
+
 		float acceptedWeight = 0.0F;
 		if (capacity && capacity->enabled)
 		{
-			auto* flora = ref && ref->GetObjectReference()
-				? ref->GetObjectReference()->As<TESFlora>()
-				: nullptr;
-			expectedItem = flora ? flora->produceItem : nullptr;
 			float unitWeight = 0.0F;
 			if (!expectedItem ||
 				!TryGetItemUnitWeightSafe(expectedItem, nullptr, unitWeight) ||
@@ -7651,7 +7866,16 @@ namespace papyrus_lootman
 
 		std::int32_t beforeCount = 0;
 		const bool gotBefore = expectedItem && TryGetReferenceItemCountSafe(actionRef, expectedItem, beforeCount);
-		if (!TryActivateRefSafe(ref, actionRef, false))
+		const auto activated = [&]()
+		{
+			if (actionRef && actionRef->IsPlayerRef())
+			{
+				PlayerCharacter::ScopedInventoryChangeMessageContext context(true, false);
+				return TryActivateRefSafe(ref, actionRef, false);
+			}
+			return TryActivateRefSafe(ref, actionRef, false);
+		}();
+		if (!activated)
 		{
 			return false;
 		}
@@ -7660,14 +7884,27 @@ namespace papyrus_lootman
 		{
 			PlayPickUpSound(std::monostate{}, player, ref);
 		}
+		std::int32_t afterCount = 0;
+		const bool gotAfter =
+			expectedItem &&
+			(capacity || notifyMovedItems) &&
+			TryGetReferenceItemCountSafe(actionRef, expectedItem, afterCount);
 		if (capacity && expectedItem)
 		{
-			std::int32_t afterCount = 0;
-			const bool gotAfter = TryGetReferenceItemCountSafe(actionRef, expectedItem, afterCount);
 			if ((!gotBefore && !gotAfter) || (gotBefore && gotAfter && afterCount > beforeCount))
 			{
 				capacity->Accept(acceptedWeight);
 			}
+		}
+		if (notifyMovedItems)
+		{
+			const auto movedCount = GetObservedMovedCount(beforeCount, afterCount, gotBefore, gotAfter, 1);
+			notificationInfo.totalCount = movedCount;
+			QueueLootItemNotification(
+				expectedItem,
+				itemName,
+				movedCount,
+				notificationInfo);
 		}
 		return true;
 	}
@@ -7697,7 +7934,8 @@ namespace papyrus_lootman
 		std::uint32_t itemType,
 		std::int32_t subType,
 		BGSKeyword* looseModKeyword,
-		LootCapacityContext* capacity = nullptr)
+		LootCapacityContext* capacity = nullptr,
+		bool notifyMovedItems = false)
 	{
 		if (!src || !dest || src == dest || itemType > all_item)
 		{
@@ -7718,6 +7956,7 @@ namespace papyrus_lootman
 		std::vector<BGSMod::Attachment::Mod*> modBuffer;
 		std::vector<InventoryFormTransferRequest> requests;
 		requests.reserve(inventoryList->data.size());
+		const auto requestInfoFlags = notifyMovedItems ? inventory_info_full : inventory_info_quest;
 
 		{
 			ReadLockGuard guard(inventoryList->rwLock);
@@ -7753,7 +7992,7 @@ namespace papyrus_lootman
 					for (auto stack = item.stackData.get(); stack; stack = stack->nextStack.get(), ++stackIndex)
 					{
 						InventoryItemInfo stackInfo{};
-						if (!TryGetInventoryStackInfoSafe(*stack, modBuffer, inventory_info_quest, stackInfo))
+						if (!TryGetInventoryStackInfoSafe(*stack, modBuffer, requestInfoFlags, stackInfo))
 						{
 							REX::WARN("TransferInventoryItems: skip stack for {:08X}: stack-info-exception", form->formID);
 							continue;
@@ -7798,7 +8037,9 @@ namespace papyrus_lootman
 								form,
 								*stack,
 								movableCount,
-								stackInfo.totalCount)
+								stackInfo.totalCount),
+							stackInfo,
+							notifyMovedItems ? GetInventoryItemDisplayNameSafe(item, form, stackIndex) : std::string{}
 						});
 					}
 
@@ -7815,7 +8056,7 @@ namespace papyrus_lootman
 				for (auto stack = item.stackData.get(); stack; stack = stack->nextStack.get(), ++stackIndex)
 				{
 					InventoryItemInfo stackInfo{};
-					if (!TryGetInventoryStackInfoSafe(*stack, modBuffer, inventory_info_quest, stackInfo))
+					if (!TryGetInventoryStackInfoSafe(*stack, modBuffer, requestInfoFlags, stackInfo))
 					{
 						REX::WARN("TransferInventoryItems: skip stack for {:08X}: stack-info-exception", form->formID);
 						continue;
@@ -7845,7 +8086,9 @@ namespace papyrus_lootman
 							form,
 							*stack,
 							stackInfo.totalCount,
-							stackInfo.totalCount)
+							stackInfo.totalCount),
+						stackInfo,
+						notifyMovedItems ? GetInventoryItemDisplayNameSafe(item, form, stackIndex) : std::string{}
 					});
 				}
 
@@ -7926,6 +8169,7 @@ namespace papyrus_lootman
 			{
 				continue;
 			}
+			const auto movedCount = request.count - remaining;
 
 			std::int32_t srcAfter = 0;
 			std::int32_t destAfter = 0;
@@ -7938,12 +8182,33 @@ namespace papyrus_lootman
 			const bool countUnavailable =
 				!gotSrcBefore && !gotSrcAfter && !gotDestBefore && !gotDestAfter;
 
-			if (observedSourceReduction || observedDestIncrease || countUnavailable)
+			if (movedCount > 0 && (observedSourceReduction || observedDestIncrease || countUnavailable))
 			{
 				++movedItems;
+				const auto observedMovedCount = GetObservedTransferCount(
+					srcBefore,
+					srcAfter,
+					gotSrcBefore,
+					gotSrcAfter,
+					destBefore,
+					destAfter,
+					gotDestBefore,
+					gotDestAfter,
+					movedCount);
 				if (capacity)
 				{
 					capacity->Accept(acceptedWeight);
+				}
+				if (notifyMovedItems)
+				{
+					auto notificationInfo = request.info;
+					notificationInfo.totalCount = observedMovedCount;
+					QueueLootItemNotification(
+						request.object,
+						request.itemName,
+						observedMovedCount,
+						notificationInfo,
+						&matchCache);
 				}
 			}
 			else
@@ -7998,6 +8263,7 @@ namespace papyrus_lootman
 		modBuffer.reserve(8);
 		std::vector<InventoryTransferRequest> requests;
 		requests.reserve(inventoryList->data.size());
+		const bool notifyMovedItems = ShouldNotifyLootDestination(dest);
 
 		{
 			ReadLockGuard guard(inventoryList->rwLock);
@@ -8091,7 +8357,9 @@ namespace papyrus_lootman
 							form,
 							*stack,
 							resolvedCount,
-							preservationStackCount)
+							preservationStackCount),
+						stackInfo,
+						notifyMovedItems ? GetInventoryItemDisplayNameSafe(item, form, stackIndex) : std::string{}
 					});
 				}
 
@@ -8123,55 +8391,68 @@ namespace papyrus_lootman
 
 			auto remaining = request.count;
 			bool transferFailed = false;
-			if (request.preserveStackExtra)
+			auto moveRequest = [&]()
 			{
-				if (!TryMoveInventoryItemPreservingStackExtraSafe(
-						src,
-						dest,
-						request.object,
-						request.count,
-						request.stackIndex,
-						request.extra))
+				if (request.preserveStackExtra)
 				{
-					REX::WARN(
-						"TransferLootableInventoryItems: instance-preserving transfer failed, src={:08X}, dest={:08X}, item={:08X}, count={}, stack={}",
-						src->formID,
-						dest->formID,
-						request.object->formID,
-						request.count,
-						request.stackIndex);
-					transferFailed = true;
+					if (!TryMoveInventoryItemPreservingStackExtraSafe(
+							src,
+							dest,
+							request.object,
+							request.count,
+							request.stackIndex,
+							request.extra))
+					{
+						REX::WARN(
+							"TransferLootableInventoryItems: instance-preserving transfer failed, src={:08X}, dest={:08X}, item={:08X}, count={}, stack={}",
+							src->formID,
+							dest->formID,
+							request.object->formID,
+							request.count,
+							request.stackIndex);
+						transferFailed = true;
+					}
+					else
+					{
+						remaining = 0;
+					}
 				}
-				else
+				while (remaining > 0 && !request.preserveStackExtra)
 				{
-					remaining = 0;
+					const auto chunk = std::min<std::int32_t>(remaining, 65535);
+					if (!TryMoveInventoryItemSafe(
+							src,
+							dest,
+							request.object,
+							chunk,
+							request.stackIndex))
+					{
+						REX::WARN(
+							"TransferLootableInventoryItems: transfer failed, src={:08X}, dest={:08X}, item={:08X}, remaining={}, stack={}",
+							src->formID,
+							dest->formID,
+							request.object->formID,
+							remaining,
+							request.stackIndex);
+						break;
+					}
+					remaining -= chunk;
 				}
+			};
+			if (dest->IsPlayerRef())
+			{
+				PlayerCharacter::ScopedInventoryChangeMessageContext context(true, false);
+				moveRequest();
 			}
-			while (remaining > 0 && !request.preserveStackExtra)
+			else
 			{
-				const auto chunk = std::min<std::int32_t>(remaining, 65535);
-				if (!TryMoveInventoryItemSafe(
-						src,
-						dest,
-						request.object,
-						chunk,
-						request.stackIndex))
-				{
-					REX::WARN(
-						"TransferLootableInventoryItems: transfer failed, src={:08X}, dest={:08X}, item={:08X}, remaining={}, stack={}",
-						src->formID,
-						dest->formID,
-						request.object->formID,
-						remaining,
-						request.stackIndex);
-					break;
-				}
-				remaining -= chunk;
+				moveRequest();
 			}
 			if (transferFailed)
 			{
 				continue;
 			}
+			const auto movedCount = request.count - remaining;
 
 			std::int32_t srcAfter = 0;
 			std::int32_t destAfter = 0;
@@ -8184,12 +8465,33 @@ namespace papyrus_lootman
 			const bool countUnavailable =
 				!gotSrcBefore && !gotSrcAfter && !gotDestBefore && !gotDestAfter;
 
-			if (observedSourceReduction || observedDestIncrease || countUnavailable)
+			if (movedCount > 0 && (observedSourceReduction || observedDestIncrease || countUnavailable))
 			{
 				++movedStacks;
+				const auto observedMovedCount = GetObservedTransferCount(
+					srcBefore,
+					srcAfter,
+					gotSrcBefore,
+					gotSrcAfter,
+					destBefore,
+					destAfter,
+					gotDestBefore,
+					gotDestAfter,
+					movedCount);
 				if (capacity)
 				{
 					capacity->Accept(acceptedWeight);
+				}
+				if (notifyMovedItems)
+				{
+					auto notificationInfo = request.info;
+					notificationInfo.totalCount = observedMovedCount;
+					QueueLootItemNotification(
+						request.object,
+						request.itemName,
+						observedMovedCount,
+						notificationInfo,
+						&matchCache);
 				}
 			}
 			else
@@ -8234,13 +8536,28 @@ namespace papyrus_lootman
 			capacityGuard = std::unique_lock<std::mutex>(lootCapacityLock);
 		}
 		auto capacity = BuildDirectTransferCapacityContext(dest);
-		if (dest && dest->IsPlayerRef() && suppressPlayerMessages)
+		const bool notifyMovedItems = dest && dest->IsPlayerRef() && !suppressPlayerMessages;
+		if (dest && dest->IsPlayerRef())
 		{
 			PlayerCharacter::ScopedInventoryChangeMessageContext context(true, false);
-			return TransferInventoryItemsImpl(src, dest, itemType, subType, looseModKeyword, &capacity);
+			return TransferInventoryItemsImpl(
+				src,
+				dest,
+				itemType,
+				subType,
+				looseModKeyword,
+				&capacity,
+				notifyMovedItems);
 		}
 
-		return TransferInventoryItemsImpl(src, dest, itemType, subType, looseModKeyword, &capacity);
+		return TransferInventoryItemsImpl(
+			src,
+			dest,
+			itemType,
+			subType,
+			looseModKeyword,
+			&capacity,
+			notifyMovedItems);
 	}
 
 	bool IsLootingSafe(std::monostate)

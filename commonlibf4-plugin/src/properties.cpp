@@ -214,6 +214,12 @@ namespace properties
 			updates[loot_is_deliver_to_player] = GetBoolProperty(propertyName);
 		}
 
+		propertyName = "LootingWithoutLogs";
+		if (updateAll || propertyName == updateProperty)
+		{
+			updates[looting_without_logs] = GetBoolProperty(propertyName);
+		}
+
 		propertyName = "LootableALCHItemType";
 		if (updateAll || updateProperty.rfind("EnableALCHItem", 0) == 0)
 		{
