@@ -991,6 +991,9 @@
         { "type": "section", "text": "$PAGE_UTILITY_BUSY_SECTION", "groupCondition": 8 },
         { "type": "button", "text": "$PAGE_UTILITY_BUSY_SECTION_TEXT", "groupCondition": 8 },
 
+        { "type": "text", "text": "$PAGE_UTILITY_CLOSE_MCM_NOTICE", "groupCondition": { "AND": [1, 6, 7] } },
+        { "type": "spacer", "groupCondition": { "AND": [1, 6, 7] } },
+
         { "type": "section", "text": "$PAGE_UTILITY_MOVE_ITEMS_SECTION", "groupCondition": { "AND": [1, 6, 7] } },
         { "type": "text", "text": "$PAGE_UTILITY_MOVE_ITEMS_SECTION_TEXT", "groupCondition": { "AND": [1, 6, 7] } },
         {
