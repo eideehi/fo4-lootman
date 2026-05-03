@@ -4050,6 +4050,200 @@ namespace papyrus_lootman
 		    || (formType == ENUM_FORM_ID::kWEAP && IsItemTypeMatch(itemType, weap));
 	}
 
+	enum EnabledFormTypeBits : std::uint32_t
+	{
+		enable_ACTI = 1u << 0,
+		enable_ALCH = 1u << 1,
+		enable_AMMO = 1u << 2,
+		enable_ARMO = 1u << 3,
+		enable_BOOK = 1u << 4,
+		enable_CONT = 1u << 5,
+		enable_FLOR = 1u << 6,
+		enable_INGR = 1u << 7,
+		enable_KEYM = 1u << 8,
+		enable_MISC = 1u << 9,
+		enable_NPC_ = 1u << 10,
+		enable_WEAP = 1u << 11,
+	};
+
+	inline constexpr std::size_t kLootPassBucketCount = 12;
+	inline constexpr std::size_t kLootPassResultProcessedObjects = 0;
+	inline constexpr std::size_t kLootPassResultSuccessfulObjects = 1;
+	inline constexpr std::size_t kLootPassResultMovedStacks = 2;
+	inline constexpr std::size_t kLootPassResultHitObjectLimit = 3;
+	inline constexpr std::size_t kLootPassResultHitTimeBudget = 4;
+	inline constexpr std::size_t kLootPassResultCandidateObjects = 5;
+	inline constexpr std::size_t kLootPassResultBucketOffset = 6;
+	inline constexpr std::size_t kLootPassResultSize = kLootPassResultBucketOffset + kLootPassBucketCount;
+
+	std::uint32_t FormTypeToEnabledBit(ENUM_FORM_ID formType)
+	{
+		switch (formType)
+		{
+		case ENUM_FORM_ID::kACTI:
+			return enable_ACTI;
+		case ENUM_FORM_ID::kALCH:
+			return enable_ALCH;
+		case ENUM_FORM_ID::kAMMO:
+			return enable_AMMO;
+		case ENUM_FORM_ID::kARMO:
+			return enable_ARMO;
+		case ENUM_FORM_ID::kBOOK:
+			return enable_BOOK;
+		case ENUM_FORM_ID::kCONT:
+			return enable_CONT;
+		case ENUM_FORM_ID::kFLOR:
+			return enable_FLOR;
+		case ENUM_FORM_ID::kINGR:
+			return enable_INGR;
+		case ENUM_FORM_ID::kKEYM:
+			return enable_KEYM;
+		case ENUM_FORM_ID::kMISC:
+			return enable_MISC;
+		case ENUM_FORM_ID::kNPC_:
+			return enable_NPC_;
+		case ENUM_FORM_ID::kWEAP:
+			return enable_WEAP;
+		default:
+			return 0;
+		}
+	}
+
+	std::int32_t FormTypeToBucketIndex(ENUM_FORM_ID formType)
+	{
+		switch (formType)
+		{
+		case ENUM_FORM_ID::kACTI:
+			return 0;
+		case ENUM_FORM_ID::kALCH:
+			return 1;
+		case ENUM_FORM_ID::kAMMO:
+			return 2;
+		case ENUM_FORM_ID::kARMO:
+			return 3;
+		case ENUM_FORM_ID::kBOOK:
+			return 4;
+		case ENUM_FORM_ID::kCONT:
+			return 5;
+		case ENUM_FORM_ID::kFLOR:
+			return 6;
+		case ENUM_FORM_ID::kINGR:
+			return 7;
+		case ENUM_FORM_ID::kKEYM:
+			return 8;
+		case ENUM_FORM_ID::kMISC:
+			return 9;
+		case ENUM_FORM_ID::kNPC_:
+			return 10;
+		case ENUM_FORM_ID::kWEAP:
+			return 11;
+		default:
+			return -1;
+		}
+	}
+
+	struct LootPassBudget
+	{
+		Clock::time_point startedAt = Clock::now();
+		bool useTimeBudget = false;
+		double timeBudgetMs = 0.0;
+		std::size_t hardMaxObjects = kMaxItemsProcessedPerThreadLimit;
+		std::size_t maxObjects = 32;
+		std::size_t maxContainers = 4;
+		std::size_t maxActors = 4;
+		std::size_t maxActivationRefs = 8;
+		std::size_t processedObjects = 0;
+		std::size_t processedContainers = 0;
+		std::size_t processedActors = 0;
+		std::size_t processedActivationRefs = 0;
+		bool hitObjectLimit = false;
+		bool hitTimeBudget = false;
+
+		static LootPassBudget Capture()
+		{
+			LootPassBudget budget;
+			budget.useTimeBudget = properties::GetBool(properties::use_looting_time_budget, false);
+			budget.timeBudgetMs = std::clamp(
+				static_cast<double>(properties::GetFloat(properties::looting_time_budget_ms, 4.0F)),
+				0.1,
+				100.0);
+
+			const auto legacyLimit = properties::GetInt(properties::max_items_processed_per_thread, 32);
+			budget.maxObjects = static_cast<std::size_t>(std::clamp(
+				properties::GetInt(properties::max_lootable_objects_per_pass, legacyLimit),
+				1,
+				static_cast<int>(kMaxItemsProcessedPerThreadLimit)));
+			budget.maxContainers = static_cast<std::size_t>(std::clamp(
+				properties::GetInt(properties::max_containers_per_pass, 4),
+				0,
+				static_cast<int>(kMaxItemsProcessedPerThreadLimit)));
+			budget.maxActors = static_cast<std::size_t>(std::clamp(
+				properties::GetInt(properties::max_actors_per_pass, 4),
+				0,
+				static_cast<int>(kMaxItemsProcessedPerThreadLimit)));
+			budget.maxActivationRefs = static_cast<std::size_t>(std::clamp(
+				properties::GetInt(properties::max_activation_refs_per_pass, 8),
+				0,
+				static_cast<int>(kMaxItemsProcessedPerThreadLimit)));
+			return budget;
+		}
+
+		bool ShouldStop()
+		{
+			if (processedObjects >= hardMaxObjects ||
+				(!useTimeBudget && processedObjects >= maxObjects))
+			{
+				hitObjectLimit = true;
+				return true;
+			}
+			if (useTimeBudget && processedObjects > 0 &&
+				ElapsedMilliseconds(startedAt) >= timeBudgetMs)
+			{
+				hitTimeBudget = true;
+				return true;
+			}
+			return false;
+		}
+
+		bool CanProcessCategory(ENUM_FORM_ID formType) const
+		{
+			if (useTimeBudget)
+			{
+				return true;
+			}
+			if (formType == ENUM_FORM_ID::kCONT)
+			{
+				return processedContainers < maxContainers;
+			}
+			if (formType == ENUM_FORM_ID::kNPC_)
+			{
+				return processedActors < maxActors;
+			}
+			if (formType == ENUM_FORM_ID::kACTI || formType == ENUM_FORM_ID::kFLOR)
+			{
+				return processedActivationRefs < maxActivationRefs;
+			}
+			return true;
+		}
+
+		void MarkProcessed(ENUM_FORM_ID formType)
+		{
+			++processedObjects;
+			if (formType == ENUM_FORM_ID::kCONT)
+			{
+				++processedContainers;
+			}
+			else if (formType == ENUM_FORM_ID::kNPC_)
+			{
+				++processedActors;
+			}
+			else if (formType == ENUM_FORM_ID::kACTI || formType == ENUM_FORM_ID::kFLOR)
+			{
+				++processedActivationRefs;
+			}
+		}
+	};
+
 	// ---- Mod helpers ----
 
 	inline bool IsLegendaryMod(const BGSMod::Attachment::Mod* mod)
@@ -7836,6 +8030,110 @@ namespace papyrus_lootman
 		return false;
 	}
 
+	bool TryLootDeferredActivationAmmoReference(
+		TESObjectREFR* ref,
+		TESObjectREFR* dest,
+		TESObjectREFR* player,
+		bool playPickupSound,
+		LootCapacityContext* capacity = nullptr)
+	{
+		auto* form = ref ? ref->GetObjectReference() : nullptr;
+		auto* object = form ? form->As<TESBoundObject>() : nullptr;
+		if (!ref || !dest || !player || !object)
+		{
+			return false;
+		}
+
+		const auto worldCount = GetWorldReferenceItemCount(ref);
+		if (worldCount <= 0)
+		{
+			return false;
+		}
+
+		float acceptedWeight = 0.0F;
+		float unitWeight = 0.0F;
+		if (capacity && capacity->enabled)
+		{
+			if (!TryGetItemUnitWeightSafe(object, GetInstanceData(ref), unitWeight) ||
+				!capacity->CanAccept(unitWeight, worldCount, acceptedWeight))
+			{
+				return false;
+			}
+		}
+
+		std::int32_t playerBefore = 0;
+		const bool gotPlayerBefore = TryGetReferenceItemCountSafe(player, object, playerBefore);
+		const auto activated = [&]()
+		{
+			if (player->IsPlayerRef())
+			{
+				PlayerCharacter::ScopedInventoryChangeMessageContext context(true, false);
+				return TryActivateRefSafe(ref, player, false);
+			}
+			return TryActivateRefSafe(ref, player, false);
+		}();
+		if (!activated)
+		{
+			return false;
+		}
+
+		if (playPickupSound)
+		{
+			PlayPickUpSound(std::monostate{}, player, ref);
+		}
+
+		std::int32_t playerAfter = 0;
+		const bool gotPlayerAfter = TryGetReferenceItemCountSafe(player, object, playerAfter);
+		std::int32_t movedCount = 0;
+		if (gotPlayerBefore && gotPlayerAfter && playerAfter > playerBefore)
+		{
+			movedCount = playerAfter - playerBefore;
+		}
+		else if (!gotPlayerBefore || !gotPlayerAfter)
+		{
+			movedCount = worldCount;
+		}
+
+		if (movedCount > 0 && dest != player)
+		{
+			auto remaining = movedCount;
+			while (remaining > 0)
+			{
+				const auto chunk = std::min<std::int32_t>(remaining, 65535);
+				if (!TryMoveInventoryItemSafe(player, dest, object, chunk))
+				{
+					REX::WARN(
+						"LootNearbyEnabledReferences: deferred activation transfer failed, player={:08X}, dest={:08X}, item={:08X}, remaining={}",
+						player->formID,
+						dest->formID,
+						object->formID,
+						remaining);
+					break;
+				}
+				remaining -= chunk;
+			}
+			movedCount -= remaining;
+		}
+
+		if (movedCount > 0 && capacity)
+		{
+			capacity->Accept(acceptedWeight);
+		}
+
+		if (movedCount > 0 && ShouldNotifyLootDestination(dest))
+		{
+			auto notificationInfo = BuildWorldReferenceNotificationInfo(ref, object, movedCount);
+			notificationInfo.totalCount = movedCount;
+			QueueLootItemNotification(
+				object,
+				GetFormName(ref),
+				movedCount,
+				notificationInfo);
+		}
+
+		return movedCount > 0 || activated;
+	}
+
 	bool TryLootActivationReference(
 		TESObjectREFR* ref,
 		TESObjectREFR* actionRef,
@@ -8235,7 +8533,8 @@ namespace papyrus_lootman
 		TESObjectREFR* src,
 		TESObjectREFR* dest,
 		std::uint32_t itemType,
-		LootCapacityContext* capacity = nullptr)
+		LootCapacityContext* capacity = nullptr,
+		LootPassBudget* passBudget = nullptr)
 	{
 		if (!src || !dest || src == dest || itemType > all_item)
 		{
@@ -8245,6 +8544,10 @@ namespace papyrus_lootman
 
 		auto inventoryList = src->inventoryList;
 		if (!inventoryList)
+		{
+			return 0;
+		}
+		if (passBudget && passBudget->ShouldStop())
 		{
 			return 0;
 		}
@@ -8269,6 +8572,11 @@ namespace papyrus_lootman
 			ReadLockGuard guard(inventoryList->rwLock);
 			for (auto& item : inventoryList->data)
 			{
+				if (passBudget && passBudget->ShouldStop())
+				{
+					break;
+				}
+
 				auto* form = item.object;
 				if (!form)
 				{
@@ -8307,6 +8615,11 @@ namespace papyrus_lootman
 				std::uint32_t stackIndex = 0;
 				for (auto stack = item.stackData.get(); stack; stack = stack->nextStack.get(), ++stackIndex)
 				{
+					if (passBudget && passBudget->ShouldStop())
+					{
+						break;
+					}
+
 					InventoryItemInfo stackInfo{};
 					bool gotStackInfo = TryGetInventoryStackInfoSafe(
 						*stack,
@@ -8373,6 +8686,11 @@ namespace papyrus_lootman
 		std::int32_t movedStacks = 0;
 		for (const auto& request : requests)
 		{
+			if (passBudget && passBudget->ShouldStop())
+			{
+				break;
+			}
+
 			if (!request.object || request.count <= 0)
 			{
 				continue;
@@ -8419,6 +8737,10 @@ namespace papyrus_lootman
 				}
 				while (remaining > 0 && !request.preserveStackExtra)
 				{
+					if (passBudget && passBudget->ShouldStop())
+					{
+						break;
+					}
 					const auto chunk = std::min<std::int32_t>(remaining, 65535);
 					if (!TryMoveInventoryItemSafe(
 							src,
@@ -9014,6 +9336,280 @@ namespace papyrus_lootman
 			std::min<std::size_t>(
 				candidateCount,
 				static_cast<std::size_t>(std::numeric_limits<std::int32_t>::max())));
+	}
+
+	std::vector<std::int32_t> LootNearbyEnabledReferences(
+		std::monostate,
+		TESObjectREFR* player,
+		TESObjectREFR* dest,
+		TESObjectREFR* activator,
+		TESObjectREFR* workshop,
+		std::uint32_t enabledFormTypeMask,
+		std::uint32_t itemType,
+		bool playPickupSound,
+		bool playContainerAnimation,
+		bool unlockLockedContainer,
+		TESForm* bobbyPin,
+		BGSPerk* locksmith01,
+		BGSPerk* locksmith02,
+		BGSPerk* locksmith03,
+		BGSPerk* locksmith04)
+	{
+		std::vector<std::int32_t> result(kLootPassResultSize, 0);
+		if (!player || !dest || enabledFormTypeMask == 0)
+		{
+			return result;
+		}
+
+		auto ui = UI::GetSingleton();
+		if (ui && ui->pauseMenuDisableCt.load_unchecked() > 0)
+		{
+			return result;
+		}
+
+		EnsureItemTypeCache();
+		auto propsSnapshot = PropertiesSnapshot::Capture();
+		auto origin = player->GetPosition();
+		auto lootingRange = std::clamp(properties::GetFloat(properties::looting_range), 0.0F, 200.0F);
+		auto maxDistance = lootingRange * 100.0F;
+		auto maxDistanceSq = maxDistance * maxDistance;
+		if (maxDistance < 1.0F)
+		{
+			return result;
+		}
+
+		std::vector<ObjectEntry> buffer;
+		buffer.reserve(1024);
+		CollectFromCells(
+			player,
+			origin,
+			maxDistanceSq,
+			propsSnapshot.notLootingFromSettlement,
+			[enabledFormTypeMask](ENUM_FORM_ID formType)
+			{
+				return (FormTypeToEnabledBit(formType) & enabledFormTypeMask) != 0;
+			},
+			buffer);
+		std::sort(
+			buffer.begin(),
+			buffer.end(),
+			[](const ObjectEntry& lhs, const ObjectEntry& rhs)
+			{
+				return lhs.distanceSquared < rhs.distanceSquared;
+			});
+
+		result[kLootPassResultCandidateObjects] = static_cast<std::int32_t>(
+			std::min<std::size_t>(
+				buffer.size(),
+				static_cast<std::size_t>(std::numeric_limits<std::int32_t>::max())));
+
+		std::unique_lock<std::mutex> capacityGuard;
+		if (!properties::GetBool(properties::ignore_overweight, true))
+		{
+			capacityGuard = std::unique_lock<std::mutex>(lootCapacityLock);
+		}
+		auto capacity = BuildLootCapacityContext(player, dest, workshop);
+		auto budget = LootPassBudget::Capture();
+		MatchCache matchCache;
+		matchCache.results.reserve(buffer.size() * 2);
+		std::vector<BGSMod::Attachment::Mod*> equipmentBuffer;
+
+		for (const auto& entry : buffer)
+		{
+			if (budget.ShouldStop())
+			{
+				break;
+			}
+
+			auto* ref = entry.obj.get();
+			if (!ref)
+			{
+				continue;
+			}
+
+			auto* baseForm = ref->GetObjectReference();
+			if (!baseForm)
+			{
+				continue;
+			}
+
+			const auto actualFormType = baseForm->GetFormType();
+			const auto enabledBit = FormTypeToEnabledBit(actualFormType);
+			if ((enabledBit & enabledFormTypeMask) == 0)
+			{
+				continue;
+			}
+			if (!budget.CanProcessCategory(actualFormType))
+			{
+				continue;
+			}
+			if (UsesWorldReferenceTransfer(actualFormType) && IsRecentlyLootedWorldRef(ref))
+			{
+				continue;
+			}
+
+			bool validForm = false;
+			const bool gotValidForm = TryIsValidFormSafe(
+				baseForm,
+				&propsSnapshot,
+				&matchCache,
+				validForm);
+			if (!gotValidForm || !validForm)
+			{
+				continue;
+			}
+
+			bool lootableForm = false;
+			const bool gotLootableForm = TryIsLootableFormSafe(
+				baseForm,
+				&propsSnapshot,
+				&matchCache,
+				lootableForm);
+			if (!gotLootableForm || !lootableForm)
+			{
+				continue;
+			}
+
+			bool validObject = false;
+			const bool gotValidObject = TryIsValidObjectSafe(
+				ref,
+				&propsSnapshot,
+				baseForm,
+				&matchCache,
+				validObject);
+			if (!gotValidObject || !validObject)
+			{
+				continue;
+			}
+
+			bool lootableObject = false;
+			const bool gotLootableObject = TryIsLootableObjectSafe(
+				ref,
+				&propsSnapshot,
+				baseForm,
+				&equipmentBuffer,
+				&matchCache,
+				lootableObject);
+			if (!gotLootableObject || !lootableObject)
+			{
+				continue;
+			}
+
+			if (!TryLockObject(ref))
+			{
+				continue;
+			}
+
+			struct ReleaseGuard
+			{
+				std::uint32_t formId = 0;
+				~ReleaseGuard()
+				{
+					if (formId != 0)
+					{
+						UnlockObject(formId);
+					}
+				}
+			} releaseGuard{ ref->formID };
+
+			budget.MarkProcessed(actualFormType);
+			result[kLootPassResultProcessedObjects] = static_cast<std::int32_t>(
+				std::min<std::size_t>(
+					budget.processedObjects,
+					static_cast<std::size_t>(std::numeric_limits<std::int32_t>::max())));
+			const auto bucketIndex = FormTypeToBucketIndex(actualFormType);
+			if (bucketIndex >= 0)
+			{
+				++result[kLootPassResultBucketOffset + static_cast<std::size_t>(bucketIndex)];
+			}
+
+			bool successful = false;
+			std::int32_t movedStacks = 0;
+			if (actualFormType == ENUM_FORM_ID::kCONT)
+			{
+				if (IsReferenceLockedForLooting(ref) &&
+					!TryUnlockContainerForLooting(
+						ref,
+						player,
+						workshop,
+						bobbyPin,
+						locksmith01,
+						locksmith02,
+						locksmith03,
+						locksmith04,
+						unlockLockedContainer))
+				{
+					continue;
+				}
+
+				movedStacks = TransferLootableInventoryItemsImpl(
+					ref,
+					dest,
+					itemType,
+					&capacity,
+					&budget);
+				successful = movedStacks > 0;
+				if (successful && playContainerAnimation && activator && IsContainerAnimationCandidate(ref))
+				{
+					(void)TryActivateRefSafe(ref, activator, true);
+				}
+			}
+			else if (actualFormType == ENUM_FORM_ID::kNPC_)
+			{
+				movedStacks = TransferLootableInventoryItemsImpl(
+					ref,
+					dest,
+					itemType,
+					&capacity,
+					&budget);
+				successful = movedStacks > 0;
+				if (successful && playPickupSound)
+				{
+					PlayPickUpSound(std::monostate{}, player, ref);
+				}
+			}
+			else if (actualFormType == ENUM_FORM_ID::kACTI || actualFormType == ENUM_FORM_ID::kFLOR)
+			{
+				successful = TryLootActivationReference(ref, dest, player, playPickupSound, &capacity);
+			}
+			else if (UsesWorldReferenceTransfer(actualFormType))
+			{
+				successful = IsDeferredActivationAmmoCandidate(ref, baseForm)
+					? TryLootDeferredActivationAmmoReference(ref, dest, player, playPickupSound, &capacity)
+					: TryLootWorldReference(ref, dest, player, playPickupSound, &capacity);
+			}
+
+			if (successful)
+			{
+				++result[kLootPassResultSuccessfulObjects];
+				result[kLootPassResultMovedStacks] += movedStacks;
+			}
+		}
+
+		if (budget.processedObjects >= budget.hardMaxObjects ||
+			(!budget.useTimeBudget && budget.processedObjects >= budget.maxObjects))
+		{
+			budget.hitObjectLimit = true;
+		}
+		if (budget.useTimeBudget && budget.processedObjects > 0 &&
+			ElapsedMilliseconds(budget.startedAt) >= budget.timeBudgetMs)
+		{
+			budget.hitTimeBudget = true;
+		}
+
+		result[kLootPassResultHitObjectLimit] = budget.hitObjectLimit ? 1 : 0;
+		result[kLootPassResultHitTimeBudget] = budget.hitTimeBudget ? 1 : 0;
+		REX::DEBUG(
+			"LootNearbyEnabledReferences: enabledMask={}, candidates={}, processed={}, successfulObjects={}, movedStacks={}, hitObjectLimit={}, hitTimeBudget={}, elapsed_ms={:.3f}",
+			enabledFormTypeMask,
+			result[kLootPassResultCandidateObjects],
+			result[kLootPassResultProcessedObjects],
+			result[kLootPassResultSuccessfulObjects],
+			result[kLootPassResultMovedStacks],
+			result[kLootPassResultHitObjectLimit],
+			result[kLootPassResultHitTimeBudget],
+			ElapsedMilliseconds(budget.startedAt));
+		return result;
 	}
 
 	struct ScrapInventoryItem
@@ -9719,6 +10315,8 @@ namespace papyrus_lootman
 			&MoveInventoryItems, false, false);
 		vm->BindNativeMethod("LTMN2:LootMan"sv, "LootNearbyReferences"sv,
 			&LootNearbyReferences, false, false);
+		vm->BindNativeMethod("LTMN2:LootMan"sv, "LootNearbyEnabledReferences"sv,
+			&LootNearbyEnabledReferences, false, false);
 		vm->BindNativeMethod("LTMN2:LootMan"sv, "GetScrappableItems"sv,
 			&GetScrappableItems, false, false);
 		vm->BindNativeMethod("LTMN2:LootMan"sv, "ScrapInventoryItems"sv,

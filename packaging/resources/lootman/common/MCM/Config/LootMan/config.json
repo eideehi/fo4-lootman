@@ -330,185 +330,92 @@
         },
         { "type": "spacer", "groupCondition": { "AND": [1, 6] } },
 
-        { "type": "section", "text": "$PAGE_LOOTING_WORKER_MAX_WORKER_THREADS_SECTION", "groupCondition": { "AND": [1, 6] } },
-        { "type": "text", "text": "$PAGE_LOOTING_WORKER_MAX_WORKER_THREADS_SECTION_TEXT", "groupCondition": { "AND": [1, 6] } },
+        { "type": "section", "text": "$PAGE_LOOTING_WORKER_NATIVE_BUDGET_SECTION", "groupCondition": { "AND": [1, 6] } },
+        { "type": "text", "text": "$PAGE_LOOTING_WORKER_NATIVE_BUDGET_SECTION_TEXT", "groupCondition": { "AND": [1, 6] } },
         {
-          "id": "MaxWorkerThreadsACTI",
-          "text": "$PAGE_LOOTING_WORKER_MAX_WORKER_THREADS_ACTI",
-          "type": "slider",
-          "help": "$PAGE_LOOTING_WORKER_MAX_WORKER_THREADS_ACTI_HELP",
+          "id": "UseLootingTimeBudget",
+          "text": "$PAGE_LOOTING_WORKER_NATIVE_BUDGET_USE_TIME_BUDGET",
+          "type": "switcher",
+          "help": "$PAGE_LOOTING_WORKER_NATIVE_BUDGET_USE_TIME_BUDGET_HELP",
           "valueOptions": {
-            "min": 1,
-            "max": 8,
-            "step": 1,
-            "sourceType": "PropertyValueInt",
+            "sourceType": "PropertyValueBool",
             "sourceForm": "LootMan.esp|F9A",
-            "propertyName": "MaxWorkerThreadsACTI"
+            "propertyName": "UseLootingTimeBudget"
           },
           "groupCondition": { "AND": [1, 6] }
         },
         {
-          "id": "MaxWorkerThreadsALCH",
-          "text": "$PAGE_LOOTING_WORKER_MAX_WORKER_THREADS_ALCH",
+          "id": "LootingTimeBudgetMs",
+          "text": "$PAGE_LOOTING_WORKER_NATIVE_BUDGET_TIME_MS",
           "type": "slider",
-          "help": "$PAGE_LOOTING_WORKER_MAX_WORKER_THREADS_ALCH_HELP",
+          "help": "$PAGE_LOOTING_WORKER_NATIVE_BUDGET_TIME_MS_HELP",
           "valueOptions": {
-            "min": 1,
-            "max": 8,
-            "step": 1,
-            "sourceType": "PropertyValueInt",
+            "min": 0.5,
+            "max": 20,
+            "step": 0.5,
+            "sourceType": "PropertyValueFloat",
             "sourceForm": "LootMan.esp|F9A",
-            "propertyName": "MaxWorkerThreadsALCH"
+            "propertyName": "LootingTimeBudgetMs"
           },
           "groupCondition": { "AND": [1, 6] }
         },
         {
-          "id": "MaxWorkerThreadsAMMO",
-          "text": "$PAGE_LOOTING_WORKER_MAX_WORKER_THREADS_AMMO",
+          "id": "MaxLootableObjectsPerPass",
+          "text": "$PAGE_LOOTING_WORKER_NATIVE_BUDGET_MAX_OBJECTS",
           "type": "slider",
-          "help": "$PAGE_LOOTING_WORKER_MAX_WORKER_THREADS_AMMO_HELP",
+          "help": "$PAGE_LOOTING_WORKER_NATIVE_BUDGET_MAX_OBJECTS_HELP",
           "valueOptions": {
             "min": 1,
-            "max": 8,
+            "max": 256,
             "step": 1,
             "sourceType": "PropertyValueInt",
             "sourceForm": "LootMan.esp|F9A",
-            "propertyName": "MaxWorkerThreadsAMMO"
+            "propertyName": "MaxLootableObjectsPerPass"
           },
           "groupCondition": { "AND": [1, 6] }
         },
         {
-          "id": "MaxWorkerThreadsARMO",
-          "text": "$PAGE_LOOTING_WORKER_MAX_WORKER_THREADS_ARMO",
+          "id": "MaxContainersPerPass",
+          "text": "$PAGE_LOOTING_WORKER_NATIVE_BUDGET_MAX_CONTAINERS",
           "type": "slider",
-          "help": "$PAGE_LOOTING_WORKER_MAX_WORKER_THREADS_ARMO_HELP",
+          "help": "$PAGE_LOOTING_WORKER_NATIVE_BUDGET_MAX_CONTAINERS_HELP",
           "valueOptions": {
-            "min": 1,
-            "max": 8,
+            "min": 0,
+            "max": 64,
             "step": 1,
             "sourceType": "PropertyValueInt",
             "sourceForm": "LootMan.esp|F9A",
-            "propertyName": "MaxWorkerThreadsARMO"
+            "propertyName": "MaxContainersPerPass"
           },
           "groupCondition": { "AND": [1, 6] }
         },
         {
-          "id": "MaxWorkerThreadsBOOK",
-          "text": "$PAGE_LOOTING_WORKER_MAX_WORKER_THREADS_BOOK",
+          "id": "MaxActorsPerPass",
+          "text": "$PAGE_LOOTING_WORKER_NATIVE_BUDGET_MAX_ACTORS",
           "type": "slider",
-          "help": "$PAGE_LOOTING_WORKER_MAX_WORKER_THREADS_BOOK_HELP",
+          "help": "$PAGE_LOOTING_WORKER_NATIVE_BUDGET_MAX_ACTORS_HELP",
           "valueOptions": {
-            "min": 1,
-            "max": 8,
+            "min": 0,
+            "max": 64,
             "step": 1,
             "sourceType": "PropertyValueInt",
             "sourceForm": "LootMan.esp|F9A",
-            "propertyName": "MaxWorkerThreadsBOOK"
+            "propertyName": "MaxActorsPerPass"
           },
           "groupCondition": { "AND": [1, 6] }
         },
         {
-          "id": "MaxWorkerThreadsCONT",
-          "text": "$PAGE_LOOTING_WORKER_MAX_WORKER_THREADS_CONT",
+          "id": "MaxActivationRefsPerPass",
+          "text": "$PAGE_LOOTING_WORKER_NATIVE_BUDGET_MAX_ACTIVATION_REFS",
           "type": "slider",
-          "help": "$PAGE_LOOTING_WORKER_MAX_WORKER_THREADS_CONT_HELP",
+          "help": "$PAGE_LOOTING_WORKER_NATIVE_BUDGET_MAX_ACTIVATION_REFS_HELP",
           "valueOptions": {
-            "min": 1,
-            "max": 8,
+            "min": 0,
+            "max": 128,
             "step": 1,
             "sourceType": "PropertyValueInt",
             "sourceForm": "LootMan.esp|F9A",
-            "propertyName": "MaxWorkerThreadsCONT"
-          },
-          "groupCondition": { "AND": [1, 6] }
-        },
-        {
-          "id": "MaxWorkerThreadsFLOR",
-          "text": "$PAGE_LOOTING_WORKER_MAX_WORKER_THREADS_FLOR",
-          "type": "slider",
-          "help": "$PAGE_LOOTING_WORKER_MAX_WORKER_THREADS_FLOR_HELP",
-          "valueOptions": {
-            "min": 1,
-            "max": 8,
-            "step": 1,
-            "sourceType": "PropertyValueInt",
-            "sourceForm": "LootMan.esp|F9A",
-            "propertyName": "MaxWorkerThreadsFLOR"
-          },
-          "groupCondition": { "AND": [1, 6] }
-        },
-        {
-          "id": "MaxWorkerThreadsINGR",
-          "text": "$PAGE_LOOTING_WORKER_MAX_WORKER_THREADS_INGR",
-          "type": "slider",
-          "help": "$PAGE_LOOTING_WORKER_MAX_WORKER_THREADS_INGR_HELP",
-          "valueOptions": {
-            "min": 1,
-            "max": 8,
-            "step": 1,
-            "sourceType": "PropertyValueInt",
-            "sourceForm": "LootMan.esp|F9A",
-            "propertyName": "MaxWorkerThreadsINGR"
-          },
-          "groupCondition": { "AND": [1, 6] }
-        },
-        {
-          "id": "MaxWorkerThreadsKEYM",
-          "text": "$PAGE_LOOTING_WORKER_MAX_WORKER_THREADS_KEYM",
-          "type": "slider",
-          "help": "$PAGE_LOOTING_WORKER_MAX_WORKER_THREADS_KEYM_HELP",
-          "valueOptions": {
-            "min": 1,
-            "max": 8,
-            "step": 1,
-            "sourceType": "PropertyValueInt",
-            "sourceForm": "LootMan.esp|F9A",
-            "propertyName": "MaxWorkerThreadsKEYM"
-          },
-          "groupCondition": { "AND": [1, 6] }
-        },
-        {
-          "id": "MaxWorkerThreadsMISC",
-          "text": "$PAGE_LOOTING_WORKER_MAX_WORKER_THREADS_MISC",
-          "type": "slider",
-          "help": "$PAGE_LOOTING_WORKER_MAX_WORKER_THREADS_MISC_HELP",
-          "valueOptions": {
-            "min": 1,
-            "max": 8,
-            "step": 1,
-            "sourceType": "PropertyValueInt",
-            "sourceForm": "LootMan.esp|F9A",
-            "propertyName": "MaxWorkerThreadsMISC"
-          },
-          "groupCondition": { "AND": [1, 6] }
-        },
-        {
-          "id": "MaxWorkerThreadsNPC_",
-          "text": "$PAGE_LOOTING_WORKER_MAX_WORKER_THREADS_NPC_",
-          "type": "slider",
-          "help": "$PAGE_LOOTING_WORKER_MAX_WORKER_THREADS_NPC__HELP",
-          "valueOptions": {
-            "min": 1,
-            "max": 8,
-            "step": 1,
-            "sourceType": "PropertyValueInt",
-            "sourceForm": "LootMan.esp|F9A",
-            "propertyName": "MaxWorkerThreadsNPC_"
-          },
-          "groupCondition": { "AND": [1, 6] }
-        },
-        {
-          "id": "MaxWorkerThreadsWEAP",
-          "text": "$PAGE_LOOTING_WORKER_MAX_WORKER_THREADS_WEAP",
-          "type": "slider",
-          "help": "$PAGE_LOOTING_WORKER_MAX_WORKER_THREADS_WEAP_HELP",
-          "valueOptions": {
-            "min": 1,
-            "max": 8,
-            "step": 1,
-            "sourceType": "PropertyValueInt",
-            "sourceForm": "LootMan.esp|F9A",
-            "propertyName": "MaxWorkerThreadsWEAP"
+            "propertyName": "MaxActivationRefsPerPass"
           },
           "groupCondition": { "AND": [1, 6] }
         },

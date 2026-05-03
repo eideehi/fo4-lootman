@@ -106,6 +106,12 @@ Group Config
     bool property PlayContainerAnimation = true auto hidden
     float property LootingRange = 6.0 auto hidden
     float property WorkerInvokeInterval = 1.0 auto hidden
+    int property MaxLootableObjectsPerPass = 32 auto hidden
+    int property MaxContainersPerPass = 4 auto hidden
+    int property MaxActorsPerPass = 4 auto hidden
+    int property MaxActivationRefsPerPass = 8 auto hidden
+    bool property UseLootingTimeBudget = false auto hidden
+    float property LootingTimeBudgetMs = 4.0 auto hidden
     int property CarryWeight = 1000 auto hidden
     bool property IgnoreOverweight = true auto hidden
     bool property LootIsDeliverToPlayer = false auto hidden

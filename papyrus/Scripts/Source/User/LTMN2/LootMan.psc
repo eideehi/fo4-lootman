@@ -61,6 +61,9 @@ Function MoveInventoryItems(ObjectReference src, ObjectReference dest, int itemT
 ; Loot nearby references of the specified form type in native code.
 int Function LootNearbyReferences(ObjectReference player, ObjectReference dest, ObjectReference activator, ObjectReference workshop, int formType, int itemType, bool playPickupSound, bool playContainerAnimation, bool unlockLockedContainer, Form bobbyPin, Perk locksmith01, Perk locksmith02, Perk locksmith03, Perk locksmith04) global native
 
+; Loot all enabled nearby references in one native pass. The result is [processed objects, successful objects, moved inventory stacks, hit object limit, hit time budget, candidate objects, ACTI, ALCH, AMMO, ARMO, BOOK, CONT, FLOR, INGR, KEYM, MISC, NPC_, WEAP].
+int[] Function LootNearbyEnabledReferences(ObjectReference player, ObjectReference dest, ObjectReference activator, ObjectReference workshop, int enabledFormTypeMask, int itemType, bool playPickupSound, bool playContainerAnimation, bool unlockLockedContainer, Form bobbyPin, Perk locksmith01, Perk locksmith02, Perk locksmith03, Perk locksmith04) global native
+
 ; Get scrappable items of the specified item type in the inventory.
 Form[] Function GetScrappableItems(ObjectReference inventoryOwner, int itemType) global native
 

@@ -25,6 +25,20 @@ int TIMER_LOOTING = 4 const
 ; Number of registered system messages.
 int MESSAGE_COUNT = 11 const
 
+; Enabled native looting form-type bits. Keep synchronized with papyrus_lootman.cpp.
+int ENABLE_FORM_TYPE_ACTI = 1 const
+int ENABLE_FORM_TYPE_ALCH = 2 const
+int ENABLE_FORM_TYPE_AMMO = 4 const
+int ENABLE_FORM_TYPE_ARMO = 8 const
+int ENABLE_FORM_TYPE_BOOK = 16 const
+int ENABLE_FORM_TYPE_CONT = 32 const
+int ENABLE_FORM_TYPE_FLOR = 64 const
+int ENABLE_FORM_TYPE_INGR = 128 const
+int ENABLE_FORM_TYPE_KEYM = 256 const
+int ENABLE_FORM_TYPE_MISC = 512 const
+int ENABLE_FORM_TYPE_NPC_ = 1024 const
+int ENABLE_FORM_TYPE_WEAP = 2048 const
+
 Group MessageId
     ; Message id
     int property MESSAGE_INSTALLED = 1 autoreadonly hidden
@@ -438,19 +452,7 @@ Function Install()
     RegisterForRemoteEvent(player, "OnLocationChange")
     RegisterForRemoteEvent(properties.LootManRef, "OnItemAdded")
 
-    LTMN2:Debug.Log(prefix + "  [ Start looting worker manager ]")
-    WorkerManagerACTI.Start()
-    WorkerManagerALCH.Start()
-    WorkerManagerAMMO.Start()
-    WorkerManagerARMO.Start()
-    WorkerManagerBOOK.Start()
-    WorkerManagerCONT.Start()
-    WorkerManagerFLOR.Start()
-    WorkerManagerINGR.Start()
-    WorkerManagerKEYM.Start()
-    WorkerManagerMISC.Start()
-    WorkerManagerNPC_.Start()
-    WorkerManagerWEAP.Start()
+    LTMN2:Debug.Log(prefix + "  [ Native looting scheduler is enabled ]")
 
     StartTimer(1, TIMER_INITIALIZE)
 
@@ -491,19 +493,8 @@ Function Uninstall()
     UnregisterForRemoteEvent(player, "OnLocationChange")
     UnregisterForRemoteEvent(properties.LootManRef, "OnItemAdded")
 
-    LTMN2:Debug.Log(prefix + "  [ Shutdown looting worker manager ]")
-    WorkerManagerACTI.Stop()
-    WorkerManagerALCH.Stop()
-    WorkerManagerAMMO.Stop()
-    WorkerManagerARMO.Stop()
-    WorkerManagerBOOK.Stop()
-    WorkerManagerCONT.Stop()
-    WorkerManagerFLOR.Stop()
-    WorkerManagerINGR.Stop()
-    WorkerManagerKEYM.Stop()
-    WorkerManagerMISC.Stop()
-    WorkerManagerNPC_.Stop()
-    WorkerManagerWEAP.Stop()
+    LTMN2:Debug.Log(prefix + "  [ Shutdown legacy looting worker manager ]")
+    StopLegacyWorkerManagers()
 
     self.SetObjectiveDisplayed(MESSAGE_UNINSTALLED)
     self.SetObjectiveSkipped(MESSAGE_UNINSTALLED)
@@ -518,6 +509,58 @@ Function Uninstall()
 
     properties.Stop()
     self.Stop()
+EndFunction
+
+Function StopLegacyWorkerManagers()
+    If (WorkerManagerACTI)
+        WorkerManagerACTI.Stop()
+    EndIf
+    If (WorkerManagerALCH)
+        WorkerManagerALCH.Stop()
+    EndIf
+    If (WorkerManagerAMMO)
+        WorkerManagerAMMO.Stop()
+    EndIf
+    If (WorkerManagerARMO)
+        WorkerManagerARMO.Stop()
+    EndIf
+    If (WorkerManagerBOOK)
+        WorkerManagerBOOK.Stop()
+    EndIf
+    If (WorkerManagerCONT)
+        WorkerManagerCONT.Stop()
+    EndIf
+    If (WorkerManagerFLOR)
+        WorkerManagerFLOR.Stop()
+    EndIf
+    If (WorkerManagerINGR)
+        WorkerManagerINGR.Stop()
+    EndIf
+    If (WorkerManagerKEYM)
+        WorkerManagerKEYM.Stop()
+    EndIf
+    If (WorkerManagerMISC)
+        WorkerManagerMISC.Stop()
+    EndIf
+    If (WorkerManagerNPC_)
+        WorkerManagerNPC_.Stop()
+    EndIf
+    If (WorkerManagerWEAP)
+        WorkerManagerWEAP.Stop()
+    EndIf
+
+    properties.ActiveWorkerThreadsACTI = 0
+    properties.ActiveWorkerThreadsALCH = 0
+    properties.ActiveWorkerThreadsAMMO = 0
+    properties.ActiveWorkerThreadsARMO = 0
+    properties.ActiveWorkerThreadsBOOK = 0
+    properties.ActiveWorkerThreadsCONT = 0
+    properties.ActiveWorkerThreadsFLOR = 0
+    properties.ActiveWorkerThreadsINGR = 0
+    properties.ActiveWorkerThreadsKEYM = 0
+    properties.ActiveWorkerThreadsMISC = 0
+    properties.ActiveWorkerThreadsNPC_ = 0
+    properties.ActiveWorkerThreadsWEAP = 0
 EndFunction
 
 ; Initialize LootMan
@@ -544,18 +587,7 @@ Function Initialize()
     LTMN2:LootMan.OnUpdateLootManProperty("")
     LTMN2:MCM.GetInstance().Initialize()
 
-    (WorkerManagerACTI As LTMN2:Looting:WorkerManagerACTI).Initialize()
-    (WorkerManagerALCH As LTMN2:Looting:WorkerManagerALCH).Initialize()
-    (WorkerManagerAMMO As LTMN2:Looting:WorkerManagerAMMO).Initialize()
-    (WorkerManagerARMO As LTMN2:Looting:WorkerManagerARMO).Initialize()
-    (WorkerManagerBOOK As LTMN2:Looting:WorkerManagerBOOK).Initialize()
-    (WorkerManagerFLOR As LTMN2:Looting:WorkerManagerFLOR).Initialize()
-    (WorkerManagerINGR As LTMN2:Looting:WorkerManagerINGR).Initialize()
-    (WorkerManagerKEYM As LTMN2:Looting:WorkerManagerKEYM).Initialize()
-    (WorkerManagerMISC As LTMN2:Looting:WorkerManagerMISC).Initialize()
-    (WorkerManagerWEAP As LTMN2:Looting:WorkerManagerWEAP).Initialize()
-    (WorkerManagerCONT As LTMN2:Looting:WorkerManagerCONT).Initialize()
-    (WorkerManagerNPC_ As LTMN2:Looting:WorkerManagerNPC_).Initialize()
+    StopLegacyWorkerManagers()
 
     StartTimer(1, TIMER_UPDATE)
     If (properties.WorkerInvokeInterval > 0)
@@ -662,6 +694,47 @@ Function Update()
     EndWhile
 EndFunction
 
+int Function GetEnabledLootingFormTypeMask()
+    int mask = 0
+    If (properties.EnableObjectLootingOfACTI)
+        mask += ENABLE_FORM_TYPE_ACTI
+    EndIf
+    If (properties.EnableObjectLootingOfALCH)
+        mask += ENABLE_FORM_TYPE_ALCH
+    EndIf
+    If (properties.EnableObjectLootingOfAMMO)
+        mask += ENABLE_FORM_TYPE_AMMO
+    EndIf
+    If (properties.EnableObjectLootingOfARMO)
+        mask += ENABLE_FORM_TYPE_ARMO
+    EndIf
+    If (properties.EnableObjectLootingOfBOOK)
+        mask += ENABLE_FORM_TYPE_BOOK
+    EndIf
+    If (properties.EnableObjectLootingOfCONT)
+        mask += ENABLE_FORM_TYPE_CONT
+    EndIf
+    If (properties.EnableObjectLootingOfFLOR)
+        mask += ENABLE_FORM_TYPE_FLOR
+    EndIf
+    If (properties.EnableObjectLootingOfINGR)
+        mask += ENABLE_FORM_TYPE_INGR
+    EndIf
+    If (properties.EnableObjectLootingOfKEYM)
+        mask += ENABLE_FORM_TYPE_KEYM
+    EndIf
+    If (properties.EnableObjectLootingOfMISC)
+        mask += ENABLE_FORM_TYPE_MISC
+    EndIf
+    If (properties.EnableObjectLootingOfNPC_)
+        mask += ENABLE_FORM_TYPE_NPC_
+    EndIf
+    If (properties.EnableObjectLootingOfWEAP)
+        mask += ENABLE_FORM_TYPE_WEAP
+    EndIf
+    Return mask
+EndFunction
+
 Function Looting()
     If (properties.IsNotInstalled || properties.IsNotInitialized || properties.IsUninstalled)
         Return
@@ -679,18 +752,15 @@ Function Looting()
         Return
     EndIf
 
-    (WorkerManagerACTI As LTMN2:Looting:WorkerManagerACTI).Looting()
-    (WorkerManagerALCH As LTMN2:Looting:WorkerManagerALCH).Looting()
-    (WorkerManagerAMMO As LTMN2:Looting:WorkerManagerAMMO).Looting()
-    (WorkerManagerARMO As LTMN2:Looting:WorkerManagerARMO).Looting()
-    (WorkerManagerBOOK As LTMN2:Looting:WorkerManagerBOOK).Looting()
-    (WorkerManagerFLOR As LTMN2:Looting:WorkerManagerFLOR).Looting()
-    (WorkerManagerINGR As LTMN2:Looting:WorkerManagerINGR).Looting()
-    (WorkerManagerKEYM As LTMN2:Looting:WorkerManagerKEYM).Looting()
-    (WorkerManagerMISC As LTMN2:Looting:WorkerManagerMISC).Looting()
-    (WorkerManagerWEAP As LTMN2:Looting:WorkerManagerWEAP).Looting()
-    (WorkerManagerCONT As LTMN2:Looting:WorkerManagerCONT).Looting()
-    (WorkerManagerNPC_ As LTMN2:Looting:WorkerManagerNPC_).Looting()
+    int enabledFormTypeMask = GetEnabledLootingFormTypeMask()
+    If (enabledFormTypeMask <= 0)
+        Return
+    EndIf
+
+    int[] result = LTMN2:LootMan.LootNearbyEnabledReferences(player, properties.LootManRef, properties.ActivatorRef, properties.LootManWorkshopRef, enabledFormTypeMask, properties.LootableInventoryItemType, properties.PlayPickupSound, properties.PlayContainerAnimation, properties.UnlockLockedContainer, properties.BobbyPin, properties.Locksmith01, properties.Locksmith02, properties.Locksmith03, properties.Locksmith04)
+    If (result.Length >= 6 && (result[3] > 0 || result[4] > 0))
+        LTMN2:Debug.Log("| System | Native loot pass limited: processed=" + result[0] + ", successful=" + result[1] + ", hitObjectLimit=" + result[3] + ", hitTimeBudget=" + result[4] + ", candidates=" + result[5])
+    EndIf
 EndFunction
 
 Function ResetLootingTimer()

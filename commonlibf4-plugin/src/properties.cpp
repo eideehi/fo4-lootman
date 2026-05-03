@@ -165,6 +165,42 @@ namespace properties
 			updates[max_items_processed_per_thread] = GetIntProperty(propertyName);
 		}
 
+		propertyName = "MaxLootableObjectsPerPass";
+		if (updateAll || propertyName == updateProperty)
+		{
+			updates[max_lootable_objects_per_pass] = GetIntProperty(propertyName);
+		}
+
+		propertyName = "MaxContainersPerPass";
+		if (updateAll || propertyName == updateProperty)
+		{
+			updates[max_containers_per_pass] = GetIntProperty(propertyName);
+		}
+
+		propertyName = "MaxActorsPerPass";
+		if (updateAll || propertyName == updateProperty)
+		{
+			updates[max_actors_per_pass] = GetIntProperty(propertyName);
+		}
+
+		propertyName = "MaxActivationRefsPerPass";
+		if (updateAll || propertyName == updateProperty)
+		{
+			updates[max_activation_refs_per_pass] = GetIntProperty(propertyName);
+		}
+
+		propertyName = "UseLootingTimeBudget";
+		if (updateAll || propertyName == updateProperty)
+		{
+			updates[use_looting_time_budget] = GetBoolProperty(propertyName);
+		}
+
+		propertyName = "LootingTimeBudgetMs";
+		if (updateAll || propertyName == updateProperty)
+		{
+			updates[looting_time_budget_ms] = GetFloatProperty(propertyName);
+		}
+
 		propertyName = "LootingRange";
 		if (updateAll || propertyName == updateProperty)
 		{

@@ -13,6 +13,12 @@ namespace properties
 	{
 		looting_range,
 		max_items_processed_per_thread,
+		max_lootable_objects_per_pass,
+		max_containers_per_pass,
+		max_actors_per_pass,
+		max_activation_refs_per_pass,
+		use_looting_time_budget,
+		looting_time_budget_ms,
 		not_looting_from_settlement,
 		lootable_inventory_item_type,
 		looting_legendary_only,
