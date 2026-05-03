@@ -23,4 +23,5 @@ packaging/.env
 
 # files
 *.zip
+*:Zone.Identifier
 compile_commands.json
