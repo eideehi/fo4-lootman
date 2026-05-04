@@ -102,4 +102,59 @@ namespace papyrus_lootman
 
 		return std::min(protectedCount, stackInfo.totalCount);
 	}
+
+	bool ShouldProtectFullEquippedTransferStack(const TESForm* form)
+	{
+		if (!form)
+		{
+			return false;
+		}
+
+		const auto formType = form->GetFormType();
+		if (formType == ENUM_FORM_ID::kAMMO)
+		{
+			return true;
+		}
+		if (formType != ENUM_FORM_ID::kWEAP)
+		{
+			return false;
+		}
+
+		const auto weaponType = GetWEAPType(form);
+		return weaponType == WEAP::grenade || weaponType == WEAP::mine;
+	}
+
+	// Transfer treats equipped throwables like ammo; scrap keeps the baseline
+	// player protection rules through GetPlayerProtectedStackCount.
+	std::int32_t GetPlayerTransferProtectedStackCount(
+		const TESForm* form,
+		const BGSInventoryItem::Stack& stack,
+		const InventoryItemInfo& stackInfo,
+		bool ownerIsPlayer,
+		bool ownerIsDead,
+		bool formIsFavorite,
+		bool hasFavoriteStack,
+		bool& retainedFormFavorite)
+	{
+		auto protectedCount = GetPlayerProtectedStackCount(
+			form,
+			stack,
+			stackInfo,
+			ownerIsPlayer,
+			ownerIsDead,
+			formIsFavorite,
+			hasFavoriteStack,
+			retainedFormFavorite);
+
+		if (ownerIsPlayer &&
+			!ownerIsDead &&
+			stackInfo.equipped &&
+			stackInfo.totalCount > 0 &&
+			ShouldProtectFullEquippedTransferStack(form))
+		{
+			protectedCount = std::max(protectedCount, stackInfo.totalCount);
+		}
+
+		return std::min(protectedCount, stackInfo.totalCount);
+	}
 }

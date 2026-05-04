@@ -216,7 +216,7 @@ namespace papyrus_lootman
 							continue;
 						}
 
-						const auto protectedCount = GetPlayerProtectedStackCount(
+						const auto protectedCount = GetPlayerTransferProtectedStackCount(
 							form,
 							*stack,
 							stackInfo,
@@ -839,6 +839,9 @@ namespace papyrus_lootman
 		{
 			return;
 		}
+		// Single-item moves still need WEAP subtype classification for transfer
+		// protection.
+		EnsureItemTypeCache();
 
 		std::vector<InventoryFormTransferRequest> requests;
 		if (src->IsPlayerRef())
@@ -882,7 +885,7 @@ namespace papyrus_lootman
 							continue;
 						}
 
-						const auto protectedCount = GetPlayerProtectedStackCount(
+						const auto protectedCount = GetPlayerTransferProtectedStackCount(
 							object,
 							*stack,
 							stackInfo,
