@@ -51,7 +51,7 @@ namespace papyrus_lootman
 
 		const auto moved = [&]()
 		{
-			if (dest->IsPlayerRef())
+			if (player && player->IsPlayerRef())
 			{
 				PlayerCharacter::ScopedInventoryChangeMessageContext context(true, false);
 				return TryAddWorldReferenceToContainerSafe(dest, ref, worldCount);
@@ -171,20 +171,32 @@ namespace papyrus_lootman
 		if (movedCount > 0 && dest != player)
 		{
 			auto remaining = movedCount;
-			while (remaining > 0)
+			auto moveActivatedAmmo = [&]()
 			{
-				const auto chunk = std::min<std::int32_t>(remaining, 65535);
-				if (!TryMoveInventoryItemSafe(player, dest, object, chunk))
+				while (remaining > 0)
 				{
-					REX::WARN(
-						"LootNearbyEnabledReferences: deferred activation transfer failed, player={:08X}, dest={:08X}, item={:08X}, remaining={}",
-						player->formID,
-						dest->formID,
-						object->formID,
-						remaining);
-					break;
+					const auto chunk = std::min<std::int32_t>(remaining, 65535);
+					if (!TryMoveInventoryItemSafe(player, dest, object, chunk))
+					{
+						REX::WARN(
+							"LootNearbyEnabledReferences: deferred activation transfer failed, player={:08X}, dest={:08X}, item={:08X}, remaining={}",
+							player->formID,
+							dest->formID,
+							object->formID,
+							remaining);
+						break;
+					}
+					remaining -= chunk;
 				}
-				remaining -= chunk;
+			};
+			if (player->IsPlayerRef())
+			{
+				PlayerCharacter::ScopedInventoryChangeMessageContext context(true, false);
+				moveActivatedAmmo();
+			}
+			else
+			{
+				moveActivatedAmmo();
 			}
 			movedCount -= remaining;
 		}
