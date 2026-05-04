@@ -293,8 +293,97 @@ namespace papyrus_lootman
 		return true;
 	}
 
+	// Container animations call Activate; trap setups may keep activation/link
+	// metadata on nearby refs instead of the container itself.
+	inline constexpr float kNearbyContainerTrapProbeRadius = 768.0F;
+	inline constexpr float kNearbyContainerTrapProbeRadiusSq =
+		kNearbyContainerTrapProbeRadius * kNearbyContainerTrapProbeRadius;
+
+	bool HasActivationOrLinkSideEffectExtras(TESObjectREFR* ref)
+	{
+		auto* extraList = ref ? ref->extraList.get() : nullptr;
+		return extraList &&
+		       (extraList->HasType(EXTRA_DATA_TYPE::kActivateRef) ||
+		        extraList->HasType(EXTRA_DATA_TYPE::kActivateRefChildren) ||
+		        extraList->HasType(EXTRA_DATA_TYPE::kOpenCloseActivateRef) ||
+		        extraList->HasType(EXTRA_DATA_TYPE::kLinkedRef) ||
+		        extraList->HasType(EXTRA_DATA_TYPE::kLinkedRefChildren));
+	}
+
+	bool HasNearbyActivationOrLinkSideEffectRef(TESObjectREFR* ref)
+	{
+		auto* cell = ref ? ref->GetParentCell() : nullptr;
+		if (!cell || cell->cellState != TESObjectCELL::CELL_STATE::kAttached)
+		{
+			return false;
+		}
+
+		const auto origin = ref->GetPosition();
+		std::uint32_t nearbyFormId = 0;
+		std::uint32_t nearbyBaseFormId = 0;
+		float nearbyDistanceSq = 0.0F;
+		{
+			BSAutoLock guard(cell->spinLock);
+			for (auto& objPtr : cell->references)
+			{
+				auto* other = objPtr.get();
+				if (!other || other == ref || !CheckPrecondition(other))
+				{
+					continue;
+				}
+
+				const auto pos = other->GetPosition();
+				const auto dx = origin.x - pos.x;
+				const auto dy = origin.y - pos.y;
+				const auto dz = origin.z - pos.z;
+				const auto distanceSq = dx * dx + dy * dy + dz * dz;
+				if (distanceSq > kNearbyContainerTrapProbeRadiusSq)
+				{
+					continue;
+				}
+
+				auto* otherBase = other->GetObjectReference();
+				if (otherBase && otherBase->GetFormType() == ENUM_FORM_ID::kCONT)
+				{
+					continue;
+				}
+				if (!HasActivationOrLinkSideEffectExtras(other))
+				{
+					continue;
+				}
+
+				nearbyFormId = other->formID;
+				nearbyBaseFormId = otherBase ? otherBase->formID : 0;
+				nearbyDistanceSq = distanceSq;
+				break;
+			}
+		}
+
+		if (nearbyFormId == 0)
+		{
+			return false;
+		}
+
+		REX::DEBUG(
+			"Skip container animation for ref={:08X}: nearby activation/link ref={:08X}, base={:08X}, distanceSq={}",
+			ref->formID,
+			nearbyFormId,
+			nearbyBaseFormId,
+			nearbyDistanceSq);
+		return true;
+	}
+
 	bool IsContainerAnimationCandidate(TESObjectREFR* ref)
 	{
-		return ref && ref->GetFullyLoaded3D() != nullptr;
+		if (!ref || ref->GetFullyLoaded3D() == nullptr)
+		{
+			return false;
+		}
+		if (HasActivationOrLinkSideEffectExtras(ref))
+		{
+			REX::DEBUG("Skip container animation for ref={:08X}: activation/link extras on container", ref->formID);
+			return false;
+		}
+		return !HasNearbyActivationOrLinkSideEffectRef(ref);
 	}
 }
