@@ -1,22 +1,19 @@
 Scriptname LTMN2:System extends Quest
 
-; Get an instance of this quest
+; Quest singleton form fixed by LootMan.esp.
 LTMN2:System Function GetInstance() global
     Return Game.GetFormFromFile(0x000F99, "LootMan.esp") As LTMN2:System
 EndFunction
 
-; Get mod version string
+; Format MOD_VERSION-style integers as major.minor.patch.
 string Function GetVersionString(int version) global debugOnly
     Return (version / 10000) + "." + (version / 100 % 100) + "." + (version % 100)
 EndFunction
 
-; Version as int.
-; syntax: Major{1}.Minor{2}.Patch{2}
-; example: 10234 // 1.2.34
-; current: 3.0.0
+; Version encoding: Major{1}.Minor{2}.Patch{2}; 10234 is 1.2.34.
 int MOD_VERSION = 30000 const
 
-; Timer id list
+; Timer IDs consumed by OnTimer.
 int TIMER_INSTALL = 1 const
 int TIMER_INITIALIZE = 2 const
 int TIMER_UPDATE = 3 const
@@ -43,7 +40,7 @@ int LOG_LEVEL_DEBUG = 1 const
 int LOG_LEVEL_INFO = 2 const
 
 Group MessageId
-    ; Message id
+    ; Quest objective message IDs.
     int property MESSAGE_INSTALLED = 1 autoreadonly hidden
     int property MESSAGE_UNINSTALLED = 2 autoreadonly hidden
     int property MESSAGE_ENABLED = 3 autoreadonly hidden
@@ -58,7 +55,7 @@ Group MessageId
 EndGroup
 
 Group WorkerManager
-    ; Looting worker manager
+    ; Legacy workers are stopped during load, initialize, and uninstall.
     Quest property WorkerManagerACTI auto const mandatory
     Quest property WorkerManagerALCH auto const mandatory
     Quest property WorkerManagerAMMO auto const mandatory
@@ -74,11 +71,10 @@ Group WorkerManager
 EndGroup
 
 Group Status
-    ; LootMan version, used to patch when mods are updated.
+    ; Save-version marker for migrations.
     int property CurrentModVersion = 0 auto hidden
 EndGroup
 
-; Local variables
 Actor player
 LTMN2:Properties properties
 int[] messageDisplayCount
@@ -93,7 +89,12 @@ string Function FormField(string name, Form target)
     Return name + "=" + LTMN2:LootMan.GetHexID(target)
 EndFunction
 
-; LootMan's system initialization
+; Keep registration diagnostics as stable key=value fields for log search.
+Function LogWorkshopRegistrationEvent(string role, WorkshopScript workshop, Location workshopLocation, string outcome, string reason, string workshopAction = "none", string locationAction = "none", int workshopIndexBefore = -1, int locationIndexBefore = -1, int workshopIndexAfter = -1, int locationIndexAfter = -1)
+    LogSystemEvent("workshop_registration", "workflow=workshop_supply_link operation=ensure_workshop_registered role=" + role + " outcome=" + outcome + " reason=" + reason + " workshop_action=" + workshopAction + " location_action=" + locationAction + " " + FormField("workshop", workshop) + " " + FormField("location", workshopLocation) + " workshop_index_before=" + workshopIndexBefore + " location_index_before=" + locationIndexBefore + " workshop_index_after=" + workshopIndexAfter + " location_index_after=" + locationIndexAfter, LOG_LEVEL_DEBUG)
+EndFunction
+
+; First quest init sets the save marker and schedules install.
 Event OnInit()
     LogSystemEvent("first_run", "version=" + GetVersionString(MOD_VERSION))
 
@@ -109,11 +110,11 @@ Event OnInit()
     StartTimer(5, TIMER_INSTALL)
 EndEvent
 
-; Process called when saved data is loaded
+; Reload transient state after a save load.
 Event Actor.OnPlayerLoadGame(Actor akSender)
     LogSystemEvent("load", "version=" + GetVersionString(MOD_VERSION) + " current_version=" + GetVersionString(CurrentModVersion))
 
-    ; Reset properties that need to be reset each load
+    ; Force runtime setup to run again after load.
     properties.IsInitialized = false
     properties.IsNotInitialized = true
 
@@ -125,7 +126,7 @@ Event Actor.OnPlayerLoadGame(Actor akSender)
     messageDisplayCount = new int[MESSAGE_COUNT]
     lastMessageDisplayTime = new float[MESSAGE_COUNT]
 
-    ; Apply the patches if the save data and the Mod version of the esp do not match due to the LootMan update.
+    ; Run migrations when the saved script version differs from the ESP version.
     If (CurrentModVersion != MOD_VERSION)
         Patch()
     EndIf
@@ -137,7 +138,7 @@ Event Actor.OnPlayerLoadGame(Actor akSender)
     EndIf
 EndEvent
 
-; An event that register to player. Process that should be performed when location is changed.
+; Refresh settlement state and optional workshop links after player travel.
 Event Actor.OnLocationChange(Actor akSender, Location akOldLoc, Location akNewLoc)
     string prefix = "source=papyrus component=system event=location_change"
 
@@ -196,7 +197,7 @@ bool Function LinkWorkshop(WorkshopScript workshop, string prefix)
     bool lootManRegistered = EnsureWorkshopRegistered(properties.LootManWorkshopRef, prefix, "LootMan")
     bool targetRegistered = EnsureWorkshopRegistered(workshop, prefix, "Target")
     If (!lootManRegistered || !targetRegistered)
-        DiagnosticLog(prefix + "      [ Location link can be created, but workshop material sharing may not use this link ]")
+        LogSystemEvent("workshop_supply_link_registration_incomplete", "workflow=workshop_supply_link operation=link_workshop outcome=degraded reason=registration_incomplete lootman_registered=" + lootManRegistered + " target_registered=" + targetRegistered + " " + FormField("lootman_workshop", properties.LootManWorkshopRef) + " " + FormField("target_workshop", workshop), LOG_LEVEL_INFO)
     EndIf
 
     Location workshopLocation = workshop.myLocation
@@ -210,47 +211,39 @@ bool Function LinkWorkshop(WorkshopScript workshop, string prefix)
     Return linked
 EndFunction
 
-Function LogWorkshopDiagnostics(WorkshopScript workshop, string prefix, string label)
-    ; Investigation-only diagnostics. Keep empty for release builds; restore
-    ; workshop/ref/inventory logging here only while debugging workshop links.
-EndFunction
-
-Function DiagnosticLog(string msg)
-    ; Investigation-only diagnostics. Keep empty for release builds; restore
-    ; LTMN2:LootMan.Log(msg) here only while debugging workshop links.
-EndFunction
-
 bool Function EnsureWorkshopRegistered(WorkshopScript workshop, string prefix, string label)
     If (!workshop)
-        DiagnosticLog(prefix + "      " + label + " workshop is missing")
+        LogWorkshopRegistrationEvent(label, None, None, "failed", "missing_workshop")
         Return false
     EndIf
 
     If (!workshop.myLocation)
         workshop.myLocation = workshop.GetCurrentLocation()
     EndIf
-    If (!workshop.myLocation)
-        DiagnosticLog(prefix + "      " + label + " workshop location is missing")
+    Location workshopLocation = workshop.myLocation
+    If (!workshopLocation)
+        LogWorkshopRegistrationEvent(label, workshop, None, "failed", "missing_location")
         Return false
     EndIf
 
     int workshopIndex = properties.WorkshopParent.Workshops.Find(workshop)
-    int locationIndex = properties.WorkshopParent.WorkshopLocations.Find(workshop.myLocation)
-    bool allowCaravan = workshop.myLocation && workshop.myLocation.HasKeyword(properties.WorkshopParent.WorkshopAllowCaravan)
-
-    DiagnosticLog(prefix + "      " + label + " workshop index: " + workshopIndex)
-    DiagnosticLog(prefix + "      " + label + " workshop location index: " + locationIndex)
-    DiagnosticLog(prefix + "      " + label + " workshop allows caravan: " + allowCaravan)
+    int locationIndex = properties.WorkshopParent.WorkshopLocations.Find(workshopLocation)
+    int workshopIndexBefore = workshopIndex
+    int locationIndexBefore = locationIndex
 
     If (workshopIndex >= 0 && locationIndex >= 0)
+        LogWorkshopRegistrationEvent(label, workshop, workshopLocation, "ready", "already_registered", "existing", "existing", workshopIndexBefore, locationIndexBefore, workshopIndex, locationIndex)
         Return true
     EndIf
 
+    string workshopAction = "existing"
+    string locationAction = "existing"
+
     If (workshopIndex < 0)
-        DiagnosticLog(prefix + "      [ Register " + label + " workshop in WorkshopParent ]")
         properties.WorkshopParent.Workshops.Add(workshop)
         workshopIndex = properties.WorkshopParent.Workshops.Length - 1
         workshop.InitWorkshopID(workshopIndex)
+        workshopAction = "added"
     EndIf
 
     If (locationIndex < 0 && workshopIndex >= 0)
@@ -259,22 +252,22 @@ bool Function EnsureWorkshopRegistered(WorkshopScript workshop, string prefix, s
         EndWhile
 
         If (properties.WorkshopParent.WorkshopLocations.Length == workshopIndex)
-            properties.WorkshopParent.WorkshopLocations.Add(workshop.myLocation)
+            properties.WorkshopParent.WorkshopLocations.Add(workshopLocation)
+            locationAction = "added"
         Else
-            properties.WorkshopParent.WorkshopLocations[workshopIndex] = workshop.myLocation
+            properties.WorkshopParent.WorkshopLocations[workshopIndex] = workshopLocation
+            locationAction = "updated"
         EndIf
 
-        locationIndex = properties.WorkshopParent.WorkshopLocations.Find(workshop.myLocation)
+        locationIndex = properties.WorkshopParent.WorkshopLocations.Find(workshopLocation)
     EndIf
 
-    DiagnosticLog(prefix + "      " + label + " workshop index after registration: " + workshopIndex)
-    DiagnosticLog(prefix + "      " + label + " workshop location index after registration: " + locationIndex)
-
     If (workshopIndex < 0 || locationIndex < 0)
-        DiagnosticLog(prefix + "      [ Failed to register " + label + " workshop ]")
+        LogWorkshopRegistrationEvent(label, workshop, workshopLocation, "failed", "index_missing_after_registration", workshopAction, locationAction, workshopIndexBefore, locationIndexBefore, workshopIndex, locationIndex)
         Return false
     EndIf
 
+    LogWorkshopRegistrationEvent(label, workshop, workshopLocation, "ready", "registered", workshopAction, locationAction, workshopIndexBefore, locationIndexBefore, workshopIndex, locationIndex)
     Return true
 EndFunction
 
@@ -289,8 +282,6 @@ Location Function GetLootManWorkshopLocation(string prefix)
     EndIf
 
     Location workshopLocation = lootManWorkshop.myLocation
-    DiagnosticLog(prefix + "      LootMan configured location: " + LTMN2:LootMan.GetName(properties.LootManLocation))
-    DiagnosticLog(prefix + "      LootMan registered location: " + LTMN2:LootMan.GetName(workshopLocation))
 
     If (workshopLocation)
         Return workshopLocation
@@ -324,11 +315,8 @@ bool Function LinkWorkshopLocation(Location workshopLocation, string prefix)
 
     bool linkedToRegisteredLocation = workshopLocation.IsLinkedLocation(lootManWorkshopLocation, properties.WorkshopCaravan)
     bool linkedToConfiguredLocation = properties.LootManLocation != None && workshopLocation.IsLinkedLocation(properties.LootManLocation, properties.WorkshopCaravan)
-    DiagnosticLog(prefix + "      Linked to LootMan registered location: " + linkedToRegisteredLocation)
-    DiagnosticLog(prefix + "      Linked to LootMan configured location: " + linkedToConfiguredLocation)
 
     If (!linkedToRegisteredLocation)
-        DiagnosticLog(prefix + "      [ Added link to LootMan ]")
         workshopLocation.AddLinkedLocation(lootManWorkshopLocation, properties.WorkshopCaravan)
         If (linkedToConfiguredLocation && properties.LootManLocation != lootManWorkshopLocation)
             workshopLocation.RemoveLinkedLocation(properties.LootManLocation, properties.WorkshopCaravan)
@@ -347,20 +335,17 @@ bool Function UnlinkWorkshopLocation(Location workshopLocation, string prefix)
     bool removed = false
     Location lootManWorkshopLocation = GetLootManWorkshopLocation(prefix)
     If (lootManWorkshopLocation && workshopLocation.IsLinkedLocation(lootManWorkshopLocation, properties.WorkshopCaravan))
-        DiagnosticLog(prefix + "      [ Removed link with LootMan registered location ]")
         workshopLocation.RemoveLinkedLocation(lootManWorkshopLocation, properties.WorkshopCaravan)
         removed = true
     EndIf
 
     If (properties.LootManLocation != None && properties.LootManLocation != lootManWorkshopLocation && workshopLocation.IsLinkedLocation(properties.LootManLocation, properties.WorkshopCaravan))
-        DiagnosticLog(prefix + "      [ Removed link with LootMan configured location ]")
         workshopLocation.RemoveLinkedLocation(properties.LootManLocation, properties.WorkshopCaravan)
         removed = true
     EndIf
 
     If (removed)
         LTMN2:LootMan.ForgetWorkshopSupplyLink(workshopLocation, prefix)
-        DiagnosticLog(prefix + "      [ Skipped immediate workshop resource recalculation after removing runtime workshop link ]")
         Return true
     EndIf
 
@@ -381,9 +366,8 @@ bool Function UnlinkAutoLinkedWorkshopLocation(string prefix)
     Return false
 EndFunction
 
-; Called when a specific item is added to LootMan's inventory. The item is moved to the workbench in an appropriate manner so that it does not cause a glitch.
 Event ObjectReference.OnItemAdded(ObjectReference akSender, Form akBaseItem, int aiItemCount, ObjectReference akItemReference, ObjectReference akSourceContainer)
-    ; Shipment will be lost if it is moved to the Wrokshop container using RemoveItem, so add it using AddItem.
+    ; Shipments lose their payload when moved to the Workshop container via RemoveItem.
     If (properties.ShipmentItemList.HasForm(akBaseItem))
         LogSystemEvent("shipment_delivered", FormField("item", akBaseItem) + " count=" + aiItemCount)
         akSender.RemoveItem(akBaseItem, aiItemCount, true)
@@ -409,7 +393,7 @@ Event OnTimer(int aiTimerId)
     EndIf
 EndEvent
 
-; Check if LootMan can be installed.
+; Install waits for either the Pip-Boy or Institute Radio state.
 bool Function CanInstall()
     bool hasPipboy = player.GetItemCount(properties.Pipboy) > 0
     bool radioRunning = properties.RadioInstitute.IsRunning()
@@ -423,7 +407,7 @@ bool Function CanInstall()
     EndIf
 EndFunction
 
-; Perform LootMan installation.
+; Register events and start initialization after the install gate passes.
 Function Install()
     If (properties.IsInstalled)
         LogSystemEvent("install_skipped", "reason=already_installed", LOG_LEVEL_DEBUG)
@@ -452,7 +436,7 @@ Function Install()
     LogSystemEvent("install_completed", "native_looting_scheduler=true")
 EndFunction
 
-; Uninstall LootMan
+; Return stored items and stop quest-owned runtime state.
 Function Uninstall()
     If (properties.IsNotInstalled)
         LogSystemEvent("uninstall_skipped", "reason=not_installed", LOG_LEVEL_DEBUG)
@@ -496,6 +480,7 @@ Function Uninstall()
     self.Stop()
 EndFunction
 
+; Old saves may still have worker quests running after native looting took over.
 Function StopLegacyWorkerManagers()
     If (WorkerManagerACTI)
         WorkerManagerACTI.Stop()
@@ -548,7 +533,7 @@ Function StopLegacyWorkerManagers()
     properties.ActiveWorkerThreadsWEAP = 0
 EndFunction
 
-; Initialize LootMan
+; Initialize runtime hooks after install or save load.
 Function Initialize()
     If (properties.IsNotInstalled)
         LogSystemEvent("initialize_skipped", "reason=not_installed", LOG_LEVEL_DEBUG)
@@ -582,12 +567,12 @@ Function Initialize()
     LogSystemEvent("initialize_completed", "worker_interval=" + properties.WorkerInvokeInterval)
 EndFunction
 
-; Apply patches for migration
+; Apply save migrations up to MOD_VERSION.
 Function Patch()
     int fromVersion = CurrentModVersion
     LogSystemEvent("patch_started", "from_version=" + GetVersionString(fromVersion) + " to_version=" + GetVersionString(MOD_VERSION))
 
-    ; Apply the patches if the save data and the Mod version of the esp do not match due to the LootMan update.
+    ; Patch order is cumulative.
     If (CurrentModVersion < 20001)
         LTMN2:Patch.v2_0_1()
     EndIf
@@ -600,7 +585,7 @@ Function Patch()
     LogSystemEvent("patch_completed", "from_version=" + GetVersionString(fromVersion) + " current_version=" + GetVersionString(CurrentModVersion))
 EndFunction
 
-; Update LootMan status
+; Deliver queued loot, refresh carry state, and expire message throttles.
 Function Update()
     If (properties.IsNotInstalled)
         Return
@@ -734,7 +719,7 @@ Function ResetLootingTimer()
     EndIf
 EndFunction
 
-; Display the message set in Quest Objectives
+; Throttle quest-objective messages to avoid repeated HUD spam.
 Function ShowMessage(int messageId, float interval = 30.0, int maxDisplayCount = 3)
     If (properties.IsNotInstalled || properties.IsNotInitialized || properties.IsUninstalled)
         Return

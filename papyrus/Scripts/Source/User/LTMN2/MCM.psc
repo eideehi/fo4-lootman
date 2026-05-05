@@ -1,7 +1,7 @@
 Scriptname LTMN2:MCM extends Quest
-{A class that collectively defines functions called from the MCM menu.}
+{Handles Mod Configuration Menu callbacks and utility actions.}
 
-; Get an instance of this quest.
+; Quest singleton form fixed by LootMan.esp.
 LTMN2:MCM Function GetInstance() global
     Return Game.GetFormFromFile(0x000F9B, "LootMan.esp") As LTMN2:MCM
 EndFunction
@@ -47,7 +47,6 @@ EndGroup
 int LOG_LEVEL_DEBUG = 1 const
 int LOG_LEVEL_INFO = 2 const
 
-; Local variables
 Actor player
 LTMN2:Properties properties
 LTMN2:System system
@@ -83,7 +82,7 @@ Event OnTimer(int aiTimerId)
 EndEvent
 
 Function Initialize()
-    ; Reset properties that need to be reset each load
+    ; Mirror native log level and reset utility state on load.
     SetUtilityBusy(false)
     LogLevel = LTMN2:LootMan.GetLogLevel()
 
@@ -350,7 +349,6 @@ Function ToggleLinkToWorkshop()
         EndIf
 
         If (system.IsWorkshopLinkedToLootMan(workshopLocation, prefix))
-            system.LogWorkshopDiagnostics(workshop, prefix, "MCM current")
             system.UnlinkWorkshopLocation(workshopLocation, prefix)
             system.ShowMessage(system.MESSAGE_UNLINKED_TO_WORKSHOP)
             LogMcmEvent("workshop_unlinked", FormField("workshop", workshop) + " " + FormField("location", workshopLocation) + " reason=manual_toggle")
