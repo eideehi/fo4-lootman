@@ -7,7 +7,16 @@ LTMN2:Properties property properties auto hidden
 
 bool threadRunning = false
 
-string processId = "0000000000"
+int LOG_LEVEL_DEBUG = 1 const
+int LOG_LEVEL_INFO = 2 const
+
+Function LogWorkerEvent(string eventName, string fields = "", int logLevel = 1)
+    LTMN2:LootMan.LogEvent("looting_worker", eventName, fields, logLevel)
+EndFunction
+
+string Function GetThreadField() debugOnly
+    Return "thread=" + GetThreadId()
+EndFunction
 
 Event OnInit()
     player = Game.GetPlayer()
@@ -15,13 +24,13 @@ Event OnInit()
 EndEvent
 
 Event OnQuestInit()
-    LTMN2:Debug.Log("| Looting Worker @ " + GetThreadId() + " | ---------- | Worker started")
+    LogWorkerEvent("started", GetThreadField())
     RegisterForCustomEvent(self, "CallLooting")
 EndEvent
 
 Event OnQuestShutdown()
     UnregisterForCustomEvent(self, "CallLooting")
-    LTMN2:Debug.Log("| Looting Worker @ " + GetThreadId() + " | ---------- | Worker shutdown")
+    LogWorkerEvent("shutdown", GetThreadField())
 EndEvent
 
 ; If the looting is possible, the looting process is called
@@ -30,7 +39,6 @@ Event LTMN2:Looting:Worker:WorkerBase.CallLooting(LTMN2:Looting:Worker:WorkerBas
         IncreaseActiveThreadCount()
         threadRunning = true
 
-        processId = LTMN2:Debug.GetRandomProcessId()
         Looting()
 
         threadRunning = false
@@ -39,7 +47,7 @@ Event LTMN2:Looting:Worker:WorkerBase.CallLooting(LTMN2:Looting:Worker:WorkerBas
 EndEvent
 
 Function Initialize()
-    LTMN2:Debug.Log("| Looting Worker @ " + GetThreadId() + " | ---------- | Initialize worker")
+    LogWorkerEvent("initialized", GetThreadField())
     threadRunning = false
 EndFunction
 
@@ -56,14 +64,14 @@ Function Looting()
         Return
     EndIf
 
-    string prefix = GetLogPrefix()
     int formType = GetFormTypeOfAssignment()
-    LTMN2:Debug.Log(prefix + "[ Start looting ]")
+    LogWorkerEvent("pass_started", GetThreadField() + " form_type=" + formType)
 
     int refCount = LTMN2:LootMan.LootNearbyReferences(player, properties.LootManRef, properties.ActivatorRef, properties.LootManWorkshopRef, formType, properties.LootableInventoryItemType, properties.PlayPickupSound, properties.PlayContainerAnimation, properties.UnlockLockedContainer, properties.BobbyPin, properties.Locksmith01, properties.Locksmith02, properties.Locksmith03, properties.Locksmith04)
 
     If (properties.WorkerInvokeInterval > 0 && refCount >= properties.MaxItemsProcessedPerThread)
         SetTurboMode()
+        LogWorkerEvent("turbo_enabled", GetThreadField() + " form_type=" + formType + " processed=" + refCount + " max_per_thread=" + properties.MaxItemsProcessedPerThread, LOG_LEVEL_INFO)
     EndIf
 EndFunction
 
@@ -89,8 +97,6 @@ Function LootObject(ObjectReference ref)
         Return
     EndIf
 
-    string prefix = GetLogPrefix(2)
-    LTMN2:Debug.Log(prefix + "Loot: [ Name: " + ref.GetDisplayName() + ", Id: " + LTMN2:Debug.GetHexID(ref) + " ]")
     Form baseForm = ref.GetBaseObject()
     int beforeCount = 0
     If (baseForm)
@@ -111,31 +117,7 @@ Function LootObject(ObjectReference ref)
     EndIf
 EndFunction
 
-; Return the process id to be output to the log
-string Function GetProcessId() debugOnly
-    Return processId
-EndFunction
-
 ; Return the thread identifier to be output to the log. Override it in the worker's script
 string Function GetThreadId() debugOnly
     Return "UNKNOWN"
-EndFunction
-
-string Function GetLogPrefix(int indent = 0) debugOnly
-    string indentString = ""
-    While indent
-        indent -= 1
-        indentString += "  "
-    EndWhile
-    return ("| Looting Worker @ " + GetThreadID() + " | " + GetProcessId() + " | " + indentString)
-EndFunction
-
-; Output the trace log of an object
-Function TraceObject(string logPrefix, ObjectReference ref) debugOnly
-    LTMN2:Debug.TraceObject(logPrefix, ref)
-EndFunction
-
-; Output the trace log of a form
-Function TraceForm(string logPrefix, Form baseForm) debugOnly
-    LTMN2:Debug.TraceForm(logPrefix, baseForm)
 EndFunction

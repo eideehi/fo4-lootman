@@ -43,6 +43,21 @@ export async function deployPex(
 	}
 }
 
+export async function pruneStaleCachedPex(
+	cacheDir: string,
+	validScripts: Record<string, string>,
+): Promise<void> {
+	if (!fs.existsSync(cacheDir)) return;
+
+	const pexFiles = await glob("**/*.pex", { cwd: cacheDir });
+	for (const file of pexFiles) {
+		const scriptName = toScriptName(file);
+		if (!Object.hasOwn(validScripts, scriptName)) {
+			fs.removeSync(path.join(cacheDir, file));
+		}
+	}
+}
+
 export interface CompilePapyrusOpts {
 	execaFn?: typeof execa;
 	mode?: BuildMode;
@@ -264,6 +279,8 @@ export async function compilePapyrus(config: Config, opts?: CompilePapyrusOpts):
 			scriptsToCompile.add(scriptName);
 		}
 	}
+
+	await pruneStaleCachedPex(modeCacheDir, newHashes);
 
 	// If cache artifacts are missing, recompile those scripts even when hashes match.
 	const cachedScriptNames = new Set<string>();

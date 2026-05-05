@@ -28,17 +28,7 @@ Function LootObject(ObjectReference ref)
         Return
     EndIf
 
-    string prefix = GetLogPrefix(2)
-    LTMN2:Debug.Log(prefix + "Loot: [ Name: \"" + ref.GetDisplayName() + "\", Id: " + LTMN2:Debug.GetHexID(ref) + " ]")
-    int beforeCount = ref.GetItemCount()
-    LTMN2:Debug.Log(prefix + "  Inventory status before looting: [ Item count: " + beforeCount + ", Total weight: " + ref.GetInventoryWeight() + " ]")
-    LTMN2:Debug.Log(prefix + "  [ Start looting ]")
-
     int itemCount = LTMN2:LootMan.TransferLootableInventoryItems(ref, properties.LootManRef, properties.LootableInventoryItemType)
-    LTMN2:Debug.Log(prefix + "    Total moved item stacks: " + itemCount)
-
-    int afterCount = ref.GetItemCount()
-    LTMN2:Debug.Log(prefix + "  Inventory status after looting: [ Item count: " + afterCount + ", Total weight: " + ref.GetInventoryWeight() + " ]")
 
     If (itemCount > 0)
         If (properties.PlayContainerAnimation && player.HasDetectionLoS(ref))
@@ -55,17 +45,9 @@ bool Function TryUnlock(ObjectReference ref, ObjectReference bobbyPinContainerRe
         Return false
     EndIf
 
-    string prefix = GetLogPrefix(2)
-
     If (!ref.IsLockBroken() && properties.UnlockLockedContainer)
-        LTMN2:Debug.Log(prefix + "[ Try to unlock ]")
-        LTMN2:Debug.Log(prefix + "  Container: [ Name: \"" + ref.GetDisplayName() + "\", Id: " + LTMN2:Debug.GetHexID(ref) + " ]")
-        LTMN2:Debug.Log(prefix + "  BobbyPinContainer: [ Name: \"" + bobbyPinContainerRef.GetDisplayName() + "\", Id: " + LTMN2:Debug.GetHexID(bobbyPinContainerRef) + " ]")
-
         int level = ref.GetLockLevel()
         int bobbyPinCount = bobbyPinContainerRef.GetItemCount(properties.BobbyPin)
-
-        LTMN2:Debug.Log(prefix + "  Lock level: " + level)
 
         int consumeCount = -1
         If (level == 100 && player.HasPerk(properties.Locksmith03))
@@ -82,8 +64,7 @@ bool Function TryUnlock(ObjectReference ref, ObjectReference bobbyPinContainerRe
             consumeCount = 0
         EndIf
 
-        LTMN2:Debug.Log(prefix + "  Number of bobby pins required: " + consumeCount)
-        LTMN2:Debug.Log(prefix + "  Bobby pin count: " + bobbyPinCount)
+        LogWorkerEvent("container_unlock_attempt", GetThreadField() + " ref=" + LTMN2:LootMan.GetHexID(ref) + " bobby_pin_owner=" + LTMN2:LootMan.GetHexID(bobbyPinContainerRef) + " lock_level=" + level + " required_pins=" + consumeCount + " available_pins=" + bobbyPinCount)
 
         If (consumeCount >= 0 && bobbyPinCount >= consumeCount)
             If (consumeCount > 0)
@@ -92,7 +73,7 @@ bool Function TryUnlock(ObjectReference ref, ObjectReference bobbyPinContainerRe
 
             ref.Unlock()
 
-            LTMN2:Debug.Log(prefix + "  [ Unlock successful ]")
+            LogWorkerEvent("container_unlock_succeeded", GetThreadField() + " ref=" + LTMN2:LootMan.GetHexID(ref) + " consumed_pins=" + consumeCount)
             Return true
         ElseIf (bobbyPinCount < consumeCount)
             LTMN2:System system = LTMN2:System.GetInstance()
@@ -100,7 +81,7 @@ bool Function TryUnlock(ObjectReference ref, ObjectReference bobbyPinContainerRe
         EndIf
     EndIf
 
-    LTMN2:Debug.Log(prefix + "  [ Unlock failure ]")
+    LogWorkerEvent("container_unlock_failed", GetThreadField() + " ref=" + LTMN2:LootMan.GetHexID(ref))
     Return false
 EndFunction
 
@@ -121,10 +102,4 @@ Function MakeActivatorFriend(ObjectReference ref)
     If (ownerAsActor && ownerAsActor.IsUnique())
         properties.ActivatorRef.SetRelationshipRank(ownerAsActor.GetUniqueActor(), 1)
     EndIf
-EndFunction
-
-Function TraceObject(string logPrefix, ObjectReference ref) debugOnly
-    LTMN2:Debug.TraceObject(logPrefix, ref)
-    LTMN2:Debug.Log(logPrefix + "  Is locked: " + ref.IsLocked())
-    LTMN2:Debug.Log(logPrefix + "  Is workshop: " + (ref Is WorkshopScript))
 EndFunction

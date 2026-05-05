@@ -12,6 +12,7 @@ import {
 	getResolvedRequiredPapyrusImports,
 	parseArgs,
 	prepareF4SEOverlay,
+	pruneStaleCachedPex,
 	resolveImportScriptPath,
 	toScriptName,
 	verifyPapyrusImportSymbols,
@@ -113,6 +114,19 @@ describe("compile-papyrus helpers", () => {
 
 		await deployPex(path.join(root, "missing"), outDir, {});
 		expect(fs.existsSync(outDir)).toBe(true);
+	});
+
+	it("pruneStaleCachedPex removes cached binaries without matching sources", async () => {
+		const root = createTempDir();
+		dirs.push(root);
+		const cacheDir = path.join(root, "cache");
+
+		fs.outputFileSync(path.join(cacheDir, "LTMN", "Test.pex"), "valid");
+		fs.outputFileSync(path.join(cacheDir, "LTMN", "Debug.pex"), "stale");
+		await pruneStaleCachedPex(cacheDir, { "ltmn:test": "hash" });
+
+		expect(fs.existsSync(path.join(cacheDir, "LTMN", "Test.pex"))).toBe(true);
+		expect(fs.existsSync(path.join(cacheDir, "LTMN", "Debug.pex"))).toBe(false);
 	});
 
 	it("resolveImportScriptPath prefers earlier import directory", () => {
@@ -257,11 +271,13 @@ describe("compilePapyrus", () => {
 		const execaFn = vi.fn().mockResolvedValue({ exitCode: 0, stdout: "compiled", stderr: "" });
 
 		fs.outputFileSync(path.join(modeCacheDir, "LTMN", "Test.pex"), "cached-binary");
+		fs.outputFileSync(path.join(modeCacheDir, "LTMN", "Debug.pex"), "stale-binary");
 		fs.outputJsonSync(hashesPath, { "ltmn:test": scriptHash });
 		await compilePapyrus(config, { mode: "product", execaFn });
 
 		expect(execaFn).not.toHaveBeenCalled();
 		expect(fs.readJsonSync(hashesPath)).toEqual({ "ltmn:test": scriptHash });
+		expect(fs.existsSync(path.join(modeCacheDir, "LTMN", "Debug.pex"))).toBe(false);
 	});
 
 	it("throws when compiler output reports failed scripts", async () => {

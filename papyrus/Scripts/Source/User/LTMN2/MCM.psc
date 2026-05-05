@@ -44,10 +44,21 @@ Group Status
     int property LogLevel = 2 auto hidden
 EndGroup
 
+int LOG_LEVEL_DEBUG = 1 const
+int LOG_LEVEL_INFO = 2 const
+
 ; Local variables
 Actor player
 LTMN2:Properties properties
 LTMN2:System system
+
+Function LogMcmEvent(string eventName, string fields = "", int logLevel = 2)
+    LTMN2:LootMan.LogEvent("mcm", eventName, fields, logLevel)
+EndFunction
+
+string Function FormField(string name, Form target)
+    Return name + "=" + LTMN2:LootMan.GetHexID(target)
+EndFunction
 
 Event OnInit()
     player = Game.GetPlayer()
@@ -84,24 +95,21 @@ Function OnMCMSettingChange(string modName, string id)
         Return
     EndIf
 
-    string prefix = ("| MCM | " + LTMN2:Debug.GetRandomProcessId() + " | ")
-    LTMN2:Debug.Log(prefix + "[ MCM settings have been changed: \"" + id + "\" ]")
+    string prefix = "source=papyrus component=mcm event=setting_changed id=" + id
+    LogMcmEvent("setting_changed", "id=" + id)
 
     If (id == "AutomaticallyLinkAndUnlinkToWorkshop")
-        LTMN2:Debug.Log(prefix + "  [ Adjust the link status between LootMan and the workshop because LootMan's configuration has been changed ]")
-        LTMN2:Debug.Log(prefix + "    Automatically link LootMan to workshops: " + properties.AutomaticallyLinkAndUnlinkToWorkshop)
-
         WorkshopScript workshop = LTMN2:Utils.GetCurrentWorkshop(player)
         Location workshopLocation = none
         If (workshop)
             workshopLocation = workshop.myLocation
         EndIf
 
-        LTMN2:Debug.Log(prefix + "    Workshop exists near the player: " + (workshop != none))
         If (workshop && workshop.OwnedByPlayer)
             If (properties.AutomaticallyLinkAndUnlinkToWorkshop)
                 If (system.LinkWorkshop(workshop, prefix))
                     system.ShowMessage(system.MESSAGE_LINKED_TO_WORKSHOP)
+                    LogMcmEvent("workshop_linked", "id=" + id + " " + FormField("workshop", workshop) + " " + FormField("location", workshop.myLocation))
                 EndIf
                 workshopLocation = workshop.myLocation
                 system.SetAutoLinkedWorkshopLocation(workshopLocation)
@@ -112,27 +120,23 @@ Function OnMCMSettingChange(string modName, string id)
                 EndIf
                 If (removedLink)
                     system.ShowMessage(system.MESSAGE_UNLINKED_TO_WORKSHOP)
+                    LogMcmEvent("workshop_unlinked", "id=" + id + " " + FormField("location", workshopLocation))
                 EndIf
             EndIf
         ElseIf (!properties.AutomaticallyLinkAndUnlinkToWorkshop)
             If (system.UnlinkAutoLinkedWorkshopLocation(prefix))
                 system.ShowMessage(system.MESSAGE_UNLINKED_TO_WORKSHOP)
+                LogMcmEvent("workshop_unlinked", "id=" + id + " reason=auto_link_disabled")
             Else
-                LTMN2:Debug.Log(prefix + "    [ No need to adjust the link status ]")
+                LogMcmEvent("workshop_link_unchanged", "id=" + id + " reason=no_auto_link", LOG_LEVEL_DEBUG)
             EndIf
         Else
-            LTMN2:Debug.Log(prefix + "    [ No need to adjust the link status ]")
+            LogMcmEvent("workshop_link_unchanged", "id=" + id + " workshop_nearby=" + (workshop != none), LOG_LEVEL_DEBUG)
         EndIf
 
     ElseIf (id == "NotLootingFromSettlement")
         Location currentLocation = player.GetCurrentLocation()
         WorkshopScript currentWorkshop = LTMN2:Utils.GetCurrentWorkshop(player)
-
-        LTMN2:Debug.Log(prefix + "  [ Adjust the flag whether you are staying in the settlement because LootMan's configuration has been changed ]")
-        LTMN2:Debug.Log(prefix + "    Not looting from settlement: " + properties.NotLootingFromSettlement)
-        LTMN2:Debug.Log(prefix + "    Current location is a settlement (LocTypeSettlement): " + currentLocation.HasKeyword(Game.GetCommonProperties().LocTypeSettlement))
-        LTMN2:Debug.Log(prefix + "    Current location is a settlement (LocTypeWorkshopSettlement): " + currentLocation.HasKeyword(Game.GetCommonProperties().LocTypeWorkshopSettlement))
-        LTMN2:Debug.Log(prefix + "    Workshop exists near the player: " + (currentWorkshop != None))
 
         If (currentLocation.HasKeyword(Game.GetCommonProperties().LocTypeSettlement) || currentLocation.HasKeyword(Game.GetCommonProperties().LocTypeWorkshopSettlement) || currentWorkshop != None)
             properties.IsInSettlement = true
@@ -140,7 +144,7 @@ Function OnMCMSettingChange(string modName, string id)
             properties.IsInSettlement = false
         EndIf
 
-        LTMN2:Debug.Log(prefix + "    [ Player is in the settlement: " + properties.IsInSettlement + " ]")
+        LogMcmEvent("settlement_state_changed", "id=" + id + " " + FormField("location", currentLocation) + " workshop_nearby=" + (currentWorkshop != None) + " in_settlement=" + properties.IsInSettlement)
 
     ElseIf (id == "WorkerInvokeInterval")
         system.ResetLootingTimer()
@@ -336,7 +340,7 @@ Function ToggleLinkToWorkshop()
         Return
     EndIf
 
-    string prefix = ("| MCM | " + LTMN2:Debug.GetRandomProcessId() + " | ")
+    string prefix = "source=papyrus component=mcm event=workshop_link_toggle"
     WorkshopScript workshop = LTMN2:Utils.GetCurrentWorkshop(player)
     If (workshop)
         Location workshopLocation = workshop.myLocation
@@ -349,13 +353,16 @@ Function ToggleLinkToWorkshop()
             system.LogWorkshopDiagnostics(workshop, prefix, "MCM current")
             system.UnlinkWorkshopLocation(workshopLocation, prefix)
             system.ShowMessage(system.MESSAGE_UNLINKED_TO_WORKSHOP)
+            LogMcmEvent("workshop_unlinked", FormField("workshop", workshop) + " " + FormField("location", workshopLocation) + " reason=manual_toggle")
         Else
             If (system.LinkWorkshop(workshop, prefix))
                 system.ShowMessage(system.MESSAGE_LINKED_TO_WORKSHOP)
+                LogMcmEvent("workshop_linked", FormField("workshop", workshop) + " " + FormField("location", workshop.myLocation) + " reason=manual_toggle")
             EndIf
         EndIf
     Else
         system.ShowMessage(system.MESSAGE_WORKSHOP_NOT_FOUND)
+        LogMcmEvent("workshop_link_failed", "reason=no_workshop", LOG_LEVEL_DEBUG)
     EndIf
 EndFunction
 

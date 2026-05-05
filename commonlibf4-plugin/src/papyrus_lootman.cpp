@@ -27,6 +27,8 @@ namespace papyrus_lootman
 			&GetFormType, true, false);
 		vm->BindNativeMethod("LTMN2:LootMan"sv, "Log"sv,
 			&Log, false, false);
+		vm->BindNativeMethod("LTMN2:LootMan"sv, "LogEvent"sv,
+			&LogEvent, false, false);
 		vm->BindNativeMethod("LTMN2:LootMan"sv, "GetLogLevel"sv,
 			&GetLogLevel, true, false);
 		vm->BindNativeMethod("LTMN2:LootMan"sv, "SetLogLevel"sv,

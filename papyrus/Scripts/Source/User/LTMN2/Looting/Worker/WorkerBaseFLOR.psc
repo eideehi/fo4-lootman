@@ -25,8 +25,6 @@ Function LootObject(ObjectReference ref)
         Return
     EndIf
 
-    string prefix = GetLogPrefix(2)
-    LTMN2:Debug.Log(prefix + "Loot: [ Name: \"" + ref.GetDisplayName() + "\", Id: " + LTMN2:Debug.GetHexID(ref) + " ]")
     If (ref.Activate(properties.LootManRef) && properties.PlayPickupSound)
         LTMN2:LootMan.PlayPickUpSound(player, ref)
     EndIf

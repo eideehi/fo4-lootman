@@ -535,6 +535,12 @@ namespace papyrus_lootman
 		std::monostate, RE::GameScript::RefrOrInventoryObj inventoryItem);
 	std::uint32_t GetFormType(std::monostate, RE::TESForm* form);
 	void Log(std::monostate, RE::BSFixedString message);
+	void LogEvent(
+		std::monostate,
+		RE::BSFixedString component,
+		RE::BSFixedString eventName,
+		RE::BSFixedString fields,
+		std::int32_t logLevel);
 	std::int32_t GetLogLevel(std::monostate);
 	void SetLogLevel(std::monostate, std::int32_t logLevel);
 	std::string GetFormTypeIdentifier(std::monostate, RE::TESForm* form);

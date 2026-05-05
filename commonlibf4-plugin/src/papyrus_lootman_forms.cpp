@@ -1,5 +1,6 @@
 #include "papyrus_lootman_internal.h"
 
+#include <cctype>
 #include <cstdint>
 #include <cstdio>
 #include <string>
@@ -11,11 +12,122 @@ namespace papyrus_lootman
 {
 	using namespace RE;
 
+	constexpr std::int32_t kDefaultPapyrusLogLevel = static_cast<std::int32_t>(spdlog::level::info);
+	constexpr std::int32_t kMinPapyrusLogLevel = static_cast<std::int32_t>(spdlog::level::trace);
+	constexpr std::int32_t kMaxPapyrusLogLevel = static_cast<std::int32_t>(spdlog::level::off);
+
 	const char* GetFormEditorIDOrEmpty(const TESForm* form)
 	{
 		auto* mutableForm = const_cast<TESForm*>(form);
 		auto* editorID = mutableForm ? mutableForm->GetFormEditorID() : nullptr;
 		return editorID ? editorID : "";
+	}
+
+	std::int32_t NormalizePapyrusLogLevel(const std::int32_t logLevel)
+	{
+		return logLevel >= kMinPapyrusLogLevel && logLevel <= kMaxPapyrusLogLevel
+			? logLevel
+			: kDefaultPapyrusLogLevel;
+	}
+
+	std::string SanitizeLogToken(const char* value, std::string fallback)
+	{
+		std::string result;
+		if (value)
+		{
+			for (auto* cursor = value; *cursor != '\0'; ++cursor)
+			{
+				const auto ch = static_cast<unsigned char>(*cursor);
+				if (std::isalnum(ch) || ch == '_' || ch == '-' || ch == '.')
+				{
+					result.push_back(static_cast<char>(ch));
+				}
+				else if (std::isspace(ch))
+				{
+					if (!result.empty() && result.back() != '_')
+					{
+						result.push_back('_');
+					}
+				}
+				else if (!result.empty() && result.back() != '_')
+				{
+					result.push_back('_');
+				}
+			}
+		}
+
+		while (!result.empty() && result.back() == '_')
+		{
+			result.pop_back();
+		}
+		return result.empty() ? fallback : result;
+	}
+
+	std::string SanitizeLogFields(const char* value)
+	{
+		std::string result;
+		if (value)
+		{
+			bool lastWasSpace = false;
+			for (auto* cursor = value; *cursor != '\0'; ++cursor)
+			{
+				const auto ch = static_cast<unsigned char>(*cursor);
+				const auto normalized = std::iscntrl(ch) ? ' ' : static_cast<char>(ch);
+				if (std::isspace(static_cast<unsigned char>(normalized)))
+				{
+					if (!result.empty() && !lastWasSpace)
+					{
+						result.push_back(' ');
+					}
+					lastWasSpace = true;
+				}
+				else
+				{
+					result.push_back(normalized);
+					lastWasSpace = false;
+				}
+			}
+		}
+
+		while (!result.empty() && result.back() == ' ')
+		{
+			result.pop_back();
+		}
+		return result;
+	}
+
+	void LogPapyrusEvent(
+		const char* component,
+		const char* eventName,
+		const char* fields,
+		const std::int32_t logLevel)
+	{
+		const auto normalizedLogLevel = NormalizePapyrusLogLevel(logLevel);
+		if (normalizedLogLevel == static_cast<std::int32_t>(spdlog::level::off))
+		{
+			return;
+		}
+
+		auto message = std::string("[Papyrus] source=papyrus component=") +
+			SanitizeLogToken(component, "unknown") +
+			" event=" +
+			SanitizeLogToken(eventName, "unknown");
+		auto fieldText = SanitizeLogFields(fields);
+		if (!fieldText.empty())
+		{
+			message.push_back(' ');
+			message += fieldText;
+		}
+
+		auto* logger = spdlog::default_logger_raw();
+		if (logger)
+		{
+			logger->log(
+				spdlog::source_loc{},
+				static_cast<spdlog::level::level_enum>(normalizedLogLevel),
+				"{}",
+				message);
+		}
 	}
 
 	std::string FormatFormId(TESForm* form)
@@ -120,7 +232,17 @@ namespace papyrus_lootman
 
 	void Log(std::monostate, BSFixedString message)
 	{
-		REX::INFO("[Papyrus] {}", message.c_str());
+		LogPapyrusEvent("raw", "message", message.c_str(), kDefaultPapyrusLogLevel);
+	}
+
+	void LogEvent(
+		std::monostate,
+		BSFixedString component,
+		BSFixedString eventName,
+		BSFixedString fields,
+		std::int32_t logLevel)
+	{
+		LogPapyrusEvent(component.c_str(), eventName.c_str(), fields.c_str(), logLevel);
 	}
 
 	std::int32_t GetLogLevel(std::monostate)

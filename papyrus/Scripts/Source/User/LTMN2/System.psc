@@ -39,6 +39,9 @@ int ENABLE_FORM_TYPE_MISC = 512 const
 int ENABLE_FORM_TYPE_NPC_ = 1024 const
 int ENABLE_FORM_TYPE_WEAP = 2048 const
 
+int LOG_LEVEL_DEBUG = 1 const
+int LOG_LEVEL_INFO = 2 const
+
 Group MessageId
     ; Message id
     int property MESSAGE_INSTALLED = 1 autoreadonly hidden
@@ -82,10 +85,17 @@ int[] messageDisplayCount
 float[] lastMessageDisplayTime
 Location autoLinkedWorkshopLocation
 
+Function LogSystemEvent(string eventName, string fields = "", int logLevel = 2)
+    LTMN2:LootMan.LogEvent("system", eventName, fields, logLevel)
+EndFunction
+
+string Function FormField(string name, Form target)
+    Return name + "=" + LTMN2:LootMan.GetHexID(target)
+EndFunction
+
 ; LootMan's system initialization
 Event OnInit()
-    LTMN2:Debug.OpenLog()
-    LTMN2:Debug.Log("| System | ---------- | LootMan " + GetVersionString(MOD_VERSION) + " has been running for the first time")
+    LogSystemEvent("first_run", "version=" + GetVersionString(MOD_VERSION))
 
     player = Game.GetPlayer()
     properties = LTMN2:Properties.GetInstance()
@@ -101,8 +111,7 @@ EndEvent
 
 ; Process called when saved data is loaded
 Event Actor.OnPlayerLoadGame(Actor akSender)
-    LTMN2:Debug.OpenLog()
-    LTMN2:Debug.Log("| System | ---------- | LootMan " + GetVersionString(MOD_VERSION) + " has been running")
+    LogSystemEvent("load", "version=" + GetVersionString(MOD_VERSION) + " current_version=" + GetVersionString(CurrentModVersion))
 
     ; Reset properties that need to be reset each load
     properties.IsInitialized = false
@@ -130,10 +139,7 @@ EndEvent
 
 ; An event that register to player. Process that should be performed when location is changed.
 Event Actor.OnLocationChange(Actor akSender, Location akOldLoc, Location akNewLoc)
-    string prefix = ("| System | " + LTMN2:Debug.GetRandomProcessID() + " | ")
-    LTMN2:Debug.Log(prefix + "[ Update LootMan status as the player's location has changed ]")
-    LTMN2:Debug.Log(prefix + "  Old location: [ Name: \"" + LTMN2:Debug.GetName(akOldLoc) + "\", Id: " + LTMN2:Debug.GetHexID(akOldLoc) + " ]")
-    LTMN2:Debug.Log(prefix + "  New location: [ Name: \"" + LTMN2:Debug.GetName(akNewLoc) + "\", Id: " + LTMN2:Debug.GetHexID(akNewLoc) + " ]")
+    string prefix = "source=papyrus component=system event=location_change"
 
     WorkshopScript currentWorkshop = LTMN2:Utils.GetCurrentWorkshop(player)
     Location currentWorkshopLocation = none
@@ -141,27 +147,22 @@ Event Actor.OnLocationChange(Actor akSender, Location akOldLoc, Location akNewLo
         currentWorkshopLocation = currentWorkshop.myLocation
     EndIf
 
-    LTMN2:Debug.Log(prefix + "  [ Not looting from settlement: " + properties.NotLootingFromSettlement + " ]")
     If (properties.NotLootingFromSettlement && akNewLoc != None)
-        LTMN2:Debug.Log(prefix + "    New location is a settlement: " + akNewLoc.HasKeyword(Game.GetCommonProperties().LocTypeSettlement))
-        LTMN2:Debug.Log(prefix + "    New location is a workshop settlement: " + akNewLoc.HasKeyword(Game.GetCommonProperties().LocTypeWorkshopSettlement))
-        LTMN2:Debug.Log(prefix + "    Workshop exists near the player: " + (currentWorkshop != None))
-
         If (akNewLoc.HasKeyword(Game.GetCommonProperties().LocTypeSettlement) || akNewLoc.HasKeyword(Game.GetCommonProperties().LocTypeWorkshopSettlement) || currentWorkshop != None)
             properties.IsInSettlement = true
             ShowMessage(MESSAGE_REMIND_NOT_LOOTING_IN_SETTLEMENT)
-            LTMN2:Debug.Log(prefix + "      [ Player entered the settlement ]")
+            LogSystemEvent("settlement_state_changed", FormField("old_location", akOldLoc) + " " + FormField("new_location", akNewLoc) + " in_settlement=true workshop_nearby=" + (currentWorkshop != None))
         Else
             properties.IsInSettlement = false
-            LTMN2:Debug.Log(prefix + "      [ Player leaved the settlement ]")
+            LogSystemEvent("settlement_state_changed", FormField("old_location", akOldLoc) + " " + FormField("new_location", akNewLoc) + " in_settlement=false workshop_nearby=" + (currentWorkshop != None))
         EndIf
     EndIf
 
-    LTMN2:Debug.Log(prefix + "  [ Automatically link / unlink to workshop: " + properties.AutomaticallyLinkAndUnlinkToWorkshop + " ]")
     If (properties.AutomaticallyLinkAndUnlinkToWorkshop)
         If (autoLinkedWorkshopLocation != None && autoLinkedWorkshopLocation != currentWorkshopLocation)
             If (UnlinkWorkshopLocation(autoLinkedWorkshopLocation, prefix))
                 ShowMessage(MESSAGE_UNLINKED_TO_WORKSHOP)
+                LogSystemEvent("workshop_unlinked", FormField("location", autoLinkedWorkshopLocation) + " reason=location_change")
             EndIf
             autoLinkedWorkshopLocation = none
         EndIf
@@ -171,14 +172,15 @@ Event Actor.OnLocationChange(Actor akSender, Location akOldLoc, Location akNewLo
             If (oldWorkshop && oldWorkshop.myLocation && oldWorkshop.myLocation != currentWorkshopLocation)
                 If (UnlinkWorkshopLocation(oldWorkshop.myLocation, prefix))
                     ShowMessage(MESSAGE_UNLINKED_TO_WORKSHOP)
+                    LogSystemEvent("workshop_unlinked", FormField("location", oldWorkshop.myLocation) + " reason=old_location")
                 EndIf
             EndIf
         EndIf
 
-        LTMN2:Debug.Log(prefix + "    Workshop exists near the player: " + (currentWorkshop != None))
         If (currentWorkshop && currentWorkshop.OwnedByPlayer)
             If (LinkWorkshop(currentWorkshop, prefix))
                 ShowMessage(MESSAGE_LINKED_TO_WORKSHOP)
+                LogSystemEvent("workshop_linked", FormField("workshop", currentWorkshop) + " " + FormField("location", currentWorkshop.myLocation) + " reason=location_change")
             EndIf
             currentWorkshopLocation = currentWorkshop.myLocation
             autoLinkedWorkshopLocation = currentWorkshopLocation
@@ -381,13 +383,9 @@ EndFunction
 
 ; Called when a specific item is added to LootMan's inventory. The item is moved to the workbench in an appropriate manner so that it does not cause a glitch.
 Event ObjectReference.OnItemAdded(ObjectReference akSender, Form akBaseItem, int aiItemCount, ObjectReference akItemReference, ObjectReference akSourceContainer)
-    string prefix = ("| System | " + LTMN2:Debug.GetRandomProcessId() + " | ")
-
-    LTMN2:Debug.Log(prefix + "[ LootMan.OnItemAdded called ]")
-
     ; Shipment will be lost if it is moved to the Wrokshop container using RemoveItem, so add it using AddItem.
     If (properties.ShipmentItemList.HasForm(akBaseItem))
-        LTMN2:Debug.Log(prefix + "  [ Move shipment safely to the workshop ]")
+        LogSystemEvent("shipment_delivered", FormField("item", akBaseItem) + " count=" + aiItemCount)
         akSender.RemoveItem(akBaseItem, aiItemCount, true)
         properties.LootManWorkshopRef.AddItem(akBaseItem, aiItemCount, true)
     EndIf
@@ -413,87 +411,74 @@ EndEvent
 
 ; Check if LootMan can be installed.
 bool Function CanInstall()
-    string prefix = ("| System | " + LTMN2:Debug.GetRandomProcessId() + " | ")
+    bool hasPipboy = player.GetItemCount(properties.Pipboy) > 0
+    bool radioRunning = properties.RadioInstitute.IsRunning()
 
-    LTMN2:Debug.Log(prefix + "[ Check if LootMan can be installed ]")
-    LTMN2:Debug.Log(prefix + "  Player has Pipboy: " + (player.GetItemCount(properties.Pipboy) > 0))
-    LTMN2:Debug.Log(prefix + "  Institute's radio is ready to receive: " + properties.RadioInstitute.IsRunning())
-
-    If (player.GetItemCount(properties.Pipboy) > 0 || properties.RadioInstitute.IsRunning())
-        LTMN2:Debug.Log(prefix + "  [ LootMan can be installed ]")
+    If (hasPipboy || radioRunning)
+        LogSystemEvent("install_check_passed", "has_pipboy=" + hasPipboy + " radio_running=" + radioRunning)
         Return true
     Else
-        LTMN2:Debug.Log(prefix + "  [ LootMan cannot be installed ]")
+        LogSystemEvent("install_check_pending", "has_pipboy=false radio_running=false", LOG_LEVEL_DEBUG)
         Return false
     EndIf
 EndFunction
 
 ; Perform LootMan installation.
 Function Install()
-    string prefix = ("| System | " + LTMN2:Debug.GetRandomProcessId() + " | ")
-
     If (properties.IsInstalled)
-        LTMN2:Debug.Log(prefix + "[ The LootMan installation process was called, but the call is skipped because LootMan is already installed ]")
+        LogSystemEvent("install_skipped", "reason=already_installed", LOG_LEVEL_DEBUG)
         Return
     EndIf
 
     If (properties.IsUninstalled)
-        LTMN2:Debug.Log(prefix + "[ The LootMan installation process is called, but the call is skipped because LootMan is already uninstalled ]")
+        LogSystemEvent("install_skipped", "reason=already_uninstalled", LOG_LEVEL_DEBUG)
         Return
     EndIf
 
     properties.IsInstalled = true
     properties.IsNotInstalled = false
 
-    LTMN2:Debug.Log(prefix + "[ Start LootMan installation ]")
+    LogSystemEvent("install_started", "version=" + GetVersionString(MOD_VERSION))
 
-    LTMN2:Debug.Log(prefix + "  [ Register an event ]")
     AddInventoryEventFilter(properties.ShipmentItemList)
     RegisterForRemoteEvent(player, "OnLocationChange")
     RegisterForRemoteEvent(properties.LootManRef, "OnItemAdded")
-
-    LTMN2:Debug.Log(prefix + "  [ Native looting scheduler is enabled ]")
 
     StartTimer(1, TIMER_INITIALIZE)
 
     self.SetObjectiveDisplayed(MESSAGE_INSTALLED)
     self.SetObjectiveSkipped(MESSAGE_INSTALLED)
 
-    LTMN2:Debug.Log(prefix + "  [ LootMan has been installed ]")
+    LogSystemEvent("install_completed", "native_looting_scheduler=true")
 EndFunction
 
 ; Uninstall LootMan
 Function Uninstall()
-    string prefix = ("| System | " + LTMN2:Debug.GetRandomProcessId() + " | ")
-
     If (properties.IsNotInstalled)
-        LTMN2:Debug.Log(prefix + "[ The LootMan uninstall process was called, but the call is skipped because LootMan is not yet installed ]")
+        LogSystemEvent("uninstall_skipped", "reason=not_installed", LOG_LEVEL_DEBUG)
         Return
     EndIf
 
     If (properties.IsUninstalled)
-        LTMN2:Debug.Log(prefix + "[ The LootMan uninstall process was called, but the call is skipped because LootMan is already uninstalled ]")
+        LogSystemEvent("uninstall_skipped", "reason=already_uninstalled", LOG_LEVEL_DEBUG)
         Return
     EndIf
 
     properties.IsUninstalled = true
     properties.IsNotUninstalled = false
 
-    LTMN2:Debug.Log(prefix + "[ Start LootMan uninstallation ]")
+    LogSystemEvent("uninstall_started")
 
-    LTMN2:Debug.Log(prefix + "  [ Stop timer function ]")
     CancelTimer(TIMER_INSTALL)
     CancelTimer(TIMER_INITIALIZE)
     CancelTimer(TIMER_UPDATE)
     CancelTimer(TIMER_LOOTING)
 
-    LTMN2:Debug.Log(prefix + "  [ Unregister an event ]")
     RemoveAllInventoryEventFilters()
     UnregisterForRemoteEvent(player, "OnPlayerLoadGame")
     UnregisterForRemoteEvent(player, "OnLocationChange")
     UnregisterForRemoteEvent(properties.LootManRef, "OnItemAdded")
 
-    LTMN2:Debug.Log(prefix + "  [ Shutdown legacy looting worker manager ]")
     StopLegacyWorkerManagers()
 
     self.SetObjectiveDisplayed(MESSAGE_UNINSTALLED)
@@ -502,7 +487,7 @@ Function Uninstall()
     LTMN2:Utils.MoveInventoryItems(properties.LootManRef, player, properties.ITEM_TYPE_ALL)
     LTMN2:Utils.MoveInventoryItems(properties.LootManWorkshopRef, player, properties.ITEM_TYPE_ALL)
 
-    LTMN2:Debug.Log(prefix + "[ LootMan has been uninstalled ]")
+    LogSystemEvent("uninstall_completed", "items_returned=true")
 
     properties.IsInstalled = false
     properties.IsInitialized = false
@@ -565,24 +550,22 @@ EndFunction
 
 ; Initialize LootMan
 Function Initialize()
-    string prefix = ("| System | " + LTMN2:Debug.GetRandomProcessId() + " | ")
-
     If (properties.IsNotInstalled)
-        LTMN2:Debug.Log(prefix + "[ The LootMan initialization process was called, but the call is skipped because LootMan is not yet installed ]")
+        LogSystemEvent("initialize_skipped", "reason=not_installed", LOG_LEVEL_DEBUG)
         Return
     EndIf
 
     If (properties.IsInitialized)
-        LTMN2:Debug.Log(prefix + "[ The LootMan initialization process was called, but the call is skipped because LootMan is already initialized ]")
+        LogSystemEvent("initialize_skipped", "reason=already_initialized", LOG_LEVEL_DEBUG)
         Return
     EndIf
 
     If (!properties.IsNotUninstalled)
-        LTMN2:Debug.Log(prefix + "[ The LootMan initialization process was called, but the call is skipped because LootMan is already uninstalled ]")
+        LogSystemEvent("initialize_skipped", "reason=already_uninstalled", LOG_LEVEL_DEBUG)
         Return
     EndIf
 
-    LTMN2:Debug.Log(prefix + "[ Start LootMan initialization ]")
+    LogSystemEvent("initialize_started")
 
     LTMN2:LootMan.OnUpdateLootManProperty("")
     LTMN2:MCM.GetInstance().Initialize()
@@ -594,18 +577,15 @@ Function Initialize()
         StartTimer(3, TIMER_LOOTING)
     EndIf
 
-    LTMN2:Debug.Log(prefix + "  [ LootMan initialization completed ]")
-
     properties.IsInitialized = true
     properties.IsNotInitialized = false
+    LogSystemEvent("initialize_completed", "worker_interval=" + properties.WorkerInvokeInterval)
 EndFunction
 
 ; Apply patches for migration
 Function Patch()
-    string prefix = ("| System | " + LTMN2:Debug.GetRandomProcessId() + " | ")
-
-    LTMN2:Debug.Log(prefix + "[ LootMan patching started ]")
-    LTMN2:Debug.Log(prefix + "  Current version: " + GetVersionString(CurrentModVersion))
+    int fromVersion = CurrentModVersion
+    LogSystemEvent("patch_started", "from_version=" + GetVersionString(fromVersion) + " to_version=" + GetVersionString(MOD_VERSION))
 
     ; Apply the patches if the save data and the Mod version of the esp do not match due to the LootMan update.
     If (CurrentModVersion < 20001)
@@ -617,25 +597,20 @@ Function Patch()
 
     CurrentModVersion = MOD_VERSION
 
-    LTMN2:Debug.Log(prefix + "  Update to version: " + GetVersionString(CurrentModVersion))
+    LogSystemEvent("patch_completed", "from_version=" + GetVersionString(fromVersion) + " current_version=" + GetVersionString(CurrentModVersion))
 EndFunction
 
 ; Update LootMan status
 Function Update()
-    string prefix = ("| System | " + LTMN2:Debug.GetRandomProcessId() + " | ")
-
     If (properties.IsNotInstalled)
-        LTMN2:Debug.Log(prefix + "[ The LootMan update process was called, but the call is skipped because LootMan is not yet installed ]")
         Return
     EndIf
 
     If (properties.IsNotInitialized)
-        LTMN2:Debug.Log(prefix + "[ The LootMan update process was called, but the call is skipped because LootMan is not yet initialized ]")
         Return
     EndIf
 
     If (properties.IsUninstalled)
-        LTMN2:Debug.Log(prefix + "[ The LootMan update process was called, but the call is skipped because LootMan is already uninstalled ]")
         Return
     EndIf
 
@@ -643,44 +618,34 @@ Function Update()
         Return
     EndIf
 
-    LTMN2:Debug.Log(prefix + "[ Start updating the state ]")
-
-    LTMN2:Debug.Log(prefix + "  [ Check LootMan (Actor) inventory ]")
-    LTMN2:Debug.Log(prefix + "    Item count: " + properties.LootManRef.GetItemCount())
     If (properties.LootManRef.GetItemCount() > 0)
         int movedItems = 0
+        string destination = "workshop"
         If (properties.LootIsDeliverToPlayer)
-            LTMN2:Debug.Log(prefix + "    [ Move items from LootMan to player ]")
-            LTMN2:Debug.Log(prefix + "      Suppress pickup messages: " + properties.LootingWithoutLogs)
+            destination = "player"
             movedItems = LTMN2:LootMan.TransferInventoryItems(properties.LootManRef, player, properties.ITEM_TYPE_ALL, -1, properties.ObjectTypeLooseMod, properties.LootingWithoutLogs)
         Else
-            LTMN2:Debug.Log(prefix + "    [ Move items from LootMan to workshop ]")
             movedItems = LTMN2:LootMan.TransferInventoryItems(properties.LootManRef, properties.LootManWorkshopRef, properties.ITEM_TYPE_ALL, -1, properties.ObjectTypeLooseMod, properties.LootingWithoutLogs)
         EndIf
-        LTMN2:Debug.Log(prefix + "      Moved item forms: " + movedItems)
-        LTMN2:Debug.Log(prefix + "      Item count of after processing: " + properties.LootManRef.GetItemCount())
+        LogSystemEvent("lootman_inventory_delivered", "destination=" + destination + " moved_forms=" + movedItems + " remaining_count=" + properties.LootManRef.GetItemCount() + " suppress_messages=" + properties.LootingWithoutLogs)
     EndIf
 
-    LTMN2:Debug.Log(prefix + "  [ Check LootMan overweight ]")
-    LTMN2:Debug.Log(prefix + "    Ignore overweight: " + properties.IgnoreOverweight)
     If (!properties.IgnoreOverweight)
-        LTMN2:Debug.Log(prefix + "    Currently in an overweight state: " + properties.IsOverweight)
-        LTMN2:Debug.Log(prefix + "    LootMan workshop inventory weight: " + properties.LootManWorkshopRef.GetInventoryWeight())
-        LTMN2:Debug.Log(prefix + "    Weight carrying capacity: " + properties.CarryWeight)
-
         bool wasOverweight = properties.IsOverweight
-        bool overweight = properties.LootManWorkshopRef.GetInventoryWeight() > properties.CarryWeight
+        float workshopWeight = properties.LootManWorkshopRef.GetInventoryWeight()
+        bool overweight = workshopWeight > properties.CarryWeight
         If (!wasOverweight && overweight)
             properties.IsOverweight = true
-            LTMN2:Debug.Log(prefix + "    [ LootMan is now overweight ]")
+            LogSystemEvent("overweight_changed", "overweight=true workshop_weight=" + workshopWeight + " carry_weight=" + properties.CarryWeight)
         ElseIf (wasOverweight && overweight)
             ShowMessage(MESSAGE_HAS_OVERWEIGHT)
         ElseIf (wasOverweight && !overweight)
             properties.IsOverweight = false
-            LTMN2:Debug.Log(prefix + "    [ LootMan is no longer overweight ]")
+            LogSystemEvent("overweight_changed", "overweight=false workshop_weight=" + workshopWeight + " carry_weight=" + properties.CarryWeight)
         EndIf
     ElseIf (properties.IsOverweight)
         properties.IsOverweight = false
+        LogSystemEvent("overweight_changed", "overweight=false reason=ignored")
     EndIf
 
     float time = Utility.GetCurrentRealTime()
@@ -759,7 +724,7 @@ Function Looting()
 
     int[] result = LTMN2:LootMan.LootNearbyEnabledReferences(player, properties.LootManRef, properties.ActivatorRef, properties.LootManWorkshopRef, enabledFormTypeMask, properties.LootableInventoryItemType, properties.PlayPickupSound, properties.PlayContainerAnimation, properties.UnlockLockedContainer, properties.BobbyPin, properties.Locksmith01, properties.Locksmith02, properties.Locksmith03, properties.Locksmith04)
     If (result.Length >= 6 && (result[3] > 0 || result[4] > 0))
-        LTMN2:Debug.Log("| System | Native loot pass limited: processed=" + result[0] + ", successful=" + result[1] + ", hitObjectLimit=" + result[3] + ", hitTimeBudget=" + result[4] + ", candidates=" + result[5])
+        LogSystemEvent("native_loot_pass_limited", "processed=" + result[0] + " successful=" + result[1] + " hit_object_limit=" + result[3] + " hit_time_budget=" + result[4] + " candidates=" + result[5])
     EndIf
 EndFunction
 
