@@ -1,0 +1,71 @@
+Program: Fallout4.exe
+Image base: 140000000
+
+================================================================================
+Target 140392514
+  140392514: CALL 0x14042bcc0
+  140392519: TEST AL,AL
+  14039251b: JZ 0x140392971
+  140392521: JMP 0x140392528
+  140392523: MOV R13,qword ptr [RSP + 0x30]
+  140392528: MOV R14,qword ptr [R12 + 0x38]
+  14039252d: TEST R14,R14
+  140392530: JNZ 0x140392556
+  140392532: MOV R14,qword ptr [R13 + 0x60]
+  140392536: CMP byte ptr [R14 + 0x1a],0x5e
+  14039253b: JNZ 0x140392556
+  14039253d: XOR R13D,R13D
+  140392540: XOR EDX,EDX
+  140392542: MOV RCX,R14
+  140392545: MOV dword ptr [0x1430ebe1c],R13D
+  14039254c: CALL 0x140588fa0
+  140392551: MOV R14,RAX
+  140392554: JMP 0x140392559
+  140392556: XOR R13D,R13D
+  140392559: CMP R14,qword ptr [0x1431e2d10]
+
+================================================================================
+Target 140398e06
+  140398e06: CALL 0x14042bcc0
+  140398e0b: TEST AL,AL
+  140398e0d: JZ 0x14039963d
+  140398e13: MOV RCX,RBX
+  140398e16: MOVAPS xmmword ptr [RSP + 0x2b0],XMM8
+  140398e1f: MOV byte ptr [RBP + 0x248],0x1
+  140398e26: CALL 0x1403822e0
+  140398e2b: TEST AL,AL
+  140398e2d: JZ 0x140398e39
+  140398e2f: MOVSS XMM0,dword ptr [0x142ed4328]
+  140398e37: JMP 0x140398e41
+  140398e39: MOVSS XMM0,dword ptr [0x142ed4310]
+  140398e41: MOVZX EAX,byte ptr [0x142ed3f38]
+  140398e48: MOVSS dword ptr [0x1430ebe04],XMM0
+  140398e50: TEST AL,AL
+  140398e52: JNZ 0x140398e63
+  140398e54: MOV RCX,RBX
+  140398e57: CALL 0x1403900b0
+  140398e5c: MOVZX EAX,byte ptr [0x142ed3f38]
+  140398e63: CMP byte ptr [RBP + 0x240],0x0
+
+================================================================================
+Target 1403b7c4e
+  1403b7c4e: CALL 0x14042bcc0
+  1403b7c53: MOV RCX,qword ptr [RBX + 0x18]
+  1403b7c57: LEA RDX,[RSP + 0x38]
+  1403b7c5c: MOV R9B,0x1
+  1403b7c5f: MOV R8,RDI
+  1403b7c62: MOV RCX,qword ptr [RCX + 0x50]
+  1403b7c66: CALL 0x140a692a0
+  1403b7c6b: MOV EAX,dword ptr [RSP + 0x50]
+  1403b7c6f: TEST EAX,EAX
+  1403b7c71: JZ 0x1403b7d4c
+  1403b7c77: MOV RBX,qword ptr [RSP + 0x40]
+  1403b7c7c: MOV R13D,EAX
+  1403b7c7f: SHL R13,0x4
+  1403b7c83: ADD R13,RBX
+  1403b7c86: CMP RBX,R13
+  1403b7c89: JZ 0x1403b7d49
+  1403b7c8f: MOVAPS xmmword ptr [RSP + 0x170],XMM6
+  1403b7c97: MOVSS XMM6,dword ptr [0x14291fca0]
+  1403b7c9f: NOP
+  1403b7ca0: CMP byte ptr [0x142ed4688],0x0

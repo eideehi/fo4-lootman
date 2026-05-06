@@ -28,15 +28,17 @@
       ],
       "evidence": [
         "tools/ghidra/reports/fo4-encounter-zone-detach-callers.txt",
-        "tools/ghidra/reports/fo4-cell-detach-reset-functions.txt"
+        "tools/ghidra/reports/fo4-cell-detach-reset-functions.txt",
+        "tools/ghidra/reports/fo4-encounter-zone-before-reset-target-functions.txt",
+        "tools/ghidra/reports/fo4-encounter-zone-before-reset-call-windows.txt"
       ],
       "unresolvedItems": [
         "Discovery strategy is unproven: Resolve the LoadChange cell reset path and require one direct CALL rel32 to the check-cell-before-reset target.",
         "Verify candidate count, CALL rel32 shape, and original target grouping before updating manifest RVAs."
       ],
       "proofReadiness": {
-        "status": "needs_rediscovery",
-        "summary": "Current evidence does not identify exactly one usable target for the selected sites.",
+        "status": "ready_for_proof_metadata",
+        "summary": "Existing evidence satisfies the resolver proof gates for this unproven call-site family.",
         "selectedSites": [
           {
             "id": "encounter-zone.reset-suppression.cell-before-reset",
@@ -46,13 +48,34 @@
             "absoluteAddress": "0x1404D23C4"
           }
         ],
-        "targetCandidates": [],
-        "directCallInstructionCount": 0,
-        "missingDirectCallSites": [
-          "0x1404D23C4"
+        "targetAbsoluteAddress": "0x140494B30",
+        "targetCandidates": [
+          {
+            "targetAbsoluteAddress": "0x140494B30",
+            "selectedSiteIds": [
+              "encounter-zone.reset-suppression.cell-before-reset"
+            ],
+            "selectedSiteAbsoluteAddresses": [
+              "0x1404D23C4"
+            ],
+            "evidence": [
+              "tools/ghidra/reports/fo4-encounter-zone-before-reset-call-windows.txt",
+              "tools/ghidra/reports/fo4-encounter-zone-before-reset-target-functions.txt"
+            ]
+          }
         ],
+        "targetReport": {
+          "path": "tools/ghidra/reports/fo4-encounter-zone-before-reset-target-functions.txt",
+          "targetAbsoluteAddress": "0x140494B30",
+          "referenceCount": 1,
+          "selectedReferenceCount": 1,
+          "missingSelectedReferences": [],
+          "extraSameTargetReferences": []
+        },
+        "directCallInstructionCount": 1,
+        "missingDirectCallSites": [],
         "extraSameTargetReferences": [],
-        "recommendedNextAction": "Refresh discovery reports around the selected manifest sites."
+        "recommendedNextAction": "Create a separate proof-promotion checkpoint with explicit proof.sites metadata."
       }
     },
     {
@@ -1139,15 +1162,17 @@
       "evidence": [
         "tools/ghidra/reports/fo4-can-produce-workshop.txt",
         "tools/ghidra/reports/fo4-canproduce-deps.txt",
-        "tools/ghidra/reports/fo4-canproduce-callers-detail.txt"
+        "tools/ghidra/reports/fo4-canproduce-callers-detail.txt",
+        "tools/ghidra/reports/fo4-build-resource-check-target-functions.txt",
+        "tools/ghidra/reports/fo4-build-resource-check-call-windows.txt"
       ],
       "unresolvedItems": [
         "Discovery strategy is unproven: Resolve build resource checks from CanProduceWorkshop analysis and require two direct CALL rel32 sites.",
         "Verify candidate count, CALL rel32 shape, and original target grouping before updating manifest RVAs."
       ],
       "proofReadiness": {
-        "status": "needs_rediscovery",
-        "summary": "Current evidence does not identify exactly one usable target for the selected sites.",
+        "status": "needs_exclusion_triage",
+        "summary": "Target allrefs include same-target references outside the selected hook sites.",
         "selectedSites": [
           {
             "id": "workshop-material.build-resource-check.placement",
@@ -1164,14 +1189,40 @@
             "absoluteAddress": "0x140398E06"
           }
         ],
-        "targetCandidates": [],
-        "directCallInstructionCount": 0,
-        "missingDirectCallSites": [
-          "0x140392514",
-          "0x140398E06"
+        "targetAbsoluteAddress": "0x14042BCC0",
+        "targetCandidates": [
+          {
+            "targetAbsoluteAddress": "0x14042BCC0",
+            "selectedSiteIds": [
+              "workshop-material.build-resource-check.confirm",
+              "workshop-material.build-resource-check.placement"
+            ],
+            "selectedSiteAbsoluteAddresses": [
+              "0x140392514",
+              "0x140398E06"
+            ],
+            "evidence": [
+              "tools/ghidra/reports/fo4-build-resource-check-call-windows.txt",
+              "tools/ghidra/reports/fo4-build-resource-check-target-functions.txt"
+            ]
+          }
         ],
-        "extraSameTargetReferences": [],
-        "recommendedNextAction": "Refresh discovery reports around the selected manifest sites."
+        "targetReport": {
+          "path": "tools/ghidra/reports/fo4-build-resource-check-target-functions.txt",
+          "targetAbsoluteAddress": "0x14042BCC0",
+          "referenceCount": 3,
+          "selectedReferenceCount": 2,
+          "missingSelectedReferences": [],
+          "extraSameTargetReferences": [
+            "0x1403B7C4E"
+          ]
+        },
+        "directCallInstructionCount": 2,
+        "missingDirectCallSites": [],
+        "extraSameTargetReferences": [
+          "0x1403B7C4E"
+        ],
+        "recommendedNextAction": "Triage 1 extra same-target references before adding exclusions."
       }
     },
     {
@@ -1205,15 +1256,17 @@
       ],
       "evidence": [
         "tools/ghidra/reports/fo4-remove-component-consume-core.txt",
-        "tools/ghidra/reports/fo4-remove-component-functions.txt"
+        "tools/ghidra/reports/fo4-remove-component-functions.txt",
+        "tools/ghidra/reports/fo4-consume-component-target-functions.txt",
+        "tools/ghidra/reports/fo4-consume-component-call-windows.txt"
       ],
       "unresolvedItems": [
         "Discovery strategy is unproven: Resolve workshop component consumption calls and require two direct CALL rel32 sites to the same consume helper.",
         "Verify candidate count, CALL rel32 shape, and original target grouping before updating manifest RVAs."
       ],
       "proofReadiness": {
-        "status": "needs_rediscovery",
-        "summary": "Current evidence does not identify exactly one usable target for the selected sites.",
+        "status": "ready_for_proof_metadata",
+        "summary": "Existing evidence satisfies the resolver proof gates for this unproven call-site family.",
         "selectedSites": [
           {
             "id": "workshop-material.consume-component.source-f3",
@@ -1230,14 +1283,36 @@
             "absoluteAddress": "0x1403B7D2A"
           }
         ],
-        "targetCandidates": [],
-        "directCallInstructionCount": 0,
-        "missingDirectCallSites": [
-          "0x140398FF6",
-          "0x1403B7D2A"
+        "targetAbsoluteAddress": "0x140392010",
+        "targetCandidates": [
+          {
+            "targetAbsoluteAddress": "0x140392010",
+            "selectedSiteIds": [
+              "workshop-material.consume-component.source-f3",
+              "workshop-material.consume-component.source-f4"
+            ],
+            "selectedSiteAbsoluteAddresses": [
+              "0x140398FF6",
+              "0x1403B7D2A"
+            ],
+            "evidence": [
+              "tools/ghidra/reports/fo4-consume-component-call-windows.txt",
+              "tools/ghidra/reports/fo4-consume-component-target-functions.txt"
+            ]
+          }
         ],
+        "targetReport": {
+          "path": "tools/ghidra/reports/fo4-consume-component-target-functions.txt",
+          "targetAbsoluteAddress": "0x140392010",
+          "referenceCount": 2,
+          "selectedReferenceCount": 2,
+          "missingSelectedReferences": [],
+          "extraSameTargetReferences": []
+        },
+        "directCallInstructionCount": 2,
+        "missingDirectCallSites": [],
         "extraSameTargetReferences": [],
-        "recommendedNextAction": "Refresh discovery reports around the selected manifest sites."
+        "recommendedNextAction": "Create a separate proof-promotion checkpoint with explicit proof.sites metadata."
       }
     },
     {
@@ -1354,15 +1429,17 @@
       "evidence": [
         "tools/ghidra/reports/fo4-remove-component-functions.txt",
         "tools/ghidra/reports/fo4-remove-component-core.txt",
-        "tools/ghidra/reports/fo4-removeitem-wrapper-callers.txt"
+        "tools/ghidra/reports/fo4-removeitem-wrapper-callers.txt",
+        "tools/ghidra/reports/fo4-remove-components-target-functions.txt",
+        "tools/ghidra/reports/fo4-remove-components-call-windows.txt"
       ],
       "unresolvedItems": [
         "Discovery strategy is unproven: Resolve RemoveComponents wrappers and require two direct CALL rel32 sites to the same remove helper.",
         "Verify candidate count, CALL rel32 shape, and original target grouping before updating manifest RVAs."
       ],
       "proofReadiness": {
-        "status": "needs_rediscovery",
-        "summary": "Current evidence does not identify exactly one usable target for the selected sites.",
+        "status": "ready_for_proof_metadata",
+        "summary": "Existing evidence satisfies the resolver proof gates for this unproven call-site family.",
         "selectedSites": [
           {
             "id": "workshop-material.remove-components.source-f1",
@@ -1379,14 +1456,36 @@
             "absoluteAddress": "0x14114E543"
           }
         ],
-        "targetCandidates": [],
-        "directCallInstructionCount": 0,
-        "missingDirectCallSites": [
-          "0x14114E543",
-          "0x14114EB19"
+        "targetAbsoluteAddress": "0x1411825A0",
+        "targetCandidates": [
+          {
+            "targetAbsoluteAddress": "0x1411825A0",
+            "selectedSiteIds": [
+              "workshop-material.remove-components.source-f1",
+              "workshop-material.remove-components.source-f2"
+            ],
+            "selectedSiteAbsoluteAddresses": [
+              "0x14114E543",
+              "0x14114EB19"
+            ],
+            "evidence": [
+              "tools/ghidra/reports/fo4-remove-components-call-windows.txt",
+              "tools/ghidra/reports/fo4-remove-components-target-functions.txt"
+            ]
+          }
         ],
+        "targetReport": {
+          "path": "tools/ghidra/reports/fo4-remove-components-target-functions.txt",
+          "targetAbsoluteAddress": "0x1411825A0",
+          "referenceCount": 2,
+          "selectedReferenceCount": 2,
+          "missingSelectedReferences": [],
+          "extraSameTargetReferences": []
+        },
+        "directCallInstructionCount": 2,
+        "missingDirectCallSites": [],
         "extraSameTargetReferences": [],
-        "recommendedNextAction": "Refresh discovery reports around the selected manifest sites."
+        "recommendedNextAction": "Create a separate proof-promotion checkpoint with explicit proof.sites metadata."
       }
     },
     {

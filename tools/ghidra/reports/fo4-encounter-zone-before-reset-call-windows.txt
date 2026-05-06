@@ -1,0 +1,25 @@
+Program: Fallout4.exe
+Image base: 140000000
+
+================================================================================
+Target 1404d23c4
+  1404d23c4: CALL 0x140494b30
+  1404d23c9: MOV byte ptr [RBP + 0x67],AL
+  1404d23cc: XOR BL,BL
+  1404d23ce: JMP 0x1404d23f0
+  1404d23d0: XOR AL,AL
+  1404d23d2: MOV byte ptr [RBP + 0x67],AL
+  1404d23d5: XOR BL,BL
+  1404d23d7: JMP 0x1404d23f0
+  1404d23d9: MOV byte ptr [RBP + 0x67],SIL
+  1404d23dd: XOR BL,BL
+  1404d23df: JMP 0x1404d23f0
+  1404d23e1: MOV BL,0x1
+  1404d23e3: MOV byte ptr [RBP + 0x67],0x1
+  1404d23e7: MOVZX ESI,BL
+  1404d23ea: MOV byte ptr [RBP + 0x6f],BL
+  1404d23ed: MOV dword ptr [RBP + 0x77],ESI
+  1404d23f0: MOV RCX,R12
+  1404d23f3: CALL 0x1404dbc60
+  1404d23f8: MOV EAX,dword ptr [R12 + 0x80]
+  1404d2400: SUB EAX,0x1

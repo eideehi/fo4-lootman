@@ -13,7 +13,9 @@
       "expectedOriginalTargetGroup": "encounter_zone.check_cell_before_reset",
       "evidence": [
         "tools/ghidra/reports/fo4-encounter-zone-detach-callers.txt",
-        "tools/ghidra/reports/fo4-cell-detach-reset-functions.txt"
+        "tools/ghidra/reports/fo4-cell-detach-reset-functions.txt",
+        "tools/ghidra/reports/fo4-encounter-zone-before-reset-target-functions.txt",
+        "tools/ghidra/reports/fo4-encounter-zone-before-reset-call-windows.txt"
       ],
       "discoveryStrategy": {
         "status": "unproven",
@@ -616,7 +618,9 @@
       "evidence": [
         "tools/ghidra/reports/fo4-can-produce-workshop.txt",
         "tools/ghidra/reports/fo4-canproduce-deps.txt",
-        "tools/ghidra/reports/fo4-canproduce-callers-detail.txt"
+        "tools/ghidra/reports/fo4-canproduce-callers-detail.txt",
+        "tools/ghidra/reports/fo4-build-resource-check-target-functions.txt",
+        "tools/ghidra/reports/fo4-build-resource-check-call-windows.txt"
       ],
       "discoveryStrategy": {
         "status": "unproven",
@@ -646,7 +650,9 @@
       "expectedOriginalTargetGroup": "workshop_material.consume_component",
       "evidence": [
         "tools/ghidra/reports/fo4-remove-component-consume-core.txt",
-        "tools/ghidra/reports/fo4-remove-component-functions.txt"
+        "tools/ghidra/reports/fo4-remove-component-functions.txt",
+        "tools/ghidra/reports/fo4-consume-component-target-functions.txt",
+        "tools/ghidra/reports/fo4-consume-component-call-windows.txt"
       ],
       "discoveryStrategy": {
         "status": "unproven",
@@ -730,7 +736,9 @@
       "evidence": [
         "tools/ghidra/reports/fo4-remove-component-functions.txt",
         "tools/ghidra/reports/fo4-remove-component-core.txt",
-        "tools/ghidra/reports/fo4-removeitem-wrapper-callers.txt"
+        "tools/ghidra/reports/fo4-removeitem-wrapper-callers.txt",
+        "tools/ghidra/reports/fo4-remove-components-target-functions.txt",
+        "tools/ghidra/reports/fo4-remove-components-call-windows.txt"
       ],
       "discoveryStrategy": {
         "status": "unproven",

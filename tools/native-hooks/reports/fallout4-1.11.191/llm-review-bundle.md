@@ -53,14 +53,14 @@ Manifest target runtime: Fallout4 1.11.191
 - workshop_material.current_workshop_object_count: 0x59D378
 
 ## Proof Readiness
+### ready_for_proof_metadata
+- encounter_zone.load_change_cell_before_zone_reset: target=0x140494B30; selectedRefs=1/1; directCalls=1/1; extras=0; Create a separate proof-promotion checkpoint with explicit proof.sites metadata.
+- workshop_material.consume_component: target=0x140392010; selectedRefs=2/2; directCalls=2/2; extras=0; Create a separate proof-promotion checkpoint with explicit proof.sites metadata.
+- workshop_material.remove_components: target=0x1411825A0; selectedRefs=2/2; directCalls=2/2; extras=0; Create a separate proof-promotion checkpoint with explicit proof.sites metadata.
 ### needs_exclusion_triage
 - workshop_menu.availability: target=0x1403997A0; selectedRefs=5/5; directCalls=5/5; extras=14; Triage 14 extra same-target references before adding exclusions.
 - workshop_menu.start_placement: target=0x140B30140; selectedRefs=2/2; directCalls=2/2; extras=5; Triage 5 extra same-target references before adding exclusions.
-### needs_rediscovery
-- encounter_zone.load_change_cell_before_zone_reset: target=none; selectedRefs=n/a; directCalls=0/1; extras=0; Refresh discovery reports around the selected manifest sites.
-- workshop_material.build_resource_check: target=none; selectedRefs=n/a; directCalls=0/2; extras=0; Refresh discovery reports around the selected manifest sites.
-- workshop_material.consume_component: target=none; selectedRefs=n/a; directCalls=0/2; extras=0; Refresh discovery reports around the selected manifest sites.
-- workshop_material.remove_components: target=none; selectedRefs=n/a; directCalls=0/2; extras=0; Refresh discovery reports around the selected manifest sites.
+- workshop_material.build_resource_check: target=0x14042BCC0; selectedRefs=2/2; directCalls=2/2; extras=1; Triage 1 extra same-target references before adding exclusions.
 ### already_proven
 - workshop_shared_container.populate_linked_workshop_container: target=0x140389E10; selectedRefs=n/a; directCalls=3/3; extras=0; No proof refresh needed; resolver proof metadata is already present.
 - workshop_material.rebuild_workshop_supply: target=0x140B29690; selectedRefs=n/a; directCalls=4/4; extras=0; No proof refresh needed; resolver proof metadata is already present.
@@ -84,15 +84,21 @@ Manifest target runtime: Fallout4 1.11.191
 - workshop_supply_owner.field_2f8: target=none; selectedRefs=n/a; directCalls=n/a; extras=0; No call-site proof refresh needed.
 
 ## Referenced Ghidra Reports
+- tools/ghidra/reports/fo4-build-resource-check-call-windows.txt
+- tools/ghidra/reports/fo4-build-resource-check-target-functions.txt
 - tools/ghidra/reports/fo4-can-produce-workshop.txt
 - tools/ghidra/reports/fo4-canproduce-callers-detail.txt
 - tools/ghidra/reports/fo4-canproduce-deps.txt
 - tools/ghidra/reports/fo4-cell-detach-reset-functions.txt
 - tools/ghidra/reports/fo4-component-helper-callers.txt
 - tools/ghidra/reports/fo4-component-ui-caller.txt
+- tools/ghidra/reports/fo4-consume-component-call-windows.txt
+- tools/ghidra/reports/fo4-consume-component-target-functions.txt
 - tools/ghidra/reports/fo4-current-workshop-global-refs.txt
 - tools/ghidra/reports/fo4-direct-component-count-allrefs.txt
 - tools/ghidra/reports/fo4-direct-component-count-callsites-window.txt
+- tools/ghidra/reports/fo4-encounter-zone-before-reset-call-windows.txt
+- tools/ghidra/reports/fo4-encounter-zone-before-reset-target-functions.txt
 - tools/ghidra/reports/fo4-encounter-zone-detach-callers.txt
 - tools/ghidra/reports/fo4-get-component-count.txt
 - tools/ghidra/reports/fo4-get-workshop-object-count.txt
@@ -104,6 +110,8 @@ Manifest target runtime: Fallout4 1.11.191
 - tools/ghidra/reports/fo4-remove-component-consume-core.txt
 - tools/ghidra/reports/fo4-remove-component-core.txt
 - tools/ghidra/reports/fo4-remove-component-functions.txt
+- tools/ghidra/reports/fo4-remove-components-call-windows.txt
+- tools/ghidra/reports/fo4-remove-components-target-functions.txt
 - tools/ghidra/reports/fo4-removeitem-wrapper-callers.txt
 - tools/ghidra/reports/fo4-resource-status-call-windows.txt
 - tools/ghidra/reports/fo4-resource-status-target-functions.txt
