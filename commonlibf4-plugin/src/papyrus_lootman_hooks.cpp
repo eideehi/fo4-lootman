@@ -1,6 +1,7 @@
 #include "papyrus_lootman_internal.h"
 
 #include <algorithm>
+#include <atomic>
 #include <array>
 #include <chrono>
 #include <cstdint>
@@ -224,6 +225,7 @@ namespace papyrus_lootman
 	RemoveComponentsFn originalRemoveComponents = nullptr;
 	WorkshopObjectCountFn originalWorkshopObjectCount = nullptr;
 	CurrentWorkshopObjectCountFn originalCurrentWorkshopObjectCount = nullptr;
+	std::atomic_bool sharedWorkshopContainerAugmentationInstalled{ false };
 	std::mutex rememberedWorkshopSupplyLinkLock;
 	std::mutex sharedWorkshopContainerProbeLogLock;
 	std::unordered_map<TESFormID, TESFormID> rememberedWorkshopSupplyLinks;
@@ -1378,9 +1380,79 @@ namespace papyrus_lootman
 			snapshot.formType == static_cast<std::uint32_t>(expectedType);
 	}
 
+	bool IsSharedWorkshopContainerAugmentationInstalled()
+	{
+		return sharedWorkshopContainerAugmentationInstalled.load(std::memory_order_acquire);
+	}
+
+	bool LinkedCountCoversRememberedLootManWorkshop(bool includeLinked)
+	{
+		return includeLinked && IsSharedWorkshopContainerAugmentationInstalled();
+	}
+
+	std::int32_t NonNegativeWorkshopComponentCount(
+		TESObjectREFR* workshop,
+		BGSComponent* component,
+		bool includeLinked)
+	{
+		if (!originalDirectComponentCount || !workshop || !component)
+		{
+			return 0;
+		}
+
+		return std::max<std::int32_t>(
+			originalDirectComponentCount(workshop, component, includeLinked),
+			0);
+	}
+
+	WorkshopMaterialCountAdjustment ComposeRememberedWorkshopComponentCount(
+		TESObjectREFR* currentWorkshop,
+		BGSLocation* currentLocation,
+		TESObjectREFR* lootManWorkshop,
+		BGSComponent* component,
+		bool includeLinked,
+		std::int32_t baseCount)
+	{
+		WorkshopMaterialCountAdjustment adjustment;
+		adjustment.currentWorkshop = currentWorkshop;
+		adjustment.currentLocation = currentLocation;
+		adjustment.lootManWorkshop = lootManWorkshop;
+		adjustment.baseCount = baseCount;
+		adjustment.totalCount = baseCount;
+
+		if (!originalDirectComponentCount ||
+			!currentWorkshop ||
+			!lootManWorkshop ||
+			lootManWorkshop == currentWorkshop ||
+			!component)
+		{
+			return adjustment;
+		}
+
+		if (LinkedCountCoversRememberedLootManWorkshop(includeLinked))
+		{
+			return adjustment;
+		}
+
+		adjustment.extraCount = NonNegativeWorkshopComponentCount(
+			lootManWorkshop,
+			component,
+			false);
+		adjustment.extraResult = true;
+		if (adjustment.extraCount <= 0)
+		{
+			return adjustment;
+		}
+
+		adjustment.totalCount = SaturatingAddNonNegative(adjustment.baseCount, adjustment.extraCount);
+		adjustment.applied = true;
+		return adjustment;
+	}
+
 	WorkshopMaterialCountAdjustment ApplyRememberedWorkshopDirectComponentCount(
 		void* owner,
 		BGSComponent* component,
+		bool includeLinked,
 		std::int32_t baseCount)
 	{
 		WorkshopMaterialCountAdjustment adjustment;
@@ -1412,19 +1484,13 @@ namespace papyrus_lootman
 		adjustment.currentWorkshop = currentWorkshop;
 		adjustment.currentLocation = currentLocation;
 		adjustment.lootManWorkshop = lootManWorkshop;
-		adjustment.extraCount = originalDirectComponentCount(
+		adjustment = ComposeRememberedWorkshopComponentCount(
+			currentWorkshop,
+			currentLocation,
 			lootManWorkshop,
 			component,
-			false);
-		adjustment.extraResult = true;
-		if (adjustment.extraCount <= 0)
-		{
-			LogWorkshopMaterialCountAdjustment(owner, component, adjustment);
-			return adjustment;
-		}
-
-		adjustment.totalCount = SaturatingAddNonNegative(adjustment.baseCount, adjustment.extraCount);
-		adjustment.applied = true;
+			includeLinked,
+			baseCount);
 		LogWorkshopMaterialCountAdjustment(owner, component, adjustment);
 		return adjustment;
 	}
@@ -1449,7 +1515,7 @@ namespace papyrus_lootman
 			!form ||
 			!IsReadableFormType(form, ENUM_FORM_ID::kCMPO) ||
 			!IsReadableFormType(reinterpret_cast<TESForm*>(owner), ENUM_FORM_ID::kREFR) ||
-			includeLinked)
+			LinkedCountCoversRememberedLootManWorkshop(includeLinked))
 		{
 			return adjustment;
 		}
@@ -1600,6 +1666,7 @@ namespace papyrus_lootman
 		const auto adjustment = ApplyRememberedWorkshopDirectComponentCount(
 			owner,
 			component,
+			includeLinked,
 			baseCount);
 		LogDirectComponentCountProbe(
 			sourceId,
@@ -1802,21 +1869,6 @@ namespace papyrus_lootman
 		return context.snapshot;
 	}
 
-	std::int32_t NonNegativeWorkshopComponentCount(
-		TESObjectREFR* workshop,
-		BGSComponent* component,
-		bool includeLinked)
-	{
-		if (!originalDirectComponentCount || !workshop || !component)
-		{
-			return 0;
-		}
-
-		return std::max<std::int32_t>(
-			originalDirectComponentCount(workshop, component, includeLinked),
-			0);
-	}
-
 	struct WorkshopMaterialComponentRemoval
 	{
 		BGSComponent* component = nullptr;
@@ -1960,11 +2012,15 @@ namespace papyrus_lootman
 				currentWorkshop,
 				component,
 				true);
-			const auto lootManCount = NonNegativeWorkshopComponentCount(
+			const auto countAdjustment = ComposeRememberedWorkshopComponentCount(
+				currentWorkshop,
+				currentLocation,
 				lootManWorkshop,
 				component,
-				false);
-			const auto totalCount = SaturatingAddNonNegative(baseCount, lootManCount);
+				true,
+				baseCount);
+			const auto lootManCount = countAdjustment.extraCount;
+			const auto totalCount = countAdjustment.totalCount;
 			const auto totalAvailable = static_cast<std::uint32_t>(totalCount);
 			if (totalAvailable < requiredCount)
 			{
@@ -1984,7 +2040,7 @@ namespace papyrus_lootman
 			const auto consumeFromLootMan = std::min(deficit, availableLootMan);
 
 			++evaluation.satisfiedItemCount;
-			if (consumeFromLootMan > 0)
+			if (countAdjustment.applied && consumeFromLootMan > 0)
 			{
 				++evaluation.lootManBackedItemCount;
 				evaluation.componentRemovals.push_back(WorkshopMaterialComponentRemoval{
@@ -3086,10 +3142,14 @@ namespace papyrus_lootman
 				currentWorkshop,
 				component,
 				includeLinked);
-			const auto lootManCount = NonNegativeWorkshopComponentCount(
+			const auto countAdjustment = ComposeRememberedWorkshopComponentCount(
+				currentWorkshop,
+				currentLocation,
 				lootManWorkshop,
 				component,
-				false);
+				includeLinked,
+				baseCount);
+			const auto lootManCount = countAdjustment.extraCount;
 			const auto availableBase = static_cast<std::uint32_t>(baseCount);
 			const auto availableLootMan = static_cast<std::uint32_t>(lootManCount);
 			const auto deficit = componentRequestedCount > availableBase ?
@@ -3103,7 +3163,7 @@ namespace papyrus_lootman
 				static_cast<std::uint64_t>(plan.consumeFromLootMan) + consumeFromLootMan,
 				static_cast<std::uint64_t>(std::numeric_limits<std::uint32_t>::max())));
 
-			if (consumeFromLootMan == 0)
+			if (!countAdjustment.applied || consumeFromLootMan == 0)
 			{
 				return;
 			}
@@ -3607,10 +3667,12 @@ namespace papyrus_lootman
 					"workshop-shared-container.populate-linked",
 					kSharedWorkshopContainerPolicy.failurePolicyAction))
 			{
+				sharedWorkshopContainerAugmentationInstalled.store(true, std::memory_order_release);
 				REX::INFO("Installed native shared workshop container hooks");
 			}
 			else
 			{
+				sharedWorkshopContainerAugmentationInstalled.store(false, std::memory_order_release);
 				REX::ERROR(
 					"Disabled native hook feature group: featureGroup={}, family=workshop-shared-container.populate-linked, failurePolicyAction={}",
 					kSharedWorkshopContainerPolicy.featureGroup,
