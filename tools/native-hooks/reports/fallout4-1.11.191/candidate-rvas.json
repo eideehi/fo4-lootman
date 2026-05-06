@@ -1022,11 +1022,11 @@
       "id": "workshop_menu.start_placement",
       "category": "call_site_rva",
       "cppName": "kWorkshopStartPlacementCallSites",
-      "expectedCount": 2,
+      "expectedCount": 7,
       "expectedInstructionKind": "call_rel32",
       "expectedOriginalTargetGroup": "workshop_menu.start_placement",
-      "discoveryStatus": "unproven",
-      "discoverySummary": "Resolve StartWorkshopPlacement callers and require two direct CALL rel32 sites to the same helper.",
+      "discoveryStatus": "proven",
+      "discoverySummary": "Resolve StartWorkshopPlacement callers and require seven direct CALL rel32 sites to the same helper.",
       "candidateRvas": [
         {
           "id": "workshop-menu.start-placement.source-a3",
@@ -1041,11 +1041,51 @@
           "sourceId": "0xA4",
           "label": "workshop-menu.start-placement.source-a4",
           "status": "current_manifest_rva"
+        },
+        {
+          "id": "workshop-menu.start-placement.source-a9",
+          "rva": "0xB2B2FF",
+          "sourceId": "0xA9",
+          "label": "workshop-menu.start-placement.source-a9",
+          "status": "current_manifest_rva"
+        },
+        {
+          "id": "workshop-menu.start-placement.source-aa",
+          "rva": "0xB2BB64",
+          "sourceId": "0xAA",
+          "label": "workshop-menu.start-placement.source-aa",
+          "status": "current_manifest_rva"
+        },
+        {
+          "id": "workshop-menu.start-placement.source-ab",
+          "rva": "0xB2DB10",
+          "sourceId": "0xAB",
+          "label": "workshop-menu.start-placement.source-ab",
+          "status": "current_manifest_rva"
+        },
+        {
+          "id": "workshop-menu.start-placement.source-ac",
+          "rva": "0xB2E886",
+          "sourceId": "0xAC",
+          "label": "workshop-menu.start-placement.source-ac",
+          "status": "current_manifest_rva"
+        },
+        {
+          "id": "workshop-menu.start-placement.source-ad",
+          "rva": "0xB2EB0F",
+          "sourceId": "0xAD",
+          "label": "workshop-menu.start-placement.source-ad",
+          "status": "current_manifest_rva"
         }
       ],
       "instructionWindowAddresses": [
         "0xB2C9EA",
-        "0xB2CCA5"
+        "0xB2CCA5",
+        "0xB2B2FF",
+        "0xB2BB64",
+        "0xB2DB10",
+        "0xB2E886",
+        "0xB2EB0F"
       ],
       "evidence": [
         "tools/ghidra/reports/fo4-workshopmenu-placement-creation-paths.txt",
@@ -1053,13 +1093,10 @@
         "tools/ghidra/reports/fo4-selected-build-functions.txt",
         "tools/ghidra/reports/fo4-start-placement-extra-windows.txt"
       ],
-      "unresolvedItems": [
-        "Discovery strategy is unproven: Resolve StartWorkshopPlacement callers and require two direct CALL rel32 sites to the same helper.",
-        "Verify candidate count, CALL rel32 shape, and original target grouping before updating manifest RVAs."
-      ],
+      "unresolvedItems": [],
       "proofReadiness": {
-        "status": "needs_exclusion_triage",
-        "summary": "Target allrefs include same-target references outside the selected hook sites.",
+        "status": "already_proven",
+        "summary": "The manifest already contains resolver proof metadata for this call-site family.",
         "selectedSites": [
           {
             "id": "workshop-menu.start-placement.source-a3",
@@ -1074,6 +1111,41 @@
             "sourceId": "0xA4",
             "label": "workshop-menu.start-placement.source-a4",
             "absoluteAddress": "0x140B2CCA5"
+          },
+          {
+            "id": "workshop-menu.start-placement.source-a9",
+            "rva": "0xB2B2FF",
+            "sourceId": "0xA9",
+            "label": "workshop-menu.start-placement.source-a9",
+            "absoluteAddress": "0x140B2B2FF"
+          },
+          {
+            "id": "workshop-menu.start-placement.source-aa",
+            "rva": "0xB2BB64",
+            "sourceId": "0xAA",
+            "label": "workshop-menu.start-placement.source-aa",
+            "absoluteAddress": "0x140B2BB64"
+          },
+          {
+            "id": "workshop-menu.start-placement.source-ab",
+            "rva": "0xB2DB10",
+            "sourceId": "0xAB",
+            "label": "workshop-menu.start-placement.source-ab",
+            "absoluteAddress": "0x140B2DB10"
+          },
+          {
+            "id": "workshop-menu.start-placement.source-ac",
+            "rva": "0xB2E886",
+            "sourceId": "0xAC",
+            "label": "workshop-menu.start-placement.source-ac",
+            "absoluteAddress": "0x140B2E886"
+          },
+          {
+            "id": "workshop-menu.start-placement.source-ad",
+            "rva": "0xB2EB0F",
+            "sourceId": "0xAD",
+            "label": "workshop-menu.start-placement.source-ad",
+            "absoluteAddress": "0x140B2EB0F"
           }
         ],
         "targetAbsoluteAddress": "0x140B30140",
@@ -1082,43 +1154,34 @@
             "targetAbsoluteAddress": "0x140B30140",
             "selectedSiteIds": [
               "workshop-menu.start-placement.source-a3",
-              "workshop-menu.start-placement.source-a4"
+              "workshop-menu.start-placement.source-a4",
+              "workshop-menu.start-placement.source-a9",
+              "workshop-menu.start-placement.source-aa",
+              "workshop-menu.start-placement.source-ab",
+              "workshop-menu.start-placement.source-ac",
+              "workshop-menu.start-placement.source-ad"
             ],
             "selectedSiteAbsoluteAddresses": [
+              "0x140B2B2FF",
+              "0x140B2BB64",
               "0x140B2C9EA",
-              "0x140B2CCA5"
+              "0x140B2CCA5",
+              "0x140B2DB10",
+              "0x140B2E886",
+              "0x140B2EB0F"
             ],
             "evidence": [
               "tools/ghidra/reports/fo4-selected-build-functions.txt",
+              "tools/ghidra/reports/fo4-start-placement-extra-windows.txt",
               "tools/ghidra/reports/fo4-workshopmenu-placement-creation-paths.txt",
               "tools/ghidra/reports/fo4-workshopmenu-placement-writes.txt"
             ]
           }
         ],
-        "targetReport": {
-          "path": "tools/ghidra/reports/fo4-selected-build-functions.txt",
-          "targetAbsoluteAddress": "0x140B30140",
-          "referenceCount": 7,
-          "selectedReferenceCount": 2,
-          "missingSelectedReferences": [],
-          "extraSameTargetReferences": [
-            "0x140B2B2FF",
-            "0x140B2BB64",
-            "0x140B2DB10",
-            "0x140B2E886",
-            "0x140B2EB0F"
-          ]
-        },
-        "directCallInstructionCount": 2,
+        "directCallInstructionCount": 7,
         "missingDirectCallSites": [],
-        "extraSameTargetReferences": [
-          "0x140B2B2FF",
-          "0x140B2BB64",
-          "0x140B2DB10",
-          "0x140B2E886",
-          "0x140B2EB0F"
-        ],
-        "recommendedNextAction": "Triage 5 extra same-target references before adding exclusions."
+        "extraSameTargetReferences": [],
+        "recommendedNextAction": "No proof refresh needed; resolver proof metadata is already present."
       }
     },
     {

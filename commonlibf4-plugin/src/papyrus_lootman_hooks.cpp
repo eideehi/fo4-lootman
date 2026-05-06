@@ -2736,6 +2736,76 @@ namespace papyrus_lootman
 			site.label);
 	}
 
+	void HookedWorkshopStartPlacementSourceA9(
+		void* menuContext,
+		bool allowPlacement,
+		bool createPreview)
+	{
+		const auto& site = kWorkshopStartPlacementCallSites[2];
+		HookedWorkshopStartPlacement(
+			menuContext,
+			allowPlacement,
+			createPreview,
+			site.sourceId,
+			site.label);
+	}
+
+	void HookedWorkshopStartPlacementSourceAA(
+		void* menuContext,
+		bool allowPlacement,
+		bool createPreview)
+	{
+		const auto& site = kWorkshopStartPlacementCallSites[3];
+		HookedWorkshopStartPlacement(
+			menuContext,
+			allowPlacement,
+			createPreview,
+			site.sourceId,
+			site.label);
+	}
+
+	void HookedWorkshopStartPlacementSourceAB(
+		void* menuContext,
+		bool allowPlacement,
+		bool createPreview)
+	{
+		const auto& site = kWorkshopStartPlacementCallSites[4];
+		HookedWorkshopStartPlacement(
+			menuContext,
+			allowPlacement,
+			createPreview,
+			site.sourceId,
+			site.label);
+	}
+
+	void HookedWorkshopStartPlacementSourceAC(
+		void* menuContext,
+		bool allowPlacement,
+		bool createPreview)
+	{
+		const auto& site = kWorkshopStartPlacementCallSites[5];
+		HookedWorkshopStartPlacement(
+			menuContext,
+			allowPlacement,
+			createPreview,
+			site.sourceId,
+			site.label);
+	}
+
+	void HookedWorkshopStartPlacementSourceAD(
+		void* menuContext,
+		bool allowPlacement,
+		bool createPreview)
+	{
+		const auto& site = kWorkshopStartPlacementCallSites[6];
+		HookedWorkshopStartPlacement(
+			menuContext,
+			allowPlacement,
+			createPreview,
+			site.sourceId,
+			site.label);
+	}
+
 	void LogWorkshopBuildResourceCheck(
 		std::uint32_t sourceId,
 		const char* sourceName,
@@ -3603,6 +3673,11 @@ namespace papyrus_lootman
 			const std::array<WorkshopStartPlacementFn, kWorkshopStartPlacementCallSites.size()> startPlacementHooks{
 				&HookedWorkshopStartPlacementSourceA3,
 				&HookedWorkshopStartPlacementSourceA4,
+				&HookedWorkshopStartPlacementSourceA9,
+				&HookedWorkshopStartPlacementSourceAA,
+				&HookedWorkshopStartPlacementSourceAB,
+				&HookedWorkshopStartPlacementSourceAC,
+				&HookedWorkshopStartPlacementSourceAD,
 			};
 			allInstalled &= InstallDirectCallHookFamily(
 				kWorkshopStartPlacementCallSites,

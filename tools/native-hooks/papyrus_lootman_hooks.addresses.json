@@ -595,7 +595,7 @@
       "id": "workshop_menu.start_placement",
       "cppName": "kWorkshopStartPlacementCallSites",
       "category": "call_site_rva",
-      "expectedCount": 2,
+      "expectedCount": 7,
       "expectedInstructionKind": "call_rel32",
       "expectedOriginalTargetGroup": "workshop_menu.start_placement",
       "evidence": [
@@ -605,8 +605,49 @@
         "tools/ghidra/reports/fo4-start-placement-extra-windows.txt"
       ],
       "discoveryStrategy": {
-        "status": "unproven",
-        "summary": "Resolve StartWorkshopPlacement callers and require two direct CALL rel32 sites to the same helper."
+        "status": "proven",
+        "summary": "Resolve StartWorkshopPlacement callers and require seven direct CALL rel32 sites to the same helper.",
+        "proof": {
+          "kind": "ghidra_reference_report",
+          "report": "tools/ghidra/reports/fo4-selected-build-functions.txt",
+          "instructionReports": [
+            "tools/ghidra/reports/fo4-workshopmenu-placement-creation-paths.txt",
+            "tools/ghidra/reports/fo4-workshopmenu-placement-writes.txt",
+            "tools/ghidra/reports/fo4-start-placement-extra-windows.txt"
+          ],
+          "targetAbsoluteAddress": "0x140B30140",
+          "referenceType": "UNCONDITIONAL_CALL",
+          "sites": [
+            {
+              "siteId": "workshop-menu.start-placement.source-a3",
+              "absoluteAddress": "0x140B2C9EA"
+            },
+            {
+              "siteId": "workshop-menu.start-placement.source-a4",
+              "absoluteAddress": "0x140B2CCA5"
+            },
+            {
+              "siteId": "workshop-menu.start-placement.source-a9",
+              "absoluteAddress": "0x140B2B2FF"
+            },
+            {
+              "siteId": "workshop-menu.start-placement.source-aa",
+              "absoluteAddress": "0x140B2BB64"
+            },
+            {
+              "siteId": "workshop-menu.start-placement.source-ab",
+              "absoluteAddress": "0x140B2DB10"
+            },
+            {
+              "siteId": "workshop-menu.start-placement.source-ac",
+              "absoluteAddress": "0x140B2E886"
+            },
+            {
+              "siteId": "workshop-menu.start-placement.source-ad",
+              "absoluteAddress": "0x140B2EB0F"
+            }
+          ]
+        }
       },
       "sites": [
         {
@@ -620,6 +661,36 @@
           "rva": "0xB2CCA5",
           "sourceId": "0xA4",
           "label": "workshop-menu.start-placement.source-a4"
+        },
+        {
+          "id": "workshop-menu.start-placement.source-a9",
+          "rva": "0xB2B2FF",
+          "sourceId": "0xA9",
+          "label": "workshop-menu.start-placement.source-a9"
+        },
+        {
+          "id": "workshop-menu.start-placement.source-aa",
+          "rva": "0xB2BB64",
+          "sourceId": "0xAA",
+          "label": "workshop-menu.start-placement.source-aa"
+        },
+        {
+          "id": "workshop-menu.start-placement.source-ab",
+          "rva": "0xB2DB10",
+          "sourceId": "0xAB",
+          "label": "workshop-menu.start-placement.source-ab"
+        },
+        {
+          "id": "workshop-menu.start-placement.source-ac",
+          "rva": "0xB2E886",
+          "sourceId": "0xAC",
+          "label": "workshop-menu.start-placement.source-ac"
+        },
+        {
+          "id": "workshop-menu.start-placement.source-ad",
+          "rva": "0xB2EB0F",
+          "sourceId": "0xAD",
+          "label": "workshop-menu.start-placement.source-ad"
         }
       ]
     },

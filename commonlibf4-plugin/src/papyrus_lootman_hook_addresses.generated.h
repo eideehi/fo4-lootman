@@ -222,7 +222,7 @@ namespace papyrus_lootman
 		},
 	}};
 
-	inline constexpr std::array<NativeHookCallSite, 2> kWorkshopStartPlacementCallSites{{
+	inline constexpr std::array<NativeHookCallSite, 7> kWorkshopStartPlacementCallSites{{
 		{
 			"workshop-menu.start-placement.source-a3",
 			0xB2C9EA,
@@ -234,6 +234,36 @@ namespace papyrus_lootman
 			0xB2CCA5,
 			0xA4,
 			"workshop-menu.start-placement.source-a4@0xB2CCA5",
+		},
+		{
+			"workshop-menu.start-placement.source-a9",
+			0xB2B2FF,
+			0xA9,
+			"workshop-menu.start-placement.source-a9@0xB2B2FF",
+		},
+		{
+			"workshop-menu.start-placement.source-aa",
+			0xB2BB64,
+			0xAA,
+			"workshop-menu.start-placement.source-aa@0xB2BB64",
+		},
+		{
+			"workshop-menu.start-placement.source-ab",
+			0xB2DB10,
+			0xAB,
+			"workshop-menu.start-placement.source-ab@0xB2DB10",
+		},
+		{
+			"workshop-menu.start-placement.source-ac",
+			0xB2E886,
+			0xAC,
+			"workshop-menu.start-placement.source-ac@0xB2E886",
+		},
+		{
+			"workshop-menu.start-placement.source-ad",
+			0xB2EB0F,
+			0xAD,
+			"workshop-menu.start-placement.source-ad@0xB2EB0F",
 		},
 	}};
 

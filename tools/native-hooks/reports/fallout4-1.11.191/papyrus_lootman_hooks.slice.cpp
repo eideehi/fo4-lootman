@@ -343,186 +343,191 @@
 
 // ...
 
-// 3486 | 			prefixText,
-// 3487 | 			targetWorkshop ? targetWorkshop->formID : 0,
-// 3488 | 			targetLocation ? targetLocation->formID : 0,
-// 3489 | 			lootManWorkshop ? lootManWorkshop->formID : 0,
-// 3490 | 			lootManLocation ? lootManLocation->formID : 0,
-// 3491 | 			workshopCaravanKeyword ? workshopCaravanKeyword->formID : 0);
-// 3492 | 	}
-// 3493 |
-// 3494 | 	void InstallWorkbenchSharedContainerHooks()
-// 3495 | 	{
-// 3496 | 		static std::once_flag installOnce;
-// 3497 | 		std::call_once(installOnce, []()
-// 3498 | 		{
-// 3499 | 			const std::array<PopulateLinkedWorkshopContainersFn, kPopulateLinkedWorkshopContainerCallSites.size()> hooks{
-// 3500 | 				&HookedPopulateLinkedWorkshopContainers,
-// 3501 | 				&HookedPopulateLinkedWorkshopContainers,
-// 3502 | 				&HookedPopulateLinkedWorkshopContainers,
-// 3503 | 			};
-// 3504 |
-// 3505 | 			if (InstallDirectCallHookFamily(
-// 3506 | 					kPopulateLinkedWorkshopContainerCallSites,
-// 3507 | 					hooks,
-// 3508 | 					originalPopulateLinkedWorkshopContainers,
-// 3509 | 					"workshop-shared-container.populate-linked"))
-// 3510 | 			{
-// 3511 | 				REX::INFO("Installed native shared workshop container hooks");
-// 3512 | 			}
-// 3513 | 		});
-// 3514 | 	}
-// 3515 |
-// 3516 | 	void InstallWorkshopMaterialProbeHooks()
-// 3517 | 	{
-// 3518 | 		static std::once_flag installOnce;
-// 3519 | 		std::call_once(installOnce, []()
-// 3520 | 		{
-// 3521 | 			bool allInstalled = true;
-// 3522 |
-// 3523 | 			const std::array<RebuildWorkshopSupplyFn, kRebuildWorkshopSupplyCallSites.size()> rebuildHooks{
-// 3524 | 				&HookedRebuildWorkshopSupplySourceA1,
-// 3525 | 				&HookedRebuildWorkshopSupplySourceA2,
-// 3526 | 				&HookedRebuildWorkshopSupplySourceA3,
-// 3527 | 				&HookedRebuildWorkshopSupplySourceA4,
-// 3528 | 			};
-// 3529 | 			allInstalled &= InstallDirectCallHookFamily(
-// 3530 | 				kRebuildWorkshopSupplyCallSites,
-// 3531 | 				rebuildHooks,
-// 3532 | 				originalRebuildWorkshopSupply,
-// 3533 | 				"workshop-material.rebuild-supply");
-// 3534 |
-// 3535 | 			const std::array<ComponentCountHelperFn, kComponentCountHelperCallSites.size()> componentCountHooks{
-// 3536 | 				&HookedComponentCountPapyrus,
-// 3537 | 				&HookedComponentCountWorkbenchUi,
-// 3538 | 			};
-// 3539 | 			allInstalled &= InstallDirectCallHookFamily(
-// 3540 | 				kComponentCountHelperCallSites,
-// 3541 | 				componentCountHooks,
-// 3542 | 				originalComponentCountHelper,
-// 3543 | 				"workshop-material.component-count");
-// 3544 |
-// 3545 | 			const std::array<DirectComponentCountFn, kDirectComponentCountCallSites.size()> directComponentHooks{
-// 3546 | 				&HookedDirectComponentCountSourceE1,
-// 3547 | 				&HookedDirectComponentCountSourceE2,
-// 3548 | 				&HookedDirectComponentCountSourceE3,
-// 3549 | 				&HookedDirectComponentCountSourceE4,
-// 3550 | 				&HookedDirectComponentCountSourceE5,
-// 3551 | 			};
-// 3552 | 			allInstalled &= InstallDirectCallHookFamily(
-// 3553 | 				kDirectComponentCountCallSites,
-// 3554 | 				directComponentHooks,
-// 3555 | 				originalDirectComponentCount,
-// 3556 | 				"workshop-material.direct-component-count");
-// 3557 |
-// 3558 | 			const std::array<WorkshopResourceStatusFn, kWorkshopResourceStatusCallSites.size()> resourceStatusHooks{
-// 3559 | 				&HookedWorkshopResourceStatusSourceF1,
-// 3560 | 				&HookedWorkshopResourceStatusSourceF2,
-// 3561 | 			};
-// 3562 | 			allInstalled &= InstallDirectCallHookFamily(
-// 3563 | 				kWorkshopResourceStatusCallSites,
-// 3564 | 				resourceStatusHooks,
-// 3565 | 				originalWorkshopResourceStatus,
-// 3566 | 				"workshop-material.resource-status");
-// 3567 |
-// 3568 | 			const std::array<WorkshopMenuAvailabilityFn, kWorkshopMenuAvailabilityCallSites.size()> menuAvailabilityHooks{
-// 3569 | 				&HookedWorkshopMenuAvailabilitySource91,
-// 3570 | 				&HookedWorkshopMenuAvailabilitySource92,
-// 3571 | 				&HookedWorkshopMenuAvailabilitySource93,
-// 3572 | 				&HookedWorkshopMenuAvailabilitySource94,
-// 3573 | 				&HookedWorkshopMenuAvailabilitySource95,
-// 3574 | 			};
-// 3575 | 			allInstalled &= InstallDirectCallHookFamily(
-// 3576 | 				kWorkshopMenuAvailabilityCallSites,
-// 3577 | 				menuAvailabilityHooks,
-// 3578 | 				originalWorkshopMenuAvailability,
-// 3579 | 				"workshop-menu.availability");
-// 3580 |
-// 3581 | 			const std::array<WorkshopCheckAndSetPlacementFn, kWorkshopCheckAndSetPlacementCallSites.size()> checkAndSetPlacementHooks{
-// 3582 | 				&HookedWorkshopCheckAndSetPlacementSourceA5,
-// 3583 | 				&HookedWorkshopCheckAndSetPlacementSourceA6,
-// 3584 | 				&HookedWorkshopCheckAndSetPlacementSourceA7,
-// 3585 | 				&HookedWorkshopCheckAndSetPlacementSourceA8,
-// 3586 | 			};
-// 3587 | 			allInstalled &= InstallDirectCallHookFamily(
-// 3588 | 				kWorkshopCheckAndSetPlacementCallSites,
-// 3589 | 				checkAndSetPlacementHooks,
-// 3590 | 				originalWorkshopCheckAndSetPlacement,
-// 3591 | 				"workshop-menu.check-placement");
+// 3556 | 			prefixText,
+// 3557 | 			targetWorkshop ? targetWorkshop->formID : 0,
+// 3558 | 			targetLocation ? targetLocation->formID : 0,
+// 3559 | 			lootManWorkshop ? lootManWorkshop->formID : 0,
+// 3560 | 			lootManLocation ? lootManLocation->formID : 0,
+// 3561 | 			workshopCaravanKeyword ? workshopCaravanKeyword->formID : 0);
+// 3562 | 	}
+// 3563 |
+// 3564 | 	void InstallWorkbenchSharedContainerHooks()
+// 3565 | 	{
+// 3566 | 		static std::once_flag installOnce;
+// 3567 | 		std::call_once(installOnce, []()
+// 3568 | 		{
+// 3569 | 			const std::array<PopulateLinkedWorkshopContainersFn, kPopulateLinkedWorkshopContainerCallSites.size()> hooks{
+// 3570 | 				&HookedPopulateLinkedWorkshopContainers,
+// 3571 | 				&HookedPopulateLinkedWorkshopContainers,
+// 3572 | 				&HookedPopulateLinkedWorkshopContainers,
+// 3573 | 			};
+// 3574 |
+// 3575 | 			if (InstallDirectCallHookFamily(
+// 3576 | 					kPopulateLinkedWorkshopContainerCallSites,
+// 3577 | 					hooks,
+// 3578 | 					originalPopulateLinkedWorkshopContainers,
+// 3579 | 					"workshop-shared-container.populate-linked"))
+// 3580 | 			{
+// 3581 | 				REX::INFO("Installed native shared workshop container hooks");
+// 3582 | 			}
+// 3583 | 		});
+// 3584 | 	}
+// 3585 |
+// 3586 | 	void InstallWorkshopMaterialProbeHooks()
+// 3587 | 	{
+// 3588 | 		static std::once_flag installOnce;
+// 3589 | 		std::call_once(installOnce, []()
+// 3590 | 		{
+// 3591 | 			bool allInstalled = true;
 // 3592 |
-// 3593 | 			const std::array<WorkshopMenuSelectFn, kWorkshopMenuSelectCallSites.size()> menuSelectHooks{
-// 3594 | 				&HookedWorkshopMenuSelectSourceA1,
-// 3595 | 				&HookedWorkshopMenuSelectSourceA2,
-// 3596 | 			};
-// 3597 | 			allInstalled &= InstallDirectCallHookFamily(
-// 3598 | 				kWorkshopMenuSelectCallSites,
-// 3599 | 				menuSelectHooks,
-// 3600 | 				originalWorkshopMenuSelect,
-// 3601 | 				"workshop-menu.select");
-// 3602 |
-// 3603 | 			const std::array<WorkshopStartPlacementFn, kWorkshopStartPlacementCallSites.size()> startPlacementHooks{
-// 3604 | 				&HookedWorkshopStartPlacementSourceA3,
-// 3605 | 				&HookedWorkshopStartPlacementSourceA4,
-// 3606 | 			};
-// 3607 | 			allInstalled &= InstallDirectCallHookFamily(
-// 3608 | 				kWorkshopStartPlacementCallSites,
-// 3609 | 				startPlacementHooks,
-// 3610 | 				originalWorkshopStartPlacement,
-// 3611 | 				"workshop-menu.start-placement");
-// 3612 |
-// 3613 | 			const std::array<WorkshopBuildResourceCheckFn, kWorkshopBuildResourceCheckCallSites.size()> buildResourceCheckHooks{
-// 3614 | 				&HookedWorkshopBuildResourceCheckPlacement,
-// 3615 | 				&HookedWorkshopBuildResourceCheckConfirm,
-// 3616 | 				&HookedWorkshopBuildResourceCheckConsumePrecheck,
-// 3617 | 			};
-// 3618 | 			allInstalled &= InstallDirectCallHookFamily(
-// 3619 | 				kWorkshopBuildResourceCheckCallSites,
-// 3620 | 				buildResourceCheckHooks,
-// 3621 | 				originalWorkshopBuildResourceCheck,
-// 3622 | 				"workshop-material.build-resource-check");
-// 3623 |
-// 3624 | 			const std::array<RemoveComponentsFn, kRemoveComponentsCallSites.size()> removeComponentHooks{
-// 3625 | 				&HookedRemoveComponentsSourceF1,
-// 3626 | 				&HookedRemoveComponentsSourceF2,
-// 3627 | 			};
-// 3628 | 			allInstalled &= InstallDirectCallHookFamily(
-// 3629 | 				kRemoveComponentsCallSites,
-// 3630 | 				removeComponentHooks,
-// 3631 | 				originalRemoveComponents,
-// 3632 | 				"workshop-material.remove-components");
-// 3633 |
-// 3634 | 			const std::array<WorkshopConsumeComponentFn, kWorkshopConsumeComponentCallSites.size()> consumeComponentHooks{
-// 3635 | 				&HookedWorkshopConsumeComponentSourceF3,
-// 3636 | 				&HookedWorkshopConsumeComponentSourceF4,
-// 3637 | 			};
-// 3638 | 			allInstalled &= InstallDirectCallHookFamily(
-// 3639 | 				kWorkshopConsumeComponentCallSites,
-// 3640 | 				consumeComponentHooks,
-// 3641 | 				originalWorkshopConsumeComponent,
-// 3642 | 				"workshop-material.consume-component");
-// 3643 |
-// 3644 | 			allInstalled &= InstallDirectCallHookSite(
-// 3645 | 				kWorkshopObjectCountPapyrusCallSite,
-// 3646 | 				&HookedWorkshopObjectCount,
-// 3647 | 				originalWorkshopObjectCount,
-// 3648 | 				"workshop-material.object-count.papyrus");
-// 3649 |
-// 3650 | 			allInstalled &= InstallDirectCallHookSite(
-// 3651 | 				kCurrentWorkshopObjectCountCallSite,
-// 3652 | 				&HookedCurrentWorkshopObjectCount,
-// 3653 | 				originalCurrentWorkshopObjectCount,
-// 3654 | 				"workshop-material.object-count.current-workshop");
-// 3655 |
-// 3656 | 			if (allInstalled)
-// 3657 | 			{
-// 3658 | 				REX::INFO("Installed native workshop material probe hooks");
-// 3659 | 			}
-// 3660 | 			else
-// 3661 | 			{
-// 3662 | 				REX::WARN("Installed native workshop material probe hooks with one or more skipped families");
-// 3663 | 			}
-// 3664 | 		});
-// 3665 | 	}
-// 3666 |
-// 3667 | }
-// 3668 |
+// 3593 | 			const std::array<RebuildWorkshopSupplyFn, kRebuildWorkshopSupplyCallSites.size()> rebuildHooks{
+// 3594 | 				&HookedRebuildWorkshopSupplySourceA1,
+// 3595 | 				&HookedRebuildWorkshopSupplySourceA2,
+// 3596 | 				&HookedRebuildWorkshopSupplySourceA3,
+// 3597 | 				&HookedRebuildWorkshopSupplySourceA4,
+// 3598 | 			};
+// 3599 | 			allInstalled &= InstallDirectCallHookFamily(
+// 3600 | 				kRebuildWorkshopSupplyCallSites,
+// 3601 | 				rebuildHooks,
+// 3602 | 				originalRebuildWorkshopSupply,
+// 3603 | 				"workshop-material.rebuild-supply");
+// 3604 |
+// 3605 | 			const std::array<ComponentCountHelperFn, kComponentCountHelperCallSites.size()> componentCountHooks{
+// 3606 | 				&HookedComponentCountPapyrus,
+// 3607 | 				&HookedComponentCountWorkbenchUi,
+// 3608 | 			};
+// 3609 | 			allInstalled &= InstallDirectCallHookFamily(
+// 3610 | 				kComponentCountHelperCallSites,
+// 3611 | 				componentCountHooks,
+// 3612 | 				originalComponentCountHelper,
+// 3613 | 				"workshop-material.component-count");
+// 3614 |
+// 3615 | 			const std::array<DirectComponentCountFn, kDirectComponentCountCallSites.size()> directComponentHooks{
+// 3616 | 				&HookedDirectComponentCountSourceE1,
+// 3617 | 				&HookedDirectComponentCountSourceE2,
+// 3618 | 				&HookedDirectComponentCountSourceE3,
+// 3619 | 				&HookedDirectComponentCountSourceE4,
+// 3620 | 				&HookedDirectComponentCountSourceE5,
+// 3621 | 			};
+// 3622 | 			allInstalled &= InstallDirectCallHookFamily(
+// 3623 | 				kDirectComponentCountCallSites,
+// 3624 | 				directComponentHooks,
+// 3625 | 				originalDirectComponentCount,
+// 3626 | 				"workshop-material.direct-component-count");
+// 3627 |
+// 3628 | 			const std::array<WorkshopResourceStatusFn, kWorkshopResourceStatusCallSites.size()> resourceStatusHooks{
+// 3629 | 				&HookedWorkshopResourceStatusSourceF1,
+// 3630 | 				&HookedWorkshopResourceStatusSourceF2,
+// 3631 | 			};
+// 3632 | 			allInstalled &= InstallDirectCallHookFamily(
+// 3633 | 				kWorkshopResourceStatusCallSites,
+// 3634 | 				resourceStatusHooks,
+// 3635 | 				originalWorkshopResourceStatus,
+// 3636 | 				"workshop-material.resource-status");
+// 3637 |
+// 3638 | 			const std::array<WorkshopMenuAvailabilityFn, kWorkshopMenuAvailabilityCallSites.size()> menuAvailabilityHooks{
+// 3639 | 				&HookedWorkshopMenuAvailabilitySource91,
+// 3640 | 				&HookedWorkshopMenuAvailabilitySource92,
+// 3641 | 				&HookedWorkshopMenuAvailabilitySource93,
+// 3642 | 				&HookedWorkshopMenuAvailabilitySource94,
+// 3643 | 				&HookedWorkshopMenuAvailabilitySource95,
+// 3644 | 			};
+// 3645 | 			allInstalled &= InstallDirectCallHookFamily(
+// 3646 | 				kWorkshopMenuAvailabilityCallSites,
+// 3647 | 				menuAvailabilityHooks,
+// 3648 | 				originalWorkshopMenuAvailability,
+// 3649 | 				"workshop-menu.availability");
+// 3650 |
+// 3651 | 			const std::array<WorkshopCheckAndSetPlacementFn, kWorkshopCheckAndSetPlacementCallSites.size()> checkAndSetPlacementHooks{
+// 3652 | 				&HookedWorkshopCheckAndSetPlacementSourceA5,
+// 3653 | 				&HookedWorkshopCheckAndSetPlacementSourceA6,
+// 3654 | 				&HookedWorkshopCheckAndSetPlacementSourceA7,
+// 3655 | 				&HookedWorkshopCheckAndSetPlacementSourceA8,
+// 3656 | 			};
+// 3657 | 			allInstalled &= InstallDirectCallHookFamily(
+// 3658 | 				kWorkshopCheckAndSetPlacementCallSites,
+// 3659 | 				checkAndSetPlacementHooks,
+// 3660 | 				originalWorkshopCheckAndSetPlacement,
+// 3661 | 				"workshop-menu.check-placement");
+// 3662 |
+// 3663 | 			const std::array<WorkshopMenuSelectFn, kWorkshopMenuSelectCallSites.size()> menuSelectHooks{
+// 3664 | 				&HookedWorkshopMenuSelectSourceA1,
+// 3665 | 				&HookedWorkshopMenuSelectSourceA2,
+// 3666 | 			};
+// 3667 | 			allInstalled &= InstallDirectCallHookFamily(
+// 3668 | 				kWorkshopMenuSelectCallSites,
+// 3669 | 				menuSelectHooks,
+// 3670 | 				originalWorkshopMenuSelect,
+// 3671 | 				"workshop-menu.select");
+// 3672 |
+// 3673 | 			const std::array<WorkshopStartPlacementFn, kWorkshopStartPlacementCallSites.size()> startPlacementHooks{
+// 3674 | 				&HookedWorkshopStartPlacementSourceA3,
+// 3675 | 				&HookedWorkshopStartPlacementSourceA4,
+// 3676 | 				&HookedWorkshopStartPlacementSourceA9,
+// 3677 | 				&HookedWorkshopStartPlacementSourceAA,
+// 3678 | 				&HookedWorkshopStartPlacementSourceAB,
+// 3679 | 				&HookedWorkshopStartPlacementSourceAC,
+// 3680 | 				&HookedWorkshopStartPlacementSourceAD,
+// 3681 | 			};
+// 3682 | 			allInstalled &= InstallDirectCallHookFamily(
+// 3683 | 				kWorkshopStartPlacementCallSites,
+// 3684 | 				startPlacementHooks,
+// 3685 | 				originalWorkshopStartPlacement,
+// 3686 | 				"workshop-menu.start-placement");
+// 3687 |
+// 3688 | 			const std::array<WorkshopBuildResourceCheckFn, kWorkshopBuildResourceCheckCallSites.size()> buildResourceCheckHooks{
+// 3689 | 				&HookedWorkshopBuildResourceCheckPlacement,
+// 3690 | 				&HookedWorkshopBuildResourceCheckConfirm,
+// 3691 | 				&HookedWorkshopBuildResourceCheckConsumePrecheck,
+// 3692 | 			};
+// 3693 | 			allInstalled &= InstallDirectCallHookFamily(
+// 3694 | 				kWorkshopBuildResourceCheckCallSites,
+// 3695 | 				buildResourceCheckHooks,
+// 3696 | 				originalWorkshopBuildResourceCheck,
+// 3697 | 				"workshop-material.build-resource-check");
+// 3698 |
+// 3699 | 			const std::array<RemoveComponentsFn, kRemoveComponentsCallSites.size()> removeComponentHooks{
+// 3700 | 				&HookedRemoveComponentsSourceF1,
+// 3701 | 				&HookedRemoveComponentsSourceF2,
+// 3702 | 			};
+// 3703 | 			allInstalled &= InstallDirectCallHookFamily(
+// 3704 | 				kRemoveComponentsCallSites,
+// 3705 | 				removeComponentHooks,
+// 3706 | 				originalRemoveComponents,
+// 3707 | 				"workshop-material.remove-components");
+// 3708 |
+// 3709 | 			const std::array<WorkshopConsumeComponentFn, kWorkshopConsumeComponentCallSites.size()> consumeComponentHooks{
+// 3710 | 				&HookedWorkshopConsumeComponentSourceF3,
+// 3711 | 				&HookedWorkshopConsumeComponentSourceF4,
+// 3712 | 			};
+// 3713 | 			allInstalled &= InstallDirectCallHookFamily(
+// 3714 | 				kWorkshopConsumeComponentCallSites,
+// 3715 | 				consumeComponentHooks,
+// 3716 | 				originalWorkshopConsumeComponent,
+// 3717 | 				"workshop-material.consume-component");
+// 3718 |
+// 3719 | 			allInstalled &= InstallDirectCallHookSite(
+// 3720 | 				kWorkshopObjectCountPapyrusCallSite,
+// 3721 | 				&HookedWorkshopObjectCount,
+// 3722 | 				originalWorkshopObjectCount,
+// 3723 | 				"workshop-material.object-count.papyrus");
+// 3724 |
+// 3725 | 			allInstalled &= InstallDirectCallHookSite(
+// 3726 | 				kCurrentWorkshopObjectCountCallSite,
+// 3727 | 				&HookedCurrentWorkshopObjectCount,
+// 3728 | 				originalCurrentWorkshopObjectCount,
+// 3729 | 				"workshop-material.object-count.current-workshop");
+// 3730 |
+// 3731 | 			if (allInstalled)
+// 3732 | 			{
+// 3733 | 				REX::INFO("Installed native workshop material probe hooks");
+// 3734 | 			}
+// 3735 | 			else
+// 3736 | 			{
+// 3737 | 				REX::WARN("Installed native workshop material probe hooks with one or more skipped families");
+// 3738 | 			}
+// 3739 | 		});
+// 3740 | 	}
+// 3741 |
+// 3742 | }
+// 3743 |
