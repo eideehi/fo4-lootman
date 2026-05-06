@@ -11,6 +11,7 @@
     "build": "node scripts/preflight.js build && tsx scripts/cli.ts build",
     "generate:native-hooks": "node scripts/preflight.js generate:native-hooks && tsx scripts/generate-native-hook-addresses.ts",
     "generate:native-hook-bundle": "node scripts/preflight.js generate:native-hook-bundle && tsx scripts/generate-native-hook-review-bundle.ts",
+    "resolve:native-hooks": "node scripts/preflight.js resolve:native-hooks && tsx scripts/resolve-native-hook-addresses.ts",
     "verify:native-hooks": "node scripts/preflight.js verify:native-hooks && tsx scripts/verify-native-hooks.ts",
     "deploy": "node scripts/preflight.js deploy && tsx scripts/cli.ts deploy",
     "deploy:dev": "pnpm run deploy -- --build --with-papyrus",

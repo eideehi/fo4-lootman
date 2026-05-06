@@ -693,8 +693,8 @@
       "expectedCount": 1,
       "expectedInstructionKind": "call_rel32",
       "expectedOriginalTargetGroup": "workshop_material.workshop_object_count",
-      "discoveryStatus": "unproven",
-      "discoverySummary": "Resolve the Papyrus workshop object count call site and verify it remains a direct CALL rel32.",
+      "discoveryStatus": "proven",
+      "discoverySummary": "Resolve the Papyrus workshop object count call site from the exact Ghidra reference report and require one direct CALL rel32.",
       "candidateRvas": [
         {
           "id": "workshop-material.object-count.papyrus",
@@ -712,10 +712,7 @@
         "tools/ghidra/reports/fo4-get-workshop-object-count.txt",
         "tools/ghidra/reports/fo4-workshop-count-helper.txt"
       ],
-      "unresolvedItems": [
-        "Discovery strategy is unproven: Resolve the Papyrus workshop object count call site and verify it remains a direct CALL rel32.",
-        "Verify candidate count, CALL rel32 shape, and original target grouping before updating manifest RVAs."
-      ]
+      "unresolvedItems": []
     },
     {
       "id": "workshop_material.current_workshop_object_count",
@@ -724,8 +721,8 @@
       "expectedCount": 1,
       "expectedInstructionKind": "call_rel32",
       "expectedOriginalTargetGroup": "workshop_material.current_workshop_object_count",
-      "discoveryStatus": "unproven",
-      "discoverySummary": "Resolve the current-workshop object count call site and verify it remains a direct CALL rel32.",
+      "discoveryStatus": "proven",
+      "discoverySummary": "Resolve the current-workshop object count call site from the exact Ghidra reference report and require one direct CALL rel32.",
       "candidateRvas": [
         {
           "id": "workshop-material.object-count.current-workshop",
@@ -740,12 +737,10 @@
       ],
       "evidence": [
         "tools/ghidra/reports/fo4-workshop-object-count-functions.txt",
+        "tools/ghidra/reports/fo4-get-workshop-object-count.txt",
         "tools/ghidra/reports/fo4-workshop-count-helper.txt"
       ],
-      "unresolvedItems": [
-        "Discovery strategy is unproven: Resolve the current-workshop object count call site and verify it remains a direct CALL rel32.",
-        "Verify candidate count, CALL rel32 shape, and original target grouping before updating manifest RVAs."
-      ]
+      "unresolvedItems": []
     },
     {
       "id": "workshop_supply_owner.field_e0",

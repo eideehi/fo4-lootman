@@ -10,9 +10,20 @@ export const defaultManifestPath = path.join(projectRoot, "tools", "native-hooks
 type HookAddressCategory = "call_site_rva" | "function_rva" | "global_rva" | "layout_offset" | "constant";
 type DiscoveryStatus = "automated" | "manual" | "proven" | "unproven";
 
+export interface NativeHookGhidraReferenceProof {
+	kind: "ghidra_reference_report";
+	report: string;
+	instructionReports?: string[];
+	targetAbsoluteAddress: string;
+	referenceType: "UNCONDITIONAL_CALL";
+}
+
+export type NativeHookDiscoveryProof = NativeHookGhidraReferenceProof;
+
 export interface NativeHookDiscoveryStrategy {
 	status: DiscoveryStatus;
 	summary: string;
+	proof?: NativeHookDiscoveryProof;
 }
 
 export interface NativeHookCallSite {
@@ -126,7 +137,66 @@ function validateNumericLiteral(value: unknown, label: string, errors: string[],
 	}
 }
 
-function validateDiscoveryStrategy(value: unknown, label: string, errors: string[]): void {
+function validateRelativePath(
+	value: unknown,
+	label: string,
+	errors: string[],
+	root: string,
+	checkExists: boolean,
+): void {
+	if (typeof value !== "string" || value.trim() === "") {
+		errors.push(`${label} must be a non-empty string.`);
+		return;
+	}
+	if (path.isAbsolute(value)) {
+		errors.push(`${label} must use a workspace-relative path: ${value}`);
+		return;
+	}
+	if (checkExists && !fs.existsSync(path.join(root, value))) {
+		errors.push(`${label} does not exist: ${value}`);
+	}
+}
+
+function validateDiscoveryProof(
+	value: unknown,
+	label: string,
+	errors: string[],
+	root: string,
+	checkEvidencePaths: boolean,
+): void {
+	if (!isRecord(value)) {
+		errors.push(`${label} must be an object.`);
+		return;
+	}
+
+	if (value.kind !== "ghidra_reference_report") {
+		errors.push(`${label}.kind must be ghidra_reference_report.`);
+		return;
+	}
+
+	validateRelativePath(value.report, `${label}.report`, errors, root, checkEvidencePaths);
+	if (value.instructionReports !== undefined) {
+		if (!isStringArray(value.instructionReports)) {
+			errors.push(`${label}.instructionReports must be an array of strings.`);
+		} else {
+			for (const [index, report] of value.instructionReports.entries()) {
+				validateRelativePath(report, `${label}.instructionReports[${index}]`, errors, root, checkEvidencePaths);
+			}
+		}
+	}
+	validateNumericLiteral(value.targetAbsoluteAddress, `${label}.targetAbsoluteAddress`, errors);
+	if (value.referenceType !== "UNCONDITIONAL_CALL") {
+		errors.push(`${label}.referenceType must be UNCONDITIONAL_CALL.`);
+	}
+}
+
+function validateDiscoveryStrategy(
+	value: unknown,
+	label: string,
+	errors: string[],
+	root: string,
+	checkEvidencePaths: boolean,
+): void {
 	if (!isRecord(value)) {
 		errors.push(`${label}.discoveryStrategy must be an object.`);
 		return;
@@ -137,6 +207,12 @@ function validateDiscoveryStrategy(value: unknown, label: string, errors: string
 	}
 	if (typeof value.summary !== "string" || value.summary.trim() === "") {
 		errors.push(`${label}.discoveryStrategy.summary must be a non-empty string.`);
+	}
+	if (value.status === "proven" && value.proof === undefined) {
+		errors.push(`${label}.discoveryStrategy.proof is required when status is proven.`);
+	}
+	if (value.proof !== undefined) {
+		validateDiscoveryProof(value.proof, `${label}.discoveryStrategy.proof`, errors, root, checkEvidencePaths);
 	}
 }
 
@@ -220,10 +296,11 @@ export function validateNativeHookManifest(
 			continue;
 		}
 
-		const id = rawEntry.id;
-		const cppName = rawEntry.cppName;
-		const category = rawEntry.category;
-		const expectedCount = rawEntry.expectedCount;
+			const id = rawEntry.id;
+			const cppName = rawEntry.cppName;
+			const category = rawEntry.category;
+			const expectedCount = rawEntry.expectedCount;
+			const expectedCountValue = typeof expectedCount === "number" && Number.isInteger(expectedCount) ? expectedCount : null;
 
 		if (typeof id !== "string" || id.trim() === "") {
 			errors.push(`${label}.id must be a non-empty string.`);
@@ -246,9 +323,9 @@ export function validateNativeHookManifest(
 			continue;
 		}
 
-		if (!Number.isInteger(expectedCount) || expectedCount < 1) {
-			errors.push(`${label}.expectedCount must be a positive integer.`);
-		}
+			if (expectedCountValue === null || expectedCountValue < 1) {
+				errors.push(`${label}.expectedCount must be a positive integer.`);
+			}
 
 		const evidence = rawEntry.evidence;
 		if (!isStringArray(evidence)) {
@@ -257,7 +334,7 @@ export function validateNativeHookManifest(
 			validateEvidencePaths(evidence, label, errors, root, checkEvidencePaths);
 		}
 
-		validateDiscoveryStrategy(rawEntry.discoveryStrategy, label, errors);
+		validateDiscoveryStrategy(rawEntry.discoveryStrategy, label, errors, root, checkEvidencePaths);
 
 		if (category === "call_site_rva") {
 			if (rawEntry.expectedInstructionKind !== "call_rel32") {
@@ -270,9 +347,9 @@ export function validateNativeHookManifest(
 				errors.push(`${label}.sites must contain at least one call site.`);
 				continue;
 			}
-			if (Number.isInteger(expectedCount) && rawEntry.sites.length !== expectedCount) {
-				errors.push(`${label}.expectedCount=${expectedCount} but sites length is ${rawEntry.sites.length}.`);
-			}
+				if (expectedCountValue !== null && rawEntry.sites.length !== expectedCountValue) {
+					errors.push(`${label}.expectedCount=${expectedCountValue} but sites length is ${rawEntry.sites.length}.`);
+				}
 			if (rawEntry.value !== undefined) {
 				errors.push(`${label}.value must not be set for call-site entries.`);
 			}
@@ -303,9 +380,9 @@ export function validateNativeHookManifest(
 			if (rawEntry.sites !== undefined) {
 				errors.push(`${label}.sites must not be set for ${category} entries.`);
 			}
-			if (Number.isInteger(expectedCount) && expectedCount !== 1) {
-				errors.push(`${label}.expectedCount must be 1 for ${category} entries.`);
-			}
+				if (expectedCountValue !== null && expectedCountValue !== 1) {
+					errors.push(`${label}.expectedCount must be 1 for ${category} entries.`);
+				}
 		}
 
 		const value = typeof rawEntry.value === "string" ? normalizeHex(rawEntry.value) : null;
@@ -327,8 +404,9 @@ export function validateNativeHookManifest(
 	}
 
 	if (options.checkGeneratedHeader && manifest.schemaVersion === 1 && typeof manifest.generatedHeader === "string") {
-		const expected = generateNativeHookHeader(manifest as NativeHookAddressManifest);
-		const headerPath = getGeneratedHeaderPath(manifest as NativeHookAddressManifest, root);
+		const typedManifest = manifest as unknown as NativeHookAddressManifest;
+		const expected = generateNativeHookHeader(typedManifest);
+		const headerPath = getGeneratedHeaderPath(typedManifest, root);
 		if (!fs.existsSync(headerPath)) {
 			errors.push(`Generated header is missing: ${manifest.generatedHeader}`);
 		} else {

@@ -556,8 +556,14 @@
         "tools/ghidra/reports/fo4-workshop-count-helper.txt"
       ],
       "discoveryStrategy": {
-        "status": "unproven",
-        "summary": "Resolve the Papyrus workshop object count call site and verify it remains a direct CALL rel32."
+        "status": "proven",
+        "summary": "Resolve the Papyrus workshop object count call site from the exact Ghidra reference report and require one direct CALL rel32.",
+        "proof": {
+          "kind": "ghidra_reference_report",
+          "report": "tools/ghidra/reports/fo4-get-workshop-object-count.txt",
+          "targetAbsoluteAddress": "0x14059D360",
+          "referenceType": "UNCONDITIONAL_CALL"
+        }
       },
       "sites": [
         {
@@ -577,11 +583,21 @@
       "expectedOriginalTargetGroup": "workshop_material.current_workshop_object_count",
       "evidence": [
         "tools/ghidra/reports/fo4-workshop-object-count-functions.txt",
+        "tools/ghidra/reports/fo4-get-workshop-object-count.txt",
         "tools/ghidra/reports/fo4-workshop-count-helper.txt"
       ],
       "discoveryStrategy": {
-        "status": "unproven",
-        "summary": "Resolve the current-workshop object count call site and verify it remains a direct CALL rel32."
+        "status": "proven",
+        "summary": "Resolve the current-workshop object count call site from the exact Ghidra reference report and require one direct CALL rel32.",
+        "proof": {
+          "kind": "ghidra_reference_report",
+          "report": "tools/ghidra/reports/fo4-workshop-count-helper.txt",
+          "instructionReports": [
+            "tools/ghidra/reports/fo4-get-workshop-object-count.txt"
+          ],
+          "targetAbsoluteAddress": "0x14037DE60",
+          "referenceType": "UNCONDITIONAL_CALL"
+        }
       },
       "sites": [
         {

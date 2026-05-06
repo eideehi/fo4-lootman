@@ -105,7 +105,11 @@ function buildUnresolvedItems(entry: NativeHookAddressEntry): string[] {
 	if (entry.discoveryStrategy.status !== "automated" && entry.discoveryStrategy.status !== "proven") {
 		items.push(`Discovery strategy is ${entry.discoveryStrategy.status}: ${entry.discoveryStrategy.summary}`);
 	}
-	if (entry.category === "call_site_rva") {
+	if (
+		entry.category === "call_site_rva"
+		&& entry.discoveryStrategy.status !== "automated"
+		&& entry.discoveryStrategy.status !== "proven"
+	) {
 		items.push("Verify candidate count, CALL rel32 shape, and original target grouping before updating manifest RVAs.");
 	}
 	if (entry.category === "layout_offset") {

@@ -28,8 +28,8 @@ Manifest target runtime: Fallout4 1.11.191
 - workshop_menu.selected_row_global (global_rva, unproven): value=0x30EBE18
 - workshop_material.resource_status_missing_resources (constant, manual): value=2
 - workshop_material.remove_components (call_site_rva, unproven): workshop-material.remove-components.source-f1=0x114EB19, workshop-material.remove-components.source-f2=0x114E543
-- workshop_material.object_count_papyrus (call_site_rva, unproven): workshop-material.object-count.papyrus=0x5DD484
-- workshop_material.current_workshop_object_count (call_site_rva, unproven): workshop-material.object-count.current-workshop=0x59D378
+- workshop_material.object_count_papyrus (call_site_rva, proven): workshop-material.object-count.papyrus=0x5DD484
+- workshop_material.current_workshop_object_count (call_site_rva, proven): workshop-material.object-count.current-workshop=0x59D378
 - workshop_supply_owner.field_e0 (layout_offset, manual): value=0xE0
 - workshop_supply_owner.field_e8 (layout_offset, manual): value=0xE8
 - workshop_supply_owner.field_f8 (layout_offset, manual): value=0xF8
@@ -116,10 +116,6 @@ Manifest target runtime: Fallout4 1.11.191
 - [ ] workshop_material.resource_status_missing_resources: Discovery strategy is manual: This is a semantic status value, not an executable RVA; update only if the resource status enum is re-proven.
 - [ ] workshop_material.remove_components: Discovery strategy is unproven: Resolve RemoveComponents wrappers and require two direct CALL rel32 sites to the same remove helper.
 - [ ] workshop_material.remove_components: Verify candidate count, CALL rel32 shape, and original target grouping before updating manifest RVAs.
-- [ ] workshop_material.object_count_papyrus: Discovery strategy is unproven: Resolve the Papyrus workshop object count call site and verify it remains a direct CALL rel32.
-- [ ] workshop_material.object_count_papyrus: Verify candidate count, CALL rel32 shape, and original target grouping before updating manifest RVAs.
-- [ ] workshop_material.current_workshop_object_count: Discovery strategy is unproven: Resolve the current-workshop object count call site and verify it remains a direct CALL rel32.
-- [ ] workshop_material.current_workshop_object_count: Verify candidate count, CALL rel32 shape, and original target grouping before updating manifest RVAs.
 - [ ] workshop_supply_owner.field_e0: Discovery strategy is manual: Raw object layout offset; do not treat as an executable RVA or auto-update target.
 - [ ] workshop_supply_owner.field_e0: Layout offset is not an executable RVA; verify object layout separately before changing it.
 - [ ] workshop_supply_owner.field_e8: Discovery strategy is manual: Raw object layout offset; do not treat as an executable RVA or auto-update target.

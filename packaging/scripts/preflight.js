@@ -9,6 +9,7 @@ const COMMAND_TOOLS = {
 	clean: ["tsx"],
 	build: ["tsx"],
 	generate: ["tsx"],
+	resolve: ["tsx"],
 	verify: ["tsx"],
 	deploy: ["tsx"],
 	undeploy: ["tsx"],
@@ -115,7 +116,7 @@ function isCliEntry() {
 function printUsage() {
 	console.log([
 		"Usage:",
-		"  node scripts/preflight.js <clean|clean:all|clean:wsl-build|build|generate:native-hooks|generate:native-hook-bundle|verify:native-hooks|deploy|undeploy|test|test:watch>",
+		"  node scripts/preflight.js <clean|clean:all|clean:wsl-build|build|generate:native-hooks|generate:native-hook-bundle|resolve:native-hooks|verify:native-hooks|deploy|undeploy|test|test:watch>",
 	].join("\n"));
 }
 
