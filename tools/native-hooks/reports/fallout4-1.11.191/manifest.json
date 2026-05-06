@@ -775,8 +775,27 @@
         "tools/ghidra/reports/fo4-remove-components-call-windows.txt"
       ],
       "discoveryStrategy": {
-        "status": "unproven",
-        "summary": "Resolve RemoveComponents wrappers and require two direct CALL rel32 sites to the same remove helper."
+        "status": "proven",
+        "summary": "Resolve RemoveComponents wrappers and require exactly two direct CALL rel32 sites to the same remove helper.",
+        "proof": {
+          "kind": "ghidra_reference_report",
+          "report": "tools/ghidra/reports/fo4-remove-components-target-functions.txt",
+          "instructionReports": [
+            "tools/ghidra/reports/fo4-remove-components-call-windows.txt"
+          ],
+          "targetAbsoluteAddress": "0x1411825A0",
+          "referenceType": "UNCONDITIONAL_CALL",
+          "sites": [
+            {
+              "siteId": "workshop-material.remove-components.source-f1",
+              "absoluteAddress": "0x14114EB19"
+            },
+            {
+              "siteId": "workshop-material.remove-components.source-f2",
+              "absoluteAddress": "0x14114E543"
+            }
+          ]
+        }
       },
       "sites": [
         {

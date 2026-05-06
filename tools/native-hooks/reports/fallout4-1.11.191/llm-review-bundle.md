@@ -27,7 +27,7 @@ Manifest target runtime: Fallout4 1.11.191
 - workshop_menu.selected_menu_node_function (function_rva, unproven): value=0x389A80
 - workshop_menu.selected_row_global (global_rva, unproven): value=0x30EBE18
 - workshop_material.resource_status_missing_resources (constant, manual): value=2
-- workshop_material.remove_components (call_site_rva, unproven): workshop-material.remove-components.source-f1=0x114EB19, workshop-material.remove-components.source-f2=0x114E543
+- workshop_material.remove_components (call_site_rva, proven): workshop-material.remove-components.source-f1=0x114EB19, workshop-material.remove-components.source-f2=0x114E543
 - workshop_material.object_count_papyrus (call_site_rva, proven): workshop-material.object-count.papyrus=0x5DD484
 - workshop_material.current_workshop_object_count (call_site_rva, proven): workshop-material.object-count.current-workshop=0x59D378
 - workshop_supply_owner.field_e0 (layout_offset, manual): value=0xE0
@@ -53,8 +53,6 @@ Manifest target runtime: Fallout4 1.11.191
 - workshop_material.current_workshop_object_count: 0x59D378
 
 ## Proof Readiness
-### ready_for_proof_metadata
-- workshop_material.remove_components: target=0x1411825A0; selectedRefs=2/2; directCalls=2/2; extras=0; Create a separate proof-promotion checkpoint with explicit proof.sites metadata.
 ### needs_exclusion_triage
 - workshop_menu.availability: target=0x1403997A0; selectedRefs=5/5; directCalls=5/5; extras=14; Triage 14 extra same-target references before adding exclusions.
 - workshop_menu.start_placement: target=0x140B30140; selectedRefs=2/2; directCalls=2/2; extras=5; Triage 5 extra same-target references before adding exclusions.
@@ -69,6 +67,7 @@ Manifest target runtime: Fallout4 1.11.191
 - workshop_menu.select: target=0x140396DB0; selectedRefs=n/a; directCalls=2/2; extras=0; No proof refresh needed; resolver proof metadata is already present.
 - workshop_menu.check_and_set_placement: target=0x140B2EB50; selectedRefs=n/a; directCalls=4/4; extras=0; No proof refresh needed; resolver proof metadata is already present.
 - workshop_material.consume_component: target=0x140392010; selectedRefs=n/a; directCalls=2/2; extras=0; No proof refresh needed; resolver proof metadata is already present.
+- workshop_material.remove_components: target=0x1411825A0; selectedRefs=n/a; directCalls=2/2; extras=0; No proof refresh needed; resolver proof metadata is already present.
 - workshop_material.object_count_papyrus: target=0x14059D360; selectedRefs=n/a; directCalls=1/1; extras=0; No proof refresh needed; resolver proof metadata is already present.
 - workshop_material.current_workshop_object_count: target=0x14037DE60; selectedRefs=n/a; directCalls=1/1; extras=0; No proof refresh needed; resolver proof metadata is already present.
 ### not_applicable
@@ -141,8 +140,6 @@ Manifest target runtime: Fallout4 1.11.191
 - [ ] workshop_menu.selected_menu_node_function: Discovery strategy is unproven: Resolve the selected workshop menu node helper from selected menu helper analysis.
 - [ ] workshop_menu.selected_row_global: Discovery strategy is unproven: Resolve the selected row global from selected workshop menu helper references.
 - [ ] workshop_material.resource_status_missing_resources: Discovery strategy is manual: This is a semantic status value, not an executable RVA; update only if the resource status enum is re-proven.
-- [ ] workshop_material.remove_components: Discovery strategy is unproven: Resolve RemoveComponents wrappers and require two direct CALL rel32 sites to the same remove helper.
-- [ ] workshop_material.remove_components: Verify candidate count, CALL rel32 shape, and original target grouping before updating manifest RVAs.
 - [ ] workshop_supply_owner.field_e0: Discovery strategy is manual: Raw diagnostic workshop supply owner layout read; do not treat as an executable RVA, Address Library candidate, or auto-update target.
 - [ ] workshop_supply_owner.field_e0: Layout offset is not an executable RVA; verify object layout separately before changing it.
 - [ ] workshop_supply_owner.field_e8: Discovery strategy is manual: Raw diagnostic workshop supply owner layout read; do not treat as an executable RVA, Address Library candidate, or auto-update target.
