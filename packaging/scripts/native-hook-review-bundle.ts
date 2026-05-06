@@ -171,6 +171,13 @@ function formatEntryValue(entry: NativeHookAddressEntry): string | undefined {
 
 function buildUnresolvedItems(entry: NativeHookAddressEntry): string[] {
 	const items: string[] = [];
+	const manualNonExecutable =
+		entry.discoveryStrategy.status === "manual" &&
+		(entry.category === "constant" || entry.category === "layout_offset");
+	if (manualNonExecutable) {
+		return items;
+	}
+
 	if (entry.discoveryStrategy.status !== "automated" && entry.discoveryStrategy.status !== "proven") {
 		items.push(`Discovery strategy is ${entry.discoveryStrategy.status}: ${entry.discoveryStrategy.summary}`);
 	}
@@ -752,8 +759,23 @@ function generateMarkdown(
 		lines.push(`- ${reportPath}`);
 	}
 
+	const manualNonExecutableEntries = candidates.entries.filter((entry) =>
+		entry.discoveryStatus === "manual" &&
+		(entry.category === "constant" || entry.category === "layout_offset")
+	);
+	if (manualNonExecutableEntries.length > 0) {
+		lines.push("", "## Manual Non-Executable Entries");
+		for (const entry of manualNonExecutableEntries) {
+			lines.push(`- ${entry.id} (${entry.category}): ${formatCandidateList(entry)}; ${entry.discoverySummary}`);
+		}
+	}
+
 	lines.push("", "## Unresolved Items Checklist");
-	for (const entry of candidates.entries) {
+	const unresolvedEntries = candidates.entries.filter((entry) => entry.unresolvedItems.length > 0);
+	if (unresolvedEntries.length === 0) {
+		lines.push("- None");
+	}
+	for (const entry of unresolvedEntries) {
 		for (const item of entry.unresolvedItems) {
 			lines.push(`- [ ] ${entry.id}: ${item}`);
 		}

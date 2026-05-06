@@ -74,17 +74,15 @@
       "category": "function_rva",
       "cppName": "kEncounterZoneResetElapsedFromDetachId",
       "expectedCount": 1,
-      "discoveryStatus": "unproven",
-      "discoverySummary": "Resolve the detach-time elapsed helper from the encounter-zone reset analysis before updating this RVA.",
+      "discoveryStatus": "automated",
+      "discoverySummary": "Resolved through exact Address Library ID 2200355 at retained offset 0x4D2E20; the encounter-zone reset report records the helper body and reset callers.",
       "candidateRvas": [],
       "value": "0x4D2E20",
       "instructionWindowAddresses": [],
       "evidence": [
         "tools/ghidra/reports/fo4-cell-detach-reset-functions.txt"
       ],
-      "unresolvedItems": [
-        "Discovery strategy is unproven: Resolve the detach-time elapsed helper from the encounter-zone reset analysis before updating this RVA."
-      ],
+      "unresolvedItems": [],
       "proofReadiness": {
         "status": "not_applicable",
         "summary": "function_rva entries do not use direct call-site proof refresh.",
@@ -101,17 +99,16 @@
       "category": "global_rva",
       "cppName": "kWorkshopCaravanKeywordGlobalId",
       "expectedCount": 1,
-      "discoveryStatus": "unproven",
-      "discoverySummary": "Re-derive from shared workshop container callers and verify the referenced global still resolves to the caravan keyword.",
+      "discoveryStatus": "automated",
+      "discoverySummary": "Resolved through exact Address Library ID 4797310 at retained offset 0x30EC9B8; linked workshop container evidence reads the global as the workshop caravan keyword.",
       "candidateRvas": [],
       "value": "0x30EC9B8",
       "instructionWindowAddresses": [],
       "evidence": [
-        "tools/ghidra/reports/fo4-workbench-shared-container-callers.txt"
+        "tools/ghidra/reports/fo4-workbench-shared-container-callers.txt",
+        "tools/ghidra/reports/fo4-workbench-linked-container-functions.txt"
       ],
-      "unresolvedItems": [
-        "Discovery strategy is unproven: Re-derive from shared workshop container callers and verify the referenced global still resolves to the caravan keyword."
-      ],
+      "unresolvedItems": [],
       "proofReadiness": {
         "status": "not_applicable",
         "summary": "global_rva entries do not use direct call-site proof refresh.",
@@ -128,17 +125,15 @@
       "category": "global_rva",
       "cppName": "kCurrentWorkshopHandleGlobalId",
       "expectedCount": 1,
-      "discoveryStatus": "unproven",
-      "discoverySummary": "Resolve the current-workshop handle global from Ghidra references and require the current workshop context probes to agree.",
+      "discoveryStatus": "automated",
+      "discoverySummary": "Resolved through exact Address Library ID 4797241 at retained offset 0x30EC598; current-workshop reference evidence shows the handle global used across workshop context probes.",
       "candidateRvas": [],
       "value": "0x30EC598",
       "instructionWindowAddresses": [],
       "evidence": [
         "tools/ghidra/reports/fo4-current-workshop-global-refs.txt"
       ],
-      "unresolvedItems": [
-        "Discovery strategy is unproven: Resolve the current-workshop handle global from Ghidra references and require the current workshop context probes to agree."
-      ],
+      "unresolvedItems": [],
       "proofReadiness": {
         "status": "not_applicable",
         "summary": "global_rva entries do not use direct call-site proof refresh.",
@@ -1579,17 +1574,15 @@
       "category": "function_rva",
       "cppName": "kWorkshopSelectedMenuNodeFunctionId",
       "expectedCount": 1,
-      "discoveryStatus": "unproven",
-      "discoverySummary": "Resolve the selected workshop menu node helper from selected menu helper analysis.",
+      "discoveryStatus": "automated",
+      "discoverySummary": "Resolved through named Address Library ID RE::ID::Workshop::GetSelectedWorkshopMenuNode at retained offset 0x389A80; selected-menu reports record the helper body and callers.",
       "candidateRvas": [],
       "value": "0x389A80",
       "instructionWindowAddresses": [],
       "evidence": [
         "tools/ghidra/reports/fo4-selected-menu-helper-functions.txt"
       ],
-      "unresolvedItems": [
-        "Discovery strategy is unproven: Resolve the selected workshop menu node helper from selected menu helper analysis."
-      ],
+      "unresolvedItems": [],
       "proofReadiness": {
         "status": "not_applicable",
         "summary": "function_rva entries do not use direct call-site proof refresh.",
@@ -1606,8 +1599,8 @@
       "category": "global_rva",
       "cppName": "kWorkshopSelectedRowGlobalId",
       "expectedCount": 1,
-      "discoveryStatus": "unproven",
-      "discoverySummary": "Resolve the selected row global from selected workshop menu helper references.",
+      "discoveryStatus": "automated",
+      "discoverySummary": "Resolved through named Address Library ID RE::ID::Workshop::CurrentRow at retained offset 0x30EBE18; selected-menu and placement reports record the current-row global references.",
       "candidateRvas": [],
       "value": "0x30EBE18",
       "instructionWindowAddresses": [],
@@ -1615,9 +1608,7 @@
         "tools/ghidra/reports/fo4-placement-secondary-globals.txt",
         "tools/ghidra/reports/fo4-selected-menu-helper-functions.txt"
       ],
-      "unresolvedItems": [
-        "Discovery strategy is unproven: Resolve the selected row global from selected workshop menu helper references."
-      ],
+      "unresolvedItems": [],
       "proofReadiness": {
         "status": "not_applicable",
         "summary": "global_rva entries do not use direct call-site proof refresh.",
@@ -1642,9 +1633,7 @@
       "evidence": [
         "tools/ghidra/reports/fo4-placement-resource-status-functions.txt"
       ],
-      "unresolvedItems": [
-        "Discovery strategy is manual: This is a semantic status value, not an executable RVA; update only if the resource status enum is re-proven."
-      ],
+      "unresolvedItems": [],
       "proofReadiness": {
         "status": "not_applicable",
         "summary": "constant entries do not use direct call-site proof refresh.",
@@ -1876,10 +1865,7 @@
       "evidence": [
         "tools/ghidra/reports/fo4-workbench-shared-container-callers.txt"
       ],
-      "unresolvedItems": [
-        "Discovery strategy is manual: Raw diagnostic workshop supply owner layout read; do not treat as an executable RVA, Address Library candidate, or auto-update target.",
-        "Layout offset is not an executable RVA; verify object layout separately before changing it."
-      ],
+      "unresolvedItems": [],
       "proofReadiness": {
         "status": "not_applicable",
         "summary": "layout_offset entries do not use direct call-site proof refresh.",
@@ -1904,10 +1890,7 @@
       "evidence": [
         "tools/ghidra/reports/fo4-workbench-shared-container-callers.txt"
       ],
-      "unresolvedItems": [
-        "Discovery strategy is manual: Raw diagnostic workshop supply owner layout read; do not treat as an executable RVA, Address Library candidate, or auto-update target.",
-        "Layout offset is not an executable RVA; verify object layout separately before changing it."
-      ],
+      "unresolvedItems": [],
       "proofReadiness": {
         "status": "not_applicable",
         "summary": "layout_offset entries do not use direct call-site proof refresh.",
@@ -1932,10 +1915,7 @@
       "evidence": [
         "tools/ghidra/reports/fo4-workbench-shared-container-callers.txt"
       ],
-      "unresolvedItems": [
-        "Discovery strategy is manual: Raw diagnostic workshop supply owner layout read; do not treat as an executable RVA, Address Library candidate, or auto-update target.",
-        "Layout offset is not an executable RVA; verify object layout separately before changing it."
-      ],
+      "unresolvedItems": [],
       "proofReadiness": {
         "status": "not_applicable",
         "summary": "layout_offset entries do not use direct call-site proof refresh.",
@@ -1960,10 +1940,7 @@
       "evidence": [
         "tools/ghidra/reports/fo4-workbench-shared-container-callers.txt"
       ],
-      "unresolvedItems": [
-        "Discovery strategy is manual: Raw diagnostic workshop supply owner layout read; do not treat as an executable RVA, Address Library candidate, or auto-update target.",
-        "Layout offset is not an executable RVA; verify object layout separately before changing it."
-      ],
+      "unresolvedItems": [],
       "proofReadiness": {
         "status": "not_applicable",
         "summary": "layout_offset entries do not use direct call-site proof refresh.",

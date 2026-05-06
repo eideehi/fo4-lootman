@@ -248,7 +248,10 @@ describe("native hook review bundle", () => {
 		expect(markdown).toContain("### needs_exclusion_triage");
 		expect(markdown).toContain("### needs_rediscovery");
 		expect(markdown).toContain("tools/ghidra/reports/fixture-ready.txt");
+		expect(markdown).toContain("## Manual Non-Executable Entries");
+		expect(markdown).toContain("fixture.layout (layout_offset): value=0xE0");
 		expect(markdown).toContain("## Unresolved Items Checklist");
+		expect(markdown).not.toContain("fixture.layout: Discovery strategy is manual");
 		expect(candidates.entries.every((entry: { proofReadiness?: unknown }) => entry.proofReadiness)).toBe(true);
 
 		const entries = new Map(candidates.entries.map((entry: { id: string }) => [entry.id, entry]));
@@ -268,6 +271,7 @@ describe("native hook review bundle", () => {
 			candidate: { targetAbsoluteAddress: string },
 		) => candidate.targetAbsoluteAddress)).toEqual(["0x140009000", "0x140009100"]);
 		expect(entries.get("fixture.layout").proofReadiness.status).toBe("not_applicable");
+		expect(entries.get("fixture.layout").unresolvedItems).toEqual([]);
 		expect(sourceSlice).toContain("DecodeDirectCallSite");
 		expect(sourceSlice).toContain("InstallWorkshopMaterialProbeHooks");
 		expect(sourceSlice.split("\n").filter((line) => /[ \t]+$/u.test(line))).toEqual([]);

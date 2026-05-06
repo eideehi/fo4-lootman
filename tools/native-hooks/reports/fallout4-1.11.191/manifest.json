@@ -59,8 +59,8 @@
         "tools/ghidra/reports/fo4-cell-detach-reset-functions.txt"
       ],
       "discoveryStrategy": {
-        "status": "unproven",
-        "summary": "Resolve the detach-time elapsed helper from the encounter-zone reset analysis before updating this RVA."
+        "status": "automated",
+        "summary": "Resolved through exact Address Library ID 2200355 at retained offset 0x4D2E20; the encounter-zone reset report records the helper body and reset callers."
       }
     },
     {
@@ -74,11 +74,12 @@
         "offset": "0x30EC9B8"
       },
       "evidence": [
-        "tools/ghidra/reports/fo4-workbench-shared-container-callers.txt"
+        "tools/ghidra/reports/fo4-workbench-shared-container-callers.txt",
+        "tools/ghidra/reports/fo4-workbench-linked-container-functions.txt"
       ],
       "discoveryStrategy": {
-        "status": "unproven",
-        "summary": "Re-derive from shared workshop container callers and verify the referenced global still resolves to the caravan keyword."
+        "status": "automated",
+        "summary": "Resolved through exact Address Library ID 4797310 at retained offset 0x30EC9B8; linked workshop container evidence reads the global as the workshop caravan keyword."
       }
     },
     {
@@ -95,8 +96,8 @@
         "tools/ghidra/reports/fo4-current-workshop-global-refs.txt"
       ],
       "discoveryStrategy": {
-        "status": "unproven",
-        "summary": "Resolve the current-workshop handle global from Ghidra references and require the current workshop context probes to agree."
+        "status": "automated",
+        "summary": "Resolved through exact Address Library ID 4797241 at retained offset 0x30EC598; current-workshop reference evidence shows the handle global used across workshop context probes."
       }
     },
     {
@@ -1004,8 +1005,8 @@
         "tools/ghidra/reports/fo4-selected-menu-helper-functions.txt"
       ],
       "discoveryStrategy": {
-        "status": "unproven",
-        "summary": "Resolve the selected workshop menu node helper from selected menu helper analysis."
+        "status": "automated",
+        "summary": "Resolved through named Address Library ID RE::ID::Workshop::GetSelectedWorkshopMenuNode at retained offset 0x389A80; selected-menu reports record the helper body and callers."
       }
     },
     {
@@ -1024,8 +1025,8 @@
         "tools/ghidra/reports/fo4-selected-menu-helper-functions.txt"
       ],
       "discoveryStrategy": {
-        "status": "unproven",
-        "summary": "Resolve the selected row global from selected workshop menu helper references."
+        "status": "automated",
+        "summary": "Resolved through named Address Library ID RE::ID::Workshop::CurrentRow at retained offset 0x30EBE18; selected-menu and placement reports record the current-row global references."
       }
     },
     {

@@ -216,6 +216,24 @@ describe("native hook address manifest", () => {
 		expect(result.errors.join("\n")).toContain("addressLibrary.offset must match");
 	});
 
+	it("treats exact Address Library non-call-site entries as automated", () => {
+		const manifest = readNativeHookManifest(defaultManifestPath);
+		const ids = [
+			"encounter_zone.reset_elapsed_from_detach_time",
+			"workshop_shared_container.workshop_caravan_keyword_global",
+			"workshop_material.current_workshop_handle_global",
+			"workshop_menu.selected_menu_node_function",
+			"workshop_menu.selected_row_global",
+		];
+
+		for (const id of ids) {
+			const entry = manifest.entries.find((candidate) => candidate.id === id);
+			if (!entry) throw new Error(`Fixture manifest has no ${id} entry.`);
+			expect(entry.discoveryStrategy.status).toBe("automated");
+			expect(entry.addressLibrary).toBeDefined();
+		}
+	});
+
 	it("fails when a direct call-site lacks expected target metadata", () => {
 		const manifest = cloneManifest(readNativeHookManifest(defaultManifestPath));
 		const entry = manifest.entries.find((candidate) => candidate.category === "call_site_rva");

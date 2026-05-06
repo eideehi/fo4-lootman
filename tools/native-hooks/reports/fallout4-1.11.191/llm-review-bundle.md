@@ -10,9 +10,9 @@ Manifest target runtime: Fallout4 1.11.191
 
 ## Candidate RVAs
 - encounter_zone.load_change_cell_before_zone_reset (call_site_rva, proven): encounter-zone.reset-suppression.cell-before-reset=0x4D23C4
-- encounter_zone.reset_elapsed_from_detach_time (function_rva, unproven): value=0x4D2E20
-- workshop_shared_container.workshop_caravan_keyword_global (global_rva, unproven): value=0x30EC9B8
-- workshop_material.current_workshop_handle_global (global_rva, unproven): value=0x30EC598
+- encounter_zone.reset_elapsed_from_detach_time (function_rva, automated): value=0x4D2E20
+- workshop_shared_container.workshop_caravan_keyword_global (global_rva, automated): value=0x30EC9B8
+- workshop_material.current_workshop_handle_global (global_rva, automated): value=0x30EC598
 - workshop_shared_container.populate_linked_workshop_container (call_site_rva, proven): workshop-shared-container.populate-linked.primary=0x391F78, workshop-shared-container.populate-linked.workbench=0xB28B76, workshop-shared-container.populate-linked.menu=0x10890F6
 - workshop_material.rebuild_workshop_supply (call_site_rva, proven): workshop-material.rebuild-supply.source-a1=0xA653F6, workshop-material.rebuild-supply.source-a2=0xA5F109, workshop-material.rebuild-supply.source-a3=0xA6052C, workshop-material.rebuild-supply.source-a4=0xAEFD89
 - workshop_material.component_count_helper (call_site_rva, proven): workshop-material.component-count.papyrus=0x59BC2A, workshop-material.component-count.workbench-ui=0x117501B
@@ -24,8 +24,8 @@ Manifest target runtime: Fallout4 1.11.191
 - workshop_menu.start_placement (call_site_rva, proven): workshop-menu.start-placement.source-a3=0xB2C9EA, workshop-menu.start-placement.source-a4=0xB2CCA5, workshop-menu.start-placement.source-a9=0xB2B2FF, workshop-menu.start-placement.source-aa=0xB2BB64, workshop-menu.start-placement.source-ab=0xB2DB10, workshop-menu.start-placement.source-ac=0xB2E886, workshop-menu.start-placement.source-ad=0xB2EB0F
 - workshop_material.build_resource_check (call_site_rva, proven): workshop-material.build-resource-check.placement=0x392514, workshop-material.build-resource-check.confirm=0x398E06, workshop-material.build-resource-check.consume-precheck=0x3B7C4E
 - workshop_material.consume_component (call_site_rva, proven): workshop-material.consume-component.source-f3=0x398FF6, workshop-material.consume-component.source-f4=0x3B7D2A
-- workshop_menu.selected_menu_node_function (function_rva, unproven): value=0x389A80
-- workshop_menu.selected_row_global (global_rva, unproven): value=0x30EBE18
+- workshop_menu.selected_menu_node_function (function_rva, automated): value=0x389A80
+- workshop_menu.selected_row_global (global_rva, automated): value=0x30EBE18
 - workshop_material.resource_status_missing_resources (constant, manual): value=2
 - workshop_material.remove_components (call_site_rva, proven): workshop-material.remove-components.source-f1=0x114EB19, workshop-material.remove-components.source-f2=0x114E543
 - workshop_material.object_count_papyrus (call_site_rva, proven): workshop-material.object-count.papyrus=0x5DD484
@@ -131,18 +131,12 @@ Manifest target runtime: Fallout4 1.11.191
 - tools/ghidra/reports/fo4-workshopmenu-placement-writes.txt
 - tools/native-hooks/reports/fallout4-1.11.191/workshop-availability-extra-classification.md
 
+## Manual Non-Executable Entries
+- workshop_material.resource_status_missing_resources (constant): value=2; This is a semantic status value, not an executable RVA; update only if the resource status enum is re-proven.
+- workshop_supply_owner.field_e0 (layout_offset): value=0xE0; Raw diagnostic workshop supply owner layout read; do not treat as an executable RVA, Address Library candidate, or auto-update target.
+- workshop_supply_owner.field_e8 (layout_offset): value=0xE8; Raw diagnostic workshop supply owner layout read; do not treat as an executable RVA, Address Library candidate, or auto-update target.
+- workshop_supply_owner.field_f8 (layout_offset): value=0xF8; Raw diagnostic workshop supply owner layout read; do not treat as an executable RVA, Address Library candidate, or auto-update target.
+- workshop_supply_owner.field_2f8 (layout_offset): value=0x2F8; Raw diagnostic workshop supply owner layout read; do not treat as an executable RVA, Address Library candidate, or auto-update target.
+
 ## Unresolved Items Checklist
-- [ ] encounter_zone.reset_elapsed_from_detach_time: Discovery strategy is unproven: Resolve the detach-time elapsed helper from the encounter-zone reset analysis before updating this RVA.
-- [ ] workshop_shared_container.workshop_caravan_keyword_global: Discovery strategy is unproven: Re-derive from shared workshop container callers and verify the referenced global still resolves to the caravan keyword.
-- [ ] workshop_material.current_workshop_handle_global: Discovery strategy is unproven: Resolve the current-workshop handle global from Ghidra references and require the current workshop context probes to agree.
-- [ ] workshop_menu.selected_menu_node_function: Discovery strategy is unproven: Resolve the selected workshop menu node helper from selected menu helper analysis.
-- [ ] workshop_menu.selected_row_global: Discovery strategy is unproven: Resolve the selected row global from selected workshop menu helper references.
-- [ ] workshop_material.resource_status_missing_resources: Discovery strategy is manual: This is a semantic status value, not an executable RVA; update only if the resource status enum is re-proven.
-- [ ] workshop_supply_owner.field_e0: Discovery strategy is manual: Raw diagnostic workshop supply owner layout read; do not treat as an executable RVA, Address Library candidate, or auto-update target.
-- [ ] workshop_supply_owner.field_e0: Layout offset is not an executable RVA; verify object layout separately before changing it.
-- [ ] workshop_supply_owner.field_e8: Discovery strategy is manual: Raw diagnostic workshop supply owner layout read; do not treat as an executable RVA, Address Library candidate, or auto-update target.
-- [ ] workshop_supply_owner.field_e8: Layout offset is not an executable RVA; verify object layout separately before changing it.
-- [ ] workshop_supply_owner.field_f8: Discovery strategy is manual: Raw diagnostic workshop supply owner layout read; do not treat as an executable RVA, Address Library candidate, or auto-update target.
-- [ ] workshop_supply_owner.field_f8: Layout offset is not an executable RVA; verify object layout separately before changing it.
-- [ ] workshop_supply_owner.field_2f8: Discovery strategy is manual: Raw diagnostic workshop supply owner layout read; do not treat as an executable RVA, Address Library candidate, or auto-update target.
-- [ ] workshop_supply_owner.field_2f8: Layout offset is not an executable RVA; verify object layout separately before changing it.
+- None
