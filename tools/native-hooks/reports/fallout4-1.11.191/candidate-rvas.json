@@ -377,7 +377,7 @@
       "expectedCount": 2,
       "expectedInstructionKind": "call_rel32",
       "expectedOriginalTargetGroup": "workshop_material.component_count_helper",
-      "discoveryStatus": "unproven",
+      "discoveryStatus": "proven",
       "discoverySummary": "Resolve Papyrus and Workbench UI calls to the component count helper and require both call sites to share the same original target.",
       "candidateRvas": [
         {
@@ -402,15 +402,13 @@
       "evidence": [
         "tools/ghidra/reports/fo4-component-helper-callers.txt",
         "tools/ghidra/reports/fo4-get-component-count.txt",
+        "tools/ghidra/reports/fo4-component-ui-caller.txt",
         "tools/ghidra/reports/fo4-workbench-ui-callbacks.txt"
       ],
-      "unresolvedItems": [
-        "Discovery strategy is unproven: Resolve Papyrus and Workbench UI calls to the component count helper and require both call sites to share the same original target.",
-        "Verify candidate count, CALL rel32 shape, and original target grouping before updating manifest RVAs."
-      ],
+      "unresolvedItems": [],
       "proofReadiness": {
-        "status": "needs_instruction_window_refresh",
-        "summary": "Target allrefs are present, but at least one selected site lacks a direct CALL instruction line.",
+        "status": "already_proven",
+        "summary": "The manifest already contains resolver proof metadata for this call-site family.",
         "selectedSites": [
           {
             "id": "workshop-material.component-count.papyrus",
@@ -441,24 +439,16 @@
             ],
             "evidence": [
               "tools/ghidra/reports/fo4-component-helper-callers.txt",
-              "tools/ghidra/reports/fo4-get-component-count.txt"
+              "tools/ghidra/reports/fo4-component-ui-caller.txt",
+              "tools/ghidra/reports/fo4-get-component-count.txt",
+              "tools/ghidra/reports/fo4-workbench-ui-callbacks.txt"
             ]
           }
         ],
-        "targetReport": {
-          "path": "tools/ghidra/reports/fo4-component-helper-callers.txt",
-          "targetAbsoluteAddress": "0x140507660",
-          "referenceCount": 2,
-          "selectedReferenceCount": 2,
-          "missingSelectedReferences": [],
-          "extraSameTargetReferences": []
-        },
-        "directCallInstructionCount": 1,
-        "missingDirectCallSites": [
-          "0x14117501B"
-        ],
+        "directCallInstructionCount": 2,
+        "missingDirectCallSites": [],
         "extraSameTargetReferences": [],
-        "recommendedNextAction": "Refresh instruction-window evidence for 0x14117501B."
+        "recommendedNextAction": "No proof refresh needed; resolver proof metadata is already present."
       }
     },
     {

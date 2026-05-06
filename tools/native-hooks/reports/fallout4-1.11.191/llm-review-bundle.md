@@ -15,7 +15,7 @@ Manifest target runtime: Fallout4 1.11.191
 - workshop_material.current_workshop_handle_global (global_rva, unproven): value=0x30EC598
 - workshop_shared_container.populate_linked_workshop_container (call_site_rva, unproven): workshop-shared-container.populate-linked.primary=0x391F78, workshop-shared-container.populate-linked.workbench=0xB28B76, workshop-shared-container.populate-linked.menu=0x10890F6
 - workshop_material.rebuild_workshop_supply (call_site_rva, unproven): workshop-material.rebuild-supply.source-a1=0xA653F6, workshop-material.rebuild-supply.source-a2=0xA5F109, workshop-material.rebuild-supply.source-a3=0xA6052C, workshop-material.rebuild-supply.source-a4=0xAEFD89
-- workshop_material.component_count_helper (call_site_rva, unproven): workshop-material.component-count.papyrus=0x59BC2A, workshop-material.component-count.workbench-ui=0x117501B
+- workshop_material.component_count_helper (call_site_rva, proven): workshop-material.component-count.papyrus=0x59BC2A, workshop-material.component-count.workbench-ui=0x117501B
 - workshop_material.direct_component_count (call_site_rva, proven): workshop-material.direct-component-count.source-e1=0x3BC3ED, workshop-material.direct-component-count.source-e2=0x39F27F, workshop-material.direct-component-count.source-e3=0xB3308B, workshop-material.direct-component-count.source-e4=0xB37A38, workshop-material.direct-component-count.source-e5=0xB2D34E
 - workshop_material.resource_status (call_site_rva, unproven): workshop-material.resource-status.source-f1=0xB2F2C0, workshop-material.resource-status.source-f2=0xB2D266
 - workshop_menu.select (call_site_rva, unproven): workshop-menu.select.source-a1=0xB2C8AA, workshop-menu.select.source-a2=0xB2CB67
@@ -56,7 +56,6 @@ Manifest target runtime: Fallout4 1.11.191
 ### needs_instruction_window_refresh
 - workshop_shared_container.populate_linked_workshop_container: target=0x140389E10; selectedRefs=3/3; directCalls=1/3; extras=0; Refresh instruction-window evidence for 0x140391F78, 0x1410890F6.
 - workshop_material.rebuild_workshop_supply: target=0x140B29690; selectedRefs=4/4; directCalls=0/4; extras=0; Refresh instruction-window evidence for 0x140A5F109, 0x140A6052C, 0x140A653F6, 0x140AEFD89.
-- workshop_material.component_count_helper: target=0x140507660; selectedRefs=2/2; directCalls=1/2; extras=0; Refresh instruction-window evidence for 0x14117501B.
 - workshop_menu.select: target=0x140396DB0; selectedRefs=2/2; directCalls=0/2; extras=0; Refresh instruction-window evidence for 0x140B2C8AA, 0x140B2CB67.
 ### needs_target_allrefs_report
 - workshop_material.resource_status: target=0x140B32FB0; selectedRefs=n/a; directCalls=0/2; extras=0; Generate a target allrefs report for 0x140B32FB0.
@@ -70,6 +69,7 @@ Manifest target runtime: Fallout4 1.11.191
 - workshop_material.consume_component: target=none; selectedRefs=n/a; directCalls=0/2; extras=0; Refresh discovery reports around the selected manifest sites.
 - workshop_material.remove_components: target=none; selectedRefs=n/a; directCalls=0/2; extras=0; Refresh discovery reports around the selected manifest sites.
 ### already_proven
+- workshop_material.component_count_helper: target=0x140507660; selectedRefs=n/a; directCalls=2/2; extras=0; No proof refresh needed; resolver proof metadata is already present.
 - workshop_material.direct_component_count: target=0x140507A00; selectedRefs=n/a; directCalls=5/5; extras=0; No proof refresh needed; resolver proof metadata is already present.
 - workshop_material.object_count_papyrus: target=0x14059D360; selectedRefs=n/a; directCalls=1/1; extras=0; No proof refresh needed; resolver proof metadata is already present.
 - workshop_material.current_workshop_object_count: target=0x14037DE60; selectedRefs=n/a; directCalls=1/1; extras=0; No proof refresh needed; resolver proof metadata is already present.
@@ -91,6 +91,7 @@ Manifest target runtime: Fallout4 1.11.191
 - tools/ghidra/reports/fo4-canproduce-deps.txt
 - tools/ghidra/reports/fo4-cell-detach-reset-functions.txt
 - tools/ghidra/reports/fo4-component-helper-callers.txt
+- tools/ghidra/reports/fo4-component-ui-caller.txt
 - tools/ghidra/reports/fo4-current-workshop-global-refs.txt
 - tools/ghidra/reports/fo4-direct-component-count-allrefs.txt
 - tools/ghidra/reports/fo4-direct-component-count-callsites-window.txt
@@ -126,8 +127,6 @@ Manifest target runtime: Fallout4 1.11.191
 - [ ] workshop_shared_container.populate_linked_workshop_container: Verify candidate count, CALL rel32 shape, and original target grouping before updating manifest RVAs.
 - [ ] workshop_material.rebuild_workshop_supply: Discovery strategy is unproven: Resolve workbench supply rebuild callers and require four direct CALL rel32 sites to the same rebuild helper.
 - [ ] workshop_material.rebuild_workshop_supply: Verify candidate count, CALL rel32 shape, and original target grouping before updating manifest RVAs.
-- [ ] workshop_material.component_count_helper: Discovery strategy is unproven: Resolve Papyrus and Workbench UI calls to the component count helper and require both call sites to share the same original target.
-- [ ] workshop_material.component_count_helper: Verify candidate count, CALL rel32 shape, and original target grouping before updating manifest RVAs.
 - [ ] workshop_material.resource_status: Discovery strategy is unproven: Resolve resource status helper callers in the workshop menu placement path and require two direct CALL rel32 sites.
 - [ ] workshop_material.resource_status: Verify candidate count, CALL rel32 shape, and original target grouping before updating manifest RVAs.
 - [ ] workshop_menu.select: Discovery strategy is unproven: Resolve SelectWorkshopMenuNode call sites from selected menu helper analysis and require two direct CALL rel32 sites.
