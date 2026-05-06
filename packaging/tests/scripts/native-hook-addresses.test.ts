@@ -138,6 +138,28 @@ describe("native hook address manifest", () => {
 		expect(proof.excludedReferences).toBeUndefined();
 	});
 
+	it("keeps workshop menu select as an explicit multi-site proof", () => {
+		const manifest = readNativeHookManifest(defaultManifestPath);
+		const entry = manifest.entries.find((candidate) => candidate.id === "workshop_menu.select");
+		if (!entry) throw new Error("Fixture manifest has no workshop menu select entry.");
+		const proof = entry.discoveryStrategy.proof;
+		if (!proof) throw new Error("Workshop menu select has no proof.");
+
+		expect(entry.discoveryStrategy.status).toBe("proven");
+		expect(entry.expectedCount).toBe(2);
+		expect(proof.report).toBe("tools/ghidra/reports/fo4-selected-menu-helper-functions.txt");
+		expect(proof.instructionReports).toEqual([
+			"tools/ghidra/reports/fo4-workshopmenu-placement-writes.txt",
+		]);
+		expect(proof.targetAbsoluteAddress).toBe("0x140396DB0");
+		expect(proof.sites?.map((site) => site.siteId)).toEqual(entry.sites?.map((site) => site.id));
+		expect(proof.sites?.map((site) => site.absoluteAddress)).toEqual([
+			"0x140B2C8AA",
+			"0x140B2CB67",
+		]);
+		expect(proof.excludedReferences).toBeUndefined();
+	});
+
 	it("fails when Address Library metadata is attached to a direct call site", () => {
 		const manifest = cloneManifest(readNativeHookManifest(defaultManifestPath));
 		const entry = manifest.entries.find((candidate) => candidate.category === "call_site_rva");

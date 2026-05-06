@@ -670,7 +670,7 @@
       "expectedCount": 2,
       "expectedInstructionKind": "call_rel32",
       "expectedOriginalTargetGroup": "workshop_menu.select",
-      "discoveryStatus": "unproven",
+      "discoveryStatus": "proven",
       "discoverySummary": "Resolve SelectWorkshopMenuNode call sites from selected menu helper analysis and require two direct CALL rel32 sites.",
       "candidateRvas": [
         {
@@ -694,15 +694,13 @@
       ],
       "evidence": [
         "tools/ghidra/reports/fo4-selected-menu-helper-functions.txt",
-        "tools/ghidra/reports/fo4-workshopmenu-b2e900-b35320-b35440.txt"
+        "tools/ghidra/reports/fo4-workshopmenu-b2e900-b35320-b35440.txt",
+        "tools/ghidra/reports/fo4-workshopmenu-placement-writes.txt"
       ],
-      "unresolvedItems": [
-        "Discovery strategy is unproven: Resolve SelectWorkshopMenuNode call sites from selected menu helper analysis and require two direct CALL rel32 sites.",
-        "Verify candidate count, CALL rel32 shape, and original target grouping before updating manifest RVAs."
-      ],
+      "unresolvedItems": [],
       "proofReadiness": {
-        "status": "needs_instruction_window_refresh",
-        "summary": "Target allrefs are present, but at least one selected site lacks a direct CALL instruction line.",
+        "status": "already_proven",
+        "summary": "The manifest already contains resolver proof metadata for this call-site family.",
         "selectedSites": [
           {
             "id": "workshop-menu.select.source-a1",
@@ -733,25 +731,15 @@
             ],
             "evidence": [
               "tools/ghidra/reports/fo4-selected-menu-helper-functions.txt",
-              "tools/ghidra/reports/fo4-workshopmenu-b2e900-b35320-b35440.txt"
+              "tools/ghidra/reports/fo4-workshopmenu-b2e900-b35320-b35440.txt",
+              "tools/ghidra/reports/fo4-workshopmenu-placement-writes.txt"
             ]
           }
         ],
-        "targetReport": {
-          "path": "tools/ghidra/reports/fo4-selected-menu-helper-functions.txt",
-          "targetAbsoluteAddress": "0x140396DB0",
-          "referenceCount": 2,
-          "selectedReferenceCount": 2,
-          "missingSelectedReferences": [],
-          "extraSameTargetReferences": []
-        },
-        "directCallInstructionCount": 0,
-        "missingDirectCallSites": [
-          "0x140B2C8AA",
-          "0x140B2CB67"
-        ],
+        "directCallInstructionCount": 2,
+        "missingDirectCallSites": [],
         "extraSameTargetReferences": [],
-        "recommendedNextAction": "Refresh instruction-window evidence for 0x140B2C8AA, 0x140B2CB67."
+        "recommendedNextAction": "No proof refresh needed; resolver proof metadata is already present."
       }
     },
     {

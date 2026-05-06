@@ -337,11 +337,31 @@
       "expectedOriginalTargetGroup": "workshop_menu.select",
       "evidence": [
         "tools/ghidra/reports/fo4-selected-menu-helper-functions.txt",
-        "tools/ghidra/reports/fo4-workshopmenu-b2e900-b35320-b35440.txt"
+        "tools/ghidra/reports/fo4-workshopmenu-b2e900-b35320-b35440.txt",
+        "tools/ghidra/reports/fo4-workshopmenu-placement-writes.txt"
       ],
       "discoveryStrategy": {
-        "status": "unproven",
-        "summary": "Resolve SelectWorkshopMenuNode call sites from selected menu helper analysis and require two direct CALL rel32 sites."
+        "status": "proven",
+        "summary": "Resolve SelectWorkshopMenuNode call sites from selected menu helper analysis and require two direct CALL rel32 sites.",
+        "proof": {
+          "kind": "ghidra_reference_report",
+          "report": "tools/ghidra/reports/fo4-selected-menu-helper-functions.txt",
+          "instructionReports": [
+            "tools/ghidra/reports/fo4-workshopmenu-placement-writes.txt"
+          ],
+          "targetAbsoluteAddress": "0x140396DB0",
+          "referenceType": "UNCONDITIONAL_CALL",
+          "sites": [
+            {
+              "siteId": "workshop-menu.select.source-a1",
+              "absoluteAddress": "0x140B2C8AA"
+            },
+            {
+              "siteId": "workshop-menu.select.source-a2",
+              "absoluteAddress": "0x140B2CB67"
+            }
+          ]
+        }
       },
       "sites": [
         {
