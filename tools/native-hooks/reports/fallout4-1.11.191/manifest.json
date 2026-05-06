@@ -494,8 +494,36 @@
         "tools/ghidra/reports/fo4-proof-refresh-call-windows.txt"
       ],
       "discoveryStrategy": {
-        "status": "unproven",
-        "summary": "Resolve CheckAndSetItemForPlacement callers and require four direct CALL rel32 sites to the same placement helper."
+        "status": "proven",
+        "summary": "Resolve CheckAndSetItemForPlacement callers and require four direct CALL rel32 sites to the same placement helper.",
+        "proof": {
+          "kind": "ghidra_reference_report",
+          "report": "tools/ghidra/reports/fo4-selected-build-functions.txt",
+          "instructionReports": [
+            "tools/ghidra/reports/fo4-workshopmenu-placement-writes.txt",
+            "tools/ghidra/reports/fo4-proof-refresh-call-windows.txt"
+          ],
+          "targetAbsoluteAddress": "0x140B2EB50",
+          "referenceType": "UNCONDITIONAL_CALL",
+          "sites": [
+            {
+              "siteId": "workshop-menu.check-placement.source-a5",
+              "absoluteAddress": "0x140B2B307"
+            },
+            {
+              "siteId": "workshop-menu.check-placement.source-a6",
+              "absoluteAddress": "0x140B2C8F2"
+            },
+            {
+              "siteId": "workshop-menu.check-placement.source-a7",
+              "absoluteAddress": "0x140B2CBAF"
+            },
+            {
+              "siteId": "workshop-menu.check-placement.source-a8",
+              "absoluteAddress": "0x140B2E88E"
+            }
+          ]
+        }
       },
       "sites": [
         {

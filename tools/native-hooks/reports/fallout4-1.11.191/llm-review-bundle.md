@@ -20,7 +20,7 @@ Manifest target runtime: Fallout4 1.11.191
 - workshop_material.resource_status (call_site_rva, unproven): workshop-material.resource-status.source-f1=0xB2F2C0, workshop-material.resource-status.source-f2=0xB2D266
 - workshop_menu.select (call_site_rva, proven): workshop-menu.select.source-a1=0xB2C8AA, workshop-menu.select.source-a2=0xB2CB67
 - workshop_menu.availability (call_site_rva, unproven): workshop-menu.availability.source-91=0xB2C86E, workshop-menu.availability.source-92=0xB2C8D7, workshop-menu.availability.source-93=0xB2CB2E, workshop-menu.availability.source-94=0xB2CB94, workshop-menu.availability.source-95=0xB2EBE4
-- workshop_menu.check_and_set_placement (call_site_rva, unproven): workshop-menu.check-placement.source-a5=0xB2B307, workshop-menu.check-placement.source-a6=0xB2C8F2, workshop-menu.check-placement.source-a7=0xB2CBAF, workshop-menu.check-placement.source-a8=0xB2E88E
+- workshop_menu.check_and_set_placement (call_site_rva, proven): workshop-menu.check-placement.source-a5=0xB2B307, workshop-menu.check-placement.source-a6=0xB2C8F2, workshop-menu.check-placement.source-a7=0xB2CBAF, workshop-menu.check-placement.source-a8=0xB2E88E
 - workshop_menu.start_placement (call_site_rva, unproven): workshop-menu.start-placement.source-a3=0xB2C9EA, workshop-menu.start-placement.source-a4=0xB2CCA5
 - workshop_material.build_resource_check (call_site_rva, unproven): workshop-material.build-resource-check.placement=0x392514, workshop-material.build-resource-check.confirm=0x398E06
 - workshop_material.consume_component (call_site_rva, unproven): workshop-material.consume-component.source-f3=0x398FF6, workshop-material.consume-component.source-f4=0x3B7D2A
@@ -53,8 +53,6 @@ Manifest target runtime: Fallout4 1.11.191
 - workshop_material.current_workshop_object_count: 0x59D378
 
 ## Proof Readiness
-### ready_for_proof_metadata
-- workshop_menu.check_and_set_placement: target=0x140B2EB50; selectedRefs=4/4; directCalls=4/4; extras=0; Create a separate proof-promotion checkpoint with explicit proof.sites metadata.
 ### needs_target_allrefs_report
 - workshop_material.resource_status: target=0x140B32FB0; selectedRefs=n/a; directCalls=0/2; extras=0; Generate a target allrefs report for 0x140B32FB0.
 ### needs_exclusion_triage
@@ -71,6 +69,7 @@ Manifest target runtime: Fallout4 1.11.191
 - workshop_material.component_count_helper: target=0x140507660; selectedRefs=n/a; directCalls=2/2; extras=0; No proof refresh needed; resolver proof metadata is already present.
 - workshop_material.direct_component_count: target=0x140507A00; selectedRefs=n/a; directCalls=5/5; extras=0; No proof refresh needed; resolver proof metadata is already present.
 - workshop_menu.select: target=0x140396DB0; selectedRefs=n/a; directCalls=2/2; extras=0; No proof refresh needed; resolver proof metadata is already present.
+- workshop_menu.check_and_set_placement: target=0x140B2EB50; selectedRefs=n/a; directCalls=4/4; extras=0; No proof refresh needed; resolver proof metadata is already present.
 - workshop_material.object_count_papyrus: target=0x14059D360; selectedRefs=n/a; directCalls=1/1; extras=0; No proof refresh needed; resolver proof metadata is already present.
 - workshop_material.current_workshop_object_count: target=0x14037DE60; selectedRefs=n/a; directCalls=1/1; extras=0; No proof refresh needed; resolver proof metadata is already present.
 ### not_applicable
@@ -129,8 +128,6 @@ Manifest target runtime: Fallout4 1.11.191
 - [ ] workshop_material.resource_status: Verify candidate count, CALL rel32 shape, and original target grouping before updating manifest RVAs.
 - [ ] workshop_menu.availability: Discovery strategy is unproven: Resolve WorkshopMenuAvailability callers and require five direct CALL rel32 sites to the same helper.
 - [ ] workshop_menu.availability: Verify candidate count, CALL rel32 shape, and original target grouping before updating manifest RVAs.
-- [ ] workshop_menu.check_and_set_placement: Discovery strategy is unproven: Resolve CheckAndSetItemForPlacement callers and require four direct CALL rel32 sites to the same placement helper.
-- [ ] workshop_menu.check_and_set_placement: Verify candidate count, CALL rel32 shape, and original target grouping before updating manifest RVAs.
 - [ ] workshop_menu.start_placement: Discovery strategy is unproven: Resolve StartWorkshopPlacement callers and require two direct CALL rel32 sites to the same helper.
 - [ ] workshop_menu.start_placement: Verify candidate count, CALL rel32 shape, and original target grouping before updating manifest RVAs.
 - [ ] workshop_material.build_resource_check: Discovery strategy is unproven: Resolve build resource checks from CanProduceWorkshop analysis and require two direct CALL rel32 sites.
