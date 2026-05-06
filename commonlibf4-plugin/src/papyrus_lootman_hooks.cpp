@@ -2285,68 +2285,14 @@ namespace papyrus_lootman
 		return result;
 	}
 
-	bool HookedWorkshopMenuAvailabilitySource91(
+	template <std::size_t Index>
+	bool HookedWorkshopMenuAvailabilitySource(
 		std::uint32_t* outValue,
 		std::uint32_t row,
 		std::uint32_t menuResult)
 	{
-		const auto& site = kWorkshopMenuAvailabilityCallSites[0];
-		return HookedWorkshopMenuAvailability(
-			outValue,
-			row,
-			menuResult,
-			site.sourceId,
-			site.label);
-	}
-
-	bool HookedWorkshopMenuAvailabilitySource92(
-		std::uint32_t* outValue,
-		std::uint32_t row,
-		std::uint32_t menuResult)
-	{
-		const auto& site = kWorkshopMenuAvailabilityCallSites[1];
-		return HookedWorkshopMenuAvailability(
-			outValue,
-			row,
-			menuResult,
-			site.sourceId,
-			site.label);
-	}
-
-	bool HookedWorkshopMenuAvailabilitySource93(
-		std::uint32_t* outValue,
-		std::uint32_t row,
-		std::uint32_t menuResult)
-	{
-		const auto& site = kWorkshopMenuAvailabilityCallSites[2];
-		return HookedWorkshopMenuAvailability(
-			outValue,
-			row,
-			menuResult,
-			site.sourceId,
-			site.label);
-	}
-
-	bool HookedWorkshopMenuAvailabilitySource94(
-		std::uint32_t* outValue,
-		std::uint32_t row,
-		std::uint32_t menuResult)
-	{
-		const auto& site = kWorkshopMenuAvailabilityCallSites[3];
-		return HookedWorkshopMenuAvailability(
-			outValue,
-			row,
-			menuResult,
-			site.sourceId,
-			site.label);
-	}
-
-	bool HookedWorkshopMenuAvailabilitySource95(
-		std::uint32_t* outValue,
-		std::uint32_t row,
-		std::uint32_t menuResult)
-	{
-		const auto& site = kWorkshopMenuAvailabilityCallSites[4];
+		static_assert(Index < kWorkshopMenuAvailabilityCallSites.size());
+		const auto& site = kWorkshopMenuAvailabilityCallSites[Index];
 		return HookedWorkshopMenuAvailability(
 			outValue,
 			row,
@@ -3636,11 +3582,25 @@ namespace papyrus_lootman
 				"workshop-material.resource-status");
 
 			const std::array<WorkshopMenuAvailabilityFn, kWorkshopMenuAvailabilityCallSites.size()> menuAvailabilityHooks{
-				&HookedWorkshopMenuAvailabilitySource91,
-				&HookedWorkshopMenuAvailabilitySource92,
-				&HookedWorkshopMenuAvailabilitySource93,
-				&HookedWorkshopMenuAvailabilitySource94,
-				&HookedWorkshopMenuAvailabilitySource95,
+				&HookedWorkshopMenuAvailabilitySource<0>,
+				&HookedWorkshopMenuAvailabilitySource<1>,
+				&HookedWorkshopMenuAvailabilitySource<2>,
+				&HookedWorkshopMenuAvailabilitySource<3>,
+				&HookedWorkshopMenuAvailabilitySource<4>,
+				&HookedWorkshopMenuAvailabilitySource<5>,
+				&HookedWorkshopMenuAvailabilitySource<6>,
+				&HookedWorkshopMenuAvailabilitySource<7>,
+				&HookedWorkshopMenuAvailabilitySource<8>,
+				&HookedWorkshopMenuAvailabilitySource<9>,
+				&HookedWorkshopMenuAvailabilitySource<10>,
+				&HookedWorkshopMenuAvailabilitySource<11>,
+				&HookedWorkshopMenuAvailabilitySource<12>,
+				&HookedWorkshopMenuAvailabilitySource<13>,
+				&HookedWorkshopMenuAvailabilitySource<14>,
+				&HookedWorkshopMenuAvailabilitySource<15>,
+				&HookedWorkshopMenuAvailabilitySource<16>,
+				&HookedWorkshopMenuAvailabilitySource<17>,
+				&HookedWorkshopMenuAvailabilitySource<18>,
 			};
 			allInstalled &= InstallDirectCallHookFamily(
 				kWorkshopMenuAvailabilityCallSites,

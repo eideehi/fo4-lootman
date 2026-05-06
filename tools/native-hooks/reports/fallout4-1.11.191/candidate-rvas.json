@@ -734,11 +734,11 @@
       "id": "workshop_menu.availability",
       "category": "call_site_rva",
       "cppName": "kWorkshopMenuAvailabilityCallSites",
-      "expectedCount": 5,
+      "expectedCount": 19,
       "expectedInstructionKind": "call_rel32",
       "expectedOriginalTargetGroup": "workshop_menu.availability",
-      "discoveryStatus": "unproven",
-      "discoverySummary": "Resolve WorkshopMenuAvailability callers and require five direct CALL rel32 sites to the same helper.",
+      "discoveryStatus": "proven",
+      "discoverySummary": "Resolve WorkshopMenuAvailability callers and require nineteen direct CALL rel32 sites to the same helper.",
       "candidateRvas": [
         {
           "id": "workshop-menu.availability.source-91",
@@ -774,6 +774,104 @@
           "sourceId": "0x95",
           "label": "workshop-menu.availability.source-95",
           "status": "current_manifest_rva"
+        },
+        {
+          "id": "workshop-menu.availability.source-96",
+          "rva": "0x396E55",
+          "sourceId": "0x96",
+          "label": "workshop-menu.availability.source-96",
+          "status": "current_manifest_rva"
+        },
+        {
+          "id": "workshop-menu.availability.source-97",
+          "rva": "0x3B7FA2",
+          "sourceId": "0x97",
+          "label": "workshop-menu.availability.source-97",
+          "status": "current_manifest_rva"
+        },
+        {
+          "id": "workshop-menu.availability.source-98",
+          "rva": "0x3C189F",
+          "sourceId": "0x98",
+          "label": "workshop-menu.availability.source-98",
+          "status": "current_manifest_rva"
+        },
+        {
+          "id": "workshop-menu.availability.source-99",
+          "rva": "0xB2BAA4",
+          "sourceId": "0x99",
+          "label": "workshop-menu.availability.source-99",
+          "status": "current_manifest_rva"
+        },
+        {
+          "id": "workshop-menu.availability.source-9a",
+          "rva": "0xB2D96F",
+          "sourceId": "0x9A",
+          "label": "workshop-menu.availability.source-9a",
+          "status": "current_manifest_rva"
+        },
+        {
+          "id": "workshop-menu.availability.source-9b",
+          "rva": "0xB2DAA1",
+          "sourceId": "0x9B",
+          "label": "workshop-menu.availability.source-9b",
+          "status": "current_manifest_rva"
+        },
+        {
+          "id": "workshop-menu.availability.source-9c",
+          "rva": "0xB2EF0F",
+          "sourceId": "0x9C",
+          "label": "workshop-menu.availability.source-9c",
+          "status": "current_manifest_rva"
+        },
+        {
+          "id": "workshop-menu.availability.source-9d",
+          "rva": "0xB3056B",
+          "sourceId": "0x9D",
+          "label": "workshop-menu.availability.source-9d",
+          "status": "current_manifest_rva"
+        },
+        {
+          "id": "workshop-menu.availability.source-9e",
+          "rva": "0xB325B5",
+          "sourceId": "0x9E",
+          "label": "workshop-menu.availability.source-9e",
+          "status": "current_manifest_rva"
+        },
+        {
+          "id": "workshop-menu.availability.source-9f",
+          "rva": "0xB332FC",
+          "sourceId": "0x9F",
+          "label": "workshop-menu.availability.source-9f",
+          "status": "current_manifest_rva"
+        },
+        {
+          "id": "workshop-menu.availability.source-a0",
+          "rva": "0xB36358",
+          "sourceId": "0xA0",
+          "label": "workshop-menu.availability.source-a0",
+          "status": "current_manifest_rva"
+        },
+        {
+          "id": "workshop-menu.availability.source-a1",
+          "rva": "0xB36861",
+          "sourceId": "0xA1",
+          "label": "workshop-menu.availability.source-a1",
+          "status": "current_manifest_rva"
+        },
+        {
+          "id": "workshop-menu.availability.source-a2",
+          "rva": "0xB37840",
+          "sourceId": "0xA2",
+          "label": "workshop-menu.availability.source-a2",
+          "status": "current_manifest_rva"
+        },
+        {
+          "id": "workshop-menu.availability.source-a3",
+          "rva": "0xB378EB",
+          "sourceId": "0xA3",
+          "label": "workshop-menu.availability.source-a3",
+          "status": "current_manifest_rva"
         }
       ],
       "instructionWindowAddresses": [
@@ -781,20 +879,36 @@
         "0xB2C8D7",
         "0xB2CB2E",
         "0xB2CB94",
-        "0xB2EBE4"
+        "0xB2EBE4",
+        "0x396E55",
+        "0x3B7FA2",
+        "0x3C189F",
+        "0xB2BAA4",
+        "0xB2D96F",
+        "0xB2DAA1",
+        "0xB2EF0F",
+        "0xB3056B",
+        "0xB325B5",
+        "0xB332FC",
+        "0xB36358",
+        "0xB36861",
+        "0xB37840",
+        "0xB378EB"
       ],
       "evidence": [
         "tools/ghidra/reports/fo4-placement-resource-status-functions.txt",
         "tools/ghidra/reports/fo4-selected-menu-helper-functions.txt",
-        "tools/ghidra/reports/fo4-selected-build-functions.txt"
+        "tools/ghidra/reports/fo4-selected-build-functions.txt",
+        "tools/ghidra/reports/fo4-workshopmenu-placement-writes.txt",
+        "tools/ghidra/reports/fo4-availability-extra-call-windows.txt",
+        "tools/ghidra/reports/fo4-availability-extra-precall-windows.txt",
+        "tools/ghidra/reports/fo4-availability-extra-caller-functions.txt",
+        "tools/native-hooks/reports/fallout4-1.11.191/workshop-availability-extra-classification.md"
       ],
-      "unresolvedItems": [
-        "Discovery strategy is unproven: Resolve WorkshopMenuAvailability callers and require five direct CALL rel32 sites to the same helper.",
-        "Verify candidate count, CALL rel32 shape, and original target grouping before updating manifest RVAs."
-      ],
+      "unresolvedItems": [],
       "proofReadiness": {
-        "status": "needs_exclusion_triage",
-        "summary": "Target allrefs include same-target references outside the selected hook sites.",
+        "status": "already_proven",
+        "summary": "The manifest already contains resolver proof metadata for this call-site family.",
         "selectedSites": [
           {
             "id": "workshop-menu.availability.source-91",
@@ -830,6 +944,104 @@
             "sourceId": "0x95",
             "label": "workshop-menu.availability.source-95",
             "absoluteAddress": "0x140B2EBE4"
+          },
+          {
+            "id": "workshop-menu.availability.source-96",
+            "rva": "0x396E55",
+            "sourceId": "0x96",
+            "label": "workshop-menu.availability.source-96",
+            "absoluteAddress": "0x140396E55"
+          },
+          {
+            "id": "workshop-menu.availability.source-97",
+            "rva": "0x3B7FA2",
+            "sourceId": "0x97",
+            "label": "workshop-menu.availability.source-97",
+            "absoluteAddress": "0x1403B7FA2"
+          },
+          {
+            "id": "workshop-menu.availability.source-98",
+            "rva": "0x3C189F",
+            "sourceId": "0x98",
+            "label": "workshop-menu.availability.source-98",
+            "absoluteAddress": "0x1403C189F"
+          },
+          {
+            "id": "workshop-menu.availability.source-99",
+            "rva": "0xB2BAA4",
+            "sourceId": "0x99",
+            "label": "workshop-menu.availability.source-99",
+            "absoluteAddress": "0x140B2BAA4"
+          },
+          {
+            "id": "workshop-menu.availability.source-9a",
+            "rva": "0xB2D96F",
+            "sourceId": "0x9A",
+            "label": "workshop-menu.availability.source-9a",
+            "absoluteAddress": "0x140B2D96F"
+          },
+          {
+            "id": "workshop-menu.availability.source-9b",
+            "rva": "0xB2DAA1",
+            "sourceId": "0x9B",
+            "label": "workshop-menu.availability.source-9b",
+            "absoluteAddress": "0x140B2DAA1"
+          },
+          {
+            "id": "workshop-menu.availability.source-9c",
+            "rva": "0xB2EF0F",
+            "sourceId": "0x9C",
+            "label": "workshop-menu.availability.source-9c",
+            "absoluteAddress": "0x140B2EF0F"
+          },
+          {
+            "id": "workshop-menu.availability.source-9d",
+            "rva": "0xB3056B",
+            "sourceId": "0x9D",
+            "label": "workshop-menu.availability.source-9d",
+            "absoluteAddress": "0x140B3056B"
+          },
+          {
+            "id": "workshop-menu.availability.source-9e",
+            "rva": "0xB325B5",
+            "sourceId": "0x9E",
+            "label": "workshop-menu.availability.source-9e",
+            "absoluteAddress": "0x140B325B5"
+          },
+          {
+            "id": "workshop-menu.availability.source-9f",
+            "rva": "0xB332FC",
+            "sourceId": "0x9F",
+            "label": "workshop-menu.availability.source-9f",
+            "absoluteAddress": "0x140B332FC"
+          },
+          {
+            "id": "workshop-menu.availability.source-a0",
+            "rva": "0xB36358",
+            "sourceId": "0xA0",
+            "label": "workshop-menu.availability.source-a0",
+            "absoluteAddress": "0x140B36358"
+          },
+          {
+            "id": "workshop-menu.availability.source-a1",
+            "rva": "0xB36861",
+            "sourceId": "0xA1",
+            "label": "workshop-menu.availability.source-a1",
+            "absoluteAddress": "0x140B36861"
+          },
+          {
+            "id": "workshop-menu.availability.source-a2",
+            "rva": "0xB37840",
+            "sourceId": "0xA2",
+            "label": "workshop-menu.availability.source-a2",
+            "absoluteAddress": "0x140B37840"
+          },
+          {
+            "id": "workshop-menu.availability.source-a3",
+            "rva": "0xB378EB",
+            "sourceId": "0xA3",
+            "label": "workshop-menu.availability.source-a3",
+            "absoluteAddress": "0x140B378EB"
           }
         ],
         "targetAbsoluteAddress": "0x1403997A0",
@@ -841,64 +1053,59 @@
               "workshop-menu.availability.source-92",
               "workshop-menu.availability.source-93",
               "workshop-menu.availability.source-94",
-              "workshop-menu.availability.source-95"
+              "workshop-menu.availability.source-95",
+              "workshop-menu.availability.source-96",
+              "workshop-menu.availability.source-97",
+              "workshop-menu.availability.source-98",
+              "workshop-menu.availability.source-99",
+              "workshop-menu.availability.source-9a",
+              "workshop-menu.availability.source-9b",
+              "workshop-menu.availability.source-9c",
+              "workshop-menu.availability.source-9d",
+              "workshop-menu.availability.source-9e",
+              "workshop-menu.availability.source-9f",
+              "workshop-menu.availability.source-a0",
+              "workshop-menu.availability.source-a1",
+              "workshop-menu.availability.source-a2",
+              "workshop-menu.availability.source-a3"
             ],
             "selectedSiteAbsoluteAddresses": [
+              "0x140396E55",
+              "0x1403B7FA2",
+              "0x1403C189F",
+              "0x140B2BAA4",
               "0x140B2C86E",
               "0x140B2C8D7",
               "0x140B2CB2E",
               "0x140B2CB94",
-              "0x140B2EBE4"
+              "0x140B2D96F",
+              "0x140B2DAA1",
+              "0x140B2EBE4",
+              "0x140B2EF0F",
+              "0x140B3056B",
+              "0x140B325B5",
+              "0x140B332FC",
+              "0x140B36358",
+              "0x140B36861",
+              "0x140B37840",
+              "0x140B378EB"
             ],
             "evidence": [
+              "tools/ghidra/reports/fo4-availability-extra-call-windows.txt",
+              "tools/ghidra/reports/fo4-availability-extra-caller-functions.txt",
+              "tools/ghidra/reports/fo4-availability-extra-precall-windows.txt",
               "tools/ghidra/reports/fo4-placement-resource-status-functions.txt",
               "tools/ghidra/reports/fo4-selected-build-functions.txt",
-              "tools/ghidra/reports/fo4-selected-menu-helper-functions.txt"
+              "tools/ghidra/reports/fo4-selected-menu-helper-functions.txt",
+              "tools/ghidra/reports/fo4-workshopmenu-placement-writes.txt",
+              "tools/native-hooks/reports/fallout4-1.11.191/workshop-availability-extra-classification.md"
             ]
           }
         ],
-        "targetReport": {
-          "path": "tools/ghidra/reports/fo4-selected-menu-helper-functions.txt",
-          "targetAbsoluteAddress": "0x1403997A0",
-          "referenceCount": 19,
-          "selectedReferenceCount": 5,
-          "missingSelectedReferences": [],
-          "extraSameTargetReferences": [
-            "0x140396E55",
-            "0x1403B7FA2",
-            "0x1403C189F",
-            "0x140B2BAA4",
-            "0x140B2D96F",
-            "0x140B2DAA1",
-            "0x140B2EF0F",
-            "0x140B3056B",
-            "0x140B325B5",
-            "0x140B332FC",
-            "0x140B36358",
-            "0x140B36861",
-            "0x140B37840",
-            "0x140B378EB"
-          ]
-        },
-        "directCallInstructionCount": 5,
+        "directCallInstructionCount": 19,
         "missingDirectCallSites": [],
-        "extraSameTargetReferences": [
-          "0x140396E55",
-          "0x1403B7FA2",
-          "0x1403C189F",
-          "0x140B2BAA4",
-          "0x140B2D96F",
-          "0x140B2DAA1",
-          "0x140B2EF0F",
-          "0x140B3056B",
-          "0x140B325B5",
-          "0x140B332FC",
-          "0x140B36358",
-          "0x140B36861",
-          "0x140B37840",
-          "0x140B378EB"
-        ],
-        "recommendedNextAction": "Triage 14 extra same-target references before adding exclusions."
+        "extraSameTargetReferences": [],
+        "recommendedNextAction": "No proof refresh needed; resolver proof metadata is already present."
       }
     },
     {

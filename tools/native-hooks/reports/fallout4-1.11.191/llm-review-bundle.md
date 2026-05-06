@@ -19,7 +19,7 @@ Manifest target runtime: Fallout4 1.11.191
 - workshop_material.direct_component_count (call_site_rva, proven): workshop-material.direct-component-count.source-e1=0x3BC3ED, workshop-material.direct-component-count.source-e2=0x39F27F, workshop-material.direct-component-count.source-e3=0xB3308B, workshop-material.direct-component-count.source-e4=0xB37A38, workshop-material.direct-component-count.source-e5=0xB2D34E
 - workshop_material.resource_status (call_site_rva, proven): workshop-material.resource-status.source-f1=0xB2F2C0, workshop-material.resource-status.source-f2=0xB2D266
 - workshop_menu.select (call_site_rva, proven): workshop-menu.select.source-a1=0xB2C8AA, workshop-menu.select.source-a2=0xB2CB67
-- workshop_menu.availability (call_site_rva, unproven): workshop-menu.availability.source-91=0xB2C86E, workshop-menu.availability.source-92=0xB2C8D7, workshop-menu.availability.source-93=0xB2CB2E, workshop-menu.availability.source-94=0xB2CB94, workshop-menu.availability.source-95=0xB2EBE4
+- workshop_menu.availability (call_site_rva, proven): workshop-menu.availability.source-91=0xB2C86E, workshop-menu.availability.source-92=0xB2C8D7, workshop-menu.availability.source-93=0xB2CB2E, workshop-menu.availability.source-94=0xB2CB94, workshop-menu.availability.source-95=0xB2EBE4, workshop-menu.availability.source-96=0x396E55, workshop-menu.availability.source-97=0x3B7FA2, workshop-menu.availability.source-98=0x3C189F, workshop-menu.availability.source-99=0xB2BAA4, workshop-menu.availability.source-9a=0xB2D96F, workshop-menu.availability.source-9b=0xB2DAA1, workshop-menu.availability.source-9c=0xB2EF0F, workshop-menu.availability.source-9d=0xB3056B, workshop-menu.availability.source-9e=0xB325B5, workshop-menu.availability.source-9f=0xB332FC, workshop-menu.availability.source-a0=0xB36358, workshop-menu.availability.source-a1=0xB36861, workshop-menu.availability.source-a2=0xB37840, workshop-menu.availability.source-a3=0xB378EB
 - workshop_menu.check_and_set_placement (call_site_rva, proven): workshop-menu.check-placement.source-a5=0xB2B307, workshop-menu.check-placement.source-a6=0xB2C8F2, workshop-menu.check-placement.source-a7=0xB2CBAF, workshop-menu.check-placement.source-a8=0xB2E88E
 - workshop_menu.start_placement (call_site_rva, proven): workshop-menu.start-placement.source-a3=0xB2C9EA, workshop-menu.start-placement.source-a4=0xB2CCA5, workshop-menu.start-placement.source-a9=0xB2B2FF, workshop-menu.start-placement.source-aa=0xB2BB64, workshop-menu.start-placement.source-ab=0xB2DB10, workshop-menu.start-placement.source-ac=0xB2E886, workshop-menu.start-placement.source-ad=0xB2EB0F
 - workshop_material.build_resource_check (call_site_rva, proven): workshop-material.build-resource-check.placement=0x392514, workshop-material.build-resource-check.confirm=0x398E06, workshop-material.build-resource-check.consume-precheck=0x3B7C4E
@@ -43,7 +43,7 @@ Manifest target runtime: Fallout4 1.11.191
 - workshop_material.direct_component_count: 0x3BC3ED, 0x39F27F, 0xB3308B, 0xB37A38, 0xB2D34E
 - workshop_material.resource_status: 0xB2F2C0, 0xB2D266
 - workshop_menu.select: 0xB2C8AA, 0xB2CB67
-- workshop_menu.availability: 0xB2C86E, 0xB2C8D7, 0xB2CB2E, 0xB2CB94, 0xB2EBE4
+- workshop_menu.availability: 0xB2C86E, 0xB2C8D7, 0xB2CB2E, 0xB2CB94, 0xB2EBE4, 0x396E55, 0x3B7FA2, 0x3C189F, 0xB2BAA4, 0xB2D96F, 0xB2DAA1, 0xB2EF0F, 0xB3056B, 0xB325B5, 0xB332FC, 0xB36358, 0xB36861, 0xB37840, 0xB378EB
 - workshop_menu.check_and_set_placement: 0xB2B307, 0xB2C8F2, 0xB2CBAF, 0xB2E88E
 - workshop_menu.start_placement: 0xB2C9EA, 0xB2CCA5, 0xB2B2FF, 0xB2BB64, 0xB2DB10, 0xB2E886, 0xB2EB0F
 - workshop_material.build_resource_check: 0x392514, 0x398E06, 0x3B7C4E
@@ -53,8 +53,6 @@ Manifest target runtime: Fallout4 1.11.191
 - workshop_material.current_workshop_object_count: 0x59D378
 
 ## Proof Readiness
-### needs_exclusion_triage
-- workshop_menu.availability: target=0x1403997A0; selectedRefs=5/5; directCalls=5/5; extras=14; Triage 14 extra same-target references before adding exclusions.
 ### already_proven
 - encounter_zone.load_change_cell_before_zone_reset: target=0x140494B30; selectedRefs=n/a; directCalls=1/1; extras=0; No proof refresh needed; resolver proof metadata is already present.
 - workshop_shared_container.populate_linked_workshop_container: target=0x140389E10; selectedRefs=n/a; directCalls=3/3; extras=0; No proof refresh needed; resolver proof metadata is already present.
@@ -63,6 +61,7 @@ Manifest target runtime: Fallout4 1.11.191
 - workshop_material.direct_component_count: target=0x140507A00; selectedRefs=n/a; directCalls=5/5; extras=0; No proof refresh needed; resolver proof metadata is already present.
 - workshop_material.resource_status: target=0x140B32FB0; selectedRefs=n/a; directCalls=2/2; extras=0; No proof refresh needed; resolver proof metadata is already present.
 - workshop_menu.select: target=0x140396DB0; selectedRefs=n/a; directCalls=2/2; extras=0; No proof refresh needed; resolver proof metadata is already present.
+- workshop_menu.availability: target=0x1403997A0; selectedRefs=n/a; directCalls=19/19; extras=0; No proof refresh needed; resolver proof metadata is already present.
 - workshop_menu.check_and_set_placement: target=0x140B2EB50; selectedRefs=n/a; directCalls=4/4; extras=0; No proof refresh needed; resolver proof metadata is already present.
 - workshop_menu.start_placement: target=0x140B30140; selectedRefs=n/a; directCalls=7/7; extras=0; No proof refresh needed; resolver proof metadata is already present.
 - workshop_material.build_resource_check: target=0x14042BCC0; selectedRefs=n/a; directCalls=3/3; extras=0; No proof refresh needed; resolver proof metadata is already present.
@@ -83,6 +82,9 @@ Manifest target runtime: Fallout4 1.11.191
 - workshop_supply_owner.field_2f8: target=none; selectedRefs=n/a; directCalls=n/a; extras=0; No call-site proof refresh needed.
 
 ## Referenced Ghidra Reports
+- tools/ghidra/reports/fo4-availability-extra-call-windows.txt
+- tools/ghidra/reports/fo4-availability-extra-caller-functions.txt
+- tools/ghidra/reports/fo4-availability-extra-precall-windows.txt
 - tools/ghidra/reports/fo4-build-resource-check-call-windows.txt
 - tools/ghidra/reports/fo4-build-resource-check-extra-path-functions.txt
 - tools/ghidra/reports/fo4-build-resource-check-target-functions.txt
@@ -127,13 +129,12 @@ Manifest target runtime: Fallout4 1.11.191
 - tools/ghidra/reports/fo4-workshopmenu-b2e900-b35320-b35440.txt
 - tools/ghidra/reports/fo4-workshopmenu-placement-creation-paths.txt
 - tools/ghidra/reports/fo4-workshopmenu-placement-writes.txt
+- tools/native-hooks/reports/fallout4-1.11.191/workshop-availability-extra-classification.md
 
 ## Unresolved Items Checklist
 - [ ] encounter_zone.reset_elapsed_from_detach_time: Discovery strategy is unproven: Resolve the detach-time elapsed helper from the encounter-zone reset analysis before updating this RVA.
 - [ ] workshop_shared_container.workshop_caravan_keyword_global: Discovery strategy is unproven: Re-derive from shared workshop container callers and verify the referenced global still resolves to the caravan keyword.
 - [ ] workshop_material.current_workshop_handle_global: Discovery strategy is unproven: Resolve the current-workshop handle global from Ghidra references and require the current workshop context probes to agree.
-- [ ] workshop_menu.availability: Discovery strategy is unproven: Resolve WorkshopMenuAvailability callers and require five direct CALL rel32 sites to the same helper.
-- [ ] workshop_menu.availability: Verify candidate count, CALL rel32 shape, and original target grouping before updating manifest RVAs.
 - [ ] workshop_menu.selected_menu_node_function: Discovery strategy is unproven: Resolve the selected workshop menu node helper from selected menu helper analysis.
 - [ ] workshop_menu.selected_row_global: Discovery strategy is unproven: Resolve the selected row global from selected workshop menu helper references.
 - [ ] workshop_material.resource_status_missing_resources: Discovery strategy is manual: This is a semantic status value, not an executable RVA; update only if the resource status enum is re-proven.

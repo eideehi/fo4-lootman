@@ -162,7 +162,7 @@ namespace papyrus_lootman
 		},
 	}};
 
-	inline constexpr std::array<NativeHookCallSite, 5> kWorkshopMenuAvailabilityCallSites{{
+	inline constexpr std::array<NativeHookCallSite, 19> kWorkshopMenuAvailabilityCallSites{{
 		{
 			"workshop-menu.availability.source-91",
 			0xB2C86E,
@@ -192,6 +192,90 @@ namespace papyrus_lootman
 			0xB2EBE4,
 			0x95,
 			"workshop-menu.availability.source-95@0xB2EBE4",
+		},
+		{
+			"workshop-menu.availability.source-96",
+			0x396E55,
+			0x96,
+			"workshop-menu.availability.source-96@0x396E55",
+		},
+		{
+			"workshop-menu.availability.source-97",
+			0x3B7FA2,
+			0x97,
+			"workshop-menu.availability.source-97@0x3B7FA2",
+		},
+		{
+			"workshop-menu.availability.source-98",
+			0x3C189F,
+			0x98,
+			"workshop-menu.availability.source-98@0x3C189F",
+		},
+		{
+			"workshop-menu.availability.source-99",
+			0xB2BAA4,
+			0x99,
+			"workshop-menu.availability.source-99@0xB2BAA4",
+		},
+		{
+			"workshop-menu.availability.source-9a",
+			0xB2D96F,
+			0x9A,
+			"workshop-menu.availability.source-9a@0xB2D96F",
+		},
+		{
+			"workshop-menu.availability.source-9b",
+			0xB2DAA1,
+			0x9B,
+			"workshop-menu.availability.source-9b@0xB2DAA1",
+		},
+		{
+			"workshop-menu.availability.source-9c",
+			0xB2EF0F,
+			0x9C,
+			"workshop-menu.availability.source-9c@0xB2EF0F",
+		},
+		{
+			"workshop-menu.availability.source-9d",
+			0xB3056B,
+			0x9D,
+			"workshop-menu.availability.source-9d@0xB3056B",
+		},
+		{
+			"workshop-menu.availability.source-9e",
+			0xB325B5,
+			0x9E,
+			"workshop-menu.availability.source-9e@0xB325B5",
+		},
+		{
+			"workshop-menu.availability.source-9f",
+			0xB332FC,
+			0x9F,
+			"workshop-menu.availability.source-9f@0xB332FC",
+		},
+		{
+			"workshop-menu.availability.source-a0",
+			0xB36358,
+			0xA0,
+			"workshop-menu.availability.source-a0@0xB36358",
+		},
+		{
+			"workshop-menu.availability.source-a1",
+			0xB36861,
+			0xA1,
+			"workshop-menu.availability.source-a1@0xB36861",
+		},
+		{
+			"workshop-menu.availability.source-a2",
+			0xB37840,
+			0xA2,
+			"workshop-menu.availability.source-a2@0xB37840",
+		},
+		{
+			"workshop-menu.availability.source-a3",
+			0xB378EB,
+			0xA3,
+			"workshop-menu.availability.source-a3@0xB378EB",
 		},
 	}};
 
