@@ -53,8 +53,8 @@ Manifest target runtime: Fallout4 1.11.191
 - workshop_material.current_workshop_object_count: 0x59D378
 
 ## Proof Readiness
-### needs_target_allrefs_report
-- workshop_material.resource_status: target=0x140B32FB0; selectedRefs=n/a; directCalls=0/2; extras=0; Generate a target allrefs report for 0x140B32FB0.
+### ready_for_proof_metadata
+- workshop_material.resource_status: target=0x140B32FB0; selectedRefs=2/2; directCalls=2/2; extras=0; Create a separate proof-promotion checkpoint with explicit proof.sites metadata.
 ### needs_exclusion_triage
 - workshop_menu.availability: target=0x1403997A0; selectedRefs=5/5; directCalls=4/5; extras=14; Triage 14 extra same-target references before adding exclusions.
 - workshop_menu.start_placement: target=0x140B30140; selectedRefs=2/2; directCalls=2/2; extras=5; Triage 5 extra same-target references before adding exclusions.
@@ -106,6 +106,8 @@ Manifest target runtime: Fallout4 1.11.191
 - tools/ghidra/reports/fo4-remove-component-core.txt
 - tools/ghidra/reports/fo4-remove-component-functions.txt
 - tools/ghidra/reports/fo4-removeitem-wrapper-callers.txt
+- tools/ghidra/reports/fo4-resource-status-call-windows.txt
+- tools/ghidra/reports/fo4-resource-status-target-functions.txt
 - tools/ghidra/reports/fo4-selected-build-functions.txt
 - tools/ghidra/reports/fo4-selected-menu-helper-functions.txt
 - tools/ghidra/reports/fo4-workbench-linked-container-functions.txt

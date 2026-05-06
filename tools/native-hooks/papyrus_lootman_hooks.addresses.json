@@ -360,7 +360,9 @@
       "expectedOriginalTargetGroup": "workshop_material.resource_status",
       "evidence": [
         "tools/ghidra/reports/fo4-placement-resource-status-functions.txt",
-        "tools/ghidra/reports/fo4-workshopmenu-b2e900-b35320-b35440.txt"
+        "tools/ghidra/reports/fo4-workshopmenu-b2e900-b35320-b35440.txt",
+        "tools/ghidra/reports/fo4-resource-status-target-functions.txt",
+        "tools/ghidra/reports/fo4-resource-status-call-windows.txt"
       ],
       "discoveryStrategy": {
         "status": "unproven",
