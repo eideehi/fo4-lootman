@@ -961,15 +961,16 @@
       "evidence": [
         "tools/ghidra/reports/fo4-placement-set-callers.txt",
         "tools/ghidra/reports/fo4-placement-set-windows.txt",
-        "tools/ghidra/reports/fo4-workshopmenu-placement-writes.txt"
+        "tools/ghidra/reports/fo4-workshopmenu-placement-writes.txt",
+        "tools/ghidra/reports/fo4-selected-build-functions.txt"
       ],
       "unresolvedItems": [
         "Discovery strategy is unproven: Resolve CheckAndSetItemForPlacement callers and require four direct CALL rel32 sites to the same placement helper.",
         "Verify candidate count, CALL rel32 shape, and original target grouping before updating manifest RVAs."
       ],
       "proofReadiness": {
-        "status": "needs_target_allrefs_report",
-        "summary": "Selected sites point to one target, but no target allrefs report section was found.",
+        "status": "needs_instruction_window_refresh",
+        "summary": "Target allrefs are present, but at least one selected site lacks a direct CALL instruction line.",
         "selectedSites": [
           {
             "id": "workshop-menu.check-placement.source-a5",
@@ -1005,26 +1006,37 @@
           {
             "targetAbsoluteAddress": "0x140B2EB50",
             "selectedSiteIds": [
+              "workshop-menu.check-placement.source-a5",
               "workshop-menu.check-placement.source-a6",
               "workshop-menu.check-placement.source-a7",
               "workshop-menu.check-placement.source-a8"
             ],
             "selectedSiteAbsoluteAddresses": [
+              "0x140B2B307",
               "0x140B2C8F2",
               "0x140B2CBAF",
               "0x140B2E88E"
             ],
             "evidence": [
+              "tools/ghidra/reports/fo4-selected-build-functions.txt",
               "tools/ghidra/reports/fo4-workshopmenu-placement-writes.txt"
             ]
           }
         ],
+        "targetReport": {
+          "path": "tools/ghidra/reports/fo4-selected-build-functions.txt",
+          "targetAbsoluteAddress": "0x140B2EB50",
+          "referenceCount": 4,
+          "selectedReferenceCount": 4,
+          "missingSelectedReferences": [],
+          "extraSameTargetReferences": []
+        },
         "directCallInstructionCount": 3,
         "missingDirectCallSites": [
           "0x140B2B307"
         ],
         "extraSameTargetReferences": [],
-        "recommendedNextAction": "Generate a target allrefs report for 0x140B2EB50."
+        "recommendedNextAction": "Refresh instruction-window evidence for 0x140B2B307."
       }
     },
     {
@@ -1058,15 +1070,16 @@
       ],
       "evidence": [
         "tools/ghidra/reports/fo4-workshopmenu-placement-creation-paths.txt",
-        "tools/ghidra/reports/fo4-workshopmenu-placement-writes.txt"
+        "tools/ghidra/reports/fo4-workshopmenu-placement-writes.txt",
+        "tools/ghidra/reports/fo4-selected-build-functions.txt"
       ],
       "unresolvedItems": [
         "Discovery strategy is unproven: Resolve StartWorkshopPlacement callers and require two direct CALL rel32 sites to the same helper.",
         "Verify candidate count, CALL rel32 shape, and original target grouping before updating manifest RVAs."
       ],
       "proofReadiness": {
-        "status": "needs_target_allrefs_report",
-        "summary": "Selected sites point to one target, but no target allrefs report section was found.",
+        "status": "needs_exclusion_triage",
+        "summary": "Target allrefs include same-target references outside the selected hook sites.",
         "selectedSites": [
           {
             "id": "workshop-menu.start-placement.source-a3",
@@ -1096,15 +1109,36 @@
               "0x140B2CCA5"
             ],
             "evidence": [
+              "tools/ghidra/reports/fo4-selected-build-functions.txt",
               "tools/ghidra/reports/fo4-workshopmenu-placement-creation-paths.txt",
               "tools/ghidra/reports/fo4-workshopmenu-placement-writes.txt"
             ]
           }
         ],
+        "targetReport": {
+          "path": "tools/ghidra/reports/fo4-selected-build-functions.txt",
+          "targetAbsoluteAddress": "0x140B30140",
+          "referenceCount": 7,
+          "selectedReferenceCount": 2,
+          "missingSelectedReferences": [],
+          "extraSameTargetReferences": [
+            "0x140B2B2FF",
+            "0x140B2BB64",
+            "0x140B2DB10",
+            "0x140B2E886",
+            "0x140B2EB0F"
+          ]
+        },
         "directCallInstructionCount": 2,
         "missingDirectCallSites": [],
-        "extraSameTargetReferences": [],
-        "recommendedNextAction": "Generate a target allrefs report for 0x140B30140."
+        "extraSameTargetReferences": [
+          "0x140B2B2FF",
+          "0x140B2BB64",
+          "0x140B2DB10",
+          "0x140B2E886",
+          "0x140B2EB0F"
+        ],
+        "recommendedNextAction": "Triage 5 extra same-target references before adding exclusions."
       }
     },
     {

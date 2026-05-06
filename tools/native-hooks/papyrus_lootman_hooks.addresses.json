@@ -436,7 +436,8 @@
       "evidence": [
         "tools/ghidra/reports/fo4-placement-set-callers.txt",
         "tools/ghidra/reports/fo4-placement-set-windows.txt",
-        "tools/ghidra/reports/fo4-workshopmenu-placement-writes.txt"
+        "tools/ghidra/reports/fo4-workshopmenu-placement-writes.txt",
+        "tools/ghidra/reports/fo4-selected-build-functions.txt"
       ],
       "discoveryStrategy": {
         "status": "unproven",
@@ -478,7 +479,8 @@
       "expectedOriginalTargetGroup": "workshop_menu.start_placement",
       "evidence": [
         "tools/ghidra/reports/fo4-workshopmenu-placement-creation-paths.txt",
-        "tools/ghidra/reports/fo4-workshopmenu-placement-writes.txt"
+        "tools/ghidra/reports/fo4-workshopmenu-placement-writes.txt",
+        "tools/ghidra/reports/fo4-selected-build-functions.txt"
       ],
       "discoveryStrategy": {
         "status": "unproven",

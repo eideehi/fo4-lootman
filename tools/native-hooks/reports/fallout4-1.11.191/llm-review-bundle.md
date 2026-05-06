@@ -56,12 +56,12 @@ Manifest target runtime: Fallout4 1.11.191
 ### needs_instruction_window_refresh
 - workshop_shared_container.populate_linked_workshop_container: target=0x140389E10; selectedRefs=3/3; directCalls=1/3; extras=0; Refresh instruction-window evidence for 0x140391F78, 0x1410890F6.
 - workshop_material.rebuild_workshop_supply: target=0x140B29690; selectedRefs=4/4; directCalls=0/4; extras=0; Refresh instruction-window evidence for 0x140A5F109, 0x140A6052C, 0x140A653F6, 0x140AEFD89.
+- workshop_menu.check_and_set_placement: target=0x140B2EB50; selectedRefs=4/4; directCalls=3/4; extras=0; Refresh instruction-window evidence for 0x140B2B307.
 ### needs_target_allrefs_report
 - workshop_material.resource_status: target=0x140B32FB0; selectedRefs=n/a; directCalls=0/2; extras=0; Generate a target allrefs report for 0x140B32FB0.
-- workshop_menu.check_and_set_placement: target=0x140B2EB50; selectedRefs=n/a; directCalls=3/4; extras=0; Generate a target allrefs report for 0x140B2EB50.
-- workshop_menu.start_placement: target=0x140B30140; selectedRefs=n/a; directCalls=2/2; extras=0; Generate a target allrefs report for 0x140B30140.
 ### needs_exclusion_triage
 - workshop_menu.availability: target=0x1403997A0; selectedRefs=5/5; directCalls=4/5; extras=14; Triage 14 extra same-target references before adding exclusions.
+- workshop_menu.start_placement: target=0x140B30140; selectedRefs=2/2; directCalls=2/2; extras=5; Triage 5 extra same-target references before adding exclusions.
 ### needs_rediscovery
 - encounter_zone.load_change_cell_before_zone_reset: target=none; selectedRefs=n/a; directCalls=0/1; extras=0; Refresh discovery reports around the selected manifest sites.
 - workshop_material.build_resource_check: target=none; selectedRefs=n/a; directCalls=0/2; extras=0; Refresh discovery reports around the selected manifest sites.
@@ -106,6 +106,7 @@ Manifest target runtime: Fallout4 1.11.191
 - tools/ghidra/reports/fo4-remove-component-core.txt
 - tools/ghidra/reports/fo4-remove-component-functions.txt
 - tools/ghidra/reports/fo4-removeitem-wrapper-callers.txt
+- tools/ghidra/reports/fo4-selected-build-functions.txt
 - tools/ghidra/reports/fo4-selected-menu-helper-functions.txt
 - tools/ghidra/reports/fo4-workbench-linked-container-functions.txt
 - tools/ghidra/reports/fo4-workbench-shared-container-callers.txt
