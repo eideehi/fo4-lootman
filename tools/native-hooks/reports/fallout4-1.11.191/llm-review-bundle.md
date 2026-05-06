@@ -14,7 +14,7 @@ Manifest target runtime: Fallout4 1.11.191
 - workshop_shared_container.workshop_caravan_keyword_global (global_rva, unproven): value=0x30EC9B8
 - workshop_material.current_workshop_handle_global (global_rva, unproven): value=0x30EC598
 - workshop_shared_container.populate_linked_workshop_container (call_site_rva, proven): workshop-shared-container.populate-linked.primary=0x391F78, workshop-shared-container.populate-linked.workbench=0xB28B76, workshop-shared-container.populate-linked.menu=0x10890F6
-- workshop_material.rebuild_workshop_supply (call_site_rva, unproven): workshop-material.rebuild-supply.source-a1=0xA653F6, workshop-material.rebuild-supply.source-a2=0xA5F109, workshop-material.rebuild-supply.source-a3=0xA6052C, workshop-material.rebuild-supply.source-a4=0xAEFD89
+- workshop_material.rebuild_workshop_supply (call_site_rva, proven): workshop-material.rebuild-supply.source-a1=0xA653F6, workshop-material.rebuild-supply.source-a2=0xA5F109, workshop-material.rebuild-supply.source-a3=0xA6052C, workshop-material.rebuild-supply.source-a4=0xAEFD89
 - workshop_material.component_count_helper (call_site_rva, proven): workshop-material.component-count.papyrus=0x59BC2A, workshop-material.component-count.workbench-ui=0x117501B
 - workshop_material.direct_component_count (call_site_rva, proven): workshop-material.direct-component-count.source-e1=0x3BC3ED, workshop-material.direct-component-count.source-e2=0x39F27F, workshop-material.direct-component-count.source-e3=0xB3308B, workshop-material.direct-component-count.source-e4=0xB37A38, workshop-material.direct-component-count.source-e5=0xB2D34E
 - workshop_material.resource_status (call_site_rva, unproven): workshop-material.resource-status.source-f1=0xB2F2C0, workshop-material.resource-status.source-f2=0xB2D266
@@ -54,7 +54,6 @@ Manifest target runtime: Fallout4 1.11.191
 
 ## Proof Readiness
 ### ready_for_proof_metadata
-- workshop_material.rebuild_workshop_supply: target=0x140B29690; selectedRefs=4/4; directCalls=4/4; extras=0; Create a separate proof-promotion checkpoint with explicit proof.sites metadata.
 - workshop_menu.check_and_set_placement: target=0x140B2EB50; selectedRefs=4/4; directCalls=4/4; extras=0; Create a separate proof-promotion checkpoint with explicit proof.sites metadata.
 ### needs_target_allrefs_report
 - workshop_material.resource_status: target=0x140B32FB0; selectedRefs=n/a; directCalls=0/2; extras=0; Generate a target allrefs report for 0x140B32FB0.
@@ -68,6 +67,7 @@ Manifest target runtime: Fallout4 1.11.191
 - workshop_material.remove_components: target=none; selectedRefs=n/a; directCalls=0/2; extras=0; Refresh discovery reports around the selected manifest sites.
 ### already_proven
 - workshop_shared_container.populate_linked_workshop_container: target=0x140389E10; selectedRefs=n/a; directCalls=3/3; extras=0; No proof refresh needed; resolver proof metadata is already present.
+- workshop_material.rebuild_workshop_supply: target=0x140B29690; selectedRefs=n/a; directCalls=4/4; extras=0; No proof refresh needed; resolver proof metadata is already present.
 - workshop_material.component_count_helper: target=0x140507660; selectedRefs=n/a; directCalls=2/2; extras=0; No proof refresh needed; resolver proof metadata is already present.
 - workshop_material.direct_component_count: target=0x140507A00; selectedRefs=n/a; directCalls=5/5; extras=0; No proof refresh needed; resolver proof metadata is already present.
 - workshop_menu.select: target=0x140396DB0; selectedRefs=n/a; directCalls=2/2; extras=0; No proof refresh needed; resolver proof metadata is already present.
@@ -125,8 +125,6 @@ Manifest target runtime: Fallout4 1.11.191
 - [ ] encounter_zone.reset_elapsed_from_detach_time: Discovery strategy is unproven: Resolve the detach-time elapsed helper from the encounter-zone reset analysis before updating this RVA.
 - [ ] workshop_shared_container.workshop_caravan_keyword_global: Discovery strategy is unproven: Re-derive from shared workshop container callers and verify the referenced global still resolves to the caravan keyword.
 - [ ] workshop_material.current_workshop_handle_global: Discovery strategy is unproven: Resolve the current-workshop handle global from Ghidra references and require the current workshop context probes to agree.
-- [ ] workshop_material.rebuild_workshop_supply: Discovery strategy is unproven: Resolve workbench supply rebuild callers and require four direct CALL rel32 sites to the same rebuild helper.
-- [ ] workshop_material.rebuild_workshop_supply: Verify candidate count, CALL rel32 shape, and original target grouping before updating manifest RVAs.
 - [ ] workshop_material.resource_status: Discovery strategy is unproven: Resolve resource status helper callers in the workshop menu placement path and require two direct CALL rel32 sites.
 - [ ] workshop_material.resource_status: Verify candidate count, CALL rel32 shape, and original target grouping before updating manifest RVAs.
 - [ ] workshop_menu.availability: Discovery strategy is unproven: Resolve WorkshopMenuAvailability callers and require five direct CALL rel32 sites to the same helper.

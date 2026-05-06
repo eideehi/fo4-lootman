@@ -156,8 +156,35 @@
         "tools/ghidra/reports/fo4-proof-refresh-call-windows.txt"
       ],
       "discoveryStrategy": {
-        "status": "unproven",
-        "summary": "Resolve workbench supply rebuild callers and require four direct CALL rel32 sites to the same rebuild helper."
+        "status": "proven",
+        "summary": "Resolve workbench supply rebuild callers and require four direct CALL rel32 sites to the same rebuild helper.",
+        "proof": {
+          "kind": "ghidra_reference_report",
+          "report": "tools/ghidra/reports/fo4-workbench-supply-functions.txt",
+          "instructionReports": [
+            "tools/ghidra/reports/fo4-proof-refresh-call-windows.txt"
+          ],
+          "targetAbsoluteAddress": "0x140B29690",
+          "referenceType": "UNCONDITIONAL_CALL",
+          "sites": [
+            {
+              "siteId": "workshop-material.rebuild-supply.source-a1",
+              "absoluteAddress": "0x140A653F6"
+            },
+            {
+              "siteId": "workshop-material.rebuild-supply.source-a2",
+              "absoluteAddress": "0x140A5F109"
+            },
+            {
+              "siteId": "workshop-material.rebuild-supply.source-a3",
+              "absoluteAddress": "0x140A6052C"
+            },
+            {
+              "siteId": "workshop-material.rebuild-supply.source-a4",
+              "absoluteAddress": "0x140AEFD89"
+            }
+          ]
+        }
       },
       "sites": [
         {

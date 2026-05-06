@@ -239,7 +239,7 @@
       "expectedCount": 4,
       "expectedInstructionKind": "call_rel32",
       "expectedOriginalTargetGroup": "workshop_material.rebuild_workshop_supply",
-      "discoveryStatus": "unproven",
+      "discoveryStatus": "proven",
       "discoverySummary": "Resolve workbench supply rebuild callers and require four direct CALL rel32 sites to the same rebuild helper.",
       "candidateRvas": [
         {
@@ -282,13 +282,10 @@
         "tools/ghidra/reports/fo4-component-helper-callers.txt",
         "tools/ghidra/reports/fo4-proof-refresh-call-windows.txt"
       ],
-      "unresolvedItems": [
-        "Discovery strategy is unproven: Resolve workbench supply rebuild callers and require four direct CALL rel32 sites to the same rebuild helper.",
-        "Verify candidate count, CALL rel32 shape, and original target grouping before updating manifest RVAs."
-      ],
+      "unresolvedItems": [],
       "proofReadiness": {
-        "status": "ready_for_proof_metadata",
-        "summary": "Existing evidence satisfies the resolver proof gates for this unproven call-site family.",
+        "status": "already_proven",
+        "summary": "The manifest already contains resolver proof metadata for this call-site family.",
         "selectedSites": [
           {
             "id": "workshop-material.rebuild-supply.source-a1",
@@ -336,23 +333,16 @@
               "0x140AEFD89"
             ],
             "evidence": [
+              "tools/ghidra/reports/fo4-component-helper-callers.txt",
               "tools/ghidra/reports/fo4-proof-refresh-call-windows.txt",
               "tools/ghidra/reports/fo4-workbench-supply-functions.txt"
             ]
           }
         ],
-        "targetReport": {
-          "path": "tools/ghidra/reports/fo4-workbench-supply-functions.txt",
-          "targetAbsoluteAddress": "0x140B29690",
-          "referenceCount": 4,
-          "selectedReferenceCount": 4,
-          "missingSelectedReferences": [],
-          "extraSameTargetReferences": []
-        },
         "directCallInstructionCount": 4,
         "missingDirectCallSites": [],
         "extraSameTargetReferences": [],
-        "recommendedNextAction": "Create a separate proof-promotion checkpoint with explicit proof.sites metadata."
+        "recommendedNextAction": "No proof refresh needed; resolver proof metadata is already present."
       }
     },
     {
