@@ -670,8 +670,27 @@
         "tools/ghidra/reports/fo4-consume-component-call-windows.txt"
       ],
       "discoveryStrategy": {
-        "status": "unproven",
-        "summary": "Resolve workshop component consumption calls and require two direct CALL rel32 sites to the same consume helper."
+        "status": "proven",
+        "summary": "Resolve workshop component consumption calls and require exactly two direct CALL rel32 sites to the same consume helper.",
+        "proof": {
+          "kind": "ghidra_reference_report",
+          "report": "tools/ghidra/reports/fo4-consume-component-target-functions.txt",
+          "instructionReports": [
+            "tools/ghidra/reports/fo4-consume-component-call-windows.txt"
+          ],
+          "targetAbsoluteAddress": "0x140392010",
+          "referenceType": "UNCONDITIONAL_CALL",
+          "sites": [
+            {
+              "siteId": "workshop-material.consume-component.source-f3",
+              "absoluteAddress": "0x140398FF6"
+            },
+            {
+              "siteId": "workshop-material.consume-component.source-f4",
+              "absoluteAddress": "0x1403B7D2A"
+            }
+          ]
+        }
       },
       "sites": [
         {

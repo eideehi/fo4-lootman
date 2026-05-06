@@ -1223,8 +1223,8 @@
       "expectedCount": 2,
       "expectedInstructionKind": "call_rel32",
       "expectedOriginalTargetGroup": "workshop_material.consume_component",
-      "discoveryStatus": "unproven",
-      "discoverySummary": "Resolve workshop component consumption calls and require two direct CALL rel32 sites to the same consume helper.",
+      "discoveryStatus": "proven",
+      "discoverySummary": "Resolve workshop component consumption calls and require exactly two direct CALL rel32 sites to the same consume helper.",
       "candidateRvas": [
         {
           "id": "workshop-material.consume-component.source-f3",
@@ -1251,13 +1251,10 @@
         "tools/ghidra/reports/fo4-consume-component-target-functions.txt",
         "tools/ghidra/reports/fo4-consume-component-call-windows.txt"
       ],
-      "unresolvedItems": [
-        "Discovery strategy is unproven: Resolve workshop component consumption calls and require two direct CALL rel32 sites to the same consume helper.",
-        "Verify candidate count, CALL rel32 shape, and original target grouping before updating manifest RVAs."
-      ],
+      "unresolvedItems": [],
       "proofReadiness": {
-        "status": "ready_for_proof_metadata",
-        "summary": "Existing evidence satisfies the resolver proof gates for this unproven call-site family.",
+        "status": "already_proven",
+        "summary": "The manifest already contains resolver proof metadata for this call-site family.",
         "selectedSites": [
           {
             "id": "workshop-material.consume-component.source-f3",
@@ -1288,22 +1285,16 @@
             ],
             "evidence": [
               "tools/ghidra/reports/fo4-consume-component-call-windows.txt",
-              "tools/ghidra/reports/fo4-consume-component-target-functions.txt"
+              "tools/ghidra/reports/fo4-consume-component-target-functions.txt",
+              "tools/ghidra/reports/fo4-remove-component-consume-core.txt",
+              "tools/ghidra/reports/fo4-remove-component-functions.txt"
             ]
           }
         ],
-        "targetReport": {
-          "path": "tools/ghidra/reports/fo4-consume-component-target-functions.txt",
-          "targetAbsoluteAddress": "0x140392010",
-          "referenceCount": 2,
-          "selectedReferenceCount": 2,
-          "missingSelectedReferences": [],
-          "extraSameTargetReferences": []
-        },
         "directCallInstructionCount": 2,
         "missingDirectCallSites": [],
         "extraSameTargetReferences": [],
-        "recommendedNextAction": "Create a separate proof-promotion checkpoint with explicit proof.sites metadata."
+        "recommendedNextAction": "No proof refresh needed; resolver proof metadata is already present."
       }
     },
     {

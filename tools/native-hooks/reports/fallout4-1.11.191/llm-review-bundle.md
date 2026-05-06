@@ -23,7 +23,7 @@ Manifest target runtime: Fallout4 1.11.191
 - workshop_menu.check_and_set_placement (call_site_rva, proven): workshop-menu.check-placement.source-a5=0xB2B307, workshop-menu.check-placement.source-a6=0xB2C8F2, workshop-menu.check-placement.source-a7=0xB2CBAF, workshop-menu.check-placement.source-a8=0xB2E88E
 - workshop_menu.start_placement (call_site_rva, unproven): workshop-menu.start-placement.source-a3=0xB2C9EA, workshop-menu.start-placement.source-a4=0xB2CCA5
 - workshop_material.build_resource_check (call_site_rva, unproven): workshop-material.build-resource-check.placement=0x392514, workshop-material.build-resource-check.confirm=0x398E06
-- workshop_material.consume_component (call_site_rva, unproven): workshop-material.consume-component.source-f3=0x398FF6, workshop-material.consume-component.source-f4=0x3B7D2A
+- workshop_material.consume_component (call_site_rva, proven): workshop-material.consume-component.source-f3=0x398FF6, workshop-material.consume-component.source-f4=0x3B7D2A
 - workshop_menu.selected_menu_node_function (function_rva, unproven): value=0x389A80
 - workshop_menu.selected_row_global (global_rva, unproven): value=0x30EBE18
 - workshop_material.resource_status_missing_resources (constant, manual): value=2
@@ -54,7 +54,6 @@ Manifest target runtime: Fallout4 1.11.191
 
 ## Proof Readiness
 ### ready_for_proof_metadata
-- workshop_material.consume_component: target=0x140392010; selectedRefs=2/2; directCalls=2/2; extras=0; Create a separate proof-promotion checkpoint with explicit proof.sites metadata.
 - workshop_material.remove_components: target=0x1411825A0; selectedRefs=2/2; directCalls=2/2; extras=0; Create a separate proof-promotion checkpoint with explicit proof.sites metadata.
 ### needs_exclusion_triage
 - workshop_menu.availability: target=0x1403997A0; selectedRefs=5/5; directCalls=5/5; extras=14; Triage 14 extra same-target references before adding exclusions.
@@ -69,6 +68,7 @@ Manifest target runtime: Fallout4 1.11.191
 - workshop_material.resource_status: target=0x140B32FB0; selectedRefs=n/a; directCalls=2/2; extras=0; No proof refresh needed; resolver proof metadata is already present.
 - workshop_menu.select: target=0x140396DB0; selectedRefs=n/a; directCalls=2/2; extras=0; No proof refresh needed; resolver proof metadata is already present.
 - workshop_menu.check_and_set_placement: target=0x140B2EB50; selectedRefs=n/a; directCalls=4/4; extras=0; No proof refresh needed; resolver proof metadata is already present.
+- workshop_material.consume_component: target=0x140392010; selectedRefs=n/a; directCalls=2/2; extras=0; No proof refresh needed; resolver proof metadata is already present.
 - workshop_material.object_count_papyrus: target=0x14059D360; selectedRefs=n/a; directCalls=1/1; extras=0; No proof refresh needed; resolver proof metadata is already present.
 - workshop_material.current_workshop_object_count: target=0x14037DE60; selectedRefs=n/a; directCalls=1/1; extras=0; No proof refresh needed; resolver proof metadata is already present.
 ### not_applicable
@@ -138,8 +138,6 @@ Manifest target runtime: Fallout4 1.11.191
 - [ ] workshop_menu.start_placement: Verify candidate count, CALL rel32 shape, and original target grouping before updating manifest RVAs.
 - [ ] workshop_material.build_resource_check: Discovery strategy is unproven: Resolve build resource checks from CanProduceWorkshop analysis and require two direct CALL rel32 sites.
 - [ ] workshop_material.build_resource_check: Verify candidate count, CALL rel32 shape, and original target grouping before updating manifest RVAs.
-- [ ] workshop_material.consume_component: Discovery strategy is unproven: Resolve workshop component consumption calls and require two direct CALL rel32 sites to the same consume helper.
-- [ ] workshop_material.consume_component: Verify candidate count, CALL rel32 shape, and original target grouping before updating manifest RVAs.
 - [ ] workshop_menu.selected_menu_node_function: Discovery strategy is unproven: Resolve the selected workshop menu node helper from selected menu helper analysis.
 - [ ] workshop_menu.selected_row_global: Discovery strategy is unproven: Resolve the selected row global from selected workshop menu helper references.
 - [ ] workshop_material.resource_status_missing_resources: Discovery strategy is manual: This is a semantic status value, not an executable RVA; update only if the resource status enum is re-proven.
