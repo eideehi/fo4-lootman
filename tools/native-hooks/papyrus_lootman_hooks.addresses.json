@@ -30,10 +30,14 @@
     },
     {
       "id": "encounter_zone.reset_elapsed_from_detach_time",
-      "cppName": "kEncounterZoneResetElapsedFromDetachRva",
+      "cppName": "kEncounterZoneResetElapsedFromDetachId",
       "category": "function_rva",
       "expectedCount": 1,
       "value": "0x4D2E20",
+      "addressLibrary": {
+        "id": "2200355",
+        "offset": "0x4D2E20"
+      },
       "evidence": [
         "tools/ghidra/reports/fo4-cell-detach-reset-functions.txt"
       ],
@@ -44,10 +48,14 @@
     },
     {
       "id": "workshop_shared_container.workshop_caravan_keyword_global",
-      "cppName": "kWorkshopCaravanKeywordGlobalRva",
+      "cppName": "kWorkshopCaravanKeywordGlobalId",
       "category": "global_rva",
       "expectedCount": 1,
       "value": "0x30EC9B8",
+      "addressLibrary": {
+        "id": "4797310",
+        "offset": "0x30EC9B8"
+      },
       "evidence": [
         "tools/ghidra/reports/fo4-workbench-shared-container-callers.txt"
       ],
@@ -58,10 +66,14 @@
     },
     {
       "id": "workshop_material.current_workshop_handle_global",
-      "cppName": "kCurrentWorkshopHandleGlobalRva",
+      "cppName": "kCurrentWorkshopHandleGlobalId",
       "category": "global_rva",
       "expectedCount": 1,
       "value": "0x30EC598",
+      "addressLibrary": {
+        "id": "4797241",
+        "offset": "0x30EC598"
+      },
       "evidence": [
         "tools/ghidra/reports/fo4-current-workshop-global-refs.txt"
       ],
@@ -471,10 +483,15 @@
     },
     {
       "id": "workshop_menu.selected_menu_node_function",
-      "cppName": "kWorkshopSelectedMenuNodeFunctionRva",
+      "cppName": "kWorkshopSelectedMenuNodeFunctionId",
       "category": "function_rva",
       "expectedCount": 1,
       "value": "0x389A80",
+      "addressLibrary": {
+        "id": "2195024",
+        "offset": "0x389A80",
+        "namedId": "RE::ID::Workshop::GetSelectedWorkshopMenuNode"
+      },
       "evidence": [
         "tools/ghidra/reports/fo4-selected-menu-helper-functions.txt"
       ],
@@ -485,10 +502,15 @@
     },
     {
       "id": "workshop_menu.selected_row_global",
-      "cppName": "kWorkshopSelectedRowGlobalRva",
+      "cppName": "kWorkshopSelectedRowGlobalId",
       "category": "global_rva",
       "expectedCount": 1,
       "value": "0x30EBE18",
+      "addressLibrary": {
+        "id": "4797160",
+        "offset": "0x30EBE18",
+        "namedId": "RE::ID::Workshop::CurrentRow"
+      },
       "evidence": [
         "tools/ghidra/reports/fo4-placement-secondary-globals.txt",
         "tools/ghidra/reports/fo4-selected-menu-helper-functions.txt"

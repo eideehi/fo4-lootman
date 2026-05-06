@@ -72,6 +72,62 @@ describe("native hook address manifest", () => {
 		expect(result.errors.join("\n")).toContain("layout_offset");
 	});
 
+	it("fails when Address Library metadata is attached to a direct call site", () => {
+		const manifest = cloneManifest(readNativeHookManifest(defaultManifestPath));
+		const entry = manifest.entries.find((candidate) => candidate.category === "call_site_rva");
+		if (!entry) throw new Error("Fixture manifest has no call-site entry.");
+		entry.addressLibrary = {
+			id: "123",
+			offset: "0x1234",
+		};
+
+		const result = validateNativeHookManifest(manifest, {
+			projectRoot,
+			checkEvidencePaths: true,
+		});
+
+		expect(result.valid).toBe(false);
+		expect(result.errors.join("\n")).toContain("addressLibrary must not be set for call-site entries");
+	});
+
+	it("fails when Address Library metadata is attached to layout offsets or constants", () => {
+		for (const category of ["layout_offset", "constant"] as const) {
+			const manifest = cloneManifest(readNativeHookManifest(defaultManifestPath));
+			const entry = manifest.entries.find((candidate) => candidate.category === category);
+			if (!entry) throw new Error(`Fixture manifest has no ${category} entry.`);
+			entry.addressLibrary = {
+				id: "123",
+				offset: "0x1234",
+			};
+
+			const result = validateNativeHookManifest(manifest, {
+				projectRoot,
+				checkEvidencePaths: true,
+			});
+
+			expect(result.valid).toBe(false);
+			expect(result.errors.join("\n")).toContain("addressLibrary is only allowed for function_rva and global_rva entries");
+		}
+	});
+
+	it("fails when an exact Address Library offset does not match the retained RVA", () => {
+		const manifest = cloneManifest(readNativeHookManifest(defaultManifestPath));
+		const entry = manifest.entries.find((candidate) => candidate.id === "encounter_zone.reset_elapsed_from_detach_time");
+		if (!entry) throw new Error("Fixture manifest has no reset elapsed entry.");
+		entry.addressLibrary = {
+			id: "2200355",
+			offset: "0x4D2E21",
+		};
+
+		const result = validateNativeHookManifest(manifest, {
+			projectRoot,
+			checkEvidencePaths: true,
+		});
+
+		expect(result.valid).toBe(false);
+		expect(result.errors.join("\n")).toContain("addressLibrary.offset must match");
+	});
+
 	it("fails when a direct call-site lacks expected target metadata", () => {
 		const manifest = cloneManifest(readNativeHookManifest(defaultManifestPath));
 		const entry = manifest.entries.find((candidate) => candidate.category === "call_site_rva");
@@ -95,6 +151,10 @@ describe("native hook address manifest", () => {
 
 		expect(first).toBe(second);
 		expect(fs.readFileSync(headerPath, "utf8")).toBe(first);
+		expect(first).toContain("#include <REL/ID.h>");
+		expect(first).toContain("inline constexpr REL::ID kEncounterZoneResetElapsedFromDetachId{ 2200355 };");
+		expect(first).toContain("inline constexpr REL::ID kWorkshopCaravanKeywordGlobalId{ 4797310 };");
+		expect(first).toContain("Address Library: RE::ID::Workshop::GetSelectedWorkshopMenuNode @ 0x389A80");
 		expect(path.relative(projectRoot, headerPath).replaceAll("\\", "/")).toBe(manifest.generatedHeader);
 	});
 });

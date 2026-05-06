@@ -8,6 +8,7 @@
 
 #include <array>
 #include <cstdint>
+#include <REL/ID.h>
 
 namespace papyrus_lootman
 {
@@ -26,11 +27,14 @@ namespace papyrus_lootman
 		"encounter-zone.reset-suppression.cell-before-reset@0x4D23C4",
 	};
 
-	inline constexpr std::uintptr_t kEncounterZoneResetElapsedFromDetachRva = 0x4D2E20;
+	// Address Library offset: 0x4D2E20
+	inline constexpr REL::ID kEncounterZoneResetElapsedFromDetachId{ 2200355 };
 
-	inline constexpr std::uintptr_t kWorkshopCaravanKeywordGlobalRva = 0x30EC9B8;
+	// Address Library offset: 0x30EC9B8
+	inline constexpr REL::ID kWorkshopCaravanKeywordGlobalId{ 4797310 };
 
-	inline constexpr std::uintptr_t kCurrentWorkshopHandleGlobalRva = 0x30EC598;
+	// Address Library offset: 0x30EC598
+	inline constexpr REL::ID kCurrentWorkshopHandleGlobalId{ 4797241 };
 
 	inline constexpr std::array<NativeHookCallSite, 3> kPopulateLinkedWorkshopContainerCallSites{{
 		{
@@ -263,9 +267,11 @@ namespace papyrus_lootman
 		},
 	}};
 
-	inline constexpr std::uintptr_t kWorkshopSelectedMenuNodeFunctionRva = 0x389A80;
+	// Address Library: RE::ID::Workshop::GetSelectedWorkshopMenuNode @ 0x389A80
+	inline constexpr REL::ID kWorkshopSelectedMenuNodeFunctionId{ 2195024 };
 
-	inline constexpr std::uintptr_t kWorkshopSelectedRowGlobalRva = 0x30EBE18;
+	// Address Library: RE::ID::Workshop::CurrentRow @ 0x30EBE18
+	inline constexpr REL::ID kWorkshopSelectedRowGlobalId{ 4797160 };
 
 	inline constexpr std::uint32_t kWorkshopResourceStatusMissingResources = 0x2;
 

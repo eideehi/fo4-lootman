@@ -135,7 +135,7 @@ namespace papyrus_lootman
 		std::call_once(installOnce, []()
 		{
 			REL::Relocation<CheckResetElapsedFromDetachTimeFn> resetElapsedFromDetach{
-				REL::Offset(kEncounterZoneResetElapsedFromDetachRva)
+				kEncounterZoneResetElapsedFromDetachId
 			};
 
 			if (!InstallDirectCallHookSite(
@@ -695,7 +695,7 @@ namespace papyrus_lootman
 	{
 		auto* context = static_cast<CurrentWorkshopProbeContext*>(opaque);
 		static REL::Relocation<std::uint32_t*> currentWorkshopHandle{
-			REL::Offset(kCurrentWorkshopHandleGlobalRva)
+			kCurrentWorkshopHandleGlobalId
 		};
 		auto* handlePtr = currentWorkshopHandle.get();
 		if (!handlePtr)
@@ -915,7 +915,7 @@ namespace papyrus_lootman
 	BGSKeyword* GetNativeWorkshopCaravanKeyword()
 	{
 		static REL::Relocation<BGSKeyword**> keyword{
-			REL::Offset(kWorkshopCaravanKeywordGlobalRva)
+			kWorkshopCaravanKeywordGlobalId
 		};
 		auto* keywordPtr = keyword.get();
 		return keywordPtr ? *keywordPtr : nullptr;
@@ -1599,14 +1599,11 @@ namespace papyrus_lootman
 	void CaptureSelectedWorkshopRecipeProbeCall(void* opaque)
 	{
 		auto* context = static_cast<SelectedWorkshopRecipeProbeContext*>(opaque);
-		static REL::Relocation<std::uint16_t*> selectedRowGlobal{
-			REL::Offset(kWorkshopSelectedRowGlobalRva)
-		};
 		static REL::Relocation<GetWorkshopMenuNodeFn> getWorkshopMenuNode{
-			REL::Offset(kWorkshopSelectedMenuNodeFunctionRva)
+			ID::Workshop::GetSelectedWorkshopMenuNode
 		};
 
-		auto* selectedRow = selectedRowGlobal.get();
+		auto* selectedRow = Workshop::GetCurrentRow();
 		if (!selectedRow || !getWorkshopMenuNode)
 		{
 			return;
@@ -1648,7 +1645,7 @@ namespace papyrus_lootman
 	{
 		auto* context = static_cast<WorkshopMenuRecipeProbeContext*>(opaque);
 		static REL::Relocation<GetWorkshopMenuNodeFn> getWorkshopMenuNode{
-			REL::Offset(kWorkshopSelectedMenuNodeFunctionRva)
+			ID::Workshop::GetSelectedWorkshopMenuNode
 		};
 		if (!getWorkshopMenuNode)
 		{

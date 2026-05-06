@@ -33,6 +33,12 @@ export interface NativeHookCallSite {
 	label: string;
 }
 
+export interface NativeHookAddressLibraryMetadata {
+	id: string;
+	offset: string;
+	namedId?: string;
+}
+
 export interface NativeHookAddressEntry {
 	id: string;
 	cppName: string;
@@ -41,6 +47,7 @@ export interface NativeHookAddressEntry {
 	expectedInstructionKind?: "call_rel32";
 	expectedOriginalTargetGroup?: string;
 	value?: string;
+	addressLibrary?: NativeHookAddressLibraryMetadata;
 	evidence: string[];
 	discoveryStrategy: NativeHookDiscoveryStrategy;
 	sites?: NativeHookCallSite[];
@@ -77,6 +84,7 @@ const VALID_DISCOVERY_STATUSES = new Set<DiscoveryStatus>(["automated", "manual"
 const HEX_VALUE_PATTERN = /^0x[0-9A-F]+$/i;
 const DECIMAL_VALUE_PATTERN = /^[0-9]+$/;
 const CPP_NAME_PATTERN = /^k[A-Za-z0-9]+$/;
+const CPP_QUALIFIED_NAME_PATTERN = /^(?:RE|REL)::[A-Za-z_][A-Za-z0-9_]*(?:::[A-Za-z_][A-Za-z0-9_]*)*$/;
 const RAW_LAYOUT_OFFSET_VALUES = new Set(["0xE0", "0xE8", "0xF8", "0x2F8"]);
 const ADDRESS_CODED_HOOK_NAME_PATTERN = /\bHooked[A-Za-z0-9_]*[0-9A-F]{5,}[A-Za-z0-9_]*\b/g;
 const ADDRESS_CODED_LOG_LABEL_PATTERN = /"[^"]*0x14[0-9A-F]{5,}[^"]*"/gi;
@@ -109,6 +117,14 @@ function normalizeHex(value: string): string {
 
 function formatHex(value: string): string {
 	return normalizeHex(value);
+}
+
+function formatDecimal(value: string): string {
+	const parsed = parseNumericLiteral(value);
+	if (parsed === null) {
+		return value;
+	}
+	return parsed.toString(10);
 }
 
 function formatSiteLabel(site: NativeHookCallSite): string {
@@ -213,6 +229,38 @@ function validateDiscoveryStrategy(
 	}
 	if (value.proof !== undefined) {
 		validateDiscoveryProof(value.proof, `${label}.discoveryStrategy.proof`, errors, root, checkEvidencePaths);
+	}
+}
+
+function validateAddressLibraryMetadata(
+	value: unknown,
+	label: string,
+	errors: string[],
+	entryValue: unknown,
+): void {
+	if (!isRecord(value)) {
+		errors.push(`${label}.addressLibrary must be an object.`);
+		return;
+	}
+
+	validateNumericLiteral(value.id, `${label}.addressLibrary.id`, errors, true);
+	validateNumericLiteral(value.offset, `${label}.addressLibrary.offset`, errors);
+	if (
+		typeof entryValue === "string" &&
+		typeof value.offset === "string" &&
+		HEX_VALUE_PATTERN.test(entryValue) &&
+		HEX_VALUE_PATTERN.test(value.offset) &&
+		normalizeHex(value.offset) !== normalizeHex(entryValue)
+	) {
+		errors.push(`${label}.addressLibrary.offset must match ${label}.value for exact Address Library mappings.`);
+	}
+
+	if (value.namedId !== undefined) {
+		if (typeof value.namedId !== "string" || value.namedId.trim() === "") {
+			errors.push(`${label}.addressLibrary.namedId must be a non-empty string.`);
+		} else if (!CPP_QUALIFIED_NAME_PATTERN.test(value.namedId)) {
+			errors.push(`${label}.addressLibrary.namedId must be a C++ qualified RE:: or REL:: name.`);
+		}
 	}
 }
 
@@ -323,9 +371,9 @@ export function validateNativeHookManifest(
 			continue;
 		}
 
-			if (expectedCountValue === null || expectedCountValue < 1) {
-				errors.push(`${label}.expectedCount must be a positive integer.`);
-			}
+		if (expectedCountValue === null || expectedCountValue < 1) {
+			errors.push(`${label}.expectedCount must be a positive integer.`);
+		}
 
 		const evidence = rawEntry.evidence;
 		if (!isStringArray(evidence)) {
@@ -347,11 +395,14 @@ export function validateNativeHookManifest(
 				errors.push(`${label}.sites must contain at least one call site.`);
 				continue;
 			}
-				if (expectedCountValue !== null && rawEntry.sites.length !== expectedCountValue) {
-					errors.push(`${label}.expectedCount=${expectedCountValue} but sites length is ${rawEntry.sites.length}.`);
-				}
+			if (expectedCountValue !== null && rawEntry.sites.length !== expectedCountValue) {
+				errors.push(`${label}.expectedCount=${expectedCountValue} but sites length is ${rawEntry.sites.length}.`);
+			}
 			if (rawEntry.value !== undefined) {
 				errors.push(`${label}.value must not be set for call-site entries.`);
+			}
+			if (rawEntry.addressLibrary !== undefined) {
+				errors.push(`${label}.addressLibrary must not be set for call-site entries.`);
 			}
 
 			for (const [siteIndex, rawSite] of rawEntry.sites.entries()) {
@@ -380,9 +431,16 @@ export function validateNativeHookManifest(
 			if (rawEntry.sites !== undefined) {
 				errors.push(`${label}.sites must not be set for ${category} entries.`);
 			}
-				if (expectedCountValue !== null && expectedCountValue !== 1) {
-					errors.push(`${label}.expectedCount must be 1 for ${category} entries.`);
+			if (expectedCountValue !== null && expectedCountValue !== 1) {
+				errors.push(`${label}.expectedCount must be 1 for ${category} entries.`);
+			}
+			if (rawEntry.addressLibrary !== undefined) {
+				if (category === "function_rva" || category === "global_rva") {
+					validateAddressLibraryMetadata(rawEntry.addressLibrary, label, errors, rawEntry.value);
+				} else {
+					errors.push(`${label}.addressLibrary is only allowed for function_rva and global_rva entries.`);
 				}
+			}
 		}
 
 		const value = typeof rawEntry.value === "string" ? normalizeHex(rawEntry.value) : null;
@@ -448,6 +506,7 @@ export function generateNativeHookHeader(manifest: NativeHookAddressManifest): s
 		"",
 		"#include <array>",
 		"#include <cstdint>",
+		"#include <REL/ID.h>",
 		"",
 		"namespace papyrus_lootman",
 		"{",
@@ -494,6 +553,15 @@ export function generateNativeHookHeader(manifest: NativeHookAddressManifest): s
 
 		const type = entry.category === "constant" ? "std::uint32_t" : "std::uintptr_t";
 		const value = entry.value ?? "0";
+		if (entry.addressLibrary) {
+			if (entry.addressLibrary.namedId) {
+				lines.push(`\t// Address Library: ${entry.addressLibrary.namedId} @ ${formatHex(entry.addressLibrary.offset)}`);
+			} else {
+				lines.push(`\t// Address Library offset: ${formatHex(entry.addressLibrary.offset)}`);
+			}
+			lines.push(`\tinline constexpr REL::ID ${entry.cppName}{ ${formatDecimal(entry.addressLibrary.id)} };`, "");
+			continue;
+		}
 		lines.push(`\tinline constexpr ${type} ${entry.cppName} = ${formatHex(value)};`, "");
 	}
 
