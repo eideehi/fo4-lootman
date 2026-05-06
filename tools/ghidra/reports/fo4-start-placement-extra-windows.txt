@@ -1,0 +1,137 @@
+Program: Fallout4.exe
+Image base: 140000000
+
+================================================================================
+Target 140b2b2d0
+  140b2b2cf: INC.LOCK dword ptr [RAX + 0x18]
+  140b2b2d3: MOV qword ptr [RSI + 0x380],RAX
+  140b2b2da: TEST RCX,RCX
+  140b2b2dd: JZ 0x140b2b2f5
+  140b2b2df: MOV EAX,EDI
+  140b2b2e1: XADD.LOCK dword ptr [RCX + 0x18],EAX
+  140b2b2e6: CMP EAX,0x1
+  140b2b2e9: JNZ 0x140b2b2f5
+  140b2b2eb: MOV RAX,qword ptr [RCX]
+  140b2b2ee: MOV EDX,0x1
+  140b2b2f3: CALL qword ptr [RAX]
+  140b2b2f5: MOV R8B,0x1
+  140b2b2f8: MOV RCX,RSI
+  140b2b2fb: MOVZX EDX,R8B
+  140b2b2ff: CALL 0x140b30140
+  140b2b304: MOV RCX,RSI
+  140b2b307: CALL 0x140b2eb50
+  140b2b30c: CALL 0x1409de1b0
+  140b2b311: MOV RCX,RAX
+  140b2b314: CALL 0x140a37050
+  140b2b319: MOV RCX,RSI
+  140b2b31c: CALL 0x140b2f400
+  140b2b321: MOV RCX,RSI
+  140b2b324: CALL 0x140b2ec50
+
+================================================================================
+Target 140b2bb00
+  140b2baff: TEST AL,AL
+  140b2bb01: JZ 0x140b2bb15
+  140b2bb03: CALL 0x1403a3dc0
+  140b2bb08: TEST AL,AL
+  140b2bb0a: JNZ 0x140b2bb15
+  140b2bb0c: LEA RCX,[RBP + -0x20]
+  140b2bb10: CALL 0x1403969e0
+  140b2bb15: MOVSS XMM0,dword ptr [RSI + 0x310]
+  140b2bb1d: MOV ECX,0x358
+  140b2bb22: SUBSS XMM0,dword ptr [0x14291fca0]
+  140b2bb2a: MOV EAX,0x340
+  140b2bb2f: MOV R8B,0x1
+  140b2bb32: ANDPS XMM0,xmmword ptr [0x14245e5b0]
+  140b2bb39: COMISS XMM0,dword ptr [0x14291fc48]
+  140b2bb40: CMOVBE EAX,ECX
+  140b2bb43: MOV RCX,RSI
+  140b2bb46: MOVSS XMM0,dword ptr [RAX + RSI*0x1]
+  140b2bb4b: SUBSS XMM0,dword ptr [0x14291fca0]
+  140b2bb53: ANDPS XMM0,xmmword ptr [0x14245e5b0]
+  140b2bb5a: COMISS XMM0,dword ptr [0x14291fc48]
+  140b2bb61: SETA DL
+  140b2bb64: CALL 0x140b30140
+  140b2bb69: XOR EDX,EDX
+  140b2bb6b: MOV RCX,RSI
+
+================================================================================
+Target 140b2dae0
+  140b2dae0: ANDPS XMM0,xmmword ptr [0x14245e5b0]
+  140b2dae7: COMISS XMM0,dword ptr [0x14291fc48]
+  140b2daee: CMOVBE EAX,ECX
+  140b2daf1: LEA RCX,[R15 + -0x10]
+  140b2daf5: MOVSS XMM0,dword ptr [RAX + R15*0x1]
+  140b2dafb: SUBSS XMM0,XMM7
+  140b2daff: ANDPS XMM0,xmmword ptr [0x14245e5b0]
+  140b2db06: COMISS XMM0,dword ptr [0x14291fc48]
+  140b2db0d: SETA DL
+  140b2db10: CALL 0x140b30140
+  140b2db15: JMP 0x140b2dbcd
+  140b2db1a: LEA RCX,[R15 + -0x10]
+  140b2db1e: CALL 0x140b2e690
+  140b2db23: JMP 0x140b2dbd8
+  140b2db28: TEST RSI,RSI
+  140b2db2b: JNZ 0x140b2dbd8
+  140b2db31: CALL 0x1403970a0
+  140b2db36: TEST AL,AL
+  140b2db38: JNZ 0x140b2db43
+  140b2db3a: CALL 0x1403a3d10
+  140b2db3f: TEST AL,AL
+  140b2db41: JZ 0x140b2db7f
+  140b2db43: CMP byte ptr [R15 + 0x41a],R12B
+  140b2db4a: JNZ 0x140b2db7f
+
+================================================================================
+Target 140b2e850
+  140b2e84d: MOVSS XMM0,dword ptr [0x14291fca0]
+  140b2e855: UCOMISS XMM0,dword ptr [RDI + 0x358]
+  140b2e85c: MOV R15,qword ptr [RSP + 0x60]
+  140b2e861: MOV R14,qword ptr [RSP + 0x68]
+  140b2e866: MOV RSI,qword ptr [RSP + 0x78]
+  140b2e86b: MOV RBX,qword ptr [RSP + 0x90]
+  140b2e873: MOVAPS XMM6,xmmword ptr [RSP + 0x50]
+  140b2e878: JNZ 0x140b2e87e
+  140b2e87a: XOR EDX,EDX
+  140b2e87c: JMP 0x140b2e880
+  140b2e87e: MOV DL,0x1
+  140b2e880: MOV R8B,0x1
+  140b2e883: MOV RCX,RDI
+  140b2e886: CALL 0x140b30140
+  140b2e88b: MOV RCX,RDI
+  140b2e88e: CALL 0x140b2eb50
+  140b2e893: CMP dword ptr [RBP + 0x20],R12D
+  140b2e897: JNZ 0x140b2e8c0
+  140b2e899: MOVSD XMM0,qword ptr [0x14291fcd8]
+  140b2e8a1: COMISD XMM0,qword ptr [RDI + 0x420]
+  140b2e8a9: JA 0x140b2e8c0
+  140b2e8ab: MOV RCX,qword ptr [0x142f19fe0]
+  140b2e8b2: MOV R9B,0x1
+  140b2e8b5: MOVZX R8D,R9B
+
+================================================================================
+Target 140b2eaf0
+  140b2eaed: MOV byte ptr [RSI + 0x42e],0x0
+  140b2eaf4: XOR R8D,R8D
+  140b2eaf7: MOV EAX,dword ptr [0x1430da180]
+  140b2eafd: MOV DL,0x1
+  140b2eaff: MOV RCX,RSI
+  140b2eb02: MOV dword ptr [0x1430ec580],EAX
+  140b2eb08: MOV byte ptr [0x1430ebddc],0x0
+  140b2eb0f: CALL 0x140b30140
+  140b2eb14: XOR EDX,EDX
+  140b2eb16: MOV RCX,RSI
+  140b2eb19: CALL 0x140b30bf0
+  140b2eb1e: MOV RCX,RSI
+  140b2eb21: CALL 0x140b2f400
+  140b2eb26: LEA RCX,[0x14253bab0]
+  140b2eb2d: CALL 0x141086080
+  140b2eb32: ADD RSP,0x80
+  140b2eb39: POP RSI
+  140b2eb3a: RET
+  140b2eb50: MOV qword ptr [RSP + 0x8],RBX
+  140b2eb55: PUSH RDI
+  140b2eb56: SUB RSP,0x50
+  140b2eb5a: MOVZX ECX,word ptr [0x1430ebe18]
+  140b2eb61: LEA RDX,[RSP + 0x68]
+  140b2eb66: XOR EDI,EDI

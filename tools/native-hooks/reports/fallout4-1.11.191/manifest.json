@@ -583,7 +583,8 @@
       "evidence": [
         "tools/ghidra/reports/fo4-workshopmenu-placement-creation-paths.txt",
         "tools/ghidra/reports/fo4-workshopmenu-placement-writes.txt",
-        "tools/ghidra/reports/fo4-selected-build-functions.txt"
+        "tools/ghidra/reports/fo4-selected-build-functions.txt",
+        "tools/ghidra/reports/fo4-start-placement-extra-windows.txt"
       ],
       "discoveryStrategy": {
         "status": "unproven",

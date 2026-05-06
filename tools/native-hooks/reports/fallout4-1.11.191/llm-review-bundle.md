@@ -109,6 +109,7 @@ Manifest target runtime: Fallout4 1.11.191
 - tools/ghidra/reports/fo4-resource-status-target-functions.txt
 - tools/ghidra/reports/fo4-selected-build-functions.txt
 - tools/ghidra/reports/fo4-selected-menu-helper-functions.txt
+- tools/ghidra/reports/fo4-start-placement-extra-windows.txt
 - tools/ghidra/reports/fo4-workbench-linked-container-functions.txt
 - tools/ghidra/reports/fo4-workbench-shared-container-callers.txt
 - tools/ghidra/reports/fo4-workbench-supply-functions.txt
