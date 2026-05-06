@@ -52,6 +52,39 @@ Manifest target runtime: Fallout4 1.11.191
 - workshop_material.object_count_papyrus: 0x5DD484
 - workshop_material.current_workshop_object_count: 0x59D378
 
+## Proof Readiness
+### needs_instruction_window_refresh
+- workshop_shared_container.populate_linked_workshop_container: target=0x140389E10; selectedRefs=3/3; directCalls=1/3; extras=0; Refresh instruction-window evidence for 0x140391F78, 0x1410890F6.
+- workshop_material.rebuild_workshop_supply: target=0x140B29690; selectedRefs=4/4; directCalls=0/4; extras=0; Refresh instruction-window evidence for 0x140A5F109, 0x140A6052C, 0x140A653F6, 0x140AEFD89.
+- workshop_material.component_count_helper: target=0x140507660; selectedRefs=2/2; directCalls=1/2; extras=0; Refresh instruction-window evidence for 0x14117501B.
+- workshop_menu.select: target=0x140396DB0; selectedRefs=2/2; directCalls=0/2; extras=0; Refresh instruction-window evidence for 0x140B2C8AA, 0x140B2CB67.
+### needs_target_allrefs_report
+- workshop_material.resource_status: target=0x140B32FB0; selectedRefs=n/a; directCalls=0/2; extras=0; Generate a target allrefs report for 0x140B32FB0.
+- workshop_menu.check_and_set_placement: target=0x140B2EB50; selectedRefs=n/a; directCalls=3/4; extras=0; Generate a target allrefs report for 0x140B2EB50.
+- workshop_menu.start_placement: target=0x140B30140; selectedRefs=n/a; directCalls=2/2; extras=0; Generate a target allrefs report for 0x140B30140.
+### needs_exclusion_triage
+- workshop_menu.availability: target=0x1403997A0; selectedRefs=5/5; directCalls=4/5; extras=14; Triage 14 extra same-target references before adding exclusions.
+### needs_rediscovery
+- encounter_zone.load_change_cell_before_zone_reset: target=none; selectedRefs=n/a; directCalls=0/1; extras=0; Refresh discovery reports around the selected manifest sites.
+- workshop_material.build_resource_check: target=none; selectedRefs=n/a; directCalls=0/2; extras=0; Refresh discovery reports around the selected manifest sites.
+- workshop_material.consume_component: target=none; selectedRefs=n/a; directCalls=0/2; extras=0; Refresh discovery reports around the selected manifest sites.
+- workshop_material.remove_components: target=none; selectedRefs=n/a; directCalls=0/2; extras=0; Refresh discovery reports around the selected manifest sites.
+### already_proven
+- workshop_material.direct_component_count: target=0x140507A00; selectedRefs=n/a; directCalls=5/5; extras=0; No proof refresh needed; resolver proof metadata is already present.
+- workshop_material.object_count_papyrus: target=0x14059D360; selectedRefs=n/a; directCalls=1/1; extras=0; No proof refresh needed; resolver proof metadata is already present.
+- workshop_material.current_workshop_object_count: target=0x14037DE60; selectedRefs=n/a; directCalls=1/1; extras=0; No proof refresh needed; resolver proof metadata is already present.
+### not_applicable
+- encounter_zone.reset_elapsed_from_detach_time: target=none; selectedRefs=n/a; directCalls=n/a; extras=0; No call-site proof refresh needed.
+- workshop_shared_container.workshop_caravan_keyword_global: target=none; selectedRefs=n/a; directCalls=n/a; extras=0; No call-site proof refresh needed.
+- workshop_material.current_workshop_handle_global: target=none; selectedRefs=n/a; directCalls=n/a; extras=0; No call-site proof refresh needed.
+- workshop_menu.selected_menu_node_function: target=none; selectedRefs=n/a; directCalls=n/a; extras=0; No call-site proof refresh needed.
+- workshop_menu.selected_row_global: target=none; selectedRefs=n/a; directCalls=n/a; extras=0; No call-site proof refresh needed.
+- workshop_material.resource_status_missing_resources: target=none; selectedRefs=n/a; directCalls=n/a; extras=0; No call-site proof refresh needed.
+- workshop_supply_owner.field_e0: target=none; selectedRefs=n/a; directCalls=n/a; extras=0; No call-site proof refresh needed.
+- workshop_supply_owner.field_e8: target=none; selectedRefs=n/a; directCalls=n/a; extras=0; No call-site proof refresh needed.
+- workshop_supply_owner.field_f8: target=none; selectedRefs=n/a; directCalls=n/a; extras=0; No call-site proof refresh needed.
+- workshop_supply_owner.field_2f8: target=none; selectedRefs=n/a; directCalls=n/a; extras=0; No call-site proof refresh needed.
+
 ## Referenced Ghidra Reports
 - tools/ghidra/reports/fo4-can-produce-workshop.txt
 - tools/ghidra/reports/fo4-canproduce-callers-detail.txt
