@@ -365,8 +365,27 @@
         "tools/ghidra/reports/fo4-resource-status-call-windows.txt"
       ],
       "discoveryStrategy": {
-        "status": "unproven",
-        "summary": "Resolve resource status helper callers in the workshop menu placement path and require two direct CALL rel32 sites."
+        "status": "proven",
+        "summary": "Resolve resource status helper callers in the workshop menu placement path and require two direct CALL rel32 sites.",
+        "proof": {
+          "kind": "ghidra_reference_report",
+          "report": "tools/ghidra/reports/fo4-resource-status-target-functions.txt",
+          "instructionReports": [
+            "tools/ghidra/reports/fo4-resource-status-call-windows.txt"
+          ],
+          "targetAbsoluteAddress": "0x140B32FB0",
+          "referenceType": "UNCONDITIONAL_CALL",
+          "sites": [
+            {
+              "siteId": "workshop-material.resource-status.source-f1",
+              "absoluteAddress": "0x140B2F2C0"
+            },
+            {
+              "siteId": "workshop-material.resource-status.source-f2",
+              "absoluteAddress": "0x140B2D266"
+            }
+          ]
+        }
       },
       "sites": [
         {

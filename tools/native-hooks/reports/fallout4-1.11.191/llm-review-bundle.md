@@ -17,7 +17,7 @@ Manifest target runtime: Fallout4 1.11.191
 - workshop_material.rebuild_workshop_supply (call_site_rva, proven): workshop-material.rebuild-supply.source-a1=0xA653F6, workshop-material.rebuild-supply.source-a2=0xA5F109, workshop-material.rebuild-supply.source-a3=0xA6052C, workshop-material.rebuild-supply.source-a4=0xAEFD89
 - workshop_material.component_count_helper (call_site_rva, proven): workshop-material.component-count.papyrus=0x59BC2A, workshop-material.component-count.workbench-ui=0x117501B
 - workshop_material.direct_component_count (call_site_rva, proven): workshop-material.direct-component-count.source-e1=0x3BC3ED, workshop-material.direct-component-count.source-e2=0x39F27F, workshop-material.direct-component-count.source-e3=0xB3308B, workshop-material.direct-component-count.source-e4=0xB37A38, workshop-material.direct-component-count.source-e5=0xB2D34E
-- workshop_material.resource_status (call_site_rva, unproven): workshop-material.resource-status.source-f1=0xB2F2C0, workshop-material.resource-status.source-f2=0xB2D266
+- workshop_material.resource_status (call_site_rva, proven): workshop-material.resource-status.source-f1=0xB2F2C0, workshop-material.resource-status.source-f2=0xB2D266
 - workshop_menu.select (call_site_rva, proven): workshop-menu.select.source-a1=0xB2C8AA, workshop-menu.select.source-a2=0xB2CB67
 - workshop_menu.availability (call_site_rva, unproven): workshop-menu.availability.source-91=0xB2C86E, workshop-menu.availability.source-92=0xB2C8D7, workshop-menu.availability.source-93=0xB2CB2E, workshop-menu.availability.source-94=0xB2CB94, workshop-menu.availability.source-95=0xB2EBE4
 - workshop_menu.check_and_set_placement (call_site_rva, proven): workshop-menu.check-placement.source-a5=0xB2B307, workshop-menu.check-placement.source-a6=0xB2C8F2, workshop-menu.check-placement.source-a7=0xB2CBAF, workshop-menu.check-placement.source-a8=0xB2E88E
@@ -53,8 +53,6 @@ Manifest target runtime: Fallout4 1.11.191
 - workshop_material.current_workshop_object_count: 0x59D378
 
 ## Proof Readiness
-### ready_for_proof_metadata
-- workshop_material.resource_status: target=0x140B32FB0; selectedRefs=2/2; directCalls=2/2; extras=0; Create a separate proof-promotion checkpoint with explicit proof.sites metadata.
 ### needs_exclusion_triage
 - workshop_menu.availability: target=0x1403997A0; selectedRefs=5/5; directCalls=4/5; extras=14; Triage 14 extra same-target references before adding exclusions.
 - workshop_menu.start_placement: target=0x140B30140; selectedRefs=2/2; directCalls=2/2; extras=5; Triage 5 extra same-target references before adding exclusions.
@@ -68,6 +66,7 @@ Manifest target runtime: Fallout4 1.11.191
 - workshop_material.rebuild_workshop_supply: target=0x140B29690; selectedRefs=n/a; directCalls=4/4; extras=0; No proof refresh needed; resolver proof metadata is already present.
 - workshop_material.component_count_helper: target=0x140507660; selectedRefs=n/a; directCalls=2/2; extras=0; No proof refresh needed; resolver proof metadata is already present.
 - workshop_material.direct_component_count: target=0x140507A00; selectedRefs=n/a; directCalls=5/5; extras=0; No proof refresh needed; resolver proof metadata is already present.
+- workshop_material.resource_status: target=0x140B32FB0; selectedRefs=n/a; directCalls=2/2; extras=0; No proof refresh needed; resolver proof metadata is already present.
 - workshop_menu.select: target=0x140396DB0; selectedRefs=n/a; directCalls=2/2; extras=0; No proof refresh needed; resolver proof metadata is already present.
 - workshop_menu.check_and_set_placement: target=0x140B2EB50; selectedRefs=n/a; directCalls=4/4; extras=0; No proof refresh needed; resolver proof metadata is already present.
 - workshop_material.object_count_papyrus: target=0x14059D360; selectedRefs=n/a; directCalls=1/1; extras=0; No proof refresh needed; resolver proof metadata is already present.
@@ -126,8 +125,6 @@ Manifest target runtime: Fallout4 1.11.191
 - [ ] encounter_zone.reset_elapsed_from_detach_time: Discovery strategy is unproven: Resolve the detach-time elapsed helper from the encounter-zone reset analysis before updating this RVA.
 - [ ] workshop_shared_container.workshop_caravan_keyword_global: Discovery strategy is unproven: Re-derive from shared workshop container callers and verify the referenced global still resolves to the caravan keyword.
 - [ ] workshop_material.current_workshop_handle_global: Discovery strategy is unproven: Resolve the current-workshop handle global from Ghidra references and require the current workshop context probes to agree.
-- [ ] workshop_material.resource_status: Discovery strategy is unproven: Resolve resource status helper callers in the workshop menu placement path and require two direct CALL rel32 sites.
-- [ ] workshop_material.resource_status: Verify candidate count, CALL rel32 shape, and original target grouping before updating manifest RVAs.
 - [ ] workshop_menu.availability: Discovery strategy is unproven: Resolve WorkshopMenuAvailability callers and require five direct CALL rel32 sites to the same helper.
 - [ ] workshop_menu.availability: Verify candidate count, CALL rel32 shape, and original target grouping before updating manifest RVAs.
 - [ ] workshop_menu.start_placement: Discovery strategy is unproven: Resolve StartWorkshopPlacement callers and require two direct CALL rel32 sites to the same helper.
