@@ -474,6 +474,8 @@ namespace papyrus_lootman
 	struct WorkshopSupplyOwnerProbeSnapshot
 	{
 		std::uintptr_t owner = 0;
+		// Raw diagnostic reads from an opaque workshop supply owner layout.
+		// They are not executable RVAs and do not drive behavior decisions.
 		std::uintptr_t fieldE0 = 0;
 		std::uintptr_t fieldE8 = 0;
 		std::uintptr_t fieldF8 = 0;

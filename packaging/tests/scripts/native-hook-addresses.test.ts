@@ -72,6 +72,23 @@ describe("native hook address manifest", () => {
 		expect(result.errors.join("\n")).toContain("layout_offset");
 	});
 
+	it("keeps workshop supply owner fields as diagnostic layout offsets", () => {
+		const manifest = readNativeHookManifest(defaultManifestPath);
+		const entries = manifest.entries.filter((candidate) => candidate.id.startsWith("workshop_supply_owner."));
+
+		expect(entries.map((entry) => entry.id).sort()).toEqual([
+			"workshop_supply_owner.field_2f8",
+			"workshop_supply_owner.field_e0",
+			"workshop_supply_owner.field_e8",
+			"workshop_supply_owner.field_f8",
+		]);
+		for (const entry of entries) {
+			expect(entry.category).toBe("layout_offset");
+			expect(entry.addressLibrary).toBeUndefined();
+			expect(entry.discoveryStrategy.summary).toContain("Raw diagnostic workshop supply owner layout read");
+		}
+	});
+
 	it("fails when Address Library metadata is attached to a direct call site", () => {
 		const manifest = cloneManifest(readNativeHookManifest(defaultManifestPath));
 		const entry = manifest.entries.find((candidate) => candidate.category === "call_site_rva");
