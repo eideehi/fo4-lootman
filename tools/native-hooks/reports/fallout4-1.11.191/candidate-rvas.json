@@ -12,8 +12,8 @@
       "expectedCount": 1,
       "expectedInstructionKind": "call_rel32",
       "expectedOriginalTargetGroup": "encounter_zone.check_cell_before_reset",
-      "discoveryStatus": "unproven",
-      "discoverySummary": "Resolve the LoadChange cell reset path and require one direct CALL rel32 to the check-cell-before-reset target.",
+      "discoveryStatus": "proven",
+      "discoverySummary": "Resolve the LoadChange cell reset path and require exactly one direct CALL rel32 to the check-cell-before-reset helper.",
       "candidateRvas": [
         {
           "id": "encounter-zone.reset-suppression.cell-before-reset",
@@ -32,13 +32,10 @@
         "tools/ghidra/reports/fo4-encounter-zone-before-reset-target-functions.txt",
         "tools/ghidra/reports/fo4-encounter-zone-before-reset-call-windows.txt"
       ],
-      "unresolvedItems": [
-        "Discovery strategy is unproven: Resolve the LoadChange cell reset path and require one direct CALL rel32 to the check-cell-before-reset target.",
-        "Verify candidate count, CALL rel32 shape, and original target grouping before updating manifest RVAs."
-      ],
+      "unresolvedItems": [],
       "proofReadiness": {
-        "status": "ready_for_proof_metadata",
-        "summary": "Existing evidence satisfies the resolver proof gates for this unproven call-site family.",
+        "status": "already_proven",
+        "summary": "The manifest already contains resolver proof metadata for this call-site family.",
         "selectedSites": [
           {
             "id": "encounter-zone.reset-suppression.cell-before-reset",
@@ -59,23 +56,17 @@
               "0x1404D23C4"
             ],
             "evidence": [
+              "tools/ghidra/reports/fo4-cell-detach-reset-functions.txt",
               "tools/ghidra/reports/fo4-encounter-zone-before-reset-call-windows.txt",
-              "tools/ghidra/reports/fo4-encounter-zone-before-reset-target-functions.txt"
+              "tools/ghidra/reports/fo4-encounter-zone-before-reset-target-functions.txt",
+              "tools/ghidra/reports/fo4-encounter-zone-detach-callers.txt"
             ]
           }
         ],
-        "targetReport": {
-          "path": "tools/ghidra/reports/fo4-encounter-zone-before-reset-target-functions.txt",
-          "targetAbsoluteAddress": "0x140494B30",
-          "referenceCount": 1,
-          "selectedReferenceCount": 1,
-          "missingSelectedReferences": [],
-          "extraSameTargetReferences": []
-        },
         "directCallInstructionCount": 1,
         "missingDirectCallSites": [],
         "extraSameTargetReferences": [],
-        "recommendedNextAction": "Create a separate proof-promotion checkpoint with explicit proof.sites metadata."
+        "recommendedNextAction": "No proof refresh needed; resolver proof metadata is already present."
       }
     },
     {

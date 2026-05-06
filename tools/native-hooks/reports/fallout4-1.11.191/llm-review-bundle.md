@@ -9,7 +9,7 @@ Manifest target runtime: Fallout4 1.11.191
 - Current hook source slice: tools/native-hooks/reports/fallout4-1.11.191/papyrus_lootman_hooks.slice.cpp
 
 ## Candidate RVAs
-- encounter_zone.load_change_cell_before_zone_reset (call_site_rva, unproven): encounter-zone.reset-suppression.cell-before-reset=0x4D23C4
+- encounter_zone.load_change_cell_before_zone_reset (call_site_rva, proven): encounter-zone.reset-suppression.cell-before-reset=0x4D23C4
 - encounter_zone.reset_elapsed_from_detach_time (function_rva, unproven): value=0x4D2E20
 - workshop_shared_container.workshop_caravan_keyword_global (global_rva, unproven): value=0x30EC9B8
 - workshop_material.current_workshop_handle_global (global_rva, unproven): value=0x30EC598
@@ -54,7 +54,6 @@ Manifest target runtime: Fallout4 1.11.191
 
 ## Proof Readiness
 ### ready_for_proof_metadata
-- encounter_zone.load_change_cell_before_zone_reset: target=0x140494B30; selectedRefs=1/1; directCalls=1/1; extras=0; Create a separate proof-promotion checkpoint with explicit proof.sites metadata.
 - workshop_material.consume_component: target=0x140392010; selectedRefs=2/2; directCalls=2/2; extras=0; Create a separate proof-promotion checkpoint with explicit proof.sites metadata.
 - workshop_material.remove_components: target=0x1411825A0; selectedRefs=2/2; directCalls=2/2; extras=0; Create a separate proof-promotion checkpoint with explicit proof.sites metadata.
 ### needs_exclusion_triage
@@ -62,6 +61,7 @@ Manifest target runtime: Fallout4 1.11.191
 - workshop_menu.start_placement: target=0x140B30140; selectedRefs=2/2; directCalls=2/2; extras=5; Triage 5 extra same-target references before adding exclusions.
 - workshop_material.build_resource_check: target=0x14042BCC0; selectedRefs=2/2; directCalls=2/2; extras=1; Triage 1 extra same-target references before adding exclusions.
 ### already_proven
+- encounter_zone.load_change_cell_before_zone_reset: target=0x140494B30; selectedRefs=n/a; directCalls=1/1; extras=0; No proof refresh needed; resolver proof metadata is already present.
 - workshop_shared_container.populate_linked_workshop_container: target=0x140389E10; selectedRefs=n/a; directCalls=3/3; extras=0; No proof refresh needed; resolver proof metadata is already present.
 - workshop_material.rebuild_workshop_supply: target=0x140B29690; selectedRefs=n/a; directCalls=4/4; extras=0; No proof refresh needed; resolver proof metadata is already present.
 - workshop_material.component_count_helper: target=0x140507660; selectedRefs=n/a; directCalls=2/2; extras=0; No proof refresh needed; resolver proof metadata is already present.
@@ -129,8 +129,6 @@ Manifest target runtime: Fallout4 1.11.191
 - tools/ghidra/reports/fo4-workshopmenu-placement-writes.txt
 
 ## Unresolved Items Checklist
-- [ ] encounter_zone.load_change_cell_before_zone_reset: Discovery strategy is unproven: Resolve the LoadChange cell reset path and require one direct CALL rel32 to the check-cell-before-reset target.
-- [ ] encounter_zone.load_change_cell_before_zone_reset: Verify candidate count, CALL rel32 shape, and original target grouping before updating manifest RVAs.
 - [ ] encounter_zone.reset_elapsed_from_detach_time: Discovery strategy is unproven: Resolve the detach-time elapsed helper from the encounter-zone reset analysis before updating this RVA.
 - [ ] workshop_shared_container.workshop_caravan_keyword_global: Discovery strategy is unproven: Re-derive from shared workshop container callers and verify the referenced global still resolves to the caravan keyword.
 - [ ] workshop_material.current_workshop_handle_global: Discovery strategy is unproven: Resolve the current-workshop handle global from Ghidra references and require the current workshop context probes to agree.

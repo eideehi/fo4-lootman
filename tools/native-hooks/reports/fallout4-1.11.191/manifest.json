@@ -18,8 +18,23 @@
         "tools/ghidra/reports/fo4-encounter-zone-before-reset-call-windows.txt"
       ],
       "discoveryStrategy": {
-        "status": "unproven",
-        "summary": "Resolve the LoadChange cell reset path and require one direct CALL rel32 to the check-cell-before-reset target."
+        "status": "proven",
+        "summary": "Resolve the LoadChange cell reset path and require exactly one direct CALL rel32 to the check-cell-before-reset helper.",
+        "proof": {
+          "kind": "ghidra_reference_report",
+          "report": "tools/ghidra/reports/fo4-encounter-zone-before-reset-target-functions.txt",
+          "instructionReports": [
+            "tools/ghidra/reports/fo4-encounter-zone-before-reset-call-windows.txt"
+          ],
+          "targetAbsoluteAddress": "0x140494B30",
+          "referenceType": "UNCONDITIONAL_CALL",
+          "sites": [
+            {
+              "siteId": "encounter-zone.reset-suppression.cell-before-reset",
+              "absoluteAddress": "0x1404D23C4"
+            }
+          ]
+        }
       },
       "sites": [
         {
