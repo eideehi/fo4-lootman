@@ -95,8 +95,32 @@
         "tools/ghidra/reports/fo4-proof-refresh-call-windows.txt"
       ],
       "discoveryStrategy": {
-        "status": "unproven",
-        "summary": "Find all callers of the linked workshop container population helper and require exactly three direct CALL rel32 sites."
+        "status": "proven",
+        "summary": "Resolve all callers of the linked workshop container population helper and require exactly three direct CALL rel32 sites.",
+        "proof": {
+          "kind": "ghidra_reference_report",
+          "report": "tools/ghidra/reports/fo4-workbench-linked-container-functions.txt",
+          "instructionReports": [
+            "tools/ghidra/reports/fo4-workbench-shared-container-callers.txt",
+            "tools/ghidra/reports/fo4-proof-refresh-call-windows.txt"
+          ],
+          "targetAbsoluteAddress": "0x140389E10",
+          "referenceType": "UNCONDITIONAL_CALL",
+          "sites": [
+            {
+              "siteId": "workshop-shared-container.populate-linked.primary",
+              "absoluteAddress": "0x140391F78"
+            },
+            {
+              "siteId": "workshop-shared-container.populate-linked.workbench",
+              "absoluteAddress": "0x140B28B76"
+            },
+            {
+              "siteId": "workshop-shared-container.populate-linked.menu",
+              "absoluteAddress": "0x1410890F6"
+            }
+          ]
+        }
       },
       "sites": [
         {
