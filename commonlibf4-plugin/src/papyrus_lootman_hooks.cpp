@@ -26,7 +26,31 @@ namespace papyrus_lootman
 		const NativeHookCallSite& site,
 		HookFn hook,
 		OriginalFn& original,
-		const char* family);
+		const char* family,
+		const char* failurePolicyAction);
+
+	struct NativeHookFeaturePolicy
+	{
+		const char* featureGroup;
+		const char* failurePolicyAction;
+	};
+
+	inline constexpr NativeHookFeaturePolicy kEncounterZoneResetSuppressionPolicy{
+		"encounter-zone.reset-suppression",
+		"disable-encounter-zone-reset-suppression",
+	};
+	inline constexpr NativeHookFeaturePolicy kSharedWorkshopContainerPolicy{
+		"workshop-shared-container",
+		"disable-shared-workshop-container-augmentation",
+	};
+	inline constexpr NativeHookFeaturePolicy kWorkshopMaterialBehaviorPolicy{
+		"workshop-material.behavior",
+		"disable-native-workshop-material-feature",
+	};
+	inline constexpr NativeHookFeaturePolicy kWorkshopMaterialDiagnosticsPolicy{
+		"workshop-material.diagnostics",
+		"skip-optional-workshop-material-diagnostics",
+	};
 
 	struct ExtraCellDetachTimeCompat :
 		public BSExtraData
@@ -142,8 +166,13 @@ namespace papyrus_lootman
 					kLoadChangeCellBeforeZoneResetCallSite,
 					HookedCheckCellBeforeEncounterZoneReset,
 					originalCheckCellBeforeEncounterZoneReset,
-					"encounter-zone.reset-suppression"))
+					"encounter-zone.reset-suppression",
+					kEncounterZoneResetSuppressionPolicy.failurePolicyAction))
 			{
+				REX::ERROR(
+					"Disabled native hook feature group: featureGroup={}, family=encounter-zone.reset-suppression, failurePolicyAction={}",
+					kEncounterZoneResetSuppressionPolicy.featureGroup,
+					kEncounterZoneResetSuppressionPolicy.failurePolicyAction);
 				return;
 			}
 
@@ -242,7 +271,8 @@ namespace papyrus_lootman
 
 	std::optional<DirectCallSiteDecode> DecodeDirectCallSite(
 		const NativeHookCallSite& site,
-		const char* family)
+		const char* family,
+		const char* failurePolicyAction)
 	{
 		REL::Relocation<std::uintptr_t> callSite{ REL::Offset(site.rva) };
 		const auto address = callSite.address();
@@ -250,20 +280,22 @@ namespace papyrus_lootman
 		if (!ExecuteSehCallSafe(&ReadDirectCallInstructionBytes, &context))
 		{
 			REX::ERROR(
-				"Skipping native direct-call hook: family={}, site={}, rva={:X}, reason=instruction-read-failed",
+				"Skipping native direct-call hook: family={}, site={}, rva={:X}, failurePolicyAction={}, reason=instruction-read-failed",
 				family,
 				site.id,
-				site.rva);
+				site.rva,
+				failurePolicyAction);
 			return std::nullopt;
 		}
 
 		if (context.bytes[0] != 0xE8)
 		{
 			REX::ERROR(
-				"Skipping native direct-call hook: family={}, site={}, rva={:X}, expectedOpcode=E8, actualOpcode={:02X}",
+				"Skipping native direct-call hook: family={}, site={}, rva={:X}, failurePolicyAction={}, expectedOpcode=E8, actualOpcode={:02X}",
 				family,
 				site.id,
 				site.rva,
+				failurePolicyAction,
 				context.bytes[0]);
 			return std::nullopt;
 		}
@@ -285,11 +317,15 @@ namespace papyrus_lootman
 	bool ValidateDirectCallSiteFamily(
 		std::span<const NativeHookCallSite> sites,
 		const char* family,
+		const char* failurePolicyAction,
 		bool requireSharedOriginalTarget)
 	{
 		if (sites.empty())
 		{
-			REX::ERROR("Skipping native direct-call hook family: family={}, reason=no-sites", family);
+			REX::ERROR(
+				"Skipping native direct-call hook family: family={}, failurePolicyAction={}, reason=no-sites",
+				family,
+				failurePolicyAction);
 			return false;
 		}
 
@@ -297,7 +333,7 @@ namespace papyrus_lootman
 		std::optional<std::uintptr_t> expectedTargetRva;
 		for (const auto& site : sites)
 		{
-			const auto decoded = DecodeDirectCallSite(site, family);
+			const auto decoded = DecodeDirectCallSite(site, family, failurePolicyAction);
 			if (!decoded)
 			{
 				return false;
@@ -318,12 +354,13 @@ namespace papyrus_lootman
 			if (*expectedTargetAddress != decoded->targetAddress)
 			{
 				REX::ERROR(
-					"Skipping native direct-call hook family: family={}, site={}, rva={:X}, originalTargetRva={:X}, expectedOriginalTargetRva={:X}",
+					"Skipping native direct-call hook family: family={}, site={}, rva={:X}, originalTargetRva={:X}, expectedOriginalTargetRva={:X}, failurePolicyAction={}",
 					family,
 					site.id,
 					site.rva,
 					decoded->targetRva,
-					expectedTargetRva.value_or(0));
+					expectedTargetRva.value_or(0),
+					failurePolicyAction);
 				return false;
 			}
 		}
@@ -335,9 +372,10 @@ namespace papyrus_lootman
 	OriginalFn WriteValidatedDirectCallHook(
 		const NativeHookCallSite& site,
 		HookFn hook,
-		const char* family)
+		const char* family,
+		const char* failurePolicyAction)
 	{
-		const auto decoded = DecodeDirectCallSite(site, family);
+		const auto decoded = DecodeDirectCallSite(site, family, failurePolicyAction);
 		if (!decoded)
 		{
 			return OriginalFn{};
@@ -346,12 +384,37 @@ namespace papyrus_lootman
 		REL::Relocation<std::uintptr_t> callSite{ REL::Offset(site.rva) };
 		const auto original = reinterpret_cast<OriginalFn>(callSite.write_call<5>(hook));
 		REX::INFO(
-			"Installed native direct-call hook: family={}, site={}, rva={:X}, originalTargetRva={:X}",
+			"Installed native direct-call hook: family={}, site={}, rva={:X}, originalTargetRva={:X}, failurePolicyAction={}",
 			family,
 			site.id,
 			site.rva,
-			decoded->targetRva);
+			decoded->targetRva,
+			failurePolicyAction);
 		return original;
+	}
+
+	template <std::size_t N>
+	bool PrevalidateDirectCallHookFamily(
+		const std::array<NativeHookCallSite, N>& sites,
+		const char* family,
+		const char* featureGroup,
+		const char* failurePolicyAction)
+	{
+		if (ValidateDirectCallSiteFamily(
+				std::span<const NativeHookCallSite>(sites.data(), sites.size()),
+				family,
+				failurePolicyAction,
+				true))
+		{
+			return true;
+		}
+
+		REX::ERROR(
+			"Disabled native hook feature group: featureGroup={}, family={}, failurePolicyAction={}",
+			featureGroup,
+			family,
+			failurePolicyAction);
+		return false;
 	}
 
 	template <class OriginalFn, class HookFn, std::size_t N>
@@ -359,14 +422,19 @@ namespace papyrus_lootman
 		const std::array<NativeHookCallSite, N>& sites,
 		const std::array<HookFn, N>& hooks,
 		OriginalFn& original,
-		const char* family)
+		const char* family,
+		const char* failurePolicyAction)
 	{
 		if (!ValidateDirectCallSiteFamily(
 				std::span<const NativeHookCallSite>(sites.data(), sites.size()),
 				family,
+				failurePolicyAction,
 				true))
 		{
-			REX::ERROR("Skipped native direct-call hook family: family={}", family);
+			REX::ERROR(
+				"Skipped native direct-call hook family: family={}, failurePolicyAction={}",
+				family,
+				failurePolicyAction);
 			return false;
 		}
 
@@ -375,14 +443,16 @@ namespace papyrus_lootman
 			const auto patchedOriginal = WriteValidatedDirectCallHook<OriginalFn>(
 				sites[index],
 				hooks[index],
-				family);
+				family,
+				failurePolicyAction);
 			if (!patchedOriginal)
 			{
 				REX::ERROR(
-					"Skipped native direct-call hook family after validation changed: family={}, site={}, rva={:X}",
+					"Skipped native direct-call hook family after validation changed: family={}, site={}, rva={:X}, failurePolicyAction={}",
 					family,
 					sites[index].id,
-					sites[index].rva);
+					sites[index].rva,
+					failurePolicyAction);
 				return false;
 			}
 
@@ -393,12 +463,13 @@ namespace papyrus_lootman
 			else if (original != patchedOriginal)
 			{
 				REX::WARN(
-					"Unexpected native direct-call original target after patch: family={}, site={}, rva={:X}, original={:X}, expected={:X}",
+					"Unexpected native direct-call original target after patch: family={}, site={}, rva={:X}, original={:X}, expected={:X}, failurePolicyAction={}",
 					family,
 					sites[index].id,
 					sites[index].rva,
 					reinterpret_cast<std::uintptr_t>(patchedOriginal),
-					reinterpret_cast<std::uintptr_t>(original));
+					reinterpret_cast<std::uintptr_t>(original),
+					failurePolicyAction);
 			}
 		}
 
@@ -410,24 +481,35 @@ namespace papyrus_lootman
 		const NativeHookCallSite& site,
 		HookFn hook,
 		OriginalFn& original,
-		const char* family)
+		const char* family,
+		const char* failurePolicyAction)
 	{
 		if (!ValidateDirectCallSiteFamily(
 				std::span<const NativeHookCallSite>(&site, 1),
 				family,
+				failurePolicyAction,
 				false))
 		{
-			REX::ERROR("Skipped native direct-call hook: family={}, site={}", family, site.id);
+			REX::ERROR(
+				"Skipped native direct-call hook: family={}, site={}, failurePolicyAction={}",
+				family,
+				site.id,
+				failurePolicyAction);
 			return false;
 		}
 
 		const auto patchedOriginal = WriteValidatedDirectCallHook<OriginalFn>(
 			site,
 			hook,
-			family);
+			family,
+			failurePolicyAction);
 		if (!patchedOriginal)
 		{
-			REX::ERROR("Skipped native direct-call hook after validation changed: family={}, site={}", family, site.id);
+			REX::ERROR(
+				"Skipped native direct-call hook after validation changed: family={}, site={}, failurePolicyAction={}",
+				family,
+				site.id,
+				failurePolicyAction);
 			return false;
 		}
 
@@ -3522,9 +3604,17 @@ namespace papyrus_lootman
 					kPopulateLinkedWorkshopContainerCallSites,
 					hooks,
 					originalPopulateLinkedWorkshopContainers,
-					"workshop-shared-container.populate-linked"))
+					"workshop-shared-container.populate-linked",
+					kSharedWorkshopContainerPolicy.failurePolicyAction))
 			{
 				REX::INFO("Installed native shared workshop container hooks");
+			}
+			else
+			{
+				REX::ERROR(
+					"Disabled native hook feature group: featureGroup={}, family=workshop-shared-container.populate-linked, failurePolicyAction={}",
+					kSharedWorkshopContainerPolicy.featureGroup,
+					kSharedWorkshopContainerPolicy.failurePolicyAction);
 			}
 		});
 	}
@@ -3534,30 +3624,16 @@ namespace papyrus_lootman
 		static std::once_flag installOnce;
 		std::call_once(installOnce, []()
 		{
-			bool allInstalled = true;
-
 			const std::array<RebuildWorkshopSupplyFn, kRebuildWorkshopSupplyCallSites.size()> rebuildHooks{
 				&HookedRebuildWorkshopSupplySourceA1,
 				&HookedRebuildWorkshopSupplySourceA2,
 				&HookedRebuildWorkshopSupplySourceA3,
 				&HookedRebuildWorkshopSupplySourceA4,
 			};
-			allInstalled &= InstallDirectCallHookFamily(
-				kRebuildWorkshopSupplyCallSites,
-				rebuildHooks,
-				originalRebuildWorkshopSupply,
-				"workshop-material.rebuild-supply");
-
 			const std::array<ComponentCountHelperFn, kComponentCountHelperCallSites.size()> componentCountHooks{
 				&HookedComponentCountPapyrus,
 				&HookedComponentCountWorkbenchUi,
 			};
-			allInstalled &= InstallDirectCallHookFamily(
-				kComponentCountHelperCallSites,
-				componentCountHooks,
-				originalComponentCountHelper,
-				"workshop-material.component-count");
-
 			const std::array<DirectComponentCountFn, kDirectComponentCountCallSites.size()> directComponentHooks{
 				&HookedDirectComponentCountSourceE1,
 				&HookedDirectComponentCountSourceE2,
@@ -3565,22 +3641,10 @@ namespace papyrus_lootman
 				&HookedDirectComponentCountSourceE4,
 				&HookedDirectComponentCountSourceE5,
 			};
-			allInstalled &= InstallDirectCallHookFamily(
-				kDirectComponentCountCallSites,
-				directComponentHooks,
-				originalDirectComponentCount,
-				"workshop-material.direct-component-count");
-
 			const std::array<WorkshopResourceStatusFn, kWorkshopResourceStatusCallSites.size()> resourceStatusHooks{
 				&HookedWorkshopResourceStatusSourceF1,
 				&HookedWorkshopResourceStatusSourceF2,
 			};
-			allInstalled &= InstallDirectCallHookFamily(
-				kWorkshopResourceStatusCallSites,
-				resourceStatusHooks,
-				originalWorkshopResourceStatus,
-				"workshop-material.resource-status");
-
 			const std::array<WorkshopMenuAvailabilityFn, kWorkshopMenuAvailabilityCallSites.size()> menuAvailabilityHooks{
 				&HookedWorkshopMenuAvailabilitySource<0>,
 				&HookedWorkshopMenuAvailabilitySource<1>,
@@ -3602,34 +3666,16 @@ namespace papyrus_lootman
 				&HookedWorkshopMenuAvailabilitySource<17>,
 				&HookedWorkshopMenuAvailabilitySource<18>,
 			};
-			allInstalled &= InstallDirectCallHookFamily(
-				kWorkshopMenuAvailabilityCallSites,
-				menuAvailabilityHooks,
-				originalWorkshopMenuAvailability,
-				"workshop-menu.availability");
-
 			const std::array<WorkshopCheckAndSetPlacementFn, kWorkshopCheckAndSetPlacementCallSites.size()> checkAndSetPlacementHooks{
 				&HookedWorkshopCheckAndSetPlacementSourceA5,
 				&HookedWorkshopCheckAndSetPlacementSourceA6,
 				&HookedWorkshopCheckAndSetPlacementSourceA7,
 				&HookedWorkshopCheckAndSetPlacementSourceA8,
 			};
-			allInstalled &= InstallDirectCallHookFamily(
-				kWorkshopCheckAndSetPlacementCallSites,
-				checkAndSetPlacementHooks,
-				originalWorkshopCheckAndSetPlacement,
-				"workshop-menu.check-placement");
-
 			const std::array<WorkshopMenuSelectFn, kWorkshopMenuSelectCallSites.size()> menuSelectHooks{
 				&HookedWorkshopMenuSelectSourceA1,
 				&HookedWorkshopMenuSelectSourceA2,
 			};
-			allInstalled &= InstallDirectCallHookFamily(
-				kWorkshopMenuSelectCallSites,
-				menuSelectHooks,
-				originalWorkshopMenuSelect,
-				"workshop-menu.select");
-
 			const std::array<WorkshopStartPlacementFn, kWorkshopStartPlacementCallSites.size()> startPlacementHooks{
 				&HookedWorkshopStartPlacementSourceA3,
 				&HookedWorkshopStartPlacementSourceA4,
@@ -3639,62 +3685,177 @@ namespace papyrus_lootman
 				&HookedWorkshopStartPlacementSourceAC,
 				&HookedWorkshopStartPlacementSourceAD,
 			};
-			allInstalled &= InstallDirectCallHookFamily(
-				kWorkshopStartPlacementCallSites,
-				startPlacementHooks,
-				originalWorkshopStartPlacement,
-				"workshop-menu.start-placement");
-
 			const std::array<WorkshopBuildResourceCheckFn, kWorkshopBuildResourceCheckCallSites.size()> buildResourceCheckHooks{
 				&HookedWorkshopBuildResourceCheckPlacement,
 				&HookedWorkshopBuildResourceCheckConfirm,
 				&HookedWorkshopBuildResourceCheckConsumePrecheck,
 			};
-			allInstalled &= InstallDirectCallHookFamily(
-				kWorkshopBuildResourceCheckCallSites,
-				buildResourceCheckHooks,
-				originalWorkshopBuildResourceCheck,
-				"workshop-material.build-resource-check");
-
 			const std::array<RemoveComponentsFn, kRemoveComponentsCallSites.size()> removeComponentHooks{
 				&HookedRemoveComponentsSourceF1,
 				&HookedRemoveComponentsSourceF2,
 			};
-			allInstalled &= InstallDirectCallHookFamily(
-				kRemoveComponentsCallSites,
-				removeComponentHooks,
-				originalRemoveComponents,
-				"workshop-material.remove-components");
-
 			const std::array<WorkshopConsumeComponentFn, kWorkshopConsumeComponentCallSites.size()> consumeComponentHooks{
 				&HookedWorkshopConsumeComponentSourceF3,
 				&HookedWorkshopConsumeComponentSourceF4,
 			};
-			allInstalled &= InstallDirectCallHookFamily(
+
+			bool behaviorPrevalidated = true;
+			behaviorPrevalidated &= PrevalidateDirectCallHookFamily(
+				kRemoveComponentsCallSites,
+				"workshop-material.remove-components",
+				kWorkshopMaterialBehaviorPolicy.featureGroup,
+				kWorkshopMaterialBehaviorPolicy.failurePolicyAction);
+			behaviorPrevalidated &= PrevalidateDirectCallHookFamily(
 				kWorkshopConsumeComponentCallSites,
-				consumeComponentHooks,
-				originalWorkshopConsumeComponent,
-				"workshop-material.consume-component");
+				"workshop-material.consume-component",
+				kWorkshopMaterialBehaviorPolicy.featureGroup,
+				kWorkshopMaterialBehaviorPolicy.failurePolicyAction);
+			behaviorPrevalidated &= PrevalidateDirectCallHookFamily(
+				kComponentCountHelperCallSites,
+				"workshop-material.component-count",
+				kWorkshopMaterialBehaviorPolicy.featureGroup,
+				kWorkshopMaterialBehaviorPolicy.failurePolicyAction);
+			behaviorPrevalidated &= PrevalidateDirectCallHookFamily(
+				kDirectComponentCountCallSites,
+				"workshop-material.direct-component-count",
+				kWorkshopMaterialBehaviorPolicy.featureGroup,
+				kWorkshopMaterialBehaviorPolicy.failurePolicyAction);
+			behaviorPrevalidated &= PrevalidateDirectCallHookFamily(
+				kWorkshopResourceStatusCallSites,
+				"workshop-material.resource-status",
+				kWorkshopMaterialBehaviorPolicy.featureGroup,
+				kWorkshopMaterialBehaviorPolicy.failurePolicyAction);
+			behaviorPrevalidated &= PrevalidateDirectCallHookFamily(
+				kWorkshopMenuAvailabilityCallSites,
+				"workshop-menu.availability",
+				kWorkshopMaterialBehaviorPolicy.featureGroup,
+				kWorkshopMaterialBehaviorPolicy.failurePolicyAction);
+			behaviorPrevalidated &= PrevalidateDirectCallHookFamily(
+				kWorkshopBuildResourceCheckCallSites,
+				"workshop-material.build-resource-check",
+				kWorkshopMaterialBehaviorPolicy.featureGroup,
+				kWorkshopMaterialBehaviorPolicy.failurePolicyAction);
 
-			allInstalled &= InstallDirectCallHookSite(
-				kWorkshopObjectCountPapyrusCallSite,
-				&HookedWorkshopObjectCount,
-				originalWorkshopObjectCount,
-				"workshop-material.object-count.papyrus");
-
-			allInstalled &= InstallDirectCallHookSite(
-				kCurrentWorkshopObjectCountCallSite,
-				&HookedCurrentWorkshopObjectCount,
-				originalCurrentWorkshopObjectCount,
-				"workshop-material.object-count.current-workshop");
-
-			if (allInstalled)
+			bool behaviorInstalled = false;
+			if (behaviorPrevalidated)
 			{
-				REX::INFO("Installed native workshop material probe hooks");
+				behaviorInstalled = true;
+				// Install consumption hooks before count/build allowance hooks so
+				// a mid-install failure cannot leave allowance active alone.
+				behaviorInstalled &= InstallDirectCallHookFamily(
+					kRemoveComponentsCallSites,
+					removeComponentHooks,
+					originalRemoveComponents,
+					"workshop-material.remove-components",
+					kWorkshopMaterialBehaviorPolicy.failurePolicyAction);
+				behaviorInstalled &= InstallDirectCallHookFamily(
+					kWorkshopConsumeComponentCallSites,
+					consumeComponentHooks,
+					originalWorkshopConsumeComponent,
+					"workshop-material.consume-component",
+					kWorkshopMaterialBehaviorPolicy.failurePolicyAction);
+				if (behaviorInstalled)
+				{
+					behaviorInstalled &= InstallDirectCallHookFamily(
+						kComponentCountHelperCallSites,
+						componentCountHooks,
+						originalComponentCountHelper,
+						"workshop-material.component-count",
+						kWorkshopMaterialBehaviorPolicy.failurePolicyAction);
+					behaviorInstalled &= InstallDirectCallHookFamily(
+						kDirectComponentCountCallSites,
+						directComponentHooks,
+						originalDirectComponentCount,
+						"workshop-material.direct-component-count",
+						kWorkshopMaterialBehaviorPolicy.failurePolicyAction);
+					behaviorInstalled &= InstallDirectCallHookFamily(
+						kWorkshopResourceStatusCallSites,
+						resourceStatusHooks,
+						originalWorkshopResourceStatus,
+						"workshop-material.resource-status",
+						kWorkshopMaterialBehaviorPolicy.failurePolicyAction);
+					behaviorInstalled &= InstallDirectCallHookFamily(
+						kWorkshopMenuAvailabilityCallSites,
+						menuAvailabilityHooks,
+						originalWorkshopMenuAvailability,
+						"workshop-menu.availability",
+						kWorkshopMaterialBehaviorPolicy.failurePolicyAction);
+					behaviorInstalled &= InstallDirectCallHookFamily(
+						kWorkshopBuildResourceCheckCallSites,
+						buildResourceCheckHooks,
+						originalWorkshopBuildResourceCheck,
+						"workshop-material.build-resource-check",
+						kWorkshopMaterialBehaviorPolicy.failurePolicyAction);
+				}
 			}
 			else
 			{
-				REX::WARN("Installed native workshop material probe hooks with one or more skipped families");
+				REX::ERROR(
+					"Disabled native hook feature group before patching: featureGroup={}, failurePolicyAction={}",
+					kWorkshopMaterialBehaviorPolicy.featureGroup,
+					kWorkshopMaterialBehaviorPolicy.failurePolicyAction);
+			}
+
+			bool optionalDiagnosticsInstalled = true;
+			optionalDiagnosticsInstalled &= InstallDirectCallHookFamily(
+				kRebuildWorkshopSupplyCallSites,
+				rebuildHooks,
+				originalRebuildWorkshopSupply,
+				"workshop-material.rebuild-supply",
+				kWorkshopMaterialDiagnosticsPolicy.failurePolicyAction);
+			optionalDiagnosticsInstalled &= InstallDirectCallHookFamily(
+				kWorkshopMenuSelectCallSites,
+				menuSelectHooks,
+				originalWorkshopMenuSelect,
+				"workshop-menu.select",
+				kWorkshopMaterialDiagnosticsPolicy.failurePolicyAction);
+			optionalDiagnosticsInstalled &= InstallDirectCallHookFamily(
+				kWorkshopCheckAndSetPlacementCallSites,
+				checkAndSetPlacementHooks,
+				originalWorkshopCheckAndSetPlacement,
+				"workshop-menu.check-placement",
+				kWorkshopMaterialDiagnosticsPolicy.failurePolicyAction);
+			optionalDiagnosticsInstalled &= InstallDirectCallHookFamily(
+				kWorkshopStartPlacementCallSites,
+				startPlacementHooks,
+				originalWorkshopStartPlacement,
+				"workshop-menu.start-placement",
+				kWorkshopMaterialDiagnosticsPolicy.failurePolicyAction);
+			optionalDiagnosticsInstalled &= InstallDirectCallHookSite(
+				kWorkshopObjectCountPapyrusCallSite,
+				&HookedWorkshopObjectCount,
+				originalWorkshopObjectCount,
+				"workshop-material.object-count.papyrus",
+				kWorkshopMaterialDiagnosticsPolicy.failurePolicyAction);
+			optionalDiagnosticsInstalled &= InstallDirectCallHookSite(
+				kCurrentWorkshopObjectCountCallSite,
+				&HookedCurrentWorkshopObjectCount,
+				originalCurrentWorkshopObjectCount,
+				"workshop-material.object-count.current-workshop",
+				kWorkshopMaterialDiagnosticsPolicy.failurePolicyAction);
+
+			if (behaviorInstalled && optionalDiagnosticsInstalled)
+			{
+				REX::INFO("Installed native workshop material behavior and diagnostics hooks");
+			}
+			else if (behaviorInstalled)
+			{
+				REX::WARN(
+					"Installed native workshop material behavior hooks with one or more skipped optional diagnostics: failurePolicyAction={}",
+					kWorkshopMaterialDiagnosticsPolicy.failurePolicyAction);
+			}
+			else if (optionalDiagnosticsInstalled)
+			{
+				REX::WARN(
+					"Native workshop material behavior hooks disabled; optional diagnostics hooks installed: failurePolicyAction={}",
+					kWorkshopMaterialBehaviorPolicy.failurePolicyAction);
+			}
+			else
+			{
+				REX::ERROR(
+					"Native workshop material behavior hooks disabled and optional diagnostics skipped: behaviorPolicyAction={}, diagnosticsPolicyAction={}",
+					kWorkshopMaterialBehaviorPolicy.failurePolicyAction,
+					kWorkshopMaterialDiagnosticsPolicy.failurePolicyAction);
 			}
 		});
 	}
