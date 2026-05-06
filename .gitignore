@@ -21,6 +21,9 @@ packaging/dist/
 packaging/.env
 .pnpm-store/
 
+# local tool configuration
+tools/ghidra/headless.local.json
+
 # files
 *.zip
 *:Zone.Identifier

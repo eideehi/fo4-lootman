@@ -38,6 +38,7 @@ describe("preflight", () => {
 
 		expect(() => runPreflight("generate:native-hooks", { cwd: root, packagingRoot: root, platform: "win32" })).not.toThrow();
 		expect(() => runPreflight("generate:native-hook-bundle", { cwd: root, packagingRoot: root, platform: "win32" })).not.toThrow();
+		expect(() => runPreflight("ghidra:probe", { cwd: root, packagingRoot: root, platform: "win32" })).not.toThrow();
 		expect(() => runPreflight("resolve:native-hooks", { cwd: root, packagingRoot: root, platform: "win32" })).not.toThrow();
 		expect(() => runPreflight("verify:native-hooks", { cwd: root, packagingRoot: root, platform: "win32" })).not.toThrow();
 	});
