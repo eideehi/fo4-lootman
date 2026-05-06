@@ -54,7 +54,7 @@ Manifest target runtime: Fallout4 1.11.191
 
 ## Proof Readiness
 ### needs_exclusion_triage
-- workshop_menu.availability: target=0x1403997A0; selectedRefs=5/5; directCalls=4/5; extras=14; Triage 14 extra same-target references before adding exclusions.
+- workshop_menu.availability: target=0x1403997A0; selectedRefs=5/5; directCalls=5/5; extras=14; Triage 14 extra same-target references before adding exclusions.
 - workshop_menu.start_placement: target=0x140B30140; selectedRefs=2/2; directCalls=2/2; extras=5; Triage 5 extra same-target references before adding exclusions.
 ### needs_rediscovery
 - encounter_zone.load_change_cell_before_zone_reset: target=none; selectedRefs=n/a; directCalls=0/1; extras=0; Refresh discovery reports around the selected manifest sites.

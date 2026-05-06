@@ -461,7 +461,8 @@
       "expectedOriginalTargetGroup": "workshop_menu.availability",
       "evidence": [
         "tools/ghidra/reports/fo4-placement-resource-status-functions.txt",
-        "tools/ghidra/reports/fo4-selected-menu-helper-functions.txt"
+        "tools/ghidra/reports/fo4-selected-menu-helper-functions.txt",
+        "tools/ghidra/reports/fo4-selected-build-functions.txt"
       ],
       "discoveryStrategy": {
         "status": "unproven",

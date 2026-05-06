@@ -771,7 +771,8 @@
       ],
       "evidence": [
         "tools/ghidra/reports/fo4-placement-resource-status-functions.txt",
-        "tools/ghidra/reports/fo4-selected-menu-helper-functions.txt"
+        "tools/ghidra/reports/fo4-selected-menu-helper-functions.txt",
+        "tools/ghidra/reports/fo4-selected-build-functions.txt"
       ],
       "unresolvedItems": [
         "Discovery strategy is unproven: Resolve WorkshopMenuAvailability callers and require five direct CALL rel32 sites to the same helper.",
@@ -837,6 +838,7 @@
             ],
             "evidence": [
               "tools/ghidra/reports/fo4-placement-resource-status-functions.txt",
+              "tools/ghidra/reports/fo4-selected-build-functions.txt",
               "tools/ghidra/reports/fo4-selected-menu-helper-functions.txt"
             ]
           }
@@ -864,10 +866,8 @@
             "0x140B378EB"
           ]
         },
-        "directCallInstructionCount": 4,
-        "missingDirectCallSites": [
-          "0x140B2EBE4"
-        ],
+        "directCallInstructionCount": 5,
+        "missingDirectCallSites": [],
         "extraSameTargetReferences": [
           "0x140396E55",
           "0x1403B7FA2",
