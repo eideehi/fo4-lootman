@@ -627,7 +627,7 @@
       "id": "workshop_material.build_resource_check",
       "cppName": "kWorkshopBuildResourceCheckCallSites",
       "category": "call_site_rva",
-      "expectedCount": 2,
+      "expectedCount": 3,
       "expectedInstructionKind": "call_rel32",
       "expectedOriginalTargetGroup": "workshop_material.build_resource_check",
       "evidence": [
@@ -639,8 +639,32 @@
         "tools/ghidra/reports/fo4-build-resource-check-extra-path-functions.txt"
       ],
       "discoveryStrategy": {
-        "status": "unproven",
-        "summary": "Resolve build resource checks from CanProduceWorkshop analysis and require two direct CALL rel32 sites."
+        "status": "proven",
+        "summary": "Resolve build resource checks from CanProduceWorkshop analysis and require three direct CALL rel32 sites to the same helper.",
+        "proof": {
+          "kind": "ghidra_reference_report",
+          "report": "tools/ghidra/reports/fo4-build-resource-check-target-functions.txt",
+          "instructionReports": [
+            "tools/ghidra/reports/fo4-build-resource-check-call-windows.txt",
+            "tools/ghidra/reports/fo4-build-resource-check-extra-path-functions.txt"
+          ],
+          "targetAbsoluteAddress": "0x14042BCC0",
+          "referenceType": "UNCONDITIONAL_CALL",
+          "sites": [
+            {
+              "siteId": "workshop-material.build-resource-check.placement",
+              "absoluteAddress": "0x140392514"
+            },
+            {
+              "siteId": "workshop-material.build-resource-check.confirm",
+              "absoluteAddress": "0x140398E06"
+            },
+            {
+              "siteId": "workshop-material.build-resource-check.consume-precheck",
+              "absoluteAddress": "0x1403B7C4E"
+            }
+          ]
+        }
       },
       "sites": [
         {
@@ -654,6 +678,12 @@
           "rva": "0x398E06",
           "sourceId": "0xB2",
           "label": "workshop-material.build-resource-check.confirm"
+        },
+        {
+          "id": "workshop-material.build-resource-check.consume-precheck",
+          "rva": "0x3B7C4E",
+          "sourceId": "0xB3",
+          "label": "workshop-material.build-resource-check.consume-precheck"
         }
       ]
     },

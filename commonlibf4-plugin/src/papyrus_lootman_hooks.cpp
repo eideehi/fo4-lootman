@@ -212,6 +212,10 @@ namespace papyrus_lootman
 	// Investigation-only traces. Keep false for release builds; set true only
 	// while re-investigating indoor workshop supply behavior.
 	inline constexpr bool kVerboseWorkshopMaterialDiagnostics = false;
+	inline constexpr std::uint32_t kWorkshopBuildResourceCheckConfirmSourceId =
+		kWorkshopBuildResourceCheckCallSites[1].sourceId;
+	inline constexpr std::uint32_t kWorkshopBuildResourceCheckConsumePrecheckSourceId =
+		kWorkshopBuildResourceCheckCallSites[2].sourceId;
 
 	struct DirectCallSiteDecode
 	{
@@ -1930,6 +1934,19 @@ namespace papyrus_lootman
 		return context.evaluation;
 	}
 
+	bool ShouldTrackPendingWorkshopBuildConsumption(std::uint32_t sourceId)
+	{
+		return sourceId == kWorkshopBuildResourceCheckConfirmSourceId ||
+		       sourceId == kWorkshopBuildResourceCheckConsumePrecheckSourceId;
+	}
+
+	bool ShouldConsumeWorkshopBuildDeficitsImmediately(std::uint32_t sourceId)
+	{
+		// The consume-precheck site is followed by consume-component source F4,
+		// so it only seeds pending context for that downstream consume path.
+		return sourceId == kWorkshopBuildResourceCheckConfirmSourceId;
+	}
+
 	void UpdatePendingWorkshopBuildConsumption(
 		std::uint32_t sourceId,
 		const SelectedWorkshopRecipeProbeSnapshot& recipeProbe,
@@ -1937,7 +1954,7 @@ namespace papyrus_lootman
 		bool adjustedResult,
 		const WorkshopResourceStatusEvaluation& evaluation)
 	{
-		if (sourceId != 0xB2)
+		if (!ShouldTrackPendingWorkshopBuildConsumption(sourceId))
 		{
 			return;
 		}
@@ -2808,7 +2825,7 @@ namespace papyrus_lootman
 			originalResult,
 			adjustedResult,
 			evaluation);
-		if (sourceId == 0xB2 && evaluation.applied)
+		if (ShouldConsumeWorkshopBuildDeficitsImmediately(sourceId) && evaluation.applied)
 		{
 			ConsumeWorkshopBuildDeficits(sourceName, recipeProbe, evaluation);
 			pendingWorkshopBuildConsumption = {};
@@ -2851,6 +2868,22 @@ namespace papyrus_lootman
 		bool scaleRequiredCount)
 	{
 		const auto& site = kWorkshopBuildResourceCheckCallSites[1];
+		return HookedWorkshopBuildResourceCheck(
+			recipe,
+			owner,
+			scratchList,
+			scaleRequiredCount,
+			site.sourceId,
+			site.label);
+	}
+
+	bool HookedWorkshopBuildResourceCheckConsumePrecheck(
+		BGSConstructibleObject* recipe,
+		TESObjectREFR* owner,
+		void* scratchList,
+		bool scaleRequiredCount)
+	{
+		const auto& site = kWorkshopBuildResourceCheckCallSites[2];
 		return HookedWorkshopBuildResourceCheck(
 			recipe,
 			owner,
@@ -3580,6 +3613,7 @@ namespace papyrus_lootman
 			const std::array<WorkshopBuildResourceCheckFn, kWorkshopBuildResourceCheckCallSites.size()> buildResourceCheckHooks{
 				&HookedWorkshopBuildResourceCheckPlacement,
 				&HookedWorkshopBuildResourceCheckConfirm,
+				&HookedWorkshopBuildResourceCheckConsumePrecheck,
 			};
 			allInstalled &= InstallDirectCallHookFamily(
 				kWorkshopBuildResourceCheckCallSites,

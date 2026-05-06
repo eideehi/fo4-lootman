@@ -237,7 +237,7 @@ namespace papyrus_lootman
 		},
 	}};
 
-	inline constexpr std::array<NativeHookCallSite, 2> kWorkshopBuildResourceCheckCallSites{{
+	inline constexpr std::array<NativeHookCallSite, 3> kWorkshopBuildResourceCheckCallSites{{
 		{
 			"workshop-material.build-resource-check.placement",
 			0x392514,
@@ -249,6 +249,12 @@ namespace papyrus_lootman
 			0x398E06,
 			0xB2,
 			"workshop-material.build-resource-check.confirm@0x398E06",
+		},
+		{
+			"workshop-material.build-resource-check.consume-precheck",
+			0x3B7C4E,
+			0xB3,
+			"workshop-material.build-resource-check.consume-precheck@0x3B7C4E",
 		},
 	}};
 

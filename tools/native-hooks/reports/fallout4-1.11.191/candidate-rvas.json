@@ -1125,11 +1125,11 @@
       "id": "workshop_material.build_resource_check",
       "category": "call_site_rva",
       "cppName": "kWorkshopBuildResourceCheckCallSites",
-      "expectedCount": 2,
+      "expectedCount": 3,
       "expectedInstructionKind": "call_rel32",
       "expectedOriginalTargetGroup": "workshop_material.build_resource_check",
-      "discoveryStatus": "unproven",
-      "discoverySummary": "Resolve build resource checks from CanProduceWorkshop analysis and require two direct CALL rel32 sites.",
+      "discoveryStatus": "proven",
+      "discoverySummary": "Resolve build resource checks from CanProduceWorkshop analysis and require three direct CALL rel32 sites to the same helper.",
       "candidateRvas": [
         {
           "id": "workshop-material.build-resource-check.placement",
@@ -1144,11 +1144,19 @@
           "sourceId": "0xB2",
           "label": "workshop-material.build-resource-check.confirm",
           "status": "current_manifest_rva"
+        },
+        {
+          "id": "workshop-material.build-resource-check.consume-precheck",
+          "rva": "0x3B7C4E",
+          "sourceId": "0xB3",
+          "label": "workshop-material.build-resource-check.consume-precheck",
+          "status": "current_manifest_rva"
         }
       ],
       "instructionWindowAddresses": [
         "0x392514",
-        "0x398E06"
+        "0x398E06",
+        "0x3B7C4E"
       ],
       "evidence": [
         "tools/ghidra/reports/fo4-can-produce-workshop.txt",
@@ -1158,13 +1166,10 @@
         "tools/ghidra/reports/fo4-build-resource-check-call-windows.txt",
         "tools/ghidra/reports/fo4-build-resource-check-extra-path-functions.txt"
       ],
-      "unresolvedItems": [
-        "Discovery strategy is unproven: Resolve build resource checks from CanProduceWorkshop analysis and require two direct CALL rel32 sites.",
-        "Verify candidate count, CALL rel32 shape, and original target grouping before updating manifest RVAs."
-      ],
+      "unresolvedItems": [],
       "proofReadiness": {
-        "status": "needs_exclusion_triage",
-        "summary": "Target allrefs include same-target references outside the selected hook sites.",
+        "status": "already_proven",
+        "summary": "The manifest already contains resolver proof metadata for this call-site family.",
         "selectedSites": [
           {
             "id": "workshop-material.build-resource-check.placement",
@@ -1179,6 +1184,13 @@
             "sourceId": "0xB2",
             "label": "workshop-material.build-resource-check.confirm",
             "absoluteAddress": "0x140398E06"
+          },
+          {
+            "id": "workshop-material.build-resource-check.consume-precheck",
+            "rva": "0x3B7C4E",
+            "sourceId": "0xB3",
+            "label": "workshop-material.build-resource-check.consume-precheck",
+            "absoluteAddress": "0x1403B7C4E"
           }
         ],
         "targetAbsoluteAddress": "0x14042BCC0",
@@ -1187,34 +1199,28 @@
             "targetAbsoluteAddress": "0x14042BCC0",
             "selectedSiteIds": [
               "workshop-material.build-resource-check.confirm",
+              "workshop-material.build-resource-check.consume-precheck",
               "workshop-material.build-resource-check.placement"
             ],
             "selectedSiteAbsoluteAddresses": [
               "0x140392514",
-              "0x140398E06"
+              "0x140398E06",
+              "0x1403B7C4E"
             ],
             "evidence": [
               "tools/ghidra/reports/fo4-build-resource-check-call-windows.txt",
-              "tools/ghidra/reports/fo4-build-resource-check-target-functions.txt"
+              "tools/ghidra/reports/fo4-build-resource-check-extra-path-functions.txt",
+              "tools/ghidra/reports/fo4-build-resource-check-target-functions.txt",
+              "tools/ghidra/reports/fo4-can-produce-workshop.txt",
+              "tools/ghidra/reports/fo4-canproduce-callers-detail.txt",
+              "tools/ghidra/reports/fo4-canproduce-deps.txt"
             ]
           }
         ],
-        "targetReport": {
-          "path": "tools/ghidra/reports/fo4-build-resource-check-target-functions.txt",
-          "targetAbsoluteAddress": "0x14042BCC0",
-          "referenceCount": 3,
-          "selectedReferenceCount": 2,
-          "missingSelectedReferences": [],
-          "extraSameTargetReferences": [
-            "0x1403B7C4E"
-          ]
-        },
-        "directCallInstructionCount": 2,
+        "directCallInstructionCount": 3,
         "missingDirectCallSites": [],
-        "extraSameTargetReferences": [
-          "0x1403B7C4E"
-        ],
-        "recommendedNextAction": "Triage 1 extra same-target references before adding exclusions."
+        "extraSameTargetReferences": [],
+        "recommendedNextAction": "No proof refresh needed; resolver proof metadata is already present."
       }
     },
     {

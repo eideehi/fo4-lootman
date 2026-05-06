@@ -22,7 +22,7 @@ Manifest target runtime: Fallout4 1.11.191
 - workshop_menu.availability (call_site_rva, unproven): workshop-menu.availability.source-91=0xB2C86E, workshop-menu.availability.source-92=0xB2C8D7, workshop-menu.availability.source-93=0xB2CB2E, workshop-menu.availability.source-94=0xB2CB94, workshop-menu.availability.source-95=0xB2EBE4
 - workshop_menu.check_and_set_placement (call_site_rva, proven): workshop-menu.check-placement.source-a5=0xB2B307, workshop-menu.check-placement.source-a6=0xB2C8F2, workshop-menu.check-placement.source-a7=0xB2CBAF, workshop-menu.check-placement.source-a8=0xB2E88E
 - workshop_menu.start_placement (call_site_rva, unproven): workshop-menu.start-placement.source-a3=0xB2C9EA, workshop-menu.start-placement.source-a4=0xB2CCA5
-- workshop_material.build_resource_check (call_site_rva, unproven): workshop-material.build-resource-check.placement=0x392514, workshop-material.build-resource-check.confirm=0x398E06
+- workshop_material.build_resource_check (call_site_rva, proven): workshop-material.build-resource-check.placement=0x392514, workshop-material.build-resource-check.confirm=0x398E06, workshop-material.build-resource-check.consume-precheck=0x3B7C4E
 - workshop_material.consume_component (call_site_rva, proven): workshop-material.consume-component.source-f3=0x398FF6, workshop-material.consume-component.source-f4=0x3B7D2A
 - workshop_menu.selected_menu_node_function (function_rva, unproven): value=0x389A80
 - workshop_menu.selected_row_global (global_rva, unproven): value=0x30EBE18
@@ -46,7 +46,7 @@ Manifest target runtime: Fallout4 1.11.191
 - workshop_menu.availability: 0xB2C86E, 0xB2C8D7, 0xB2CB2E, 0xB2CB94, 0xB2EBE4
 - workshop_menu.check_and_set_placement: 0xB2B307, 0xB2C8F2, 0xB2CBAF, 0xB2E88E
 - workshop_menu.start_placement: 0xB2C9EA, 0xB2CCA5
-- workshop_material.build_resource_check: 0x392514, 0x398E06
+- workshop_material.build_resource_check: 0x392514, 0x398E06, 0x3B7C4E
 - workshop_material.consume_component: 0x398FF6, 0x3B7D2A
 - workshop_material.remove_components: 0x114EB19, 0x114E543
 - workshop_material.object_count_papyrus: 0x5DD484
@@ -56,7 +56,6 @@ Manifest target runtime: Fallout4 1.11.191
 ### needs_exclusion_triage
 - workshop_menu.availability: target=0x1403997A0; selectedRefs=5/5; directCalls=5/5; extras=14; Triage 14 extra same-target references before adding exclusions.
 - workshop_menu.start_placement: target=0x140B30140; selectedRefs=2/2; directCalls=2/2; extras=5; Triage 5 extra same-target references before adding exclusions.
-- workshop_material.build_resource_check: target=0x14042BCC0; selectedRefs=2/2; directCalls=2/2; extras=1; Triage 1 extra same-target references before adding exclusions.
 ### already_proven
 - encounter_zone.load_change_cell_before_zone_reset: target=0x140494B30; selectedRefs=n/a; directCalls=1/1; extras=0; No proof refresh needed; resolver proof metadata is already present.
 - workshop_shared_container.populate_linked_workshop_container: target=0x140389E10; selectedRefs=n/a; directCalls=3/3; extras=0; No proof refresh needed; resolver proof metadata is already present.
@@ -66,6 +65,7 @@ Manifest target runtime: Fallout4 1.11.191
 - workshop_material.resource_status: target=0x140B32FB0; selectedRefs=n/a; directCalls=2/2; extras=0; No proof refresh needed; resolver proof metadata is already present.
 - workshop_menu.select: target=0x140396DB0; selectedRefs=n/a; directCalls=2/2; extras=0; No proof refresh needed; resolver proof metadata is already present.
 - workshop_menu.check_and_set_placement: target=0x140B2EB50; selectedRefs=n/a; directCalls=4/4; extras=0; No proof refresh needed; resolver proof metadata is already present.
+- workshop_material.build_resource_check: target=0x14042BCC0; selectedRefs=n/a; directCalls=3/3; extras=0; No proof refresh needed; resolver proof metadata is already present.
 - workshop_material.consume_component: target=0x140392010; selectedRefs=n/a; directCalls=2/2; extras=0; No proof refresh needed; resolver proof metadata is already present.
 - workshop_material.remove_components: target=0x1411825A0; selectedRefs=n/a; directCalls=2/2; extras=0; No proof refresh needed; resolver proof metadata is already present.
 - workshop_material.object_count_papyrus: target=0x14059D360; selectedRefs=n/a; directCalls=1/1; extras=0; No proof refresh needed; resolver proof metadata is already present.
@@ -136,8 +136,6 @@ Manifest target runtime: Fallout4 1.11.191
 - [ ] workshop_menu.availability: Verify candidate count, CALL rel32 shape, and original target grouping before updating manifest RVAs.
 - [ ] workshop_menu.start_placement: Discovery strategy is unproven: Resolve StartWorkshopPlacement callers and require two direct CALL rel32 sites to the same helper.
 - [ ] workshop_menu.start_placement: Verify candidate count, CALL rel32 shape, and original target grouping before updating manifest RVAs.
-- [ ] workshop_material.build_resource_check: Discovery strategy is unproven: Resolve build resource checks from CanProduceWorkshop analysis and require two direct CALL rel32 sites.
-- [ ] workshop_material.build_resource_check: Verify candidate count, CALL rel32 shape, and original target grouping before updating manifest RVAs.
 - [ ] workshop_menu.selected_menu_node_function: Discovery strategy is unproven: Resolve the selected workshop menu node helper from selected menu helper analysis.
 - [ ] workshop_menu.selected_row_global: Discovery strategy is unproven: Resolve the selected row global from selected workshop menu helper references.
 - [ ] workshop_material.resource_status_missing_resources: Discovery strategy is manual: This is a semantic status value, not an executable RVA; update only if the resource status enum is re-proven.
