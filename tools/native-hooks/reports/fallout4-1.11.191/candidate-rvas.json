@@ -1155,7 +1155,8 @@
         "tools/ghidra/reports/fo4-canproduce-deps.txt",
         "tools/ghidra/reports/fo4-canproduce-callers-detail.txt",
         "tools/ghidra/reports/fo4-build-resource-check-target-functions.txt",
-        "tools/ghidra/reports/fo4-build-resource-check-call-windows.txt"
+        "tools/ghidra/reports/fo4-build-resource-check-call-windows.txt",
+        "tools/ghidra/reports/fo4-build-resource-check-extra-path-functions.txt"
       ],
       "unresolvedItems": [
         "Discovery strategy is unproven: Resolve build resource checks from CanProduceWorkshop analysis and require two direct CALL rel32 sites.",

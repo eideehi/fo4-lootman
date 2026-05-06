@@ -84,6 +84,7 @@ Manifest target runtime: Fallout4 1.11.191
 
 ## Referenced Ghidra Reports
 - tools/ghidra/reports/fo4-build-resource-check-call-windows.txt
+- tools/ghidra/reports/fo4-build-resource-check-extra-path-functions.txt
 - tools/ghidra/reports/fo4-build-resource-check-target-functions.txt
 - tools/ghidra/reports/fo4-can-produce-workshop.txt
 - tools/ghidra/reports/fo4-canproduce-callers-detail.txt
