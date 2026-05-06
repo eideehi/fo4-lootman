@@ -1,0 +1,823 @@
+{
+  "schemaVersion": 1,
+  "binaryVersion": "Fallout4 1.11.191",
+  "manifestPath": "tools/native-hooks/papyrus_lootman_hooks.addresses.json",
+  "sourceFile": "commonlibf4-plugin/src/papyrus_lootman_hooks.cpp",
+  "generatedHeader": "commonlibf4-plugin/src/papyrus_lootman_hook_addresses.generated.h",
+  "entries": [
+    {
+      "id": "encounter_zone.load_change_cell_before_zone_reset",
+      "category": "call_site_rva",
+      "cppName": "kLoadChangeCellBeforeZoneResetCallSite",
+      "expectedCount": 1,
+      "expectedInstructionKind": "call_rel32",
+      "expectedOriginalTargetGroup": "encounter_zone.check_cell_before_reset",
+      "discoveryStatus": "unproven",
+      "discoverySummary": "Resolve the LoadChange cell reset path and require one direct CALL rel32 to the check-cell-before-reset target.",
+      "candidateRvas": [
+        {
+          "id": "encounter-zone.reset-suppression.cell-before-reset",
+          "rva": "0x4D23C4",
+          "sourceId": "0x0",
+          "label": "encounter-zone.reset-suppression.cell-before-reset",
+          "status": "current_manifest_rva"
+        }
+      ],
+      "instructionWindowAddresses": [
+        "0x4D23C4"
+      ],
+      "evidence": [
+        "tools/ghidra/reports/fo4-encounter-zone-detach-callers.txt",
+        "tools/ghidra/reports/fo4-cell-detach-reset-functions.txt"
+      ],
+      "unresolvedItems": [
+        "Discovery strategy is unproven: Resolve the LoadChange cell reset path and require one direct CALL rel32 to the check-cell-before-reset target.",
+        "Verify candidate count, CALL rel32 shape, and original target grouping before updating manifest RVAs."
+      ]
+    },
+    {
+      "id": "encounter_zone.reset_elapsed_from_detach_time",
+      "category": "function_rva",
+      "cppName": "kEncounterZoneResetElapsedFromDetachRva",
+      "expectedCount": 1,
+      "discoveryStatus": "unproven",
+      "discoverySummary": "Resolve the detach-time elapsed helper from the encounter-zone reset analysis before updating this RVA.",
+      "candidateRvas": [],
+      "value": "0x4D2E20",
+      "instructionWindowAddresses": [],
+      "evidence": [
+        "tools/ghidra/reports/fo4-cell-detach-reset-functions.txt"
+      ],
+      "unresolvedItems": [
+        "Discovery strategy is unproven: Resolve the detach-time elapsed helper from the encounter-zone reset analysis before updating this RVA."
+      ]
+    },
+    {
+      "id": "workshop_shared_container.workshop_caravan_keyword_global",
+      "category": "global_rva",
+      "cppName": "kWorkshopCaravanKeywordGlobalRva",
+      "expectedCount": 1,
+      "discoveryStatus": "unproven",
+      "discoverySummary": "Re-derive from shared workshop container callers and verify the referenced global still resolves to the caravan keyword.",
+      "candidateRvas": [],
+      "value": "0x30EC9B8",
+      "instructionWindowAddresses": [],
+      "evidence": [
+        "tools/ghidra/reports/fo4-workbench-shared-container-callers.txt"
+      ],
+      "unresolvedItems": [
+        "Discovery strategy is unproven: Re-derive from shared workshop container callers and verify the referenced global still resolves to the caravan keyword."
+      ]
+    },
+    {
+      "id": "workshop_material.current_workshop_handle_global",
+      "category": "global_rva",
+      "cppName": "kCurrentWorkshopHandleGlobalRva",
+      "expectedCount": 1,
+      "discoveryStatus": "unproven",
+      "discoverySummary": "Resolve the current-workshop handle global from Ghidra references and require the current workshop context probes to agree.",
+      "candidateRvas": [],
+      "value": "0x30EC598",
+      "instructionWindowAddresses": [],
+      "evidence": [
+        "tools/ghidra/reports/fo4-current-workshop-global-refs.txt"
+      ],
+      "unresolvedItems": [
+        "Discovery strategy is unproven: Resolve the current-workshop handle global from Ghidra references and require the current workshop context probes to agree."
+      ]
+    },
+    {
+      "id": "workshop_shared_container.populate_linked_workshop_container",
+      "category": "call_site_rva",
+      "cppName": "kPopulateLinkedWorkshopContainerCallSites",
+      "expectedCount": 3,
+      "expectedInstructionKind": "call_rel32",
+      "expectedOriginalTargetGroup": "workshop_shared_container.populate_linked_workshop_containers",
+      "discoveryStatus": "unproven",
+      "discoverySummary": "Find all callers of the linked workshop container population helper and require exactly three direct CALL rel32 sites.",
+      "candidateRvas": [
+        {
+          "id": "workshop-shared-container.populate-linked.primary",
+          "rva": "0x391F78",
+          "sourceId": "0x0",
+          "label": "workshop-shared-container.populate-linked.primary",
+          "status": "current_manifest_rva"
+        },
+        {
+          "id": "workshop-shared-container.populate-linked.workbench",
+          "rva": "0xB28B76",
+          "sourceId": "0x0",
+          "label": "workshop-shared-container.populate-linked.workbench",
+          "status": "current_manifest_rva"
+        },
+        {
+          "id": "workshop-shared-container.populate-linked.menu",
+          "rva": "0x10890F6",
+          "sourceId": "0x0",
+          "label": "workshop-shared-container.populate-linked.menu",
+          "status": "current_manifest_rva"
+        }
+      ],
+      "instructionWindowAddresses": [
+        "0x391F78",
+        "0xB28B76",
+        "0x10890F6"
+      ],
+      "evidence": [
+        "tools/ghidra/reports/fo4-workbench-shared-container-callers.txt",
+        "tools/ghidra/reports/fo4-workbench-linked-container-functions.txt"
+      ],
+      "unresolvedItems": [
+        "Discovery strategy is unproven: Find all callers of the linked workshop container population helper and require exactly three direct CALL rel32 sites.",
+        "Verify candidate count, CALL rel32 shape, and original target grouping before updating manifest RVAs."
+      ]
+    },
+    {
+      "id": "workshop_material.rebuild_workshop_supply",
+      "category": "call_site_rva",
+      "cppName": "kRebuildWorkshopSupplyCallSites",
+      "expectedCount": 4,
+      "expectedInstructionKind": "call_rel32",
+      "expectedOriginalTargetGroup": "workshop_material.rebuild_workshop_supply",
+      "discoveryStatus": "unproven",
+      "discoverySummary": "Resolve workbench supply rebuild callers and require four direct CALL rel32 sites to the same rebuild helper.",
+      "candidateRvas": [
+        {
+          "id": "workshop-material.rebuild-supply.source-a1",
+          "rva": "0xA653F6",
+          "sourceId": "0xA1",
+          "label": "workshop-material.rebuild-supply.source-a1",
+          "status": "current_manifest_rva"
+        },
+        {
+          "id": "workshop-material.rebuild-supply.source-a2",
+          "rva": "0xA5F109",
+          "sourceId": "0xA2",
+          "label": "workshop-material.rebuild-supply.source-a2",
+          "status": "current_manifest_rva"
+        },
+        {
+          "id": "workshop-material.rebuild-supply.source-a3",
+          "rva": "0xA6052C",
+          "sourceId": "0xA3",
+          "label": "workshop-material.rebuild-supply.source-a3",
+          "status": "current_manifest_rva"
+        },
+        {
+          "id": "workshop-material.rebuild-supply.source-a4",
+          "rva": "0xAEFD89",
+          "sourceId": "0xA4",
+          "label": "workshop-material.rebuild-supply.source-a4",
+          "status": "current_manifest_rva"
+        }
+      ],
+      "instructionWindowAddresses": [
+        "0xA653F6",
+        "0xA5F109",
+        "0xA6052C",
+        "0xAEFD89"
+      ],
+      "evidence": [
+        "tools/ghidra/reports/fo4-workbench-supply-functions.txt",
+        "tools/ghidra/reports/fo4-component-helper-callers.txt"
+      ],
+      "unresolvedItems": [
+        "Discovery strategy is unproven: Resolve workbench supply rebuild callers and require four direct CALL rel32 sites to the same rebuild helper.",
+        "Verify candidate count, CALL rel32 shape, and original target grouping before updating manifest RVAs."
+      ]
+    },
+    {
+      "id": "workshop_material.component_count_helper",
+      "category": "call_site_rva",
+      "cppName": "kComponentCountHelperCallSites",
+      "expectedCount": 2,
+      "expectedInstructionKind": "call_rel32",
+      "expectedOriginalTargetGroup": "workshop_material.component_count_helper",
+      "discoveryStatus": "unproven",
+      "discoverySummary": "Resolve Papyrus and Workbench UI calls to the component count helper and require both call sites to share the same original target.",
+      "candidateRvas": [
+        {
+          "id": "workshop-material.component-count.papyrus",
+          "rva": "0x59BC2A",
+          "sourceId": "0xB1",
+          "label": "workshop-material.component-count.papyrus",
+          "status": "current_manifest_rva"
+        },
+        {
+          "id": "workshop-material.component-count.workbench-ui",
+          "rva": "0x117501B",
+          "sourceId": "0xB2",
+          "label": "workshop-material.component-count.workbench-ui",
+          "status": "current_manifest_rva"
+        }
+      ],
+      "instructionWindowAddresses": [
+        "0x59BC2A",
+        "0x117501B"
+      ],
+      "evidence": [
+        "tools/ghidra/reports/fo4-component-helper-callers.txt",
+        "tools/ghidra/reports/fo4-get-component-count.txt",
+        "tools/ghidra/reports/fo4-workbench-ui-callbacks.txt"
+      ],
+      "unresolvedItems": [
+        "Discovery strategy is unproven: Resolve Papyrus and Workbench UI calls to the component count helper and require both call sites to share the same original target.",
+        "Verify candidate count, CALL rel32 shape, and original target grouping before updating manifest RVAs."
+      ]
+    },
+    {
+      "id": "workshop_material.direct_component_count",
+      "category": "call_site_rva",
+      "cppName": "kDirectComponentCountCallSites",
+      "expectedCount": 5,
+      "expectedInstructionKind": "call_rel32",
+      "expectedOriginalTargetGroup": "workshop_material.direct_component_count",
+      "discoveryStatus": "unproven",
+      "discoverySummary": "Resolve all direct component count call references and require exactly five direct CALL rel32 sites to the same helper.",
+      "candidateRvas": [
+        {
+          "id": "workshop-material.direct-component-count.source-e1",
+          "rva": "0x3BC3ED",
+          "sourceId": "0xE1",
+          "label": "workshop-material.direct-component-count.source-e1",
+          "status": "current_manifest_rva"
+        },
+        {
+          "id": "workshop-material.direct-component-count.source-e2",
+          "rva": "0x39F27F",
+          "sourceId": "0xE2",
+          "label": "workshop-material.direct-component-count.source-e2",
+          "status": "current_manifest_rva"
+        },
+        {
+          "id": "workshop-material.direct-component-count.source-e3",
+          "rva": "0xB3308B",
+          "sourceId": "0xE3",
+          "label": "workshop-material.direct-component-count.source-e3",
+          "status": "current_manifest_rva"
+        },
+        {
+          "id": "workshop-material.direct-component-count.source-e4",
+          "rva": "0xB37A38",
+          "sourceId": "0xE4",
+          "label": "workshop-material.direct-component-count.source-e4",
+          "status": "current_manifest_rva"
+        },
+        {
+          "id": "workshop-material.direct-component-count.source-e5",
+          "rva": "0xB2D34E",
+          "sourceId": "0xE5",
+          "label": "workshop-material.direct-component-count.source-e5",
+          "status": "current_manifest_rva"
+        }
+      ],
+      "instructionWindowAddresses": [
+        "0x3BC3ED",
+        "0x39F27F",
+        "0xB3308B",
+        "0xB37A38",
+        "0xB2D34E"
+      ],
+      "evidence": [
+        "tools/ghidra/reports/fo4-direct-component-count-callsites-window.txt",
+        "tools/ghidra/reports/fo4-direct-component-count-allrefs.txt"
+      ],
+      "unresolvedItems": [
+        "Discovery strategy is unproven: Resolve all direct component count call references and require exactly five direct CALL rel32 sites to the same helper.",
+        "Verify candidate count, CALL rel32 shape, and original target grouping before updating manifest RVAs."
+      ]
+    },
+    {
+      "id": "workshop_material.resource_status",
+      "category": "call_site_rva",
+      "cppName": "kWorkshopResourceStatusCallSites",
+      "expectedCount": 2,
+      "expectedInstructionKind": "call_rel32",
+      "expectedOriginalTargetGroup": "workshop_material.resource_status",
+      "discoveryStatus": "unproven",
+      "discoverySummary": "Resolve resource status helper callers in the workshop menu placement path and require two direct CALL rel32 sites.",
+      "candidateRvas": [
+        {
+          "id": "workshop-material.resource-status.source-f1",
+          "rva": "0xB2F2C0",
+          "sourceId": "0xF1",
+          "label": "workshop-material.resource-status.source-f1",
+          "status": "current_manifest_rva"
+        },
+        {
+          "id": "workshop-material.resource-status.source-f2",
+          "rva": "0xB2D266",
+          "sourceId": "0xF2",
+          "label": "workshop-material.resource-status.source-f2",
+          "status": "current_manifest_rva"
+        }
+      ],
+      "instructionWindowAddresses": [
+        "0xB2F2C0",
+        "0xB2D266"
+      ],
+      "evidence": [
+        "tools/ghidra/reports/fo4-placement-resource-status-functions.txt",
+        "tools/ghidra/reports/fo4-workshopmenu-b2e900-b35320-b35440.txt"
+      ],
+      "unresolvedItems": [
+        "Discovery strategy is unproven: Resolve resource status helper callers in the workshop menu placement path and require two direct CALL rel32 sites.",
+        "Verify candidate count, CALL rel32 shape, and original target grouping before updating manifest RVAs."
+      ]
+    },
+    {
+      "id": "workshop_menu.select",
+      "category": "call_site_rva",
+      "cppName": "kWorkshopMenuSelectCallSites",
+      "expectedCount": 2,
+      "expectedInstructionKind": "call_rel32",
+      "expectedOriginalTargetGroup": "workshop_menu.select",
+      "discoveryStatus": "unproven",
+      "discoverySummary": "Resolve SelectWorkshopMenuNode call sites from selected menu helper analysis and require two direct CALL rel32 sites.",
+      "candidateRvas": [
+        {
+          "id": "workshop-menu.select.source-a1",
+          "rva": "0xB2C8AA",
+          "sourceId": "0xA1",
+          "label": "workshop-menu.select.source-a1",
+          "status": "current_manifest_rva"
+        },
+        {
+          "id": "workshop-menu.select.source-a2",
+          "rva": "0xB2CB67",
+          "sourceId": "0xA2",
+          "label": "workshop-menu.select.source-a2",
+          "status": "current_manifest_rva"
+        }
+      ],
+      "instructionWindowAddresses": [
+        "0xB2C8AA",
+        "0xB2CB67"
+      ],
+      "evidence": [
+        "tools/ghidra/reports/fo4-selected-menu-helper-functions.txt",
+        "tools/ghidra/reports/fo4-workshopmenu-b2e900-b35320-b35440.txt"
+      ],
+      "unresolvedItems": [
+        "Discovery strategy is unproven: Resolve SelectWorkshopMenuNode call sites from selected menu helper analysis and require two direct CALL rel32 sites.",
+        "Verify candidate count, CALL rel32 shape, and original target grouping before updating manifest RVAs."
+      ]
+    },
+    {
+      "id": "workshop_menu.availability",
+      "category": "call_site_rva",
+      "cppName": "kWorkshopMenuAvailabilityCallSites",
+      "expectedCount": 5,
+      "expectedInstructionKind": "call_rel32",
+      "expectedOriginalTargetGroup": "workshop_menu.availability",
+      "discoveryStatus": "unproven",
+      "discoverySummary": "Resolve WorkshopMenuAvailability callers and require five direct CALL rel32 sites to the same helper.",
+      "candidateRvas": [
+        {
+          "id": "workshop-menu.availability.source-91",
+          "rva": "0xB2C86E",
+          "sourceId": "0x91",
+          "label": "workshop-menu.availability.source-91",
+          "status": "current_manifest_rva"
+        },
+        {
+          "id": "workshop-menu.availability.source-92",
+          "rva": "0xB2C8D7",
+          "sourceId": "0x92",
+          "label": "workshop-menu.availability.source-92",
+          "status": "current_manifest_rva"
+        },
+        {
+          "id": "workshop-menu.availability.source-93",
+          "rva": "0xB2CB2E",
+          "sourceId": "0x93",
+          "label": "workshop-menu.availability.source-93",
+          "status": "current_manifest_rva"
+        },
+        {
+          "id": "workshop-menu.availability.source-94",
+          "rva": "0xB2CB94",
+          "sourceId": "0x94",
+          "label": "workshop-menu.availability.source-94",
+          "status": "current_manifest_rva"
+        },
+        {
+          "id": "workshop-menu.availability.source-95",
+          "rva": "0xB2EBE4",
+          "sourceId": "0x95",
+          "label": "workshop-menu.availability.source-95",
+          "status": "current_manifest_rva"
+        }
+      ],
+      "instructionWindowAddresses": [
+        "0xB2C86E",
+        "0xB2C8D7",
+        "0xB2CB2E",
+        "0xB2CB94",
+        "0xB2EBE4"
+      ],
+      "evidence": [
+        "tools/ghidra/reports/fo4-placement-resource-status-functions.txt",
+        "tools/ghidra/reports/fo4-selected-menu-helper-functions.txt"
+      ],
+      "unresolvedItems": [
+        "Discovery strategy is unproven: Resolve WorkshopMenuAvailability callers and require five direct CALL rel32 sites to the same helper.",
+        "Verify candidate count, CALL rel32 shape, and original target grouping before updating manifest RVAs."
+      ]
+    },
+    {
+      "id": "workshop_menu.check_and_set_placement",
+      "category": "call_site_rva",
+      "cppName": "kWorkshopCheckAndSetPlacementCallSites",
+      "expectedCount": 4,
+      "expectedInstructionKind": "call_rel32",
+      "expectedOriginalTargetGroup": "workshop_menu.check_and_set_placement",
+      "discoveryStatus": "unproven",
+      "discoverySummary": "Resolve CheckAndSetItemForPlacement callers and require four direct CALL rel32 sites to the same placement helper.",
+      "candidateRvas": [
+        {
+          "id": "workshop-menu.check-placement.source-a5",
+          "rva": "0xB2B307",
+          "sourceId": "0xA5",
+          "label": "workshop-menu.check-placement.source-a5",
+          "status": "current_manifest_rva"
+        },
+        {
+          "id": "workshop-menu.check-placement.source-a6",
+          "rva": "0xB2C8F2",
+          "sourceId": "0xA6",
+          "label": "workshop-menu.check-placement.source-a6",
+          "status": "current_manifest_rva"
+        },
+        {
+          "id": "workshop-menu.check-placement.source-a7",
+          "rva": "0xB2CBAF",
+          "sourceId": "0xA7",
+          "label": "workshop-menu.check-placement.source-a7",
+          "status": "current_manifest_rva"
+        },
+        {
+          "id": "workshop-menu.check-placement.source-a8",
+          "rva": "0xB2E88E",
+          "sourceId": "0xA8",
+          "label": "workshop-menu.check-placement.source-a8",
+          "status": "current_manifest_rva"
+        }
+      ],
+      "instructionWindowAddresses": [
+        "0xB2B307",
+        "0xB2C8F2",
+        "0xB2CBAF",
+        "0xB2E88E"
+      ],
+      "evidence": [
+        "tools/ghidra/reports/fo4-placement-set-callers.txt",
+        "tools/ghidra/reports/fo4-placement-set-windows.txt",
+        "tools/ghidra/reports/fo4-workshopmenu-placement-writes.txt"
+      ],
+      "unresolvedItems": [
+        "Discovery strategy is unproven: Resolve CheckAndSetItemForPlacement callers and require four direct CALL rel32 sites to the same placement helper.",
+        "Verify candidate count, CALL rel32 shape, and original target grouping before updating manifest RVAs."
+      ]
+    },
+    {
+      "id": "workshop_menu.start_placement",
+      "category": "call_site_rva",
+      "cppName": "kWorkshopStartPlacementCallSites",
+      "expectedCount": 2,
+      "expectedInstructionKind": "call_rel32",
+      "expectedOriginalTargetGroup": "workshop_menu.start_placement",
+      "discoveryStatus": "unproven",
+      "discoverySummary": "Resolve StartWorkshopPlacement callers and require two direct CALL rel32 sites to the same helper.",
+      "candidateRvas": [
+        {
+          "id": "workshop-menu.start-placement.source-a3",
+          "rva": "0xB2C9EA",
+          "sourceId": "0xA3",
+          "label": "workshop-menu.start-placement.source-a3",
+          "status": "current_manifest_rva"
+        },
+        {
+          "id": "workshop-menu.start-placement.source-a4",
+          "rva": "0xB2CCA5",
+          "sourceId": "0xA4",
+          "label": "workshop-menu.start-placement.source-a4",
+          "status": "current_manifest_rva"
+        }
+      ],
+      "instructionWindowAddresses": [
+        "0xB2C9EA",
+        "0xB2CCA5"
+      ],
+      "evidence": [
+        "tools/ghidra/reports/fo4-workshopmenu-placement-creation-paths.txt",
+        "tools/ghidra/reports/fo4-workshopmenu-placement-writes.txt"
+      ],
+      "unresolvedItems": [
+        "Discovery strategy is unproven: Resolve StartWorkshopPlacement callers and require two direct CALL rel32 sites to the same helper.",
+        "Verify candidate count, CALL rel32 shape, and original target grouping before updating manifest RVAs."
+      ]
+    },
+    {
+      "id": "workshop_material.build_resource_check",
+      "category": "call_site_rva",
+      "cppName": "kWorkshopBuildResourceCheckCallSites",
+      "expectedCount": 2,
+      "expectedInstructionKind": "call_rel32",
+      "expectedOriginalTargetGroup": "workshop_material.build_resource_check",
+      "discoveryStatus": "unproven",
+      "discoverySummary": "Resolve build resource checks from CanProduceWorkshop analysis and require two direct CALL rel32 sites.",
+      "candidateRvas": [
+        {
+          "id": "workshop-material.build-resource-check.placement",
+          "rva": "0x392514",
+          "sourceId": "0xB1",
+          "label": "workshop-material.build-resource-check.placement",
+          "status": "current_manifest_rva"
+        },
+        {
+          "id": "workshop-material.build-resource-check.confirm",
+          "rva": "0x398E06",
+          "sourceId": "0xB2",
+          "label": "workshop-material.build-resource-check.confirm",
+          "status": "current_manifest_rva"
+        }
+      ],
+      "instructionWindowAddresses": [
+        "0x392514",
+        "0x398E06"
+      ],
+      "evidence": [
+        "tools/ghidra/reports/fo4-can-produce-workshop.txt",
+        "tools/ghidra/reports/fo4-canproduce-deps.txt",
+        "tools/ghidra/reports/fo4-canproduce-callers-detail.txt"
+      ],
+      "unresolvedItems": [
+        "Discovery strategy is unproven: Resolve build resource checks from CanProduceWorkshop analysis and require two direct CALL rel32 sites.",
+        "Verify candidate count, CALL rel32 shape, and original target grouping before updating manifest RVAs."
+      ]
+    },
+    {
+      "id": "workshop_material.consume_component",
+      "category": "call_site_rva",
+      "cppName": "kWorkshopConsumeComponentCallSites",
+      "expectedCount": 2,
+      "expectedInstructionKind": "call_rel32",
+      "expectedOriginalTargetGroup": "workshop_material.consume_component",
+      "discoveryStatus": "unproven",
+      "discoverySummary": "Resolve workshop component consumption calls and require two direct CALL rel32 sites to the same consume helper.",
+      "candidateRvas": [
+        {
+          "id": "workshop-material.consume-component.source-f3",
+          "rva": "0x398FF6",
+          "sourceId": "0xF3",
+          "label": "workshop-material.consume-component.source-f3",
+          "status": "current_manifest_rva"
+        },
+        {
+          "id": "workshop-material.consume-component.source-f4",
+          "rva": "0x3B7D2A",
+          "sourceId": "0xF4",
+          "label": "workshop-material.consume-component.source-f4",
+          "status": "current_manifest_rva"
+        }
+      ],
+      "instructionWindowAddresses": [
+        "0x398FF6",
+        "0x3B7D2A"
+      ],
+      "evidence": [
+        "tools/ghidra/reports/fo4-remove-component-consume-core.txt",
+        "tools/ghidra/reports/fo4-remove-component-functions.txt"
+      ],
+      "unresolvedItems": [
+        "Discovery strategy is unproven: Resolve workshop component consumption calls and require two direct CALL rel32 sites to the same consume helper.",
+        "Verify candidate count, CALL rel32 shape, and original target grouping before updating manifest RVAs."
+      ]
+    },
+    {
+      "id": "workshop_menu.selected_menu_node_function",
+      "category": "function_rva",
+      "cppName": "kWorkshopSelectedMenuNodeFunctionRva",
+      "expectedCount": 1,
+      "discoveryStatus": "unproven",
+      "discoverySummary": "Resolve the selected workshop menu node helper from selected menu helper analysis.",
+      "candidateRvas": [],
+      "value": "0x389A80",
+      "instructionWindowAddresses": [],
+      "evidence": [
+        "tools/ghidra/reports/fo4-selected-menu-helper-functions.txt"
+      ],
+      "unresolvedItems": [
+        "Discovery strategy is unproven: Resolve the selected workshop menu node helper from selected menu helper analysis."
+      ]
+    },
+    {
+      "id": "workshop_menu.selected_row_global",
+      "category": "global_rva",
+      "cppName": "kWorkshopSelectedRowGlobalRva",
+      "expectedCount": 1,
+      "discoveryStatus": "unproven",
+      "discoverySummary": "Resolve the selected row global from selected workshop menu helper references.",
+      "candidateRvas": [],
+      "value": "0x30EBE18",
+      "instructionWindowAddresses": [],
+      "evidence": [
+        "tools/ghidra/reports/fo4-placement-secondary-globals.txt",
+        "tools/ghidra/reports/fo4-selected-menu-helper-functions.txt"
+      ],
+      "unresolvedItems": [
+        "Discovery strategy is unproven: Resolve the selected row global from selected workshop menu helper references."
+      ]
+    },
+    {
+      "id": "workshop_material.resource_status_missing_resources",
+      "category": "constant",
+      "cppName": "kWorkshopResourceStatusMissingResources",
+      "expectedCount": 1,
+      "discoveryStatus": "manual",
+      "discoverySummary": "This is a semantic status value, not an executable RVA; update only if the resource status enum is re-proven.",
+      "candidateRvas": [],
+      "value": "2",
+      "instructionWindowAddresses": [],
+      "evidence": [
+        "tools/ghidra/reports/fo4-placement-resource-status-functions.txt"
+      ],
+      "unresolvedItems": [
+        "Discovery strategy is manual: This is a semantic status value, not an executable RVA; update only if the resource status enum is re-proven."
+      ]
+    },
+    {
+      "id": "workshop_material.remove_components",
+      "category": "call_site_rva",
+      "cppName": "kRemoveComponentsCallSites",
+      "expectedCount": 2,
+      "expectedInstructionKind": "call_rel32",
+      "expectedOriginalTargetGroup": "workshop_material.remove_components",
+      "discoveryStatus": "unproven",
+      "discoverySummary": "Resolve RemoveComponents wrappers and require two direct CALL rel32 sites to the same remove helper.",
+      "candidateRvas": [
+        {
+          "id": "workshop-material.remove-components.source-f1",
+          "rva": "0x114EB19",
+          "sourceId": "0xF1",
+          "label": "workshop-material.remove-components.source-f1",
+          "status": "current_manifest_rva"
+        },
+        {
+          "id": "workshop-material.remove-components.source-f2",
+          "rva": "0x114E543",
+          "sourceId": "0xF2",
+          "label": "workshop-material.remove-components.source-f2",
+          "status": "current_manifest_rva"
+        }
+      ],
+      "instructionWindowAddresses": [
+        "0x114EB19",
+        "0x114E543"
+      ],
+      "evidence": [
+        "tools/ghidra/reports/fo4-remove-component-functions.txt",
+        "tools/ghidra/reports/fo4-remove-component-core.txt",
+        "tools/ghidra/reports/fo4-removeitem-wrapper-callers.txt"
+      ],
+      "unresolvedItems": [
+        "Discovery strategy is unproven: Resolve RemoveComponents wrappers and require two direct CALL rel32 sites to the same remove helper.",
+        "Verify candidate count, CALL rel32 shape, and original target grouping before updating manifest RVAs."
+      ]
+    },
+    {
+      "id": "workshop_material.object_count_papyrus",
+      "category": "call_site_rva",
+      "cppName": "kWorkshopObjectCountPapyrusCallSite",
+      "expectedCount": 1,
+      "expectedInstructionKind": "call_rel32",
+      "expectedOriginalTargetGroup": "workshop_material.workshop_object_count",
+      "discoveryStatus": "unproven",
+      "discoverySummary": "Resolve the Papyrus workshop object count call site and verify it remains a direct CALL rel32.",
+      "candidateRvas": [
+        {
+          "id": "workshop-material.object-count.papyrus",
+          "rva": "0x5DD484",
+          "sourceId": "0xC1",
+          "label": "workshop-material.object-count.papyrus",
+          "status": "current_manifest_rva"
+        }
+      ],
+      "instructionWindowAddresses": [
+        "0x5DD484"
+      ],
+      "evidence": [
+        "tools/ghidra/reports/fo4-workshop-object-count-functions.txt",
+        "tools/ghidra/reports/fo4-get-workshop-object-count.txt",
+        "tools/ghidra/reports/fo4-workshop-count-helper.txt"
+      ],
+      "unresolvedItems": [
+        "Discovery strategy is unproven: Resolve the Papyrus workshop object count call site and verify it remains a direct CALL rel32.",
+        "Verify candidate count, CALL rel32 shape, and original target grouping before updating manifest RVAs."
+      ]
+    },
+    {
+      "id": "workshop_material.current_workshop_object_count",
+      "category": "call_site_rva",
+      "cppName": "kCurrentWorkshopObjectCountCallSite",
+      "expectedCount": 1,
+      "expectedInstructionKind": "call_rel32",
+      "expectedOriginalTargetGroup": "workshop_material.current_workshop_object_count",
+      "discoveryStatus": "unproven",
+      "discoverySummary": "Resolve the current-workshop object count call site and verify it remains a direct CALL rel32.",
+      "candidateRvas": [
+        {
+          "id": "workshop-material.object-count.current-workshop",
+          "rva": "0x59D378",
+          "sourceId": "0xC2",
+          "label": "workshop-material.object-count.current-workshop",
+          "status": "current_manifest_rva"
+        }
+      ],
+      "instructionWindowAddresses": [
+        "0x59D378"
+      ],
+      "evidence": [
+        "tools/ghidra/reports/fo4-workshop-object-count-functions.txt",
+        "tools/ghidra/reports/fo4-workshop-count-helper.txt"
+      ],
+      "unresolvedItems": [
+        "Discovery strategy is unproven: Resolve the current-workshop object count call site and verify it remains a direct CALL rel32.",
+        "Verify candidate count, CALL rel32 shape, and original target grouping before updating manifest RVAs."
+      ]
+    },
+    {
+      "id": "workshop_supply_owner.field_e0",
+      "category": "layout_offset",
+      "cppName": "kWorkshopSupplyOwnerFieldE0Offset",
+      "expectedCount": 1,
+      "discoveryStatus": "manual",
+      "discoverySummary": "Raw object layout offset; do not treat as an executable RVA or auto-update target.",
+      "candidateRvas": [],
+      "value": "0xE0",
+      "instructionWindowAddresses": [],
+      "evidence": [
+        "tools/ghidra/reports/fo4-workbench-shared-container-callers.txt"
+      ],
+      "unresolvedItems": [
+        "Discovery strategy is manual: Raw object layout offset; do not treat as an executable RVA or auto-update target.",
+        "Layout offset is not an executable RVA; verify object layout separately before changing it."
+      ]
+    },
+    {
+      "id": "workshop_supply_owner.field_e8",
+      "category": "layout_offset",
+      "cppName": "kWorkshopSupplyOwnerFieldE8Offset",
+      "expectedCount": 1,
+      "discoveryStatus": "manual",
+      "discoverySummary": "Raw object layout offset; do not treat as an executable RVA or auto-update target.",
+      "candidateRvas": [],
+      "value": "0xE8",
+      "instructionWindowAddresses": [],
+      "evidence": [
+        "tools/ghidra/reports/fo4-workbench-shared-container-callers.txt"
+      ],
+      "unresolvedItems": [
+        "Discovery strategy is manual: Raw object layout offset; do not treat as an executable RVA or auto-update target.",
+        "Layout offset is not an executable RVA; verify object layout separately before changing it."
+      ]
+    },
+    {
+      "id": "workshop_supply_owner.field_f8",
+      "category": "layout_offset",
+      "cppName": "kWorkshopSupplyOwnerFieldF8Offset",
+      "expectedCount": 1,
+      "discoveryStatus": "manual",
+      "discoverySummary": "Raw object layout offset; do not treat as an executable RVA or auto-update target.",
+      "candidateRvas": [],
+      "value": "0xF8",
+      "instructionWindowAddresses": [],
+      "evidence": [
+        "tools/ghidra/reports/fo4-workbench-shared-container-callers.txt"
+      ],
+      "unresolvedItems": [
+        "Discovery strategy is manual: Raw object layout offset; do not treat as an executable RVA or auto-update target.",
+        "Layout offset is not an executable RVA; verify object layout separately before changing it."
+      ]
+    },
+    {
+      "id": "workshop_supply_owner.field_2f8",
+      "category": "layout_offset",
+      "cppName": "kWorkshopSupplyOwnerField2F8Offset",
+      "expectedCount": 1,
+      "discoveryStatus": "manual",
+      "discoverySummary": "Raw object layout offset; do not treat as an executable RVA or auto-update target.",
+      "candidateRvas": [],
+      "value": "0x2F8",
+      "instructionWindowAddresses": [],
+      "evidence": [
+        "tools/ghidra/reports/fo4-workbench-shared-container-callers.txt"
+      ],
+      "unresolvedItems": [
+        "Discovery strategy is manual: Raw object layout offset; do not treat as an executable RVA or auto-update target.",
+        "Layout offset is not an executable RVA; verify object layout separately before changing it."
+      ]
+    }
+  ]
+}

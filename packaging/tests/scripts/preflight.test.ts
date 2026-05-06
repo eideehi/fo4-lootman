@@ -37,6 +37,7 @@ describe("preflight", () => {
 		seedTool(root, "tsx");
 
 		expect(() => runPreflight("generate:native-hooks", { cwd: root, packagingRoot: root, platform: "win32" })).not.toThrow();
+		expect(() => runPreflight("generate:native-hook-bundle", { cwd: root, packagingRoot: root, platform: "win32" })).not.toThrow();
 		expect(() => runPreflight("verify:native-hooks", { cwd: root, packagingRoot: root, platform: "win32" })).not.toThrow();
 	});
 
