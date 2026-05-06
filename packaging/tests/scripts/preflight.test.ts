@@ -31,6 +31,15 @@ describe("preflight", () => {
 		expect(() => runPreflight("build", { cwd: root, packagingRoot: root, platform: "win32" })).not.toThrow();
 	});
 
+	it("passes for native hook utility aliases when tsx artifacts exist in packaging", () => {
+		const root = createTempDir();
+		dirs.push(root);
+		seedTool(root, "tsx");
+
+		expect(() => runPreflight("generate:native-hooks", { cwd: root, packagingRoot: root, platform: "win32" })).not.toThrow();
+		expect(() => runPreflight("verify:native-hooks", { cwd: root, packagingRoot: root, platform: "win32" })).not.toThrow();
+	});
+
 	it("fails with a packaging directory hint when cwd is wrong", () => {
 		const root = createTempDir();
 		dirs.push(root);

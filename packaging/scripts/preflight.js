@@ -8,6 +8,8 @@ export const packagingRoot = path.resolve(__dirname, "..");
 const COMMAND_TOOLS = {
 	clean: ["tsx"],
 	build: ["tsx"],
+	generate: ["tsx"],
+	verify: ["tsx"],
 	deploy: ["tsx"],
 	undeploy: ["tsx"],
 	test: ["vitest"],
@@ -113,7 +115,7 @@ function isCliEntry() {
 function printUsage() {
 	console.log([
 		"Usage:",
-		"  node scripts/preflight.js <clean|clean:all|clean:wsl-build|build|deploy|undeploy|test|test:watch>",
+		"  node scripts/preflight.js <clean|clean:all|clean:wsl-build|build|generate:native-hooks|verify:native-hooks|deploy|undeploy|test|test:watch>",
 	].join("\n"));
 }
 

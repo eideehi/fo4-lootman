@@ -1,0 +1,7 @@
+Program: Fallout4.exe
+Image base: 140000000
+Scalars: [691]
+
+Function FUN_140bdf050 entry=140bdf050 body=[[140bdf050, 140bdf6fb]]
+  scalar 0x2B3:
+    140bdf364: MOV qword ptr [RDX + 0x2b3],R9

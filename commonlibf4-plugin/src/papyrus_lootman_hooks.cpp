@@ -8,83 +8,25 @@
 #include <limits>
 #include <mutex>
 #include <optional>
+#include <span>
 #include <unordered_map>
 #include <unordered_set>
 
 #include <REL/Relocation.h>
 
+#include "papyrus_lootman_hook_addresses.generated.h"
 #include "properties.h"
 
 namespace papyrus_lootman
 {
 	using namespace RE;
 
-	inline constexpr std::uintptr_t kLoadChangeCellBeforeZoneResetCallRva = 0x4D23C4;
-	inline constexpr std::uintptr_t kEncounterZoneResetElapsedFromDetachRva = 0x4D2E20;
-	inline constexpr std::uintptr_t kWorkshopCaravanKeywordGlobalRva = 0x30EC9B8;
-	inline constexpr std::uintptr_t kCurrentWorkshopHandleGlobalRva = 0x30EC598;
-	inline constexpr std::array<std::uintptr_t, 3> kPopulateLinkedWorkshopContainerCallSites{
-		0x391F78,
-		0xB28B76,
-		0x10890F6,
-	};
-	inline constexpr std::array<std::uintptr_t, 4> kRebuildWorkshopSupplyCallSites{
-		0xA653F6,
-		0xA5F109,
-		0xA6052C,
-		0xAEFD89,
-	};
-	inline constexpr std::uintptr_t kComponentCountPapyrusCallSite = 0x59BC2A;
-	inline constexpr std::uintptr_t kComponentCountWorkbenchUiCallSite = 0x117501B;
-	inline constexpr std::array<std::uintptr_t, 5> kDirectComponentCountCallSites{
-		0x3BC3ED,
-		0x39F27F,
-		0xB3308B,
-		0xB37A38,
-		0xB2D34E,
-	};
-	inline constexpr std::array<std::uintptr_t, 2> kWorkshopResourceStatusCallSites{
-		0xB2F2C0,
-		0xB2D266,
-	};
-	inline constexpr std::array<std::uintptr_t, 2> kWorkshopMenuSelectCallSites{
-		0xB2C8AA,
-		0xB2CB67,
-	};
-	inline constexpr std::array<std::uintptr_t, 5> kWorkshopMenuAvailabilityCallSites{
-		0xB2C86E,
-		0xB2C8D7,
-		0xB2CB2E,
-		0xB2CB94,
-		0xB2EBE4,
-	};
-	inline constexpr std::array<std::uintptr_t, 4> kWorkshopCheckAndSetPlacementCallSites{
-		0xB2B307,
-		0xB2C8F2,
-		0xB2CBAF,
-		0xB2E88E,
-	};
-	inline constexpr std::array<std::uintptr_t, 2> kWorkshopStartPlacementCallSites{
-		0xB2C9EA,
-		0xB2CCA5,
-	};
-	inline constexpr std::array<std::uintptr_t, 2> kWorkshopBuildResourceCheckCallSites{
-		0x392514,
-		0x398E06,
-	};
-	inline constexpr std::array<std::uintptr_t, 2> kWorkshopConsumeComponentCallSites{
-		0x398FF6,
-		0x3B7D2A,
-	};
-	inline constexpr std::uintptr_t kWorkshopSelectedMenuNodeFunctionRva = 0x389A80;
-	inline constexpr std::uintptr_t kWorkshopSelectedRowGlobalRva = 0x30EBE18;
-	inline constexpr std::uint32_t kWorkshopResourceStatusMissingResources = 2;
-	inline constexpr std::array<std::uintptr_t, 2> kRemoveComponentsCallSites{
-		0x114EB19,
-		0x114E543,
-	};
-	inline constexpr std::uintptr_t kWorkshopObjectCountPapyrusCallSite = 0x5DD484;
-	inline constexpr std::uintptr_t kCurrentWorkshopObjectCountCallSite = 0x59D378;
+	template <class OriginalFn, class HookFn>
+	bool InstallDirectCallHookSite(
+		const NativeHookCallSite& site,
+		HookFn hook,
+		OriginalFn& original,
+		const char* family);
 
 	struct ExtraCellDetachTimeCompat :
 		public BSExtraData
@@ -192,17 +134,19 @@ namespace papyrus_lootman
 		static std::once_flag installOnce;
 		std::call_once(installOnce, []()
 		{
-			REL::Relocation<std::uintptr_t> cellBeforeResetCallSite{
-				REL::Offset(kLoadChangeCellBeforeZoneResetCallRva)
-			};
 			REL::Relocation<CheckResetElapsedFromDetachTimeFn> resetElapsedFromDetach{
 				REL::Offset(kEncounterZoneResetElapsedFromDetachRva)
 			};
 
-			originalCheckCellBeforeEncounterZoneReset =
-				reinterpret_cast<CheckCellBeforeEncounterZoneResetFn>(
-					cellBeforeResetCallSite.write_call<5>(
-						HookedCheckCellBeforeEncounterZoneReset));
+			if (!InstallDirectCallHookSite(
+					kLoadChangeCellBeforeZoneResetCallSite,
+					HookedCheckCellBeforeEncounterZoneReset,
+					originalCheckCellBeforeEncounterZoneReset,
+					"encounter-zone.reset-suppression"))
+			{
+				return;
+			}
+
 			checkResetElapsedFromDetachTime = resetElapsedFromDetach.get();
 
 			REX::INFO("Installed encounter-zone reset suppression hook");
@@ -268,6 +212,224 @@ namespace papyrus_lootman
 	// Investigation-only traces. Keep false for release builds; set true only
 	// while re-investigating indoor workshop supply behavior.
 	inline constexpr bool kVerboseWorkshopMaterialDiagnostics = false;
+
+	struct DirectCallSiteDecode
+	{
+		const NativeHookCallSite* site = nullptr;
+		std::uintptr_t address = 0;
+		std::uintptr_t targetAddress = 0;
+		std::uintptr_t targetRva = 0;
+	};
+
+	struct DirectCallInstructionReadContext
+	{
+		std::uintptr_t address = 0;
+		std::array<std::uint8_t, 5> bytes{};
+	};
+
+	void ReadDirectCallInstructionBytes(void* opaque)
+	{
+		auto* context = static_cast<DirectCallInstructionReadContext*>(opaque);
+		std::memcpy(
+			context->bytes.data(),
+			reinterpret_cast<const void*>(context->address),
+			context->bytes.size());
+	}
+
+	std::optional<DirectCallSiteDecode> DecodeDirectCallSite(
+		const NativeHookCallSite& site,
+		const char* family)
+	{
+		REL::Relocation<std::uintptr_t> callSite{ REL::Offset(site.rva) };
+		const auto address = callSite.address();
+		DirectCallInstructionReadContext context{ address };
+		if (!ExecuteSehCallSafe(&ReadDirectCallInstructionBytes, &context))
+		{
+			REX::ERROR(
+				"Skipping native direct-call hook: family={}, site={}, rva={:X}, reason=instruction-read-failed",
+				family,
+				site.id,
+				site.rva);
+			return std::nullopt;
+		}
+
+		if (context.bytes[0] != 0xE8)
+		{
+			REX::ERROR(
+				"Skipping native direct-call hook: family={}, site={}, rva={:X}, expectedOpcode=E8, actualOpcode={:02X}",
+				family,
+				site.id,
+				site.rva,
+				context.bytes[0]);
+			return std::nullopt;
+		}
+
+		std::int32_t displacement = 0;
+		std::memcpy(&displacement, context.bytes.data() + 1, sizeof(displacement));
+		const auto targetAddress = static_cast<std::uintptr_t>(
+			static_cast<std::intptr_t>(address + 5) +
+			static_cast<std::intptr_t>(displacement));
+		const auto moduleBase = address - site.rva;
+		return DirectCallSiteDecode{
+			&site,
+			address,
+			targetAddress,
+			targetAddress - moduleBase,
+		};
+	}
+
+	bool ValidateDirectCallSiteFamily(
+		std::span<const NativeHookCallSite> sites,
+		const char* family,
+		bool requireSharedOriginalTarget)
+	{
+		if (sites.empty())
+		{
+			REX::ERROR("Skipping native direct-call hook family: family={}, reason=no-sites", family);
+			return false;
+		}
+
+		std::optional<std::uintptr_t> expectedTargetAddress;
+		std::optional<std::uintptr_t> expectedTargetRva;
+		for (const auto& site : sites)
+		{
+			const auto decoded = DecodeDirectCallSite(site, family);
+			if (!decoded)
+			{
+				return false;
+			}
+
+			if (!requireSharedOriginalTarget)
+			{
+				continue;
+			}
+
+			if (!expectedTargetAddress)
+			{
+				expectedTargetAddress = decoded->targetAddress;
+				expectedTargetRva = decoded->targetRva;
+				continue;
+			}
+
+			if (*expectedTargetAddress != decoded->targetAddress)
+			{
+				REX::ERROR(
+					"Skipping native direct-call hook family: family={}, site={}, rva={:X}, originalTargetRva={:X}, expectedOriginalTargetRva={:X}",
+					family,
+					site.id,
+					site.rva,
+					decoded->targetRva,
+					expectedTargetRva.value_or(0));
+				return false;
+			}
+		}
+
+		return true;
+	}
+
+	template <class OriginalFn, class HookFn>
+	OriginalFn WriteValidatedDirectCallHook(
+		const NativeHookCallSite& site,
+		HookFn hook,
+		const char* family)
+	{
+		const auto decoded = DecodeDirectCallSite(site, family);
+		if (!decoded)
+		{
+			return OriginalFn{};
+		}
+
+		REL::Relocation<std::uintptr_t> callSite{ REL::Offset(site.rva) };
+		const auto original = reinterpret_cast<OriginalFn>(callSite.write_call<5>(hook));
+		REX::INFO(
+			"Installed native direct-call hook: family={}, site={}, rva={:X}, originalTargetRva={:X}",
+			family,
+			site.id,
+			site.rva,
+			decoded->targetRva);
+		return original;
+	}
+
+	template <class OriginalFn, class HookFn, std::size_t N>
+	bool InstallDirectCallHookFamily(
+		const std::array<NativeHookCallSite, N>& sites,
+		const std::array<HookFn, N>& hooks,
+		OriginalFn& original,
+		const char* family)
+	{
+		if (!ValidateDirectCallSiteFamily(
+				std::span<const NativeHookCallSite>(sites.data(), sites.size()),
+				family,
+				true))
+		{
+			REX::ERROR("Skipped native direct-call hook family: family={}", family);
+			return false;
+		}
+
+		for (std::size_t index = 0; index < sites.size(); ++index)
+		{
+			const auto patchedOriginal = WriteValidatedDirectCallHook<OriginalFn>(
+				sites[index],
+				hooks[index],
+				family);
+			if (!patchedOriginal)
+			{
+				REX::ERROR(
+					"Skipped native direct-call hook family after validation changed: family={}, site={}, rva={:X}",
+					family,
+					sites[index].id,
+					sites[index].rva);
+				return false;
+			}
+
+			if (!original)
+			{
+				original = patchedOriginal;
+			}
+			else if (original != patchedOriginal)
+			{
+				REX::WARN(
+					"Unexpected native direct-call original target after patch: family={}, site={}, rva={:X}, original={:X}, expected={:X}",
+					family,
+					sites[index].id,
+					sites[index].rva,
+					reinterpret_cast<std::uintptr_t>(patchedOriginal),
+					reinterpret_cast<std::uintptr_t>(original));
+			}
+		}
+
+		return true;
+	}
+
+	template <class OriginalFn, class HookFn>
+	bool InstallDirectCallHookSite(
+		const NativeHookCallSite& site,
+		HookFn hook,
+		OriginalFn& original,
+		const char* family)
+	{
+		if (!ValidateDirectCallSiteFamily(
+				std::span<const NativeHookCallSite>(&site, 1),
+				family,
+				false))
+		{
+			REX::ERROR("Skipped native direct-call hook: family={}, site={}", family, site.id);
+			return false;
+		}
+
+		const auto patchedOriginal = WriteValidatedDirectCallHook<OriginalFn>(
+			site,
+			hook,
+			family);
+		if (!patchedOriginal)
+		{
+			REX::ERROR("Skipped native direct-call hook after validation changed: family={}, site={}", family, site.id);
+			return false;
+		}
+
+		original = patchedOriginal;
+		return true;
+	}
 
 	struct FormProbeSnapshot
 	{
@@ -335,10 +497,10 @@ namespace papyrus_lootman
 		}
 
 		context->snapshot.owner = base;
-		context->snapshot.fieldE0 = *reinterpret_cast<std::uintptr_t*>(base + 0xE0);
-		context->snapshot.fieldE8 = *reinterpret_cast<std::uintptr_t*>(base + 0xE8);
-		context->snapshot.fieldF8 = *reinterpret_cast<std::uintptr_t*>(base + 0xF8);
-		context->snapshot.field2F8 = *reinterpret_cast<std::uintptr_t*>(base + 0x2F8);
+		context->snapshot.fieldE0 = *reinterpret_cast<std::uintptr_t*>(base + kWorkshopSupplyOwnerFieldE0Offset);
+		context->snapshot.fieldE8 = *reinterpret_cast<std::uintptr_t*>(base + kWorkshopSupplyOwnerFieldE8Offset);
+		context->snapshot.fieldF8 = *reinterpret_cast<std::uintptr_t*>(base + kWorkshopSupplyOwnerFieldF8Offset);
+		context->snapshot.field2F8 = *reinterpret_cast<std::uintptr_t*>(base + kWorkshopSupplyOwnerField2F8Offset);
 		context->snapshot.readable = true;
 	}
 
@@ -990,24 +1152,28 @@ namespace papyrus_lootman
 		LogRebuildWorkshopSupplyProbe(sourceId, sourceName, owner);
 	}
 
-	void HookedRebuildWorkshopSupplyA653F6(void* owner)
+	void HookedRebuildWorkshopSupplySourceA1(void* owner)
 	{
-		HookedRebuildWorkshopSupply(owner, 0xA1, "0x140A653F6");
+		const auto& site = kRebuildWorkshopSupplyCallSites[0];
+		HookedRebuildWorkshopSupply(owner, site.sourceId, site.label);
 	}
 
-	void HookedRebuildWorkshopSupplyA5F109(void* owner)
+	void HookedRebuildWorkshopSupplySourceA2(void* owner)
 	{
-		HookedRebuildWorkshopSupply(owner, 0xA2, "0x140A5F109");
+		const auto& site = kRebuildWorkshopSupplyCallSites[1];
+		HookedRebuildWorkshopSupply(owner, site.sourceId, site.label);
 	}
 
-	void HookedRebuildWorkshopSupplyA6052C(void* owner)
+	void HookedRebuildWorkshopSupplySourceA3(void* owner)
 	{
-		HookedRebuildWorkshopSupply(owner, 0xA3, "0x140A6052C");
+		const auto& site = kRebuildWorkshopSupplyCallSites[2];
+		HookedRebuildWorkshopSupply(owner, site.sourceId, site.label);
 	}
 
-	void HookedRebuildWorkshopSupplyAEFD89(void* owner)
+	void HookedRebuildWorkshopSupplySourceA4(void* owner)
 	{
-		HookedRebuildWorkshopSupply(owner, 0xA4, "0x140AEFD89");
+		const auto& site = kRebuildWorkshopSupplyCallSites[3];
+		HookedRebuildWorkshopSupply(owner, site.sourceId, site.label);
 	}
 
 	void LogComponentCountProbe(
@@ -1258,24 +1424,26 @@ namespace papyrus_lootman
 
 	bool HookedComponentCountPapyrus(void* owner, std::int32_t* outCount, TESForm* form, bool includeLinked)
 	{
+		const auto& site = kComponentCountHelperCallSites[0];
 		return HookedComponentCountHelper(
 			owner,
 			outCount,
 			form,
 			includeLinked,
-			0xB1,
-			"0x14059BC2A:GetComponentCount");
+			site.sourceId,
+			site.label);
 	}
 
 	bool HookedComponentCountWorkbenchUi(void* owner, std::int32_t* outCount, TESForm* form, bool includeLinked)
 	{
+		const auto& site = kComponentCountHelperCallSites[1];
 		return HookedComponentCountHelper(
 			owner,
 			outCount,
 			form,
 			includeLinked,
-			0xB2,
-			"0x14117501B:WorkbenchUI");
+			site.sourceId,
+			site.label);
 	}
 
 	void LogDirectComponentCountProbe(
@@ -1356,29 +1524,34 @@ namespace papyrus_lootman
 		return adjustment.applied ? adjustment.totalCount : baseCount;
 	}
 
-	std::int32_t HookedDirectComponentCount3BC3ED(void* owner, BGSComponent* component, bool includeLinked)
+	std::int32_t HookedDirectComponentCountSourceE1(void* owner, BGSComponent* component, bool includeLinked)
 	{
-		return HookedDirectComponentCount(owner, component, includeLinked, 0xE1, "0x1403BC3ED");
+		const auto& site = kDirectComponentCountCallSites[0];
+		return HookedDirectComponentCount(owner, component, includeLinked, site.sourceId, site.label);
 	}
 
-	std::int32_t HookedDirectComponentCount39F27F(void* owner, BGSComponent* component, bool includeLinked)
+	std::int32_t HookedDirectComponentCountSourceE2(void* owner, BGSComponent* component, bool includeLinked)
 	{
-		return HookedDirectComponentCount(owner, component, includeLinked, 0xE2, "0x14039F27F");
+		const auto& site = kDirectComponentCountCallSites[1];
+		return HookedDirectComponentCount(owner, component, includeLinked, site.sourceId, site.label);
 	}
 
-	std::int32_t HookedDirectComponentCountB3308B(void* owner, BGSComponent* component, bool includeLinked)
+	std::int32_t HookedDirectComponentCountSourceE3(void* owner, BGSComponent* component, bool includeLinked)
 	{
-		return HookedDirectComponentCount(owner, component, includeLinked, 0xE3, "0x140B3308B");
+		const auto& site = kDirectComponentCountCallSites[2];
+		return HookedDirectComponentCount(owner, component, includeLinked, site.sourceId, site.label);
 	}
 
-	std::int32_t HookedDirectComponentCountB37A38(void* owner, BGSComponent* component, bool includeLinked)
+	std::int32_t HookedDirectComponentCountSourceE4(void* owner, BGSComponent* component, bool includeLinked)
 	{
-		return HookedDirectComponentCount(owner, component, includeLinked, 0xE4, "0x140B37A38");
+		const auto& site = kDirectComponentCountCallSites[3];
+		return HookedDirectComponentCount(owner, component, includeLinked, site.sourceId, site.label);
 	}
 
-	std::int32_t HookedDirectComponentCountB2D34E(void* owner, BGSComponent* component, bool includeLinked)
+	std::int32_t HookedDirectComponentCountSourceE5(void* owner, BGSComponent* component, bool includeLinked)
 	{
-		return HookedDirectComponentCount(owner, component, includeLinked, 0xE5, "0x140B2D34E");
+		const auto& site = kDirectComponentCountCallSites[4];
+		return HookedDirectComponentCount(owner, component, includeLinked, site.sourceId, site.label);
 	}
 
 	TESObjectREFR* ResolveActiveRememberedWorkshop()
@@ -1976,14 +2149,16 @@ namespace papyrus_lootman
 		return adjustedStatus;
 	}
 
-	std::uint32_t HookedWorkshopResourceStatusB2F2C0()
+	std::uint32_t HookedWorkshopResourceStatusSourceF1()
 	{
-		return HookedWorkshopResourceStatus(0xF1, "0x140B2F2C0");
+		const auto& site = kWorkshopResourceStatusCallSites[0];
+		return HookedWorkshopResourceStatus(site.sourceId, site.label);
 	}
 
-	std::uint32_t HookedWorkshopResourceStatusB2D266()
+	std::uint32_t HookedWorkshopResourceStatusSourceF2()
 	{
-		return HookedWorkshopResourceStatus(0xF2, "0x140B2D266");
+		const auto& site = kWorkshopResourceStatusCallSites[1];
+		return HookedWorkshopResourceStatus(site.sourceId, site.label);
 	}
 
 	void LogWorkshopMenuAvailability(
@@ -2094,69 +2269,74 @@ namespace papyrus_lootman
 		return result;
 	}
 
-	bool HookedWorkshopMenuAvailabilityB2C86E(
+	bool HookedWorkshopMenuAvailabilitySource91(
 		std::uint32_t* outValue,
 		std::uint32_t row,
 		std::uint32_t menuResult)
 	{
+		const auto& site = kWorkshopMenuAvailabilityCallSites[0];
 		return HookedWorkshopMenuAvailability(
 			outValue,
 			row,
 			menuResult,
-			0x91,
-			"0x140B2C86E:WorkshopMenuAvailability");
+			site.sourceId,
+			site.label);
 	}
 
-	bool HookedWorkshopMenuAvailabilityB2C8D7(
+	bool HookedWorkshopMenuAvailabilitySource92(
 		std::uint32_t* outValue,
 		std::uint32_t row,
 		std::uint32_t menuResult)
 	{
+		const auto& site = kWorkshopMenuAvailabilityCallSites[1];
 		return HookedWorkshopMenuAvailability(
 			outValue,
 			row,
 			menuResult,
-			0x92,
-			"0x140B2C8D7:WorkshopMenuAvailability");
+			site.sourceId,
+			site.label);
 	}
 
-	bool HookedWorkshopMenuAvailabilityB2CB2E(
+	bool HookedWorkshopMenuAvailabilitySource93(
 		std::uint32_t* outValue,
 		std::uint32_t row,
 		std::uint32_t menuResult)
 	{
+		const auto& site = kWorkshopMenuAvailabilityCallSites[2];
 		return HookedWorkshopMenuAvailability(
 			outValue,
 			row,
 			menuResult,
-			0x93,
-			"0x140B2CB2E:WorkshopMenuAvailability");
+			site.sourceId,
+			site.label);
 	}
 
-	bool HookedWorkshopMenuAvailabilityB2CB94(
+	bool HookedWorkshopMenuAvailabilitySource94(
 		std::uint32_t* outValue,
 		std::uint32_t row,
 		std::uint32_t menuResult)
 	{
+		const auto& site = kWorkshopMenuAvailabilityCallSites[3];
 		return HookedWorkshopMenuAvailability(
 			outValue,
 			row,
 			menuResult,
-			0x94,
-			"0x140B2CB94:WorkshopMenuAvailability");
+			site.sourceId,
+			site.label);
 	}
 
-	bool HookedWorkshopMenuAvailabilityB2EBE4(
+	bool HookedWorkshopMenuAvailabilitySource95(
 		std::uint32_t* outValue,
 		std::uint32_t row,
 		std::uint32_t menuResult)
 	{
+		const auto& site = kWorkshopMenuAvailabilityCallSites[4];
 		return HookedWorkshopMenuAvailability(
 			outValue,
 			row,
 			menuResult,
-			0x95,
-			"0x140B2EBE4:WorkshopMenuAvailability");
+			site.sourceId,
+			site.label);
 	}
 
 	void LogWorkshopCheckAndSetPlacement(
@@ -2249,36 +2429,40 @@ namespace papyrus_lootman
 			afterPlacement);
 	}
 
-	void HookedWorkshopCheckAndSetPlacementB2B307(WorkshopMenu* menu)
+	void HookedWorkshopCheckAndSetPlacementSourceA5(WorkshopMenu* menu)
 	{
+		const auto& site = kWorkshopCheckAndSetPlacementCallSites[0];
 		HookedWorkshopCheckAndSetPlacement(
 			menu,
-			0xA5,
-			"0x140B2B307:CheckAndSetItemForPlacement");
+			site.sourceId,
+			site.label);
 	}
 
-	void HookedWorkshopCheckAndSetPlacementB2C8F2(WorkshopMenu* menu)
+	void HookedWorkshopCheckAndSetPlacementSourceA6(WorkshopMenu* menu)
 	{
+		const auto& site = kWorkshopCheckAndSetPlacementCallSites[1];
 		HookedWorkshopCheckAndSetPlacement(
 			menu,
-			0xA6,
-			"0x140B2C8F2:CheckAndSetItemForPlacement");
+			site.sourceId,
+			site.label);
 	}
 
-	void HookedWorkshopCheckAndSetPlacementB2CBAF(WorkshopMenu* menu)
+	void HookedWorkshopCheckAndSetPlacementSourceA7(WorkshopMenu* menu)
 	{
+		const auto& site = kWorkshopCheckAndSetPlacementCallSites[2];
 		HookedWorkshopCheckAndSetPlacement(
 			menu,
-			0xA7,
-			"0x140B2CBAF:CheckAndSetItemForPlacement");
+			site.sourceId,
+			site.label);
 	}
 
-	void HookedWorkshopCheckAndSetPlacementB2E88E(WorkshopMenu* menu)
+	void HookedWorkshopCheckAndSetPlacementSourceA8(WorkshopMenu* menu)
 	{
+		const auto& site = kWorkshopCheckAndSetPlacementCallSites[3];
 		HookedWorkshopCheckAndSetPlacement(
 			menu,
-			0xA8,
-			"0x140B2E88E:CheckAndSetItemForPlacement");
+			site.sourceId,
+			site.label);
 	}
 
 	void LogWorkshopPlacementTransition(
@@ -2434,22 +2618,24 @@ namespace papyrus_lootman
 		return result;
 	}
 
-	bool HookedWorkshopMenuSelectB2C8AA(bool forward, void* context)
+	bool HookedWorkshopMenuSelectSourceA1(bool forward, void* context)
 	{
+		const auto& site = kWorkshopMenuSelectCallSites[0];
 		return HookedWorkshopMenuSelect(
 			forward,
 			context,
-			0xA1,
-			"0x140B2C8AA:SelectWorkshopMenuNode");
+			site.sourceId,
+			site.label);
 	}
 
-	bool HookedWorkshopMenuSelectB2CB67(bool forward, void* context)
+	bool HookedWorkshopMenuSelectSourceA2(bool forward, void* context)
 	{
+		const auto& site = kWorkshopMenuSelectCallSites[1];
 		return HookedWorkshopMenuSelect(
 			forward,
 			context,
-			0xA2,
-			"0x140B2CB67:SelectWorkshopMenuNode");
+			site.sourceId,
+			site.label);
 	}
 
 	void HookedWorkshopStartPlacement(
@@ -2506,30 +2692,32 @@ namespace papyrus_lootman
 			placementAfter);
 	}
 
-	void HookedWorkshopStartPlacementB2C9EA(
+	void HookedWorkshopStartPlacementSourceA3(
 		void* menuContext,
 		bool allowPlacement,
 		bool createPreview)
 	{
+		const auto& site = kWorkshopStartPlacementCallSites[0];
 		HookedWorkshopStartPlacement(
 			menuContext,
 			allowPlacement,
 			createPreview,
-			0xA3,
-			"0x140B2C9EA:StartWorkshopPlacement");
+			site.sourceId,
+			site.label);
 	}
 
-	void HookedWorkshopStartPlacementB2CCA5(
+	void HookedWorkshopStartPlacementSourceA4(
 		void* menuContext,
 		bool allowPlacement,
 		bool createPreview)
 	{
+		const auto& site = kWorkshopStartPlacementCallSites[1];
 		HookedWorkshopStartPlacement(
 			menuContext,
 			allowPlacement,
 			createPreview,
-			0xA4,
-			"0x140B2CCA5:StartWorkshopPlacement");
+			site.sourceId,
+			site.label);
 	}
 
 	void LogWorkshopBuildResourceCheck(
@@ -2641,34 +2829,36 @@ namespace papyrus_lootman
 		return adjustedResult;
 	}
 
-	bool HookedWorkshopBuildResourceCheck392514(
+	bool HookedWorkshopBuildResourceCheckPlacement(
 		BGSConstructibleObject* recipe,
 		TESObjectREFR* owner,
 		void* scratchList,
 		bool scaleRequiredCount)
 	{
+		const auto& site = kWorkshopBuildResourceCheckCallSites[0];
 		return HookedWorkshopBuildResourceCheck(
 			recipe,
 			owner,
 			scratchList,
 			scaleRequiredCount,
-			0xB1,
-			"0x140392514:BuildResourceCheckForPlacement");
+			site.sourceId,
+			site.label);
 	}
 
-	bool HookedWorkshopBuildResourceCheck398E06(
+	bool HookedWorkshopBuildResourceCheckConfirm(
 		BGSConstructibleObject* recipe,
 		TESObjectREFR* owner,
 		void* scratchList,
 		bool scaleRequiredCount)
 	{
+		const auto& site = kWorkshopBuildResourceCheckCallSites[1];
 		return HookedWorkshopBuildResourceCheck(
 			recipe,
 			owner,
 			scratchList,
 			scaleRequiredCount,
-			0xB2,
-			"0x140398E06:BuildResourceCheckForConfirm");
+			site.sourceId,
+			site.label);
 	}
 
 	std::uint32_t SaturatingRequiredComponentCount(
@@ -2944,22 +3134,24 @@ namespace papyrus_lootman
 		NotePendingWorkshopBuildConsumptionCall(currentWorkshop);
 	}
 
-	void HookedWorkshopConsumeComponent398FF6(TESForm* form, std::uint32_t count)
+	void HookedWorkshopConsumeComponentSourceF3(TESForm* form, std::uint32_t count)
 	{
+		const auto& site = kWorkshopConsumeComponentCallSites[0];
 		HookedWorkshopConsumeComponent(
 			form,
 			count,
-			0xF3,
-			"0x140398FF6:ConsumeWorkshopBuildComponent");
+			site.sourceId,
+			site.label);
 	}
 
-	void HookedWorkshopConsumeComponent3B7D2A(TESForm* form, std::uint32_t count)
+	void HookedWorkshopConsumeComponentSourceF4(TESForm* form, std::uint32_t count)
 	{
+		const auto& site = kWorkshopConsumeComponentCallSites[1];
 		HookedWorkshopConsumeComponent(
 			form,
 			count,
-			0xF4,
-			"0x1403B7D2A:ConsumeWorkshopBuildComponent");
+			site.sourceId,
+			site.label);
 	}
 
 	void HookedRemoveComponents(
@@ -3039,7 +3231,7 @@ namespace papyrus_lootman
 			plan);
 	}
 
-	void HookedRemoveComponents14114EB19(
+	void HookedRemoveComponentsSourceF1(
 		TESObjectREFR* owner,
 		TESForm* form,
 		std::uint32_t count,
@@ -3049,6 +3241,7 @@ namespace papyrus_lootman
 		std::uint32_t uiMessageId,
 		void* uiMessageContext)
 	{
+		const auto& site = kRemoveComponentsCallSites[0];
 		HookedRemoveComponents(
 			owner,
 			form,
@@ -3058,11 +3251,11 @@ namespace papyrus_lootman
 			allowFallback,
 			uiMessageId,
 			uiMessageContext,
-			0xF1,
-			"0x14114EB19:RemoveComponents");
+			site.sourceId,
+			site.label);
 	}
 
-	void HookedRemoveComponents14114E543(
+	void HookedRemoveComponentsSourceF2(
 		TESObjectREFR* owner,
 		TESForm* form,
 		std::uint32_t count,
@@ -3072,6 +3265,7 @@ namespace papyrus_lootman
 		std::uint32_t uiMessageId,
 		void* uiMessageContext)
 	{
+		const auto& site = kRemoveComponentsCallSites[1];
 		HookedRemoveComponents(
 			owner,
 			form,
@@ -3081,8 +3275,8 @@ namespace papyrus_lootman
 			allowFallback,
 			uiMessageId,
 			uiMessageContext,
-			0xF2,
-			"0x14114E543:RemoveItemByComponent");
+			site.sourceId,
+			site.label);
 	}
 
 	void LogWorkshopObjectCountProbe(
@@ -3090,11 +3284,13 @@ namespace papyrus_lootman
 		TESForm* form,
 		bool includeLinked,
 		float* outValue,
-		bool result)
+		bool result,
+		std::uint32_t sourceId,
+		const char* sourceName)
 	{
 		const auto targetForm = CaptureFormProbeSnapshot(form);
 		const auto key = MakePointerProbeKey(
-			0xC1,
+			sourceId,
 			reinterpret_cast<std::uintptr_t>(scriptContext),
 			targetForm.formID);
 		if (!ShouldLogWorkshopMaterialProbe(key, 224))
@@ -3103,7 +3299,8 @@ namespace papyrus_lootman
 		}
 
 		REX::INFO(
-			"Native workshop material probe: kind=workshop-object-count, source=0x1405DD484:GetWorkshopObjectCount, scriptContext={:016X}, target={:016X}, targetReadable={}, targetForm={:08X}, targetType={}, includeLinked={}, result={}, outValue={}",
+			"Native workshop material probe: kind=workshop-object-count, source={}, scriptContext={:016X}, target={:016X}, targetReadable={}, targetForm={:08X}, targetType={}, includeLinked={}, result={}, outValue={}",
+			sourceName,
 			reinterpret_cast<std::uintptr_t>(scriptContext),
 			reinterpret_cast<std::uintptr_t>(form),
 			targetForm.readable,
@@ -3116,19 +3313,31 @@ namespace papyrus_lootman
 
 	bool HookedWorkshopObjectCount(void* scriptContext, TESForm* form, bool includeLinked, float* outValue)
 	{
+		const auto& site = kWorkshopObjectCountPapyrusCallSite;
 		const bool result = originalWorkshopObjectCount ?
 			originalWorkshopObjectCount(scriptContext, form, includeLinked, outValue) :
 			false;
-		LogWorkshopObjectCountProbe(scriptContext, form, includeLinked, outValue, result);
+		LogWorkshopObjectCountProbe(
+			scriptContext,
+			form,
+			includeLinked,
+			outValue,
+			result,
+			site.sourceId,
+			site.label);
 		return result;
 	}
 
-	void LogCurrentWorkshopObjectCountProbe(TESForm* form, std::uint32_t count)
+	void LogCurrentWorkshopObjectCountProbe(
+		TESForm* form,
+		std::uint32_t count,
+		std::uint32_t sourceId,
+		const char* sourceName)
 	{
 		const auto targetForm = CaptureFormProbeSnapshot(form);
 		const auto context = CaptureWorkshopMaterialContextProbe();
 		const auto key = MakePointerProbeKey(
-			0xC2,
+			sourceId,
 			reinterpret_cast<std::uintptr_t>(form),
 			targetForm.formID ^
 				context.currentWorkshop.workshop.formID ^
@@ -3139,7 +3348,8 @@ namespace papyrus_lootman
 		}
 
 		REX::INFO(
-			"Native workshop material probe: kind=current-workshop-object-count, source=0x14059D378:GetWorkshopObjectCountCurrent, target={:016X}, targetReadable={}, targetForm={:08X}, targetType={}, count={}, currentWorkshopHandle={:08X}, currentWorkshopReadable={}, currentWorkshop={:08X}, currentWorkshopType={}, currentLocationReadable={}, currentLocation={:08X}, currentLocationRemembered={}, nearestWorkshopReadable={}, nearestWorkshop={:08X}, nearestWorkshopType={}, nearestLocationReadable={}, nearestLocation={:08X}, nearestLocationRemembered={}",
+			"Native workshop material probe: kind=current-workshop-object-count, source={}, target={:016X}, targetReadable={}, targetForm={:08X}, targetType={}, count={}, currentWorkshopHandle={:08X}, currentWorkshopReadable={}, currentWorkshop={:08X}, currentWorkshopType={}, currentLocationReadable={}, currentLocation={:08X}, currentLocationRemembered={}, nearestWorkshopReadable={}, nearestWorkshop={:08X}, nearestWorkshopType={}, nearestLocationReadable={}, nearestLocation={:08X}, nearestLocationRemembered={}",
+			sourceName,
 			reinterpret_cast<std::uintptr_t>(form),
 			targetForm.readable,
 			targetForm.formID,
@@ -3162,10 +3372,11 @@ namespace papyrus_lootman
 
 	std::uint32_t HookedCurrentWorkshopObjectCount(TESForm* form)
 	{
+		const auto& site = kCurrentWorkshopObjectCountCallSite;
 		const auto count = originalCurrentWorkshopObjectCount ?
 			originalCurrentWorkshopObjectCount(form) :
 			0;
-		LogCurrentWorkshopObjectCountProbe(form, count);
+		LogCurrentWorkshopObjectCountProbe(form, count, site.sourceId, site.label);
 		return count;
 	}
 
@@ -3253,26 +3464,20 @@ namespace papyrus_lootman
 		static std::once_flag installOnce;
 		std::call_once(installOnce, []()
 		{
-			for (const auto callSiteRva : kPopulateLinkedWorkshopContainerCallSites)
-			{
-				REL::Relocation<std::uintptr_t> callSite{ REL::Offset(callSiteRva) };
-				const auto original = reinterpret_cast<PopulateLinkedWorkshopContainersFn>(
-					callSite.write_call<5>(HookedPopulateLinkedWorkshopContainers));
-				if (!originalPopulateLinkedWorkshopContainers)
-				{
-					originalPopulateLinkedWorkshopContainers = original;
-				}
-				else if (originalPopulateLinkedWorkshopContainers != original)
-				{
-					REX::WARN(
-						"Unexpected native shared workshop container target: callSite={:X}, original={:X}, expected={:X}",
-						callSiteRva,
-						reinterpret_cast<std::uintptr_t>(original),
-						reinterpret_cast<std::uintptr_t>(originalPopulateLinkedWorkshopContainers));
-				}
-			}
+			const std::array<PopulateLinkedWorkshopContainersFn, kPopulateLinkedWorkshopContainerCallSites.size()> hooks{
+				&HookedPopulateLinkedWorkshopContainers,
+				&HookedPopulateLinkedWorkshopContainers,
+				&HookedPopulateLinkedWorkshopContainers,
+			};
 
-			REX::INFO("Installed native shared workshop container hooks");
+			if (InstallDirectCallHookFamily(
+					kPopulateLinkedWorkshopContainerCallSites,
+					hooks,
+					originalPopulateLinkedWorkshopContainers,
+					"workshop-shared-container.populate-linked"))
+			{
+				REX::INFO("Installed native shared workshop container hooks");
+			}
 		});
 	}
 
@@ -3281,302 +3486,148 @@ namespace papyrus_lootman
 		static std::once_flag installOnce;
 		std::call_once(installOnce, []()
 		{
-			const std::array<RebuildWorkshopSupplyFn, 4> rebuildHooks{
-				&HookedRebuildWorkshopSupplyA653F6,
-				&HookedRebuildWorkshopSupplyA5F109,
-				&HookedRebuildWorkshopSupplyA6052C,
-				&HookedRebuildWorkshopSupplyAEFD89,
+			bool allInstalled = true;
+
+			const std::array<RebuildWorkshopSupplyFn, kRebuildWorkshopSupplyCallSites.size()> rebuildHooks{
+				&HookedRebuildWorkshopSupplySourceA1,
+				&HookedRebuildWorkshopSupplySourceA2,
+				&HookedRebuildWorkshopSupplySourceA3,
+				&HookedRebuildWorkshopSupplySourceA4,
 			};
+			allInstalled &= InstallDirectCallHookFamily(
+				kRebuildWorkshopSupplyCallSites,
+				rebuildHooks,
+				originalRebuildWorkshopSupply,
+				"workshop-material.rebuild-supply");
 
-			for (std::size_t index = 0; index < kRebuildWorkshopSupplyCallSites.size(); ++index)
-			{
-				const auto callSiteRva = kRebuildWorkshopSupplyCallSites[index];
-				REL::Relocation<std::uintptr_t> callSite{ REL::Offset(callSiteRva) };
-				const auto original = reinterpret_cast<RebuildWorkshopSupplyFn>(
-					callSite.write_call<5>(rebuildHooks[index]));
-				if (!originalRebuildWorkshopSupply)
-				{
-					originalRebuildWorkshopSupply = original;
-				}
-				else if (originalRebuildWorkshopSupply != original)
-				{
-					REX::WARN(
-						"Unexpected native workshop supply rebuild target: callSite={:X}, original={:X}, expected={:X}",
-						callSiteRva,
-						reinterpret_cast<std::uintptr_t>(original),
-						reinterpret_cast<std::uintptr_t>(originalRebuildWorkshopSupply));
-				}
-			}
-
-			{
-				REL::Relocation<std::uintptr_t> callSite{ REL::Offset(kComponentCountPapyrusCallSite) };
-				originalComponentCountHelper = reinterpret_cast<ComponentCountHelperFn>(
-					callSite.write_call<5>(&HookedComponentCountPapyrus));
-			}
-			{
-				REL::Relocation<std::uintptr_t> callSite{ REL::Offset(kComponentCountWorkbenchUiCallSite) };
-				const auto original = reinterpret_cast<ComponentCountHelperFn>(
-					callSite.write_call<5>(&HookedComponentCountWorkbenchUi));
-				if (!originalComponentCountHelper)
-				{
-					originalComponentCountHelper = original;
-				}
-				else if (originalComponentCountHelper != original)
-				{
-					REX::WARN(
-						"Unexpected native component-count target: callSite={:X}, original={:X}, expected={:X}",
-						kComponentCountWorkbenchUiCallSite,
-						reinterpret_cast<std::uintptr_t>(original),
-						reinterpret_cast<std::uintptr_t>(originalComponentCountHelper));
-				}
-			}
-
-			const std::array<DirectComponentCountFn, 5> directComponentHooks{
-				&HookedDirectComponentCount3BC3ED,
-				&HookedDirectComponentCount39F27F,
-				&HookedDirectComponentCountB3308B,
-				&HookedDirectComponentCountB37A38,
-				&HookedDirectComponentCountB2D34E,
+			const std::array<ComponentCountHelperFn, kComponentCountHelperCallSites.size()> componentCountHooks{
+				&HookedComponentCountPapyrus,
+				&HookedComponentCountWorkbenchUi,
 			};
+			allInstalled &= InstallDirectCallHookFamily(
+				kComponentCountHelperCallSites,
+				componentCountHooks,
+				originalComponentCountHelper,
+				"workshop-material.component-count");
 
-			for (std::size_t index = 0; index < kDirectComponentCountCallSites.size(); ++index)
-			{
-				const auto callSiteRva = kDirectComponentCountCallSites[index];
-				REL::Relocation<std::uintptr_t> callSite{ REL::Offset(callSiteRva) };
-				const auto original = reinterpret_cast<DirectComponentCountFn>(
-					callSite.write_call<5>(directComponentHooks[index]));
-				if (!originalDirectComponentCount)
-				{
-					originalDirectComponentCount = original;
-				}
-				else if (originalDirectComponentCount != original)
-				{
-					REX::WARN(
-						"Unexpected native direct component-count target: callSite={:X}, original={:X}, expected={:X}",
-						callSiteRva,
-						reinterpret_cast<std::uintptr_t>(original),
-						reinterpret_cast<std::uintptr_t>(originalDirectComponentCount));
-				}
-			}
-
-			const std::array<WorkshopResourceStatusFn, 2> resourceStatusHooks{
-				&HookedWorkshopResourceStatusB2F2C0,
-				&HookedWorkshopResourceStatusB2D266,
+			const std::array<DirectComponentCountFn, kDirectComponentCountCallSites.size()> directComponentHooks{
+				&HookedDirectComponentCountSourceE1,
+				&HookedDirectComponentCountSourceE2,
+				&HookedDirectComponentCountSourceE3,
+				&HookedDirectComponentCountSourceE4,
+				&HookedDirectComponentCountSourceE5,
 			};
+			allInstalled &= InstallDirectCallHookFamily(
+				kDirectComponentCountCallSites,
+				directComponentHooks,
+				originalDirectComponentCount,
+				"workshop-material.direct-component-count");
 
-			for (std::size_t index = 0; index < kWorkshopResourceStatusCallSites.size(); ++index)
-			{
-				const auto callSiteRva = kWorkshopResourceStatusCallSites[index];
-				REL::Relocation<std::uintptr_t> callSite{ REL::Offset(callSiteRva) };
-				const auto original = reinterpret_cast<WorkshopResourceStatusFn>(
-					callSite.write_call<5>(resourceStatusHooks[index]));
-				if (!originalWorkshopResourceStatus)
-				{
-					originalWorkshopResourceStatus = original;
-				}
-				else if (originalWorkshopResourceStatus != original)
-				{
-					REX::WARN(
-						"Unexpected native workshop resource-status target: callSite={:X}, original={:X}, expected={:X}",
-						callSiteRva,
-						reinterpret_cast<std::uintptr_t>(original),
-						reinterpret_cast<std::uintptr_t>(originalWorkshopResourceStatus));
-				}
-			}
-
-			const std::array<WorkshopMenuAvailabilityFn, 5> menuAvailabilityHooks{
-				&HookedWorkshopMenuAvailabilityB2C86E,
-				&HookedWorkshopMenuAvailabilityB2C8D7,
-				&HookedWorkshopMenuAvailabilityB2CB2E,
-				&HookedWorkshopMenuAvailabilityB2CB94,
-				&HookedWorkshopMenuAvailabilityB2EBE4,
+			const std::array<WorkshopResourceStatusFn, kWorkshopResourceStatusCallSites.size()> resourceStatusHooks{
+				&HookedWorkshopResourceStatusSourceF1,
+				&HookedWorkshopResourceStatusSourceF2,
 			};
+			allInstalled &= InstallDirectCallHookFamily(
+				kWorkshopResourceStatusCallSites,
+				resourceStatusHooks,
+				originalWorkshopResourceStatus,
+				"workshop-material.resource-status");
 
-			for (std::size_t index = 0; index < kWorkshopMenuAvailabilityCallSites.size(); ++index)
-			{
-				const auto callSiteRva = kWorkshopMenuAvailabilityCallSites[index];
-				REL::Relocation<std::uintptr_t> callSite{ REL::Offset(callSiteRva) };
-				const auto original = reinterpret_cast<WorkshopMenuAvailabilityFn>(
-					callSite.write_call<5>(menuAvailabilityHooks[index]));
-				if (!originalWorkshopMenuAvailability)
-				{
-					originalWorkshopMenuAvailability = original;
-				}
-				else if (originalWorkshopMenuAvailability != original)
-				{
-					REX::WARN(
-						"Unexpected native workshop menu-availability target: callSite={:X}, original={:X}, expected={:X}",
-						callSiteRva,
-						reinterpret_cast<std::uintptr_t>(original),
-						reinterpret_cast<std::uintptr_t>(originalWorkshopMenuAvailability));
-				}
-			}
-
-			const std::array<WorkshopCheckAndSetPlacementFn, 4> checkAndSetPlacementHooks{
-				&HookedWorkshopCheckAndSetPlacementB2B307,
-				&HookedWorkshopCheckAndSetPlacementB2C8F2,
-				&HookedWorkshopCheckAndSetPlacementB2CBAF,
-				&HookedWorkshopCheckAndSetPlacementB2E88E,
+			const std::array<WorkshopMenuAvailabilityFn, kWorkshopMenuAvailabilityCallSites.size()> menuAvailabilityHooks{
+				&HookedWorkshopMenuAvailabilitySource91,
+				&HookedWorkshopMenuAvailabilitySource92,
+				&HookedWorkshopMenuAvailabilitySource93,
+				&HookedWorkshopMenuAvailabilitySource94,
+				&HookedWorkshopMenuAvailabilitySource95,
 			};
+			allInstalled &= InstallDirectCallHookFamily(
+				kWorkshopMenuAvailabilityCallSites,
+				menuAvailabilityHooks,
+				originalWorkshopMenuAvailability,
+				"workshop-menu.availability");
 
-			for (std::size_t index = 0; index < kWorkshopCheckAndSetPlacementCallSites.size(); ++index)
-			{
-				const auto callSiteRva = kWorkshopCheckAndSetPlacementCallSites[index];
-				REL::Relocation<std::uintptr_t> callSite{ REL::Offset(callSiteRva) };
-				const auto original = reinterpret_cast<WorkshopCheckAndSetPlacementFn>(
-					callSite.write_call<5>(checkAndSetPlacementHooks[index]));
-				if (!originalWorkshopCheckAndSetPlacement)
-				{
-					originalWorkshopCheckAndSetPlacement = original;
-				}
-				else if (originalWorkshopCheckAndSetPlacement != original)
-				{
-					REX::WARN(
-						"Unexpected native workshop check-placement target: callSite={:X}, original={:X}, expected={:X}",
-						callSiteRva,
-						reinterpret_cast<std::uintptr_t>(original),
-						reinterpret_cast<std::uintptr_t>(originalWorkshopCheckAndSetPlacement));
-				}
-			}
-
-			const std::array<WorkshopMenuSelectFn, 2> menuSelectHooks{
-				&HookedWorkshopMenuSelectB2C8AA,
-				&HookedWorkshopMenuSelectB2CB67,
+			const std::array<WorkshopCheckAndSetPlacementFn, kWorkshopCheckAndSetPlacementCallSites.size()> checkAndSetPlacementHooks{
+				&HookedWorkshopCheckAndSetPlacementSourceA5,
+				&HookedWorkshopCheckAndSetPlacementSourceA6,
+				&HookedWorkshopCheckAndSetPlacementSourceA7,
+				&HookedWorkshopCheckAndSetPlacementSourceA8,
 			};
+			allInstalled &= InstallDirectCallHookFamily(
+				kWorkshopCheckAndSetPlacementCallSites,
+				checkAndSetPlacementHooks,
+				originalWorkshopCheckAndSetPlacement,
+				"workshop-menu.check-placement");
 
-			for (std::size_t index = 0; index < kWorkshopMenuSelectCallSites.size(); ++index)
-			{
-				const auto callSiteRva = kWorkshopMenuSelectCallSites[index];
-				REL::Relocation<std::uintptr_t> callSite{ REL::Offset(callSiteRva) };
-				const auto original = reinterpret_cast<WorkshopMenuSelectFn>(
-					callSite.write_call<5>(menuSelectHooks[index]));
-				if (!originalWorkshopMenuSelect)
-				{
-					originalWorkshopMenuSelect = original;
-				}
-				else if (originalWorkshopMenuSelect != original)
-				{
-					REX::WARN(
-						"Unexpected native workshop menu-select target: callSite={:X}, original={:X}, expected={:X}",
-						callSiteRva,
-						reinterpret_cast<std::uintptr_t>(original),
-						reinterpret_cast<std::uintptr_t>(originalWorkshopMenuSelect));
-				}
-			}
-
-			const std::array<WorkshopStartPlacementFn, 2> startPlacementHooks{
-				&HookedWorkshopStartPlacementB2C9EA,
-				&HookedWorkshopStartPlacementB2CCA5,
+			const std::array<WorkshopMenuSelectFn, kWorkshopMenuSelectCallSites.size()> menuSelectHooks{
+				&HookedWorkshopMenuSelectSourceA1,
+				&HookedWorkshopMenuSelectSourceA2,
 			};
+			allInstalled &= InstallDirectCallHookFamily(
+				kWorkshopMenuSelectCallSites,
+				menuSelectHooks,
+				originalWorkshopMenuSelect,
+				"workshop-menu.select");
 
-			for (std::size_t index = 0; index < kWorkshopStartPlacementCallSites.size(); ++index)
-			{
-				const auto callSiteRva = kWorkshopStartPlacementCallSites[index];
-				REL::Relocation<std::uintptr_t> callSite{ REL::Offset(callSiteRva) };
-				const auto original = reinterpret_cast<WorkshopStartPlacementFn>(
-					callSite.write_call<5>(startPlacementHooks[index]));
-				if (!originalWorkshopStartPlacement)
-				{
-					originalWorkshopStartPlacement = original;
-				}
-				else if (originalWorkshopStartPlacement != original)
-				{
-					REX::WARN(
-						"Unexpected native workshop placement-start target: callSite={:X}, original={:X}, expected={:X}",
-						callSiteRva,
-						reinterpret_cast<std::uintptr_t>(original),
-						reinterpret_cast<std::uintptr_t>(originalWorkshopStartPlacement));
-				}
-			}
-
-			const std::array<WorkshopBuildResourceCheckFn, 2> buildResourceCheckHooks{
-				&HookedWorkshopBuildResourceCheck392514,
-				&HookedWorkshopBuildResourceCheck398E06,
+			const std::array<WorkshopStartPlacementFn, kWorkshopStartPlacementCallSites.size()> startPlacementHooks{
+				&HookedWorkshopStartPlacementSourceA3,
+				&HookedWorkshopStartPlacementSourceA4,
 			};
+			allInstalled &= InstallDirectCallHookFamily(
+				kWorkshopStartPlacementCallSites,
+				startPlacementHooks,
+				originalWorkshopStartPlacement,
+				"workshop-menu.start-placement");
 
-			for (std::size_t index = 0; index < kWorkshopBuildResourceCheckCallSites.size(); ++index)
-			{
-				const auto callSiteRva = kWorkshopBuildResourceCheckCallSites[index];
-				REL::Relocation<std::uintptr_t> callSite{ REL::Offset(callSiteRva) };
-				const auto original = reinterpret_cast<WorkshopBuildResourceCheckFn>(
-					callSite.write_call<5>(buildResourceCheckHooks[index]));
-				if (!originalWorkshopBuildResourceCheck)
-				{
-					originalWorkshopBuildResourceCheck = original;
-				}
-				else if (originalWorkshopBuildResourceCheck != original)
-				{
-					REX::WARN(
-						"Unexpected native workshop build-resource target: callSite={:X}, original={:X}, expected={:X}",
-						callSiteRva,
-						reinterpret_cast<std::uintptr_t>(original),
-						reinterpret_cast<std::uintptr_t>(originalWorkshopBuildResourceCheck));
-				}
-			}
-
-			const std::array<RemoveComponentsFn, 2> removeComponentHooks{
-				&HookedRemoveComponents14114EB19,
-				&HookedRemoveComponents14114E543,
+			const std::array<WorkshopBuildResourceCheckFn, kWorkshopBuildResourceCheckCallSites.size()> buildResourceCheckHooks{
+				&HookedWorkshopBuildResourceCheckPlacement,
+				&HookedWorkshopBuildResourceCheckConfirm,
 			};
+			allInstalled &= InstallDirectCallHookFamily(
+				kWorkshopBuildResourceCheckCallSites,
+				buildResourceCheckHooks,
+				originalWorkshopBuildResourceCheck,
+				"workshop-material.build-resource-check");
 
-			for (std::size_t index = 0; index < kRemoveComponentsCallSites.size(); ++index)
-			{
-				const auto callSiteRva = kRemoveComponentsCallSites[index];
-				REL::Relocation<std::uintptr_t> callSite{ REL::Offset(callSiteRva) };
-				const auto original = reinterpret_cast<RemoveComponentsFn>(
-					callSite.write_call<5>(removeComponentHooks[index]));
-				if (!originalRemoveComponents)
-				{
-					originalRemoveComponents = original;
-				}
-				else if (originalRemoveComponents != original)
-				{
-					REX::WARN(
-						"Unexpected native component-consume target: callSite={:X}, original={:X}, expected={:X}",
-						callSiteRva,
-						reinterpret_cast<std::uintptr_t>(original),
-						reinterpret_cast<std::uintptr_t>(originalRemoveComponents));
-				}
-			}
-
-			const std::array<WorkshopConsumeComponentFn, 2> consumeComponentHooks{
-				&HookedWorkshopConsumeComponent398FF6,
-				&HookedWorkshopConsumeComponent3B7D2A,
+			const std::array<RemoveComponentsFn, kRemoveComponentsCallSites.size()> removeComponentHooks{
+				&HookedRemoveComponentsSourceF1,
+				&HookedRemoveComponentsSourceF2,
 			};
+			allInstalled &= InstallDirectCallHookFamily(
+				kRemoveComponentsCallSites,
+				removeComponentHooks,
+				originalRemoveComponents,
+				"workshop-material.remove-components");
 
-			for (std::size_t index = 0; index < kWorkshopConsumeComponentCallSites.size(); ++index)
+			const std::array<WorkshopConsumeComponentFn, kWorkshopConsumeComponentCallSites.size()> consumeComponentHooks{
+				&HookedWorkshopConsumeComponentSourceF3,
+				&HookedWorkshopConsumeComponentSourceF4,
+			};
+			allInstalled &= InstallDirectCallHookFamily(
+				kWorkshopConsumeComponentCallSites,
+				consumeComponentHooks,
+				originalWorkshopConsumeComponent,
+				"workshop-material.consume-component");
+
+			allInstalled &= InstallDirectCallHookSite(
+				kWorkshopObjectCountPapyrusCallSite,
+				&HookedWorkshopObjectCount,
+				originalWorkshopObjectCount,
+				"workshop-material.object-count.papyrus");
+
+			allInstalled &= InstallDirectCallHookSite(
+				kCurrentWorkshopObjectCountCallSite,
+				&HookedCurrentWorkshopObjectCount,
+				originalCurrentWorkshopObjectCount,
+				"workshop-material.object-count.current-workshop");
+
+			if (allInstalled)
 			{
-				const auto callSiteRva = kWorkshopConsumeComponentCallSites[index];
-				REL::Relocation<std::uintptr_t> callSite{ REL::Offset(callSiteRva) };
-				const auto original = reinterpret_cast<WorkshopConsumeComponentFn>(
-					callSite.write_call<5>(consumeComponentHooks[index]));
-				if (!originalWorkshopConsumeComponent)
-				{
-					originalWorkshopConsumeComponent = original;
-				}
-				else if (originalWorkshopConsumeComponent != original)
-				{
-					REX::WARN(
-						"Unexpected native workshop consume-component target: callSite={:X}, original={:X}, expected={:X}",
-						callSiteRva,
-						reinterpret_cast<std::uintptr_t>(original),
-						reinterpret_cast<std::uintptr_t>(originalWorkshopConsumeComponent));
-				}
+				REX::INFO("Installed native workshop material probe hooks");
 			}
-
+			else
 			{
-				REL::Relocation<std::uintptr_t> callSite{ REL::Offset(kWorkshopObjectCountPapyrusCallSite) };
-				originalWorkshopObjectCount = reinterpret_cast<WorkshopObjectCountFn>(
-					callSite.write_call<5>(&HookedWorkshopObjectCount));
+				REX::WARN("Installed native workshop material probe hooks with one or more skipped families");
 			}
-
-			{
-				REL::Relocation<std::uintptr_t> callSite{ REL::Offset(kCurrentWorkshopObjectCountCallSite) };
-				originalCurrentWorkshopObjectCount = reinterpret_cast<CurrentWorkshopObjectCountFn>(
-					callSite.write_call<5>(&HookedCurrentWorkshopObjectCount));
-			}
-
-			REX::INFO("Installed native workshop material probe hooks");
 		});
 	}
 

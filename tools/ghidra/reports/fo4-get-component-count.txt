@@ -1,0 +1,78 @@
+Program: Fallout4.exe
+Image base: 140000000
+
+================================================================================
+Target 14059bbb0
+Function: FUN_14059bbb0
+Entry: 14059bbb0
+Body: [[14059bbb0, 14059bc89]]
+
+References to entry:
+  143edb8dc -> 14059bbb0 type=DATA
+  1405c602d -> 14059bbb0 type=UNCONDITIONAL_CALL
+  142ee1ea0 -> 14059bbb0 type=DATA
+
+Outgoing references from function body:
+  14059bbdc -> 1405088c0 type=UNCONDITIONAL_CALL
+  14059bbe4 -> 14059bc14 type=CONDITIONAL_JUMP
+  14059bbfd -> 14059bc73 type=CONDITIONAL_JUMP
+  14059bc0d -> 14103bb90 type=UNCONDITIONAL_CALL
+  14059bc12 -> 14059bc73 type=UNCONDITIONAL_JUMP
+  14059bc2a -> 140507660 type=UNCONDITIONAL_CALL
+  14059bc56 -> 14059bc73 type=CONDITIONAL_JUMP
+  14059bc6e -> 14103bb90 type=UNCONDITIONAL_CALL
+
+Instructions:
+  14059bbb0: MOV qword ptr [RSP + 0x10],RBX
+  14059bbb5: MOV qword ptr [RSP + 0x18],RBP
+  14059bbba: MOV qword ptr [RSP + 0x20],RSI
+  14059bbbf: PUSH RDI
+  14059bbc0: SUB RSP,0x20
+  14059bbc4: MOV RDI,RCX
+  14059bbc7: MOV dword ptr [R9],0x0
+  14059bbce: MOV RCX,qword ptr [RCX]
+  14059bbd1: MOV RBX,R9
+  14059bbd4: MOV RSI,RDX
+  14059bbd7: MOV EBP,0x830
+  14059bbdc: CALL 0x1405088c0
+  14059bbe1: TEST RAX,RAX
+  14059bbe4: JNZ 0x14059bc14
+  14059bbe6: MOV ECX,dword ptr [0x143e5c658]
+  14059bbec: MOV RAX,qword ptr GS:[0x58]
+  14059bbf5: MOV RCX,qword ptr [RAX + RCX*0x8]
+  14059bbf9: CMP byte ptr [RCX + RBP*0x1],0x0
+  14059bbfd: JZ 0x14059bc73
+  14059bbff: MOV RCX,qword ptr [0x1430ed2b8]
+  14059bc06: LEA RDX,[0x1424a7e18]
+  14059bc0d: CALL 0x14103bb90
+  14059bc12: JMP 0x14059bc73
+  14059bc14: MOV RCX,qword ptr [RDI]
+  14059bc17: LEA RDX,[RSP + 0x30]
+  14059bc1c: MOV R9B,0x1
+  14059bc1f: MOV dword ptr [RSP + 0x30],0x0
+  14059bc27: MOV R8,RSI
+  14059bc2a: CALL 0x140507660
+  14059bc2f: MOV EAX,dword ptr [RSP + 0x30]
+  14059bc33: XORPS XMM0,XMM0
+  14059bc36: MOV ECX,dword ptr [0x143e5c658]
+  14059bc3c: CVTSI2SS XMM0,RAX
+  14059bc41: MOV RAX,qword ptr GS:[0x58]
+  14059bc4a: MOV RCX,qword ptr [RAX + RCX*0x8]
+  14059bc4e: MOVSS dword ptr [RBX],XMM0
+  14059bc52: CMP byte ptr [RCX + RBP*0x1],0x0
+  14059bc56: JZ 0x14059bc73
+  14059bc58: MOV RCX,qword ptr [0x1430ed2b8]
+  14059bc5f: LEA RDX,[0x1424a7e60]
+  14059bc66: CVTPS2PD XMM2,XMM0
+  14059bc69: MOVQ R8,XMM2
+  14059bc6e: CALL 0x14103bb90
+  14059bc73: MOV RBX,qword ptr [RSP + 0x38]
+  14059bc78: MOV AL,0x1
+  14059bc7a: MOV RBP,qword ptr [RSP + 0x40]
+  14059bc7f: MOV RSI,qword ptr [RSP + 0x48]
+  14059bc84: ADD RSP,0x20
+  14059bc88: POP RDI
+  14059bc89: RET
+
+Decompiled C:
+  <decompile failed: >

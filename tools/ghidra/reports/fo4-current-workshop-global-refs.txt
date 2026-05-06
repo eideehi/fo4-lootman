@@ -1,0 +1,40 @@
+Program: Fallout4.exe
+Image base: 140000000
+Scalars: [5420008856]
+
+Function FUN_14037cc60 entry=14037cc60 body=[[14037cc60, 14037ccd5]]
+  scalar 0x1430EC598:
+    14037cc7a: LEA RDX,[0x1430ec598]
+
+Function FUN_140392a30 entry=140392a30 body=[[140392a30, 140392df9]]
+  scalar 0x1430EC598:
+    140392b86: LEA RDX,[0x1430ec598]
+
+Function FUN_1403970f0 entry=1403970f0 body=[[1403970f0, 14039743c]]
+  scalar 0x1430EC598:
+    1403972f1: LEA RDX,[0x1430ec598]
+
+Function FUN_1403997a0 entry=1403997a0 body=[[1403997a0, 140399957]]
+  scalar 0x1430EC598:
+    1403998e1: LEA RDX,[0x1430ec598]
+
+Function FUN_1403b7e50 entry=1403b7e50 body=[[1403b7e50, 1403b806e]]
+  scalar 0x1430EC598:
+    1403b7ebd: LEA RDX,[0x1430ec598]
+
+Function FUN_1403bf180 entry=1403bf180 body=[[1403bf180, 1403bf3bb]]
+  scalar 0x1430EC598:
+    1403bf2be: LEA RDX,[0x1430ec598]
+
+Function FUN_1403c1690 entry=1403c1690 body=[[1403c1690, 1403c1924]]
+  scalar 0x1430EC598:
+    1403c170b: LEA RDX,[0x1430ec598]
+
+Function FUN_140b2b990 entry=140b2b990 body=[[140b2b990, 140b2c11c]]
+  scalar 0x1430EC598:
+    140b2bb80: LEA RDX,[0x1430ec598]
+
+Function FUN_140b2c380 entry=140b2c380 body=[[140b2c380, 140b2e0ac]]
+  scalar 0x1430EC598:
+    140b2cee4: LEA RDX,[0x1430ec598]
+    140b2d154: LEA RDX,[0x1430ec598]

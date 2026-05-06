@@ -1,0 +1,129 @@
+Program: Fallout4.exe
+Image base: 140000000
+
+================================================================================
+Target 1430ec588
+No function found.
+
+References to entry:
+  1403934d7 -> 1430ec588 type=WRITE
+  140380f8f -> 1430ec588 type=READ
+  1403a182e -> 1430ec588 type=WRITE
+  140397258 -> 1430ec588 type=READ
+  140398b1a -> 1430ec588 type=READ
+  140398b5d -> 1430ec588 type=WRITE
+  140399220 -> 1430ec588 type=WRITE
+  14039783f -> 1430ec588 type=WRITE
+  140b2ece0 -> 1430ec588 type=READ
+  140b2ed4f -> 1430ec588 type=WRITE
+  140b3532f -> 1430ec588 type=READ
+  140b3539d -> 1430ec588 type=WRITE
+  140381133 -> 1430ec588 type=DATA
+  140381abd -> 1430ec588 type=DATA
+  140380fd8 -> 1430ec588 type=DATA
+  1403934a3 -> 1430ec588 type=DATA
+  140078d86 -> 1430ec588 type=WRITE
+
+================================================================================
+Target 1430ed080
+No function found.
+
+References to entry:
+  140b30d31 -> 1430ed080 type=DATA
+  140b2ee9d -> 1430ed080 type=DATA
+  140b2d53a -> 1430ed080 type=DATA
+  1403997c1 -> 1430ed080 type=DATA
+  140392330 -> 1430ed080 type=DATA
+  140391d4a -> 1430ed080 type=DATA
+  142384fa4 -> 1430ed080 type=DATA
+
+================================================================================
+Target 1430ebe18
+No function found.
+
+References to entry:
+  140395f7e -> 1430ebe18 type=READ
+  140395fd1 -> 1430ebe18 type=WRITE
+  140398d74 -> 1430ebe18 type=READ
+  140389bd9 -> 1430ebe18 type=READ
+  140389c96 -> 1430ebe18 type=READ
+  140389cfa -> 1430ebe18 type=READ
+  140389d84 -> 1430ebe18 type=READ
+  140392339 -> 1430ebe18 type=READ
+  140395102 -> 1430ebe18 type=READ
+  140396cf4 -> 1430ebe18 type=READ
+  140396d24 -> 1430ebe18 type=READ
+  140396d64 -> 1430ebe18 type=READ
+  140396dbe -> 1430ebe18 type=READ
+  140396e42 -> 1430ebe18 type=READ
+  140396eaa -> 1430ebe18 type=READ
+  14039de53 -> 1430ebe18 type=READ
+  14039deac -> 1430ebe18 type=WRITE
+  1403b7f62 -> 1430ebe18 type=READ
+  1403b7f8b -> 1430ebe18 type=READ
+  1403c185c -> 1430ebe18 type=READ
+  1403c1888 -> 1430ebe18 type=READ
+  140b2eb5a -> 1430ebe18 type=READ
+  140b2ebd3 -> 1430ebe18 type=READ
+  140b2eecf -> 1430ebe18 type=READ
+  140b2eefc -> 1430ebe18 type=READ
+  140b2f42e -> 1430ebe18 type=READ
+  140b305ba -> 1430ebe18 type=READ
+  140b30635 -> 1430ebe18 type=READ
+  140b30667 -> 1430ebe18 type=READ
+  140b30831 -> 1430ebe18 type=READ
+  140396cd0 -> 1430ebe18 type=READ
+  140b30d3a -> 1430ebe18 type=READ
+  140b32fba -> 1430ebe18 type=READ
+  140b3631c -> 1430ebe18 type=READ
+  140b36326 -> 1430ebe18 type=READ
+  140b377fd -> 1430ebe18 type=READ
+  140b37807 -> 1430ebe18 type=READ
+  140b2ba50 -> 1430ebe18 type=READ
+  140b2ba72 -> 1430ebe18 type=READ
+  140b2ba91 -> 1430ebe18 type=READ
+  140b2be74 -> 1430ebe18 type=READ
+  140b2bf65 -> 1430ebe18 type=READ
+  140b2bfa0 -> 1430ebe18 type=READ
+  140b2c83c -> 1430ebe18 type=READ
+  140b2c859 -> 1430ebe18 type=READ
+  140b2c8af -> 1430ebe18 type=READ
+  140b2c8c5 -> 1430ebe18 type=READ
+  140b2c900 -> 1430ebe18 type=READ
+  140b2caff -> 1430ebe18 type=READ
+  140b2cb1c -> 1430ebe18 type=READ
+  140b2cb6c -> 1430ebe18 type=READ
+  140b2cb82 -> 1430ebe18 type=READ
+  140b2cbbd -> 1430ebe18 type=READ
+  140b2d0d6 -> 1430ebe18 type=READ
+  140b2d6ac -> 1430ebe18 type=READ
+  140b2d95d -> 1430ebe18 type=READ
+  140b2da8f -> 1430ebe18 type=READ
+  140b2e6a9 -> 1430ebe18 type=READ
+  140b2e6e3 -> 1430ebe18 type=READ_WRITE
+  140b2e919 -> 1430ebe18 type=READ
+  140b2e972 -> 1430ebe18 type=WRITE
+  140b33206 -> 1430ebe18 type=READ
+  140b33219 -> 1430ebe18 type=READ
+  14039df40 -> 1430ebe18 type=DATA
+  14039605e -> 1430ebe18 type=DATA
+
+================================================================================
+Target 1430ebddc
+No function found.
+
+References to entry:
+  140b2b3da -> 1430ebddc type=WRITE
+  140b2e675 -> 1430ebddc type=WRITE
+  140b2eb08 -> 1430ebddc type=WRITE
+
+================================================================================
+Target 1430ebdea
+No function found.
+
+References to entry:
+  140395db1 -> 1430ebdea type=WRITE
+  1403a19e9 -> 1430ebdea type=WRITE
+  1403a2f15 -> 1430ebdea type=READ
+  1403a2f29 -> 1430ebdea type=WRITE
+  1403a2ef0 -> 1430ebdea type=WRITE

@@ -1,0 +1,42 @@
+Program: Fallout4.exe
+Image base: 140000000
+
+================================================================================
+Target 140507a00
+Function: FUN_140507a00
+Entry: 140507a00
+Body: [[140507a00, 140507a43]]
+
+References to entry:
+  143ece0c4 -> 140507a00 type=DATA
+  1403bc3ed -> 140507a00 type=UNCONDITIONAL_CALL
+  14039f27f -> 140507a00 type=UNCONDITIONAL_CALL
+  1405076d5 -> 140507a00 type=UNCONDITIONAL_CALL
+  140b3308b -> 140507a00 type=UNCONDITIONAL_CALL
+  140b37a38 -> 140507a00 type=UNCONDITIONAL_CALL
+  140b2d34e -> 140507a00 type=UNCONDITIONAL_CALL
+
+Outgoing references from function body:
+  140507a36 -> 14051e400 type=UNCONDITIONAL_CALL
+
+Instructions:
+  140507a00: MOV R11,RSP
+  140507a03: MOV byte ptr [R11 + 0x18],R8B
+  140507a07: MOV qword ptr [R11 + 0x10],RDX
+  140507a0b: SUB RSP,0x48
+  140507a0f: LEA RAX,[R11 + 0x10]
+  140507a13: MOV dword ptr [RSP + 0x68],0x0
+  140507a1b: MOV qword ptr [R11 + -0x28],RAX
+  140507a1f: LEA RDX,[R11 + -0x28]
+  140507a23: LEA RAX,[R11 + 0x18]
+  140507a27: XOR R8D,R8D
+  140507a2a: MOV qword ptr [R11 + -0x20],RAX
+  140507a2e: LEA RAX,[R11 + 0x20]
+  140507a32: MOV qword ptr [R11 + -0x18],RAX
+  140507a36: CALL 0x14051e400
+  140507a3b: MOV EAX,dword ptr [RSP + 0x68]
+  140507a3f: ADD RSP,0x48
+  140507a43: RET
+
+Decompiled C:
+  <decompile failed: >
