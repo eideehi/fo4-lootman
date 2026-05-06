@@ -16,7 +16,7 @@ Manifest target runtime: Fallout4 1.11.191
 - workshop_shared_container.populate_linked_workshop_container (call_site_rva, unproven): workshop-shared-container.populate-linked.primary=0x391F78, workshop-shared-container.populate-linked.workbench=0xB28B76, workshop-shared-container.populate-linked.menu=0x10890F6
 - workshop_material.rebuild_workshop_supply (call_site_rva, unproven): workshop-material.rebuild-supply.source-a1=0xA653F6, workshop-material.rebuild-supply.source-a2=0xA5F109, workshop-material.rebuild-supply.source-a3=0xA6052C, workshop-material.rebuild-supply.source-a4=0xAEFD89
 - workshop_material.component_count_helper (call_site_rva, unproven): workshop-material.component-count.papyrus=0x59BC2A, workshop-material.component-count.workbench-ui=0x117501B
-- workshop_material.direct_component_count (call_site_rva, unproven): workshop-material.direct-component-count.source-e1=0x3BC3ED, workshop-material.direct-component-count.source-e2=0x39F27F, workshop-material.direct-component-count.source-e3=0xB3308B, workshop-material.direct-component-count.source-e4=0xB37A38, workshop-material.direct-component-count.source-e5=0xB2D34E
+- workshop_material.direct_component_count (call_site_rva, proven): workshop-material.direct-component-count.source-e1=0x3BC3ED, workshop-material.direct-component-count.source-e2=0x39F27F, workshop-material.direct-component-count.source-e3=0xB3308B, workshop-material.direct-component-count.source-e4=0xB37A38, workshop-material.direct-component-count.source-e5=0xB2D34E
 - workshop_material.resource_status (call_site_rva, unproven): workshop-material.resource-status.source-f1=0xB2F2C0, workshop-material.resource-status.source-f2=0xB2D266
 - workshop_menu.select (call_site_rva, unproven): workshop-menu.select.source-a1=0xB2C8AA, workshop-menu.select.source-a2=0xB2CB67
 - workshop_menu.availability (call_site_rva, unproven): workshop-menu.availability.source-91=0xB2C86E, workshop-menu.availability.source-92=0xB2C8D7, workshop-menu.availability.source-93=0xB2CB2E, workshop-menu.availability.source-94=0xB2CB94, workshop-menu.availability.source-95=0xB2EBE4
@@ -95,8 +95,6 @@ Manifest target runtime: Fallout4 1.11.191
 - [ ] workshop_material.rebuild_workshop_supply: Verify candidate count, CALL rel32 shape, and original target grouping before updating manifest RVAs.
 - [ ] workshop_material.component_count_helper: Discovery strategy is unproven: Resolve Papyrus and Workbench UI calls to the component count helper and require both call sites to share the same original target.
 - [ ] workshop_material.component_count_helper: Verify candidate count, CALL rel32 shape, and original target grouping before updating manifest RVAs.
-- [ ] workshop_material.direct_component_count: Discovery strategy is unproven: Resolve all direct component count call references and require exactly five direct CALL rel32 sites to the same helper.
-- [ ] workshop_material.direct_component_count: Verify candidate count, CALL rel32 shape, and original target grouping before updating manifest RVAs.
 - [ ] workshop_material.resource_status: Discovery strategy is unproven: Resolve resource status helper callers in the workshop menu placement path and require two direct CALL rel32 sites.
 - [ ] workshop_material.resource_status: Verify candidate count, CALL rel32 shape, and original target grouping before updating manifest RVAs.
 - [ ] workshop_menu.select: Discovery strategy is unproven: Resolve SelectWorkshopMenuNode call sites from selected menu helper analysis and require two direct CALL rel32 sites.
@@ -116,11 +114,11 @@ Manifest target runtime: Fallout4 1.11.191
 - [ ] workshop_material.resource_status_missing_resources: Discovery strategy is manual: This is a semantic status value, not an executable RVA; update only if the resource status enum is re-proven.
 - [ ] workshop_material.remove_components: Discovery strategy is unproven: Resolve RemoveComponents wrappers and require two direct CALL rel32 sites to the same remove helper.
 - [ ] workshop_material.remove_components: Verify candidate count, CALL rel32 shape, and original target grouping before updating manifest RVAs.
-- [ ] workshop_supply_owner.field_e0: Discovery strategy is manual: Raw object layout offset; do not treat as an executable RVA or auto-update target.
+- [ ] workshop_supply_owner.field_e0: Discovery strategy is manual: Raw diagnostic workshop supply owner layout read; do not treat as an executable RVA, Address Library candidate, or auto-update target.
 - [ ] workshop_supply_owner.field_e0: Layout offset is not an executable RVA; verify object layout separately before changing it.
-- [ ] workshop_supply_owner.field_e8: Discovery strategy is manual: Raw object layout offset; do not treat as an executable RVA or auto-update target.
+- [ ] workshop_supply_owner.field_e8: Discovery strategy is manual: Raw diagnostic workshop supply owner layout read; do not treat as an executable RVA, Address Library candidate, or auto-update target.
 - [ ] workshop_supply_owner.field_e8: Layout offset is not an executable RVA; verify object layout separately before changing it.
-- [ ] workshop_supply_owner.field_f8: Discovery strategy is manual: Raw object layout offset; do not treat as an executable RVA or auto-update target.
+- [ ] workshop_supply_owner.field_f8: Discovery strategy is manual: Raw diagnostic workshop supply owner layout read; do not treat as an executable RVA, Address Library candidate, or auto-update target.
 - [ ] workshop_supply_owner.field_f8: Layout offset is not an executable RVA; verify object layout separately before changing it.
-- [ ] workshop_supply_owner.field_2f8: Discovery strategy is manual: Raw object layout offset; do not treat as an executable RVA or auto-update target.
+- [ ] workshop_supply_owner.field_2f8: Discovery strategy is manual: Raw diagnostic workshop supply owner layout read; do not treat as an executable RVA, Address Library candidate, or auto-update target.
 - [ ] workshop_supply_owner.field_2f8: Layout offset is not an executable RVA; verify object layout separately before changing it.

@@ -200,11 +200,49 @@
       "expectedOriginalTargetGroup": "workshop_material.direct_component_count",
       "evidence": [
         "tools/ghidra/reports/fo4-direct-component-count-callsites-window.txt",
-        "tools/ghidra/reports/fo4-direct-component-count-allrefs.txt"
+        "tools/ghidra/reports/fo4-direct-component-count-allrefs.txt",
+        "tools/ghidra/reports/fo4-component-helper-callers.txt"
       ],
       "discoveryStrategy": {
-        "status": "unproven",
-        "summary": "Resolve all direct component count call references and require exactly five direct CALL rel32 sites to the same helper."
+        "status": "proven",
+        "summary": "Resolve the five explicit direct component count hook sites and require each to be a direct CALL rel32 to the same helper.",
+        "proof": {
+          "kind": "ghidra_reference_report",
+          "report": "tools/ghidra/reports/fo4-direct-component-count-allrefs.txt",
+          "instructionReports": [
+            "tools/ghidra/reports/fo4-direct-component-count-callsites-window.txt"
+          ],
+          "targetAbsoluteAddress": "0x140507A00",
+          "referenceType": "UNCONDITIONAL_CALL",
+          "sites": [
+            {
+              "siteId": "workshop-material.direct-component-count.source-e1",
+              "absoluteAddress": "0x1403BC3ED"
+            },
+            {
+              "siteId": "workshop-material.direct-component-count.source-e2",
+              "absoluteAddress": "0x14039F27F"
+            },
+            {
+              "siteId": "workshop-material.direct-component-count.source-e3",
+              "absoluteAddress": "0x140B3308B"
+            },
+            {
+              "siteId": "workshop-material.direct-component-count.source-e4",
+              "absoluteAddress": "0x140B37A38"
+            },
+            {
+              "siteId": "workshop-material.direct-component-count.source-e5",
+              "absoluteAddress": "0x140B2D34E"
+            }
+          ],
+          "excludedReferences": [
+            {
+              "absoluteAddress": "0x1405076D5",
+              "reason": "Component helper internal fallback path, not one of the five direct component count hook sites; see tools/ghidra/reports/fo4-component-helper-callers.txt."
+            }
+          ]
+        }
       },
       "sites": [
         {

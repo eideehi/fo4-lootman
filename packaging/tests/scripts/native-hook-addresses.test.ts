@@ -89,6 +89,32 @@ describe("native hook address manifest", () => {
 		}
 	});
 
+	it("keeps direct component count as an explicit multi-site proof", () => {
+		const manifest = readNativeHookManifest(defaultManifestPath);
+		const entry = manifest.entries.find((candidate) => candidate.id === "workshop_material.direct_component_count");
+		if (!entry) throw new Error("Fixture manifest has no direct component count entry.");
+		const proof = entry.discoveryStrategy.proof;
+		if (!proof) throw new Error("Direct component count has no proof.");
+
+		expect(entry.discoveryStrategy.status).toBe("proven");
+		expect(entry.expectedCount).toBe(5);
+		expect(proof.targetAbsoluteAddress).toBe("0x140507A00");
+		expect(proof.sites?.map((site) => site.siteId)).toEqual(entry.sites?.map((site) => site.id));
+		expect(proof.sites?.map((site) => site.absoluteAddress)).toEqual([
+			"0x1403BC3ED",
+			"0x14039F27F",
+			"0x140B3308B",
+			"0x140B37A38",
+			"0x140B2D34E",
+		]);
+		expect(proof.excludedReferences).toEqual([
+			{
+				absoluteAddress: "0x1405076D5",
+				reason: "Component helper internal fallback path, not one of the five direct component count hook sites; see tools/ghidra/reports/fo4-component-helper-callers.txt.",
+			},
+		]);
+	});
+
 	it("fails when Address Library metadata is attached to a direct call site", () => {
 		const manifest = cloneManifest(readNativeHookManifest(defaultManifestPath));
 		const entry = manifest.entries.find((candidate) => candidate.category === "call_site_rva");

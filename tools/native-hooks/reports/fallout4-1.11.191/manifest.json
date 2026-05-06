@@ -30,10 +30,14 @@
     },
     {
       "id": "encounter_zone.reset_elapsed_from_detach_time",
-      "cppName": "kEncounterZoneResetElapsedFromDetachRva",
+      "cppName": "kEncounterZoneResetElapsedFromDetachId",
       "category": "function_rva",
       "expectedCount": 1,
       "value": "0x4D2E20",
+      "addressLibrary": {
+        "id": "2200355",
+        "offset": "0x4D2E20"
+      },
       "evidence": [
         "tools/ghidra/reports/fo4-cell-detach-reset-functions.txt"
       ],
@@ -44,10 +48,14 @@
     },
     {
       "id": "workshop_shared_container.workshop_caravan_keyword_global",
-      "cppName": "kWorkshopCaravanKeywordGlobalRva",
+      "cppName": "kWorkshopCaravanKeywordGlobalId",
       "category": "global_rva",
       "expectedCount": 1,
       "value": "0x30EC9B8",
+      "addressLibrary": {
+        "id": "4797310",
+        "offset": "0x30EC9B8"
+      },
       "evidence": [
         "tools/ghidra/reports/fo4-workbench-shared-container-callers.txt"
       ],
@@ -58,10 +66,14 @@
     },
     {
       "id": "workshop_material.current_workshop_handle_global",
-      "cppName": "kCurrentWorkshopHandleGlobalRva",
+      "cppName": "kCurrentWorkshopHandleGlobalId",
       "category": "global_rva",
       "expectedCount": 1,
       "value": "0x30EC598",
+      "addressLibrary": {
+        "id": "4797241",
+        "offset": "0x30EC598"
+      },
       "evidence": [
         "tools/ghidra/reports/fo4-current-workshop-global-refs.txt"
       ],
@@ -188,11 +200,49 @@
       "expectedOriginalTargetGroup": "workshop_material.direct_component_count",
       "evidence": [
         "tools/ghidra/reports/fo4-direct-component-count-callsites-window.txt",
-        "tools/ghidra/reports/fo4-direct-component-count-allrefs.txt"
+        "tools/ghidra/reports/fo4-direct-component-count-allrefs.txt",
+        "tools/ghidra/reports/fo4-component-helper-callers.txt"
       ],
       "discoveryStrategy": {
-        "status": "unproven",
-        "summary": "Resolve all direct component count call references and require exactly five direct CALL rel32 sites to the same helper."
+        "status": "proven",
+        "summary": "Resolve the five explicit direct component count hook sites and require each to be a direct CALL rel32 to the same helper.",
+        "proof": {
+          "kind": "ghidra_reference_report",
+          "report": "tools/ghidra/reports/fo4-direct-component-count-allrefs.txt",
+          "instructionReports": [
+            "tools/ghidra/reports/fo4-direct-component-count-callsites-window.txt"
+          ],
+          "targetAbsoluteAddress": "0x140507A00",
+          "referenceType": "UNCONDITIONAL_CALL",
+          "sites": [
+            {
+              "siteId": "workshop-material.direct-component-count.source-e1",
+              "absoluteAddress": "0x1403BC3ED"
+            },
+            {
+              "siteId": "workshop-material.direct-component-count.source-e2",
+              "absoluteAddress": "0x14039F27F"
+            },
+            {
+              "siteId": "workshop-material.direct-component-count.source-e3",
+              "absoluteAddress": "0x140B3308B"
+            },
+            {
+              "siteId": "workshop-material.direct-component-count.source-e4",
+              "absoluteAddress": "0x140B37A38"
+            },
+            {
+              "siteId": "workshop-material.direct-component-count.source-e5",
+              "absoluteAddress": "0x140B2D34E"
+            }
+          ],
+          "excludedReferences": [
+            {
+              "absoluteAddress": "0x1405076D5",
+              "reason": "Component helper internal fallback path, not one of the five direct component count hook sites; see tools/ghidra/reports/fo4-component-helper-callers.txt."
+            }
+          ]
+        }
       },
       "sites": [
         {
@@ -471,10 +521,15 @@
     },
     {
       "id": "workshop_menu.selected_menu_node_function",
-      "cppName": "kWorkshopSelectedMenuNodeFunctionRva",
+      "cppName": "kWorkshopSelectedMenuNodeFunctionId",
       "category": "function_rva",
       "expectedCount": 1,
       "value": "0x389A80",
+      "addressLibrary": {
+        "id": "2195024",
+        "offset": "0x389A80",
+        "namedId": "RE::ID::Workshop::GetSelectedWorkshopMenuNode"
+      },
       "evidence": [
         "tools/ghidra/reports/fo4-selected-menu-helper-functions.txt"
       ],
@@ -485,10 +540,15 @@
     },
     {
       "id": "workshop_menu.selected_row_global",
-      "cppName": "kWorkshopSelectedRowGlobalRva",
+      "cppName": "kWorkshopSelectedRowGlobalId",
       "category": "global_rva",
       "expectedCount": 1,
       "value": "0x30EBE18",
+      "addressLibrary": {
+        "id": "4797160",
+        "offset": "0x30EBE18",
+        "namedId": "RE::ID::Workshop::CurrentRow"
+      },
       "evidence": [
         "tools/ghidra/reports/fo4-placement-secondary-globals.txt",
         "tools/ghidra/reports/fo4-selected-menu-helper-functions.txt"
@@ -619,7 +679,7 @@
       ],
       "discoveryStrategy": {
         "status": "manual",
-        "summary": "Raw object layout offset; do not treat as an executable RVA or auto-update target."
+        "summary": "Raw diagnostic workshop supply owner layout read; do not treat as an executable RVA, Address Library candidate, or auto-update target."
       }
     },
     {
@@ -633,7 +693,7 @@
       ],
       "discoveryStrategy": {
         "status": "manual",
-        "summary": "Raw object layout offset; do not treat as an executable RVA or auto-update target."
+        "summary": "Raw diagnostic workshop supply owner layout read; do not treat as an executable RVA, Address Library candidate, or auto-update target."
       }
     },
     {
@@ -647,7 +707,7 @@
       ],
       "discoveryStrategy": {
         "status": "manual",
-        "summary": "Raw object layout offset; do not treat as an executable RVA or auto-update target."
+        "summary": "Raw diagnostic workshop supply owner layout read; do not treat as an executable RVA, Address Library candidate, or auto-update target."
       }
     },
     {
@@ -661,7 +721,7 @@
       ],
       "discoveryStrategy": {
         "status": "manual",
-        "summary": "Raw object layout offset; do not treat as an executable RVA or auto-update target."
+        "summary": "Raw diagnostic workshop supply owner layout read; do not treat as an executable RVA, Address Library candidate, or auto-update target."
       }
     }
   ]

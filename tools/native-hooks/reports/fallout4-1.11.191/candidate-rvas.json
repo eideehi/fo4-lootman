@@ -38,7 +38,7 @@
     {
       "id": "encounter_zone.reset_elapsed_from_detach_time",
       "category": "function_rva",
-      "cppName": "kEncounterZoneResetElapsedFromDetachRva",
+      "cppName": "kEncounterZoneResetElapsedFromDetachId",
       "expectedCount": 1,
       "discoveryStatus": "unproven",
       "discoverySummary": "Resolve the detach-time elapsed helper from the encounter-zone reset analysis before updating this RVA.",
@@ -55,7 +55,7 @@
     {
       "id": "workshop_shared_container.workshop_caravan_keyword_global",
       "category": "global_rva",
-      "cppName": "kWorkshopCaravanKeywordGlobalRva",
+      "cppName": "kWorkshopCaravanKeywordGlobalId",
       "expectedCount": 1,
       "discoveryStatus": "unproven",
       "discoverySummary": "Re-derive from shared workshop container callers and verify the referenced global still resolves to the caravan keyword.",
@@ -72,7 +72,7 @@
     {
       "id": "workshop_material.current_workshop_handle_global",
       "category": "global_rva",
-      "cppName": "kCurrentWorkshopHandleGlobalRva",
+      "cppName": "kCurrentWorkshopHandleGlobalId",
       "expectedCount": 1,
       "discoveryStatus": "unproven",
       "discoverySummary": "Resolve the current-workshop handle global from Ghidra references and require the current workshop context probes to agree.",
@@ -232,8 +232,8 @@
       "expectedCount": 5,
       "expectedInstructionKind": "call_rel32",
       "expectedOriginalTargetGroup": "workshop_material.direct_component_count",
-      "discoveryStatus": "unproven",
-      "discoverySummary": "Resolve all direct component count call references and require exactly five direct CALL rel32 sites to the same helper.",
+      "discoveryStatus": "proven",
+      "discoverySummary": "Resolve the five explicit direct component count hook sites and require each to be a direct CALL rel32 to the same helper.",
       "candidateRvas": [
         {
           "id": "workshop-material.direct-component-count.source-e1",
@@ -280,12 +280,10 @@
       ],
       "evidence": [
         "tools/ghidra/reports/fo4-direct-component-count-callsites-window.txt",
-        "tools/ghidra/reports/fo4-direct-component-count-allrefs.txt"
+        "tools/ghidra/reports/fo4-direct-component-count-allrefs.txt",
+        "tools/ghidra/reports/fo4-component-helper-callers.txt"
       ],
-      "unresolvedItems": [
-        "Discovery strategy is unproven: Resolve all direct component count call references and require exactly five direct CALL rel32 sites to the same helper.",
-        "Verify candidate count, CALL rel32 shape, and original target grouping before updating manifest RVAs."
-      ]
+      "unresolvedItems": []
     },
     {
       "id": "workshop_material.resource_status",
@@ -598,7 +596,7 @@
     {
       "id": "workshop_menu.selected_menu_node_function",
       "category": "function_rva",
-      "cppName": "kWorkshopSelectedMenuNodeFunctionRva",
+      "cppName": "kWorkshopSelectedMenuNodeFunctionId",
       "expectedCount": 1,
       "discoveryStatus": "unproven",
       "discoverySummary": "Resolve the selected workshop menu node helper from selected menu helper analysis.",
@@ -615,7 +613,7 @@
     {
       "id": "workshop_menu.selected_row_global",
       "category": "global_rva",
-      "cppName": "kWorkshopSelectedRowGlobalRva",
+      "cppName": "kWorkshopSelectedRowGlobalId",
       "expectedCount": 1,
       "discoveryStatus": "unproven",
       "discoverySummary": "Resolve the selected row global from selected workshop menu helper references.",
@@ -748,7 +746,7 @@
       "cppName": "kWorkshopSupplyOwnerFieldE0Offset",
       "expectedCount": 1,
       "discoveryStatus": "manual",
-      "discoverySummary": "Raw object layout offset; do not treat as an executable RVA or auto-update target.",
+      "discoverySummary": "Raw diagnostic workshop supply owner layout read; do not treat as an executable RVA, Address Library candidate, or auto-update target.",
       "candidateRvas": [],
       "value": "0xE0",
       "instructionWindowAddresses": [],
@@ -756,7 +754,7 @@
         "tools/ghidra/reports/fo4-workbench-shared-container-callers.txt"
       ],
       "unresolvedItems": [
-        "Discovery strategy is manual: Raw object layout offset; do not treat as an executable RVA or auto-update target.",
+        "Discovery strategy is manual: Raw diagnostic workshop supply owner layout read; do not treat as an executable RVA, Address Library candidate, or auto-update target.",
         "Layout offset is not an executable RVA; verify object layout separately before changing it."
       ]
     },
@@ -766,7 +764,7 @@
       "cppName": "kWorkshopSupplyOwnerFieldE8Offset",
       "expectedCount": 1,
       "discoveryStatus": "manual",
-      "discoverySummary": "Raw object layout offset; do not treat as an executable RVA or auto-update target.",
+      "discoverySummary": "Raw diagnostic workshop supply owner layout read; do not treat as an executable RVA, Address Library candidate, or auto-update target.",
       "candidateRvas": [],
       "value": "0xE8",
       "instructionWindowAddresses": [],
@@ -774,7 +772,7 @@
         "tools/ghidra/reports/fo4-workbench-shared-container-callers.txt"
       ],
       "unresolvedItems": [
-        "Discovery strategy is manual: Raw object layout offset; do not treat as an executable RVA or auto-update target.",
+        "Discovery strategy is manual: Raw diagnostic workshop supply owner layout read; do not treat as an executable RVA, Address Library candidate, or auto-update target.",
         "Layout offset is not an executable RVA; verify object layout separately before changing it."
       ]
     },
@@ -784,7 +782,7 @@
       "cppName": "kWorkshopSupplyOwnerFieldF8Offset",
       "expectedCount": 1,
       "discoveryStatus": "manual",
-      "discoverySummary": "Raw object layout offset; do not treat as an executable RVA or auto-update target.",
+      "discoverySummary": "Raw diagnostic workshop supply owner layout read; do not treat as an executable RVA, Address Library candidate, or auto-update target.",
       "candidateRvas": [],
       "value": "0xF8",
       "instructionWindowAddresses": [],
@@ -792,7 +790,7 @@
         "tools/ghidra/reports/fo4-workbench-shared-container-callers.txt"
       ],
       "unresolvedItems": [
-        "Discovery strategy is manual: Raw object layout offset; do not treat as an executable RVA or auto-update target.",
+        "Discovery strategy is manual: Raw diagnostic workshop supply owner layout read; do not treat as an executable RVA, Address Library candidate, or auto-update target.",
         "Layout offset is not an executable RVA; verify object layout separately before changing it."
       ]
     },
@@ -802,7 +800,7 @@
       "cppName": "kWorkshopSupplyOwnerField2F8Offset",
       "expectedCount": 1,
       "discoveryStatus": "manual",
-      "discoverySummary": "Raw object layout offset; do not treat as an executable RVA or auto-update target.",
+      "discoverySummary": "Raw diagnostic workshop supply owner layout read; do not treat as an executable RVA, Address Library candidate, or auto-update target.",
       "candidateRvas": [],
       "value": "0x2F8",
       "instructionWindowAddresses": [],
@@ -810,7 +808,7 @@
         "tools/ghidra/reports/fo4-workbench-shared-container-callers.txt"
       ],
       "unresolvedItems": [
-        "Discovery strategy is manual: Raw object layout offset; do not treat as an executable RVA or auto-update target.",
+        "Discovery strategy is manual: Raw diagnostic workshop supply owner layout read; do not treat as an executable RVA, Address Library candidate, or auto-update target.",
         "Layout offset is not an executable RVA; verify object layout separately before changing it."
       ]
     }

@@ -10,12 +10,24 @@ export const defaultManifestPath = path.join(projectRoot, "tools", "native-hooks
 type HookAddressCategory = "call_site_rva" | "function_rva" | "global_rva" | "layout_offset" | "constant";
 type DiscoveryStatus = "automated" | "manual" | "proven" | "unproven";
 
+export interface NativeHookGhidraReferenceProofSite {
+	siteId: string;
+	absoluteAddress: string;
+}
+
+export interface NativeHookGhidraExcludedReference {
+	absoluteAddress: string;
+	reason: string;
+}
+
 export interface NativeHookGhidraReferenceProof {
 	kind: "ghidra_reference_report";
 	report: string;
 	instructionReports?: string[];
 	targetAbsoluteAddress: string;
 	referenceType: "UNCONDITIONAL_CALL";
+	sites?: NativeHookGhidraReferenceProofSite[];
+	excludedReferences?: NativeHookGhidraExcludedReference[];
 }
 
 export type NativeHookDiscoveryProof = NativeHookGhidraReferenceProof;
@@ -95,6 +107,10 @@ function isRecord(value: unknown): value is Record<string, unknown> {
 
 function isStringArray(value: unknown): value is string[] {
 	return Array.isArray(value) && value.every((entry) => typeof entry === "string");
+}
+
+function isRecordArray(value: unknown): value is Record<string, unknown>[] {
+	return Array.isArray(value) && value.every(isRecord);
 }
 
 function parseNumericLiteral(value: string): number | null {
@@ -204,6 +220,36 @@ function validateDiscoveryProof(
 	if (value.referenceType !== "UNCONDITIONAL_CALL") {
 		errors.push(`${label}.referenceType must be UNCONDITIONAL_CALL.`);
 	}
+
+	if (value.sites !== undefined) {
+		if (!isRecordArray(value.sites)) {
+			errors.push(`${label}.sites must be an array of objects.`);
+		} else if (value.sites.length === 0) {
+			errors.push(`${label}.sites must contain at least one proof site.`);
+		} else {
+			for (const [index, site] of value.sites.entries()) {
+				const siteLabel = `${label}.sites[${index}]`;
+				if (typeof site.siteId !== "string" || site.siteId.trim() === "") {
+					errors.push(`${siteLabel}.siteId must be a non-empty string.`);
+				}
+				validateNumericLiteral(site.absoluteAddress, `${siteLabel}.absoluteAddress`, errors);
+			}
+		}
+	}
+
+	if (value.excludedReferences !== undefined) {
+		if (!isRecordArray(value.excludedReferences)) {
+			errors.push(`${label}.excludedReferences must be an array of objects.`);
+		} else {
+			for (const [index, reference] of value.excludedReferences.entries()) {
+				const referenceLabel = `${label}.excludedReferences[${index}]`;
+				validateNumericLiteral(reference.absoluteAddress, `${referenceLabel}.absoluteAddress`, errors);
+				if (typeof reference.reason !== "string" || reference.reason.trim() === "") {
+					errors.push(`${referenceLabel}.reason must be a non-empty string.`);
+				}
+			}
+		}
+	}
 }
 
 function validateDiscoveryStrategy(
@@ -260,6 +306,95 @@ function validateAddressLibraryMetadata(
 			errors.push(`${label}.addressLibrary.namedId must be a non-empty string.`);
 		} else if (!CPP_QUALIFIED_NAME_PATTERN.test(value.namedId)) {
 			errors.push(`${label}.addressLibrary.namedId must be a C++ qualified RE:: or REL:: name.`);
+		}
+	}
+}
+
+function validateCallSiteProofMapping(
+	rawEntry: Record<string, unknown>,
+	label: string,
+	errors: string[],
+	expectedCountValue: number | null,
+): void {
+	if (!isRecord(rawEntry.discoveryStrategy)) {
+		return;
+	}
+	const proof = rawEntry.discoveryStrategy.proof;
+	if (!isRecord(proof)) {
+		return;
+	}
+
+	const manifestSites = isRecordArray(rawEntry.sites) ? rawEntry.sites : null;
+	const proofSites = isRecordArray(proof.sites) ? proof.sites : null;
+	if (
+		rawEntry.discoveryStrategy.status === "proven" &&
+		expectedCountValue !== null &&
+		expectedCountValue > 1 &&
+		proof.sites === undefined
+	) {
+		errors.push(`${label}.discoveryStrategy.proof.sites is required for multi-site proven call-site entries.`);
+	}
+
+	if (proofSites) {
+		if (expectedCountValue !== null && proofSites.length !== expectedCountValue) {
+			errors.push(`${label}.discoveryStrategy.proof.sites length must match ${label}.expectedCount.`);
+		}
+		if (manifestSites && proofSites.length !== manifestSites.length) {
+			errors.push(`${label}.discoveryStrategy.proof.sites length must match manifest sites length.`);
+		}
+
+		const seenSiteIds = new Set<string>();
+		for (const proofSite of proofSites) {
+			if (typeof proofSite.siteId !== "string" || proofSite.siteId.trim() === "") {
+				continue;
+			}
+			if (seenSiteIds.has(proofSite.siteId)) {
+				errors.push(`${label}.discoveryStrategy.proof.sites contains duplicate siteId: ${proofSite.siteId}`);
+			}
+			seenSiteIds.add(proofSite.siteId);
+		}
+
+		if (manifestSites) {
+			const manifestSiteIds = new Set(
+				manifestSites
+					.map((site) => site.id)
+					.filter((id): id is string => typeof id === "string" && id.trim() !== ""),
+			);
+			if (manifestSiteIds.size === manifestSites.length) {
+				const proofSiteIds = new Set(
+					proofSites
+						.map((site) => site.siteId)
+						.filter((siteId): siteId is string => typeof siteId === "string" && siteId.trim() !== ""),
+				);
+				const idsMatch = proofSiteIds.size === manifestSiteIds.size &&
+					[...proofSiteIds].every((siteId) => manifestSiteIds.has(siteId));
+				if (!idsMatch) {
+					errors.push(`${label}.discoveryStrategy.proof.sites must match manifest site ids.`);
+				}
+			}
+		}
+	}
+
+	const selectedAddresses = new Set(
+		(proofSites ?? [])
+			.map((site) => site.absoluteAddress)
+			.filter((absoluteAddress): absoluteAddress is string => typeof absoluteAddress === "string" && HEX_VALUE_PATTERN.test(absoluteAddress))
+			.map(normalizeHex),
+	);
+	if (isRecordArray(proof.excludedReferences)) {
+		const seenExcludedAddresses = new Set<string>();
+		for (const reference of proof.excludedReferences) {
+			if (typeof reference.absoluteAddress !== "string" || !HEX_VALUE_PATTERN.test(reference.absoluteAddress)) {
+				continue;
+			}
+			const normalized = normalizeHex(reference.absoluteAddress);
+			if (seenExcludedAddresses.has(normalized)) {
+				errors.push(`${label}.discoveryStrategy.proof.excludedReferences contains duplicate absoluteAddress: ${normalized}`);
+			}
+			seenExcludedAddresses.add(normalized);
+			if (selectedAddresses.has(normalized)) {
+				errors.push(`${label}.discoveryStrategy.proof.excludedReferences must not overlap proof.sites.`);
+			}
 		}
 	}
 }
@@ -344,11 +479,11 @@ export function validateNativeHookManifest(
 			continue;
 		}
 
-			const id = rawEntry.id;
-			const cppName = rawEntry.cppName;
-			const category = rawEntry.category;
-			const expectedCount = rawEntry.expectedCount;
-			const expectedCountValue = typeof expectedCount === "number" && Number.isInteger(expectedCount) ? expectedCount : null;
+		const id = rawEntry.id;
+		const cppName = rawEntry.cppName;
+		const category = rawEntry.category;
+		const expectedCount = rawEntry.expectedCount;
+		const expectedCountValue = typeof expectedCount === "number" && Number.isInteger(expectedCount) ? expectedCount : null;
 
 		if (typeof id !== "string" || id.trim() === "") {
 			errors.push(`${label}.id must be a non-empty string.`);
@@ -426,6 +561,7 @@ export function validateNativeHookManifest(
 					errors.push(`${siteLabel}.label must be semantic and must not contain an address literal.`);
 				}
 			}
+			validateCallSiteProofMapping(rawEntry, label, errors, expectedCountValue);
 		} else {
 			validateNumericLiteral(rawEntry.value, `${label}.value`, errors, category === "constant");
 			if (rawEntry.sites !== undefined) {
