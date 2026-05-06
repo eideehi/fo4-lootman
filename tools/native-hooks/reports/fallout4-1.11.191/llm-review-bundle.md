@@ -53,10 +53,10 @@ Manifest target runtime: Fallout4 1.11.191
 - workshop_material.current_workshop_object_count: 0x59D378
 
 ## Proof Readiness
-### needs_instruction_window_refresh
-- workshop_shared_container.populate_linked_workshop_container: target=0x140389E10; selectedRefs=3/3; directCalls=1/3; extras=0; Refresh instruction-window evidence for 0x140391F78, 0x1410890F6.
-- workshop_material.rebuild_workshop_supply: target=0x140B29690; selectedRefs=4/4; directCalls=0/4; extras=0; Refresh instruction-window evidence for 0x140A5F109, 0x140A6052C, 0x140A653F6, 0x140AEFD89.
-- workshop_menu.check_and_set_placement: target=0x140B2EB50; selectedRefs=4/4; directCalls=3/4; extras=0; Refresh instruction-window evidence for 0x140B2B307.
+### ready_for_proof_metadata
+- workshop_shared_container.populate_linked_workshop_container: target=0x140389E10; selectedRefs=3/3; directCalls=3/3; extras=0; Create a separate proof-promotion checkpoint with explicit proof.sites metadata.
+- workshop_material.rebuild_workshop_supply: target=0x140B29690; selectedRefs=4/4; directCalls=4/4; extras=0; Create a separate proof-promotion checkpoint with explicit proof.sites metadata.
+- workshop_menu.check_and_set_placement: target=0x140B2EB50; selectedRefs=4/4; directCalls=4/4; extras=0; Create a separate proof-promotion checkpoint with explicit proof.sites metadata.
 ### needs_target_allrefs_report
 - workshop_material.resource_status: target=0x140B32FB0; selectedRefs=n/a; directCalls=0/2; extras=0; Generate a target allrefs report for 0x140B32FB0.
 ### needs_exclusion_triage
@@ -102,6 +102,7 @@ Manifest target runtime: Fallout4 1.11.191
 - tools/ghidra/reports/fo4-placement-secondary-globals.txt
 - tools/ghidra/reports/fo4-placement-set-callers.txt
 - tools/ghidra/reports/fo4-placement-set-windows.txt
+- tools/ghidra/reports/fo4-proof-refresh-call-windows.txt
 - tools/ghidra/reports/fo4-remove-component-consume-core.txt
 - tools/ghidra/reports/fo4-remove-component-core.txt
 - tools/ghidra/reports/fo4-remove-component-functions.txt

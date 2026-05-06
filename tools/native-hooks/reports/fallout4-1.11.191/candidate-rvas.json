@@ -175,15 +175,16 @@
       ],
       "evidence": [
         "tools/ghidra/reports/fo4-workbench-shared-container-callers.txt",
-        "tools/ghidra/reports/fo4-workbench-linked-container-functions.txt"
+        "tools/ghidra/reports/fo4-workbench-linked-container-functions.txt",
+        "tools/ghidra/reports/fo4-proof-refresh-call-windows.txt"
       ],
       "unresolvedItems": [
         "Discovery strategy is unproven: Find all callers of the linked workshop container population helper and require exactly three direct CALL rel32 sites.",
         "Verify candidate count, CALL rel32 shape, and original target grouping before updating manifest RVAs."
       ],
       "proofReadiness": {
-        "status": "needs_instruction_window_refresh",
-        "summary": "Target allrefs are present, but at least one selected site lacks a direct CALL instruction line.",
+        "status": "ready_for_proof_metadata",
+        "summary": "Existing evidence satisfies the resolver proof gates for this unproven call-site family.",
         "selectedSites": [
           {
             "id": "workshop-shared-container.populate-linked.primary",
@@ -222,6 +223,7 @@
               "0x1410890F6"
             ],
             "evidence": [
+              "tools/ghidra/reports/fo4-proof-refresh-call-windows.txt",
               "tools/ghidra/reports/fo4-workbench-linked-container-functions.txt",
               "tools/ghidra/reports/fo4-workbench-shared-container-callers.txt"
             ]
@@ -235,13 +237,10 @@
           "missingSelectedReferences": [],
           "extraSameTargetReferences": []
         },
-        "directCallInstructionCount": 1,
-        "missingDirectCallSites": [
-          "0x140391F78",
-          "0x1410890F6"
-        ],
+        "directCallInstructionCount": 3,
+        "missingDirectCallSites": [],
         "extraSameTargetReferences": [],
-        "recommendedNextAction": "Refresh instruction-window evidence for 0x140391F78, 0x1410890F6."
+        "recommendedNextAction": "Create a separate proof-promotion checkpoint with explicit proof.sites metadata."
       }
     },
     {
@@ -291,15 +290,16 @@
       ],
       "evidence": [
         "tools/ghidra/reports/fo4-workbench-supply-functions.txt",
-        "tools/ghidra/reports/fo4-component-helper-callers.txt"
+        "tools/ghidra/reports/fo4-component-helper-callers.txt",
+        "tools/ghidra/reports/fo4-proof-refresh-call-windows.txt"
       ],
       "unresolvedItems": [
         "Discovery strategy is unproven: Resolve workbench supply rebuild callers and require four direct CALL rel32 sites to the same rebuild helper.",
         "Verify candidate count, CALL rel32 shape, and original target grouping before updating manifest RVAs."
       ],
       "proofReadiness": {
-        "status": "needs_instruction_window_refresh",
-        "summary": "Target allrefs are present, but at least one selected site lacks a direct CALL instruction line.",
+        "status": "ready_for_proof_metadata",
+        "summary": "Existing evidence satisfies the resolver proof gates for this unproven call-site family.",
         "selectedSites": [
           {
             "id": "workshop-material.rebuild-supply.source-a1",
@@ -347,6 +347,7 @@
               "0x140AEFD89"
             ],
             "evidence": [
+              "tools/ghidra/reports/fo4-proof-refresh-call-windows.txt",
               "tools/ghidra/reports/fo4-workbench-supply-functions.txt"
             ]
           }
@@ -359,15 +360,10 @@
           "missingSelectedReferences": [],
           "extraSameTargetReferences": []
         },
-        "directCallInstructionCount": 0,
-        "missingDirectCallSites": [
-          "0x140A5F109",
-          "0x140A6052C",
-          "0x140A653F6",
-          "0x140AEFD89"
-        ],
+        "directCallInstructionCount": 4,
+        "missingDirectCallSites": [],
         "extraSameTargetReferences": [],
-        "recommendedNextAction": "Refresh instruction-window evidence for 0x140A5F109, 0x140A6052C, 0x140A653F6, 0x140AEFD89."
+        "recommendedNextAction": "Create a separate proof-promotion checkpoint with explicit proof.sites metadata."
       }
     },
     {
@@ -962,15 +958,16 @@
         "tools/ghidra/reports/fo4-placement-set-callers.txt",
         "tools/ghidra/reports/fo4-placement-set-windows.txt",
         "tools/ghidra/reports/fo4-workshopmenu-placement-writes.txt",
-        "tools/ghidra/reports/fo4-selected-build-functions.txt"
+        "tools/ghidra/reports/fo4-selected-build-functions.txt",
+        "tools/ghidra/reports/fo4-proof-refresh-call-windows.txt"
       ],
       "unresolvedItems": [
         "Discovery strategy is unproven: Resolve CheckAndSetItemForPlacement callers and require four direct CALL rel32 sites to the same placement helper.",
         "Verify candidate count, CALL rel32 shape, and original target grouping before updating manifest RVAs."
       ],
       "proofReadiness": {
-        "status": "needs_instruction_window_refresh",
-        "summary": "Target allrefs are present, but at least one selected site lacks a direct CALL instruction line.",
+        "status": "ready_for_proof_metadata",
+        "summary": "Existing evidence satisfies the resolver proof gates for this unproven call-site family.",
         "selectedSites": [
           {
             "id": "workshop-menu.check-placement.source-a5",
@@ -1018,6 +1015,7 @@
               "0x140B2E88E"
             ],
             "evidence": [
+              "tools/ghidra/reports/fo4-proof-refresh-call-windows.txt",
               "tools/ghidra/reports/fo4-selected-build-functions.txt",
               "tools/ghidra/reports/fo4-workshopmenu-placement-writes.txt"
             ]
@@ -1031,12 +1029,10 @@
           "missingSelectedReferences": [],
           "extraSameTargetReferences": []
         },
-        "directCallInstructionCount": 3,
-        "missingDirectCallSites": [
-          "0x140B2B307"
-        ],
+        "directCallInstructionCount": 4,
+        "missingDirectCallSites": [],
         "extraSameTargetReferences": [],
-        "recommendedNextAction": "Refresh instruction-window evidence for 0x140B2B307."
+        "recommendedNextAction": "Create a separate proof-promotion checkpoint with explicit proof.sites metadata."
       }
     },
     {

@@ -91,7 +91,8 @@
       "expectedOriginalTargetGroup": "workshop_shared_container.populate_linked_workshop_containers",
       "evidence": [
         "tools/ghidra/reports/fo4-workbench-shared-container-callers.txt",
-        "tools/ghidra/reports/fo4-workbench-linked-container-functions.txt"
+        "tools/ghidra/reports/fo4-workbench-linked-container-functions.txt",
+        "tools/ghidra/reports/fo4-proof-refresh-call-windows.txt"
       ],
       "discoveryStrategy": {
         "status": "unproven",
@@ -127,7 +128,8 @@
       "expectedOriginalTargetGroup": "workshop_material.rebuild_workshop_supply",
       "evidence": [
         "tools/ghidra/reports/fo4-workbench-supply-functions.txt",
-        "tools/ghidra/reports/fo4-component-helper-callers.txt"
+        "tools/ghidra/reports/fo4-component-helper-callers.txt",
+        "tools/ghidra/reports/fo4-proof-refresh-call-windows.txt"
       ],
       "discoveryStrategy": {
         "status": "unproven",
@@ -437,7 +439,8 @@
         "tools/ghidra/reports/fo4-placement-set-callers.txt",
         "tools/ghidra/reports/fo4-placement-set-windows.txt",
         "tools/ghidra/reports/fo4-workshopmenu-placement-writes.txt",
-        "tools/ghidra/reports/fo4-selected-build-functions.txt"
+        "tools/ghidra/reports/fo4-selected-build-functions.txt",
+        "tools/ghidra/reports/fo4-proof-refresh-call-windows.txt"
       ],
       "discoveryStrategy": {
         "status": "unproven",
