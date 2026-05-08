@@ -345,7 +345,7 @@ namespace papyrus_lootman
 		if (!TryRemoveScrapSourceSafe(src, object, count, stackIndex))
 		{
 			REX::WARN(
-				"Inventory transfer: source removal failed after instance-preserving add, src={:08X}, dest={:08X}, item={:08X}, count={}, stack={}",
+				"source=native component=inventory_transfer event=source_removal_failed reason=post_instance_preserving_add src={:08X} dest={:08X} item={:08X} count={} stack={}",
 				src->formID,
 				dest->formID,
 				object->formID,

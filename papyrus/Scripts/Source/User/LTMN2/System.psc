@@ -399,7 +399,7 @@ bool Function CanInstall()
     bool radioRunning = properties.RadioInstitute.IsRunning()
 
     If (hasPipboy || radioRunning)
-        LogSystemEvent("install_check_passed", "has_pipboy=" + hasPipboy + " radio_running=" + radioRunning)
+        LogSystemEvent("install_check_passed", "has_pipboy=" + hasPipboy + " radio_running=" + radioRunning, LOG_LEVEL_DEBUG)
         Return true
     Else
         LogSystemEvent("install_check_pending", "has_pipboy=false radio_running=false", LOG_LEVEL_DEBUG)

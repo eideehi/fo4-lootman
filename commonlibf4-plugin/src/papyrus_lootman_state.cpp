@@ -137,7 +137,7 @@ namespace papyrus_lootman
 
 		if (removedCount > 0)
 		{
-			REX::DEBUG("Released stale LootMan object locks: count={}", removedCount);
+			REX::DEBUG("source=native component=loot_state event=stale_locks_released count={}", removedCount);
 		}
 	}
 

@@ -71,7 +71,7 @@ Function Looting()
 
     If (properties.WorkerInvokeInterval > 0 && refCount >= properties.MaxItemsProcessedPerThread)
         SetTurboMode()
-        LogWorkerEvent("turbo_enabled", GetThreadField() + " form_type=" + formType + " processed=" + refCount + " max_per_thread=" + properties.MaxItemsProcessedPerThread, LOG_LEVEL_INFO)
+        LogWorkerEvent("turbo_enabled", GetThreadField() + " form_type=" + formType + " processed=" + refCount + " max_per_thread=" + properties.MaxItemsProcessedPerThread, LOG_LEVEL_DEBUG)
     EndIf
 EndFunction
 

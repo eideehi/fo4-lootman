@@ -96,7 +96,10 @@ namespace injection_data
 				if (!item.is_string())
 				{
 					degradedMode = true;
-					REX::WARN("Non-string entry ignored in {} from {}", kNotifyCategoryPath, file.string());
+					REX::WARN(
+						"source=native component=injection_data event=config_entry_invalid path={} file=\"{}\" reason=non_string",
+						kNotifyCategoryPath,
+						file.string());
 					continue;
 				}
 
@@ -105,7 +108,11 @@ namespace injection_data
 				if (bit == 0)
 				{
 					degradedMode = true;
-					REX::WARN("Unknown notify category \"{}\" ignored in {}", category, file.string());
+					REX::WARN(
+						"source=native component=injection_data event=config_category_unknown path={} file=\"{}\" category=\"{}\"",
+						kNotifyCategoryPath,
+						file.string(),
+						category);
 					continue;
 				}
 				mask |= bit;
@@ -121,14 +128,21 @@ namespace injection_data
 			if (bit == 0 && !NormalizeNotifyCategoryName(category).empty())
 			{
 				degradedMode = true;
-				REX::WARN("Unknown notify category \"{}\" ignored in {}", category, file.string());
+				REX::WARN(
+					"source=native component=injection_data event=config_category_unknown path={} file=\"{}\" category=\"{}\"",
+					kNotifyCategoryPath,
+					file.string(),
+					category);
 			}
 			notifyCategoryMask = bit;
 			return;
 		}
 
 		degradedMode = true;
-		REX::WARN("Entry type is illegal and ignored for {} from {}", kNotifyCategoryPath, file.string());
+		REX::WARN(
+			"source=native component=injection_data event=config_entry_invalid path={} file=\"{}\" reason=invalid_type",
+			kNotifyCategoryPath,
+			file.string());
 	}
 
 	RE::TESForm* ValueAsForm(const Value& value)
@@ -252,7 +266,7 @@ namespace injection_data
 
 		if (!std::filesystem::exists(dir))
 		{
-			REX::ERROR("Couldn't get the directory for data injection: \"{}\"", dir.string());
+			REX::ERROR("source=native component=injection_data event=directory_missing outcome=failed path=\"{}\"", dir.string());
 			return false;
 		}
 
@@ -279,7 +293,7 @@ namespace injection_data
 			if (!ifs.is_open())
 			{
 				degradedMode = true;
-				REX::WARN("Failed to open file: \"{}\"", file.string());
+				REX::WARN("source=native component=injection_data event=file_open_failed path=\"{}\"", file.string());
 				continue;
 			}
 
@@ -290,7 +304,10 @@ namespace injection_data
 			}
 			catch (const nlohmann::json::parse_error& e)
 			{
-				REX::ERROR("Json parse error in \"{}\": {}", file.string(), e.what());
+				REX::ERROR(
+					"source=native component=injection_data event=json_parse_failed path=\"{}\" reason=\"{}\"",
+					file.string(),
+					e.what());
 				return false;
 			}
 
@@ -317,7 +334,10 @@ namespace injection_data
 						if (!item.is_string())
 						{
 							degradedMode = true;
-							REX::WARN("Non-string entry ignored in {} from {}", path, file.string());
+							REX::WARN(
+								"source=native component=injection_data event=config_entry_invalid path={} file=\"{}\" reason=non_string",
+								path,
+								file.string());
 							continue;
 						}
 						values.emplace(item.get<std::string>());
@@ -333,7 +353,9 @@ namespace injection_data
 				{
 					degradedMode = true;
 					tmp.erase(tmpIt);
-					REX::WARN("Entry type is illegal and ignored: {}", value.dump());
+					REX::WARN(
+						"source=native component=injection_data event=config_entry_invalid reason=invalid_type value={}",
+						value.dump());
 				}
 			}
 
@@ -354,7 +376,10 @@ namespace injection_data
 				else
 				{
 					degradedMode = true;
-					REX::WARN("Entry type is illegal and ignored for {} from {}", kNotifyLegendaryEquipmentPath, file.string());
+					REX::WARN(
+						"source=native component=injection_data event=config_entry_invalid path={} file=\"{}\" reason=invalid_type",
+						kNotifyLegendaryEquipmentPath,
+						file.string());
 				}
 			}
 		}
@@ -392,7 +417,9 @@ namespace injection_data
 				RE::TESForm* form = utility::LookupForm(dataId);
 				if (!form)
 				{
-					REX::WARN("\"{}\" is not found", dataId);
+					REX::WARN(
+						"source=native component=injection_data event=form_resolution_failed reason=not_found data_id=\"{}\"",
+						dataId);
 					continue;
 				}
 
@@ -430,7 +457,9 @@ namespace injection_data
 
 				if ((info.type & Type::kForm) == 0)
 				{
-					REX::WARN("\"{}\" is illegal form type", dataId);
+					REX::WARN(
+						"source=native component=injection_data event=form_resolution_failed reason=illegal_form_type data_id=\"{}\"",
+						dataId);
 					continue;
 				}
 

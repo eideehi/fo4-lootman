@@ -96,7 +96,7 @@ namespace log_settings
 		std::ifstream ifs(path);
 		if (!ifs.is_open())
 		{
-			REX::WARN("Failed to open LootMan config: \"{}\"", path.string());
+			REX::WARN("source=native component=log_settings event=config_open_failed path=\"{}\"", path.string());
 			return false;
 		}
 
@@ -107,13 +107,16 @@ namespace log_settings
 		}
 		catch (const nlohmann::json::parse_error& e)
 		{
-			REX::WARN("Failed to parse LootMan config \"{}\": {}", path.string(), e.what());
+			REX::WARN(
+				"source=native component=log_settings event=config_parse_failed path=\"{}\" reason=\"{}\"",
+				path.string(),
+				e.what());
 			return false;
 		}
 
 		if (!src.is_object())
 		{
-			REX::WARN("LootMan config root must be an object: \"{}\"", path.string());
+			REX::WARN("source=native component=log_settings event=config_root_invalid path=\"{}\"", path.string());
 			return false;
 		}
 
@@ -124,7 +127,9 @@ namespace log_settings
 		}
 		if (!logIt->is_object())
 		{
-			REX::WARN("LootMan config entry \"log\" must be an object: \"{}\"", path.string());
+			REX::WARN(
+				"source=native component=log_settings event=config_entry_invalid path=\"{}\" entry=log expected=object",
+				path.string());
 			return false;
 		}
 
@@ -143,7 +148,10 @@ namespace log_settings
 				return true;
 			}
 
-			REX::WARN("Unknown LootMan log level \"{}\" in \"{}\"", levelIt->get<std::string>(), path.string());
+			REX::WARN(
+				"source=native component=log_settings event=config_level_unknown path=\"{}\" value=\"{}\"",
+				path.string(),
+				levelIt->get<std::string>());
 			return false;
 		}
 
@@ -156,11 +164,16 @@ namespace log_settings
 				return true;
 			}
 
-			REX::WARN("Out-of-range LootMan log level {} in \"{}\"", value, path.string());
+			REX::WARN(
+				"source=native component=log_settings event=config_level_out_of_range path=\"{}\" value={}",
+				path.string(),
+				value);
 			return false;
 		}
 
-		REX::WARN("LootMan config entry \"log.level\" must be a string or integer: \"{}\"", path.string());
+		REX::WARN(
+			"source=native component=log_settings event=config_entry_invalid path=\"{}\" entry=log.level expected=string_or_integer",
+			path.string());
 		return false;
 	}
 
@@ -170,7 +183,10 @@ namespace log_settings
 		std::filesystem::create_directories(path.parent_path(), ec);
 		if (ec)
 		{
-			REX::WARN("Failed to create LootMan config directory \"{}\": {}", path.parent_path().string(), ec.message());
+			REX::WARN(
+				"source=native component=log_settings event=config_directory_create_failed path=\"{}\" reason=\"{}\"",
+				path.parent_path().string(),
+				ec.message());
 			return false;
 		}
 
@@ -178,7 +194,10 @@ namespace log_settings
 		const auto exists = std::filesystem::exists(path, ec);
 		if (ec)
 		{
-			REX::WARN("Failed to check LootMan config \"{}\": {}", path.string(), ec.message());
+			REX::WARN(
+				"source=native component=log_settings event=config_check_failed path=\"{}\" reason=\"{}\"",
+				path.string(),
+				ec.message());
 			return false;
 		}
 		if (exists)
@@ -186,7 +205,9 @@ namespace log_settings
 			std::ifstream ifs(path);
 			if (!ifs.is_open())
 			{
-				REX::WARN("Not overwriting LootMan config because it cannot be opened: \"{}\"", path.string());
+				REX::WARN(
+					"source=native component=log_settings event=config_write_skipped reason=open_failed path=\"{}\"",
+					path.string());
 				return false;
 			}
 
@@ -196,13 +217,18 @@ namespace log_settings
 			}
 			catch (const nlohmann::json::parse_error& e)
 			{
-				REX::WARN("Not overwriting invalid LootMan config \"{}\": {}", path.string(), e.what());
+				REX::WARN(
+					"source=native component=log_settings event=config_write_skipped reason=parse_failed path=\"{}\" details=\"{}\"",
+					path.string(),
+					e.what());
 				return false;
 			}
 		}
 		if (!src.is_object())
 		{
-			REX::WARN("Not overwriting LootMan config because root is not an object: \"{}\"", path.string());
+			REX::WARN(
+				"source=native component=log_settings event=config_write_skipped reason=root_invalid path=\"{}\"",
+				path.string());
 			return false;
 		}
 
@@ -215,7 +241,7 @@ namespace log_settings
 		std::ofstream ofs(path, std::ios::trunc);
 		if (!ofs.is_open())
 		{
-			REX::WARN("Failed to write LootMan config: \"{}\"", path.string());
+			REX::WARN("source=native component=log_settings event=config_write_failed path=\"{}\"", path.string());
 			return false;
 		}
 		ofs << src.dump(4) << '\n';
@@ -226,6 +252,19 @@ namespace log_settings
 	{
 		std::lock_guard<std::mutex> guard(lock);
 		return currentLogLevel;
+	}
+
+	bool ShouldLog(const std::int32_t logLevel)
+	{
+		const auto normalized = NormalizeLogLevel(logLevel);
+		if (normalized == static_cast<std::int32_t>(spdlog::level::off))
+		{
+			return false;
+		}
+
+		std::lock_guard<std::mutex> guard(lock);
+		return currentLogLevel != static_cast<std::int32_t>(spdlog::level::off) &&
+			normalized >= currentLogLevel;
 	}
 
 	void SetLogLevel(const std::int32_t logLevel)
@@ -249,7 +288,10 @@ namespace log_settings
 		const auto exists = std::filesystem::exists(path, ec);
 		if (ec)
 		{
-			REX::WARN("Failed to check LootMan config \"{}\": {}", path.string(), ec.message());
+			REX::WARN(
+				"source=native component=log_settings event=config_check_failed path=\"{}\" reason=\"{}\"",
+				path.string(),
+				ec.message());
 		}
 		if (exists)
 		{

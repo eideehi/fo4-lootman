@@ -163,7 +163,10 @@ namespace message_queue
 			}
 
 			LoadTranslationsFile(file);
-			REX::DEBUG("Message queue loaded {} translations from {}", translations.size(), file.string());
+			REX::DEBUG(
+				"source=native component=message_queue event=translations_loaded count={} path=\"{}\"",
+				translations.size(),
+				file.string());
 		}
 
 		std::int32_t SaturatingAdd(std::int32_t left, std::int32_t right)
@@ -255,14 +258,14 @@ namespace message_queue
 		{
 			std::lock_guard lock(queueMutex);
 			initialized = false;
-			REX::ERROR("Failed to get task interface for message queue");
+			REX::ERROR("source=native component=message_queue event=task_interface_missing outcome=failed");
 			return;
 		}
 
 		ClearQueue();
 		LoadTranslations();
 		taskInterface->AddTaskPermanent([]() { Tick(); });
-		REX::DEBUG("Message queue initialized");
+		REX::DEBUG("source=native component=message_queue event=initialized");
 	}
 
 	void Enqueue(std::uint32_t formId, std::string itemName, std::int32_t count)

@@ -477,7 +477,7 @@ namespace papyrus_lootman
 		}
 
 		REX::DEBUG(
-			"LootNearbyReferences: formType={}, candidates={}, successfulObjects={}, movedStacks={}",
+			"source=native component=loot_nearby event=references_summary form_type={} candidates={} successful_objects={} moved_stacks={}",
 			formType,
 			candidateCount,
 			successfulObjects,
@@ -751,7 +751,7 @@ namespace papyrus_lootman
 		result[kLootPassResultHitObjectLimit] = budget.hitObjectLimit ? 1 : 0;
 		result[kLootPassResultHitTimeBudget] = budget.hitTimeBudget ? 1 : 0;
 		REX::DEBUG(
-			"LootNearbyEnabledReferences: enabledMask={}, candidates={}, processed={}, successfulObjects={}, movedStacks={}, hitObjectLimit={}, hitTimeBudget={}, elapsed_ms={:.3f}",
+			"source=native component=loot_nearby event=enabled_references_summary enabled_mask={} candidates={} processed={} successful_objects={} moved_stacks={} hit_object_limit={} hit_time_budget={} elapsed_ms={:.3f}",
 			enabledFormTypeMask,
 			result[kLootPassResultCandidateObjects],
 			result[kLootPassResultProcessedObjects],

@@ -196,7 +196,7 @@ namespace papyrus_lootman
 		if (!TryCreateInventoryListSafe(ref, container))
 		{
 			REX::WARN(
-				"ContainerLoot scan: failed to create inventory list for ref={:08X}, base={:08X}",
+				"source=native component=container_loot event=inventory_list_create_failed ref={:08X} base={:08X}",
 				ref->formID,
 				baseForm->formID);
 			return false;

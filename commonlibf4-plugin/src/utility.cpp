@@ -20,7 +20,7 @@ namespace utility
 		}
 		catch (const std::exception&)
 		{
-			REX::WARN("Invalid form identifier: {}", value);
+			REX::WARN("source=native component=utility event=form_identifier_invalid value=\"{}\"", value);
 			return nullptr;
 		}
 	}

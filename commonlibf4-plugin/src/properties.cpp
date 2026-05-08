@@ -50,7 +50,10 @@ namespace properties
 		auto prop = object->GetProperty(propName);
 		if (!prop)
 		{
-			REX::WARN("Failed to get property {}.{}", scriptName, propertyName);
+			REX::WARN(
+				"source=native component=properties event=property_lookup_failed script=\"{}\" property=\"{}\"",
+				scriptName,
+				propertyName);
 			return false;
 		}
 
@@ -146,7 +149,7 @@ namespace properties
 		}
 		if (!propertiesQuest)
 		{
-			REX::WARN("Failed to resolve properties quest LootMan.esp|000F9A");
+			REX::WARN("source=native component=properties event=properties_quest_resolution_failed form=LootMan.esp|000F9A");
 		}
 	}
 
@@ -287,7 +290,9 @@ namespace properties
 			updatedLootManWorkshopRef = GetObjectReferenceProperty(propertyName);
 			if (!updatedLootManWorkshopRef)
 			{
-				REX::WARN("Failed to resolve native property LTMN2:Properties.{}", propertyName);
+				REX::WARN(
+					"source=native component=properties event=native_property_resolution_failed script=LTMN2:Properties property=\"{}\"",
+					propertyName);
 			}
 		}
 

@@ -87,7 +87,9 @@ namespace papyrus_lootman
 				validForm);
 			if (!gotValidForm)
 			{
-				REX::WARN("GetLootableItems: skip {:08X}: valid-form-exception", form->formID);
+				REX::WARN(
+					"source=native component=loot_query event=item_skipped reason=valid_form_exception item={:08X}",
+					form->formID);
 				continue;
 			}
 			if (!validForm) continue;
@@ -100,7 +102,9 @@ namespace papyrus_lootman
 				lootableForm);
 			if (!gotLootableForm)
 			{
-				REX::WARN("GetLootableItems: skip {:08X}: lootable-form-exception", form->formID);
+				REX::WARN(
+					"source=native component=loot_query event=item_skipped reason=lootable_form_exception item={:08X}",
+					form->formID);
 				continue;
 			}
 			if (!lootableForm) continue;

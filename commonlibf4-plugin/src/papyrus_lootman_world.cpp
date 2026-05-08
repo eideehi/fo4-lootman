@@ -92,7 +92,7 @@ namespace papyrus_lootman
 			}
 
 			REX::WARN(
-				"FinalizeWorldPickup incomplete: ref={:08X} \"{}\", base={:08X} \"{}\", baseFormType={}, markedRecent={}, setWantsDeleteOk={}, disableOk={}, disabled={}, deleted={}, created={}",
+				"source=native component=world_pickup event=finalize_incomplete ref={:08X} ref_name=\"{}\" base={:08X} base_name=\"{}\" base_form_type={} marked_recent={} set_wants_delete_ok={} disable_ok={} disabled={} deleted={} created={}",
 				ref->formID,
 				refName ? refName : "",
 				baseFormId,

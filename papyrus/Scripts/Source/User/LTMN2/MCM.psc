@@ -387,7 +387,7 @@ Function ToggleLinkToWorkshop()
         EndIf
     Else
         system.ShowMessage(system.MESSAGE_WORKSHOP_NOT_FOUND)
-        LogMcmEvent("workshop_link_failed", "reason=no_workshop", LOG_LEVEL_DEBUG)
+        LogMcmEvent("workshop_link_failed", "reason=no_workshop", LOG_LEVEL_INFO)
     EndIf
 EndFunction
 

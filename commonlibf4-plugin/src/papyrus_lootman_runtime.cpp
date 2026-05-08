@@ -66,7 +66,7 @@ namespace papyrus_lootman
 		FindNearestWorkshopCallContext context{ ref };
 		if (!ExecuteSehCallSafe(&InvokeFindNearestValidWorkshopCall, &context))
 		{
-			REX::WARN("FindNearestValidWorkshop failed for ref={:08X}", ref->formID);
+			REX::WARN("source=native component=runtime event=nearest_workshop_lookup_failed ref={:08X}", ref->formID);
 			return nullptr;
 		}
 

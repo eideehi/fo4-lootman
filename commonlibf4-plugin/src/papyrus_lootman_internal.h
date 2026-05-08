@@ -202,7 +202,7 @@ namespace papyrus_lootman
 			if (!vm || !vm->CreateStruct(typeName, _proxy) || !_proxy)
 			{
 				assert(false);
-				REX::ERROR("failed to create structure of type \"{}\"", name);
+				REX::ERROR("source=native component=papyrus_struct event=create_failed type=\"{}\"", name);
 			}
 		}
 
@@ -222,7 +222,10 @@ namespace papyrus_lootman
 
 			if (!a_quiet)
 			{
-				REX::ERROR("failed to find var \"{}\" on structure \"{}\"", a_name, name);
+				REX::ERROR(
+					"source=native component=papyrus_struct event=field_lookup_failed field=\"{}\" type=\"{}\"",
+					a_name,
+					name);
 			}
 
 			return std::nullopt;
@@ -243,7 +246,10 @@ namespace papyrus_lootman
 				}
 			}
 
-			REX::ERROR("failed to pack var \"{}\" on structure \"{}\"", a_name, name);
+			REX::ERROR(
+				"source=native component=papyrus_struct event=field_pack_failed field=\"{}\" type=\"{}\"",
+				a_name,
+				name);
 			return false;
 		}
 

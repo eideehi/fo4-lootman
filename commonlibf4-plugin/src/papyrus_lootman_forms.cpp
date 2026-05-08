@@ -103,12 +103,12 @@ namespace papyrus_lootman
 		const std::int32_t logLevel)
 	{
 		const auto normalizedLogLevel = NormalizePapyrusLogLevel(logLevel);
-		if (normalizedLogLevel == static_cast<std::int32_t>(spdlog::level::off))
+		if (!log_settings::ShouldLog(normalizedLogLevel))
 		{
 			return;
 		}
 
-		auto message = std::string("[Papyrus] source=papyrus component=") +
+		auto message = std::string("source=papyrus component=") +
 			SanitizeLogToken(component, "unknown") +
 			" event=" +
 			SanitizeLogToken(eventName, "unknown");

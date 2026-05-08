@@ -141,7 +141,7 @@ namespace papyrus_lootman
 				lastEncounterZoneSuppressionLogAt = now;
 				const auto cellDetachTime = GetCellDetachTime(cell).value_or(0);
 				REX::DEBUG(
-					"Suppressed stale encounter-zone reset: zone={:08X}, cell={:08X}, zoneDetachTime={}, zoneAttachTime={}, zoneResetTime={}, cellDetachTime={}",
+					"source=native component=encounter_zone event=reset_suppressed zone={:08X} cell={:08X} zone_detach_time={} zone_attach_time={} zone_reset_time={} cell_detach_time={}",
 					zone ? zone->formID : 0,
 					cell ? cell->formID : 0,
 					zone ? zone->gameData.detachTime : 0,
@@ -171,7 +171,7 @@ namespace papyrus_lootman
 					kEncounterZoneResetSuppressionPolicy.failurePolicyAction))
 			{
 				REX::ERROR(
-					"Disabled native hook feature group: featureGroup={}, family=encounter-zone.reset-suppression, failurePolicyAction={}",
+					"source=native component=native_hook event=feature_group_disabled feature_group={} family=encounter-zone.reset-suppression failure_policy_action={}",
 					kEncounterZoneResetSuppressionPolicy.featureGroup,
 					kEncounterZoneResetSuppressionPolicy.failurePolicyAction);
 				return;
@@ -179,7 +179,7 @@ namespace papyrus_lootman
 
 			checkResetElapsedFromDetachTime = resetElapsedFromDetach.get();
 
-			REX::INFO("Installed encounter-zone reset suppression hook");
+			REX::INFO("source=native component=native_hook event=installed family=encounter-zone.reset-suppression");
 		});
 	}
 
@@ -282,7 +282,7 @@ namespace papyrus_lootman
 		if (!ExecuteSehCallSafe(&ReadDirectCallInstructionBytes, &context))
 		{
 			REX::ERROR(
-				"Skipping native direct-call hook: family={}, site={}, rva={:X}, failurePolicyAction={}, reason=instruction-read-failed",
+				"source=native component=native_hook event=direct_call_hook_skipped reason=instruction_read_failed family={} site={} rva={:X} failure_policy_action={}",
 				family,
 				site.id,
 				site.rva,
@@ -293,7 +293,7 @@ namespace papyrus_lootman
 		if (context.bytes[0] != 0xE8)
 		{
 			REX::ERROR(
-				"Skipping native direct-call hook: family={}, site={}, rva={:X}, failurePolicyAction={}, expectedOpcode=E8, actualOpcode={:02X}",
+				"source=native component=native_hook event=direct_call_hook_skipped reason=unexpected_opcode family={} site={} rva={:X} failure_policy_action={} expected_opcode=E8 actual_opcode={:02X}",
 				family,
 				site.id,
 				site.rva,
@@ -325,7 +325,7 @@ namespace papyrus_lootman
 		if (sites.empty())
 		{
 			REX::ERROR(
-				"Skipping native direct-call hook family: family={}, failurePolicyAction={}, reason=no-sites",
+				"source=native component=native_hook event=direct_call_hook_family_skipped reason=no_sites family={} failure_policy_action={}",
 				family,
 				failurePolicyAction);
 			return false;
@@ -356,7 +356,7 @@ namespace papyrus_lootman
 			if (*expectedTargetAddress != decoded->targetAddress)
 			{
 				REX::ERROR(
-					"Skipping native direct-call hook family: family={}, site={}, rva={:X}, originalTargetRva={:X}, expectedOriginalTargetRva={:X}, failurePolicyAction={}",
+					"source=native component=native_hook event=direct_call_hook_family_skipped reason=unexpected_original_target family={} site={} rva={:X} original_target_rva={:X} expected_original_target_rva={:X} failure_policy_action={}",
 					family,
 					site.id,
 					site.rva,
@@ -385,8 +385,8 @@ namespace papyrus_lootman
 
 		REL::Relocation<std::uintptr_t> callSite{ REL::Offset(site.rva) };
 		const auto original = reinterpret_cast<OriginalFn>(callSite.write_call<5>(hook));
-		REX::INFO(
-			"Installed native direct-call hook: family={}, site={}, rva={:X}, originalTargetRva={:X}, failurePolicyAction={}",
+		REX::DEBUG(
+			"source=native component=native_hook event=direct_call_hook_installed family={} site={} rva={:X} original_target_rva={:X} failure_policy_action={}",
 			family,
 			site.id,
 			site.rva,
@@ -412,7 +412,7 @@ namespace papyrus_lootman
 		}
 
 		REX::ERROR(
-			"Disabled native hook feature group: featureGroup={}, family={}, failurePolicyAction={}",
+			"source=native component=native_hook event=feature_group_disabled feature_group={} family={} failure_policy_action={}",
 			featureGroup,
 			family,
 			failurePolicyAction);
@@ -434,7 +434,7 @@ namespace papyrus_lootman
 				true))
 		{
 			REX::ERROR(
-				"Skipped native direct-call hook family: family={}, failurePolicyAction={}",
+				"source=native component=native_hook event=direct_call_hook_family_skipped reason=validation_failed family={} failure_policy_action={}",
 				family,
 				failurePolicyAction);
 			return false;
@@ -450,7 +450,7 @@ namespace papyrus_lootman
 			if (!patchedOriginal)
 			{
 				REX::ERROR(
-					"Skipped native direct-call hook family after validation changed: family={}, site={}, rva={:X}, failurePolicyAction={}",
+					"source=native component=native_hook event=direct_call_hook_family_skipped reason=validation_changed_after_patch family={} site={} rva={:X} failure_policy_action={}",
 					family,
 					sites[index].id,
 					sites[index].rva,
@@ -465,7 +465,7 @@ namespace papyrus_lootman
 			else if (original != patchedOriginal)
 			{
 				REX::WARN(
-					"Unexpected native direct-call original target after patch: family={}, site={}, rva={:X}, original={:X}, expected={:X}, failurePolicyAction={}",
+					"source=native component=native_hook event=direct_call_original_target_unexpected family={} site={} rva={:X} original={:X} expected={:X} failure_policy_action={}",
 					family,
 					sites[index].id,
 					sites[index].rva,
@@ -493,7 +493,7 @@ namespace papyrus_lootman
 				false))
 		{
 			REX::ERROR(
-				"Skipped native direct-call hook: family={}, site={}, failurePolicyAction={}",
+				"source=native component=native_hook event=direct_call_hook_skipped reason=validation_failed family={} site={} failure_policy_action={}",
 				family,
 				site.id,
 				failurePolicyAction);
@@ -508,7 +508,7 @@ namespace papyrus_lootman
 		if (!patchedOriginal)
 		{
 			REX::ERROR(
-				"Skipped native direct-call hook after validation changed: family={}, site={}, failurePolicyAction={}",
+				"source=native component=native_hook event=direct_call_hook_skipped reason=validation_changed_after_patch family={} site={} failure_policy_action={}",
 				family,
 				site.id,
 				failurePolicyAction);
@@ -1042,7 +1042,7 @@ namespace papyrus_lootman
 		auto* lootManLocation = lootManWorkshop ? lootManWorkshop->GetCurrentLocation() : nullptr;
 		auto* workshopCaravanKeyword = GetNativeWorkshopCaravanKeyword();
 
-		REX::INFO(
+		REX::TRACE(
 			"source=native component=shared_workshop_container event=probe current_location={:08X} lootman_location={:08X} lootman_workshop={:08X} workshop_caravan_keyword={:08X} include_player={} container_count={} containers={:016X}",
 			locationId,
 			lootManLocation ? lootManLocation->formID : 0,
@@ -1146,7 +1146,7 @@ namespace papyrus_lootman
 		}
 
 		auto* lootManLocation = lootManWorkshop ? lootManWorkshop->GetCurrentLocation() : nullptr;
-		REX::INFO(
+		REX::DEBUG(
 			"source=native component=shared_workshop_container event=lootman_container_added requested_location={:08X} effective_location={:08X} inferred_location={} lootman_location={:08X} lootman_workshop={:08X} container_count={}",
 			requestedLocation ? requestedLocation->formID : 0,
 			locationId,
@@ -1216,8 +1216,8 @@ namespace papyrus_lootman
 			return;
 		}
 
-		REX::INFO(
-			"Native workshop material probe: kind=rebuild-supply, source={}, owner={:016X}, ownerReadable={}, ownerForm={:08X}, ownerType={}, fieldsReadable={}, fieldE0={:016X}, fieldE8={:016X}, fieldF8={:016X}, field2F8={:016X}",
+		REX::TRACE(
+			"source=native component=workshop_material event=probe kind=rebuild_supply hook_source={} owner={:016X} owner_readable={} owner_form={:08X} owner_type={} fields_readable={} field_e0={:016X} field_e8={:016X} field_f8={:016X} field_2f8={:016X}",
 			sourceName,
 			ownerSnapshot.owner,
 			ownerForm.readable,
@@ -1292,8 +1292,8 @@ namespace papyrus_lootman
 			return;
 		}
 
-		REX::INFO(
-			"Native workshop material probe: kind=component-count, source={}, owner={:016X}, ownerReadable={}, ownerForm={:08X}, ownerType={}, target={:016X}, targetReadable={}, targetForm={:08X}, targetType={}, includeLinked={}, result={}, outCount={}, currentWorkshopHandle={:08X}, currentWorkshopReadable={}, currentWorkshop={:08X}, currentWorkshopType={}, currentLocationReadable={}, currentLocation={:08X}, currentLocationRemembered={}, nearestWorkshopReadable={}, nearestWorkshop={:08X}, nearestWorkshopType={}, nearestLocationReadable={}, nearestLocation={:08X}, nearestLocationRemembered={}",
+		REX::TRACE(
+			"source=native component=workshop_material event=probe kind=component_count hook_source={} owner={:016X} owner_readable={} owner_form={:08X} owner_type={} target={:016X} target_readable={} target_form={:08X} target_type={} include_linked={} result={} out_count={} current_workshop_handle={:08X} current_workshop_readable={} current_workshop={:08X} current_workshop_type={} current_location_readable={} current_location={:08X} current_location_remembered={} nearest_workshop_readable={} nearest_workshop={:08X} nearest_workshop_type={} nearest_location_readable={} nearest_location={:08X} nearest_location_remembered={}",
 			sourceName,
 			reinterpret_cast<std::uintptr_t>(owner),
 			ownerForm.readable,
@@ -1358,8 +1358,8 @@ namespace papyrus_lootman
 			return;
 		}
 
-		REX::INFO(
-			"Native workshop material count adjusted: owner={:016X}, target={:08X}, targetType={}, currentWorkshop={:08X}, currentLocation={:08X}, lootManWorkshop={:08X}, baseCount={}, extraResult={}, extraCount={}, totalCount={}, applied={}",
+		REX::TRACE(
+			"source=native component=workshop_material event=count_adjusted owner={:016X} target={:08X} target_type={} current_workshop={:08X} current_location={:08X} lootman_workshop={:08X} base_count={} extra_result={} extra_count={} total_count={} applied={}",
 			reinterpret_cast<std::uintptr_t>(owner),
 			targetForm.formID,
 			targetForm.formType,
@@ -1623,8 +1623,8 @@ namespace papyrus_lootman
 			return;
 		}
 
-		REX::INFO(
-			"Native workshop material probe: kind=direct-component-count, source={}, owner={:016X}, ownerReadable={}, ownerForm={:08X}, ownerType={}, component={:016X}, componentReadable={}, componentForm={:08X}, componentType={}, includeLinked={}, baseCount={}, totalCount={}, applied={}, currentWorkshopHandle={:08X}, currentWorkshopReadable={}, currentWorkshop={:08X}, currentWorkshopType={}, currentLocationReadable={}, currentLocation={:08X}, currentLocationRemembered={}, nearestWorkshopReadable={}, nearestWorkshop={:08X}, nearestWorkshopType={}, nearestLocationReadable={}, nearestLocation={:08X}, nearestLocationRemembered={}",
+		REX::TRACE(
+			"source=native component=workshop_material event=probe kind=direct_component_count hook_source={} owner={:016X} owner_readable={} owner_form={:08X} owner_type={} component={:016X} component_readable={} component_form={:08X} component_type={} include_linked={} base_count={} total_count={} applied={} current_workshop_handle={:08X} current_workshop_readable={} current_workshop={:08X} current_workshop_type={} current_location_readable={} current_location={:08X} current_location_remembered={} nearest_workshop_readable={} nearest_workshop={:08X} nearest_workshop_type={} nearest_location_readable={} nearest_location={:08X} nearest_location_remembered={}",
 			sourceName,
 			reinterpret_cast<std::uintptr_t>(owner),
 			ownerForm.readable,
@@ -2203,8 +2203,8 @@ namespace papyrus_lootman
 		const auto* firstRemoval = evaluation.componentRemovals.empty() ?
 			nullptr :
 			&evaluation.componentRemovals.front();
-		REX::INFO(
-			"Native workshop material probe: kind=build-deficit-consume, source={}, recipe={:08X}, removalCount={}, totalConsumeFromLootMan={}, firstRemovalComponent={:08X}, firstRemovalRequested={}, firstRemovalBaseCount={}, firstRemovalLootManCount={}, firstRemovalConsumeFromLootMan={}, applied={}, currentWorkshop={:08X}, currentLocation={:08X}, lootManWorkshop={:08X}",
+		REX::TRACE(
+			"source=native component=workshop_material event=probe kind=build_deficit_consume hook_source={} recipe={:08X} removal_count={} total_consume_from_lootman={} first_removal_component={:08X} first_removal_requested={} first_removal_base_count={} first_removal_lootman_count={} first_removal_consume_from_lootman={} applied={} current_workshop={:08X} current_location={:08X} lootman_workshop={:08X}",
 			sourceName,
 			recipeProbe.recipeForm.formID,
 			evaluation.componentRemovals.size(),
@@ -2242,8 +2242,8 @@ namespace papyrus_lootman
 			return;
 		}
 
-		REX::INFO(
-			"Native workshop material probe: kind=resource-status, source={}, originalStatus={}, adjustedStatus={}, applied={}, selectedRow={}, menuResult={}, menuNode={:016X}, menuReadable={}, recipe={:016X}, recipeReadable={}, recipeForm={:08X}, recipeType={}, requiredItems={}, satisfiedItems={}, lootManBackedItems={}, evaluated={}, sehFailed={}, currentWorkshop={:08X}, currentLocation={:08X}, lootManWorkshop={:08X}, missingForm={:08X}, missingRequired={}, missingBaseCount={}, missingLootManCount={}, missingTotalCount={}, unsupportedForm={:08X}, unsupportedType={}",
+		REX::TRACE(
+			"source=native component=workshop_material event=probe kind=resource_status hook_source={} original_status={} adjusted_status={} applied={} selected_row={} menu_result={} menu_node={:016X} menu_readable={} recipe={:016X} recipe_readable={} recipe_form={:08X} recipe_type={} required_items={} satisfied_items={} lootman_backed_items={} evaluated={} seh_failed={} current_workshop={:08X} current_location={:08X} lootman_workshop={:08X} missing_form={:08X} missing_required={} missing_base_count={} missing_lootman_count={} missing_total_count={} unsupported_form={:08X} unsupported_type={}",
 			sourceName,
 			originalStatus,
 			adjustedStatus,
@@ -2343,8 +2343,8 @@ namespace papyrus_lootman
 			return;
 		}
 
-		REX::INFO(
-			"Native workshop material probe: kind=menu-availability, source={}, row={}, inputMenuResult={}, beforeOut={}, originalOut={}, adjustedOut={}, result={}, adjusted={}, selectedRow={}, menuResult={}, menuNode={:016X}, menuReadable={}, recipe={:016X}, recipeReadable={}, recipeForm={:08X}, recipeType={}, requiredItems={}, satisfiedItems={}, lootManBackedItems={}, evaluated={}, allSatisfied={}, sehFailed={}, currentWorkshop={:08X}, currentLocation={:08X}, lootManWorkshop={:08X}, missingForm={:08X}, missingRequired={}, missingBaseCount={}, missingLootManCount={}, missingTotalCount={}, unsupportedForm={:08X}, unsupportedType={}",
+		REX::TRACE(
+			"source=native component=workshop_material event=probe kind=menu_availability hook_source={} row={} input_menu_result={} before_out={} original_out={} adjusted_out={} result={} adjusted={} selected_row={} menu_result={} menu_node={:016X} menu_readable={} recipe={:016X} recipe_readable={} recipe_form={:08X} recipe_type={} required_items={} satisfied_items={} lootman_backed_items={} evaluated={} all_satisfied={} seh_failed={} current_workshop={:08X} current_location={:08X} lootman_workshop={:08X} missing_form={:08X} missing_required={} missing_base_count={} missing_lootman_count={} missing_total_count={} unsupported_form={:08X} unsupported_type={}",
 			sourceName,
 			row,
 			inputMenuResult,
@@ -2461,8 +2461,8 @@ namespace papyrus_lootman
 			return;
 		}
 
-		REX::INFO(
-			"Native workshop material probe: kind=check-placement, source={}, stage={}, menu={:016X}, selectedRow={}, menuResult={}, recipe={:08X}, recipeReadable={}, evaluated={}, allSatisfied={}, lootManBackedItems={}, currentWorkshop={:08X}, currentLocation={:08X}, lootManWorkshop={:08X}, placementHandle={:08X}, placementResolved={}, placementRef={:08X}, placementRefReadable={}, placementBase={:08X}, placementBaseType={}, dataHandle={:08X}, dataResolved={}, dataRef={:08X}, dataRefReadable={}, dataBase={:08X}, dataBaseType={}, dataIsSet={}, dataDropProxyCount={}, dataBodyCount={}, sehFailed={}",
+		REX::TRACE(
+			"source=native component=workshop_material event=probe kind=check_placement hook_source={} stage={} menu={:016X} selected_row={} menu_result={} recipe={:08X} recipe_readable={} evaluated={} all_satisfied={} lootman_backed_items={} current_workshop={:08X} current_location={:08X} lootman_workshop={:08X} placement_handle={:08X} placement_resolved={} placement_ref={:08X} placement_ref_readable={} placement_base={:08X} placement_base_type={} data_handle={:08X} data_resolved={} data_ref={:08X} data_ref_readable={} data_base={:08X} data_base_type={} data_is_set={} data_drop_proxy_count={} data_body_count={} seh_failed={}",
 			sourceName,
 			stage,
 			reinterpret_cast<std::uintptr_t>(menu),
@@ -2592,8 +2592,8 @@ namespace papyrus_lootman
 			return;
 		}
 
-		REX::INFO(
-			"Native workshop material probe: kind={}, source={}, forward={}, resultKnown={}, result={}, context={:016X}, beforeRow={}, beforeMenuResult={}, beforeNode={:016X}, beforeRecipe={:08X}, beforeRecipeReadable={}, afterRow={}, afterMenuResult={}, afterNode={:016X}, afterRecipe={:08X}, afterRecipeReadable={}, evaluated={}, allSatisfied={}, lootManBackedItems={}, currentWorkshop={:08X}, currentLocation={:08X}, lootManWorkshop={:08X}, missingForm={:08X}, missingRequired={}, missingBaseCount={}, missingLootManCount={}, missingTotalCount={}, unsupportedForm={:08X}, unsupportedType={}",
+		REX::TRACE(
+			"source=native component=workshop_material event=probe kind={} hook_source={} forward={} result_known={} result={} context={:016X} before_row={} before_menu_result={} before_node={:016X} before_recipe={:08X} before_recipe_readable={} after_row={} after_menu_result={} after_node={:016X} after_recipe={:08X} after_recipe_readable={} evaluated={} all_satisfied={} lootman_backed_items={} current_workshop={:08X} current_location={:08X} lootman_workshop={:08X} missing_form={:08X} missing_required={} missing_base_count={} missing_lootman_count={} missing_total_count={} unsupported_form={:08X} unsupported_type={}",
 			kind,
 			sourceName,
 			forward,
@@ -2652,8 +2652,8 @@ namespace papyrus_lootman
 			return;
 		}
 
-		REX::INFO(
-			"Native workshop material probe: kind=placement-state, source={}, stage={}, allowPlacement={}, createPreview={}, context={:016X}, selectedRow={}, menuResult={}, recipe={:08X}, recipeReadable={}, evaluated={}, allSatisfied={}, lootManBackedItems={}, currentWorkshop={:08X}, currentLocation={:08X}, lootManWorkshop={:08X}, placementHandlePtr={:016X}, placementHandle={:08X}, placementResolved={}, placementRef={:08X}, placementRefReadable={}, placementBase={:08X}, placementBaseType={}, placementDataPtr={:016X}, dataReadable={}, dataHandle={:08X}, dataResolved={}, dataRef={:08X}, dataRefReadable={}, dataBase={:08X}, dataBaseType={}, dataIsSet={}, dataMustSnap={}, dataAnythingIsGround={}, dataDropProxyCount={}, dataBodyCount={}, sehFailed={}",
+		REX::TRACE(
+			"source=native component=workshop_material event=probe kind=placement_state hook_source={} stage={} allow_placement={} create_preview={} context={:016X} selected_row={} menu_result={} recipe={:08X} recipe_readable={} evaluated={} all_satisfied={} lootman_backed_items={} current_workshop={:08X} current_location={:08X} lootman_workshop={:08X} placement_handle_ptr={:016X} placement_handle={:08X} placement_resolved={} placement_ref={:08X} placement_ref_readable={} placement_base={:08X} placement_base_type={} placement_data_ptr={:016X} data_readable={} data_handle={:08X} data_resolved={} data_ref={:08X} data_ref_readable={} data_base={:08X} data_base_type={} data_is_set={} data_must_snap={} data_anything_is_ground={} data_drop_proxy_count={} data_body_count={} seh_failed={}",
 			sourceName,
 			stage,
 			allowPlacement,
@@ -2916,8 +2916,8 @@ namespace papyrus_lootman
 			return;
 		}
 
-		REX::INFO(
-			"Native workshop material probe: kind=build-resource-check, source={}, recipe={:016X}, recipeReadable={}, recipeForm={:08X}, recipeType={}, owner={:016X}, ownerReadable={}, ownerForm={:08X}, ownerType={}, scratchList={:016X}, scaleRequiredCount={}, originalResult={}, adjustedResult={}, applied={}, requiredItems={}, satisfiedItems={}, lootManBackedItems={}, evaluated={}, allSatisfied={}, sehFailed={}, currentWorkshop={:08X}, currentLocation={:08X}, lootManWorkshop={:08X}, missingForm={:08X}, missingRequired={}, missingBaseCount={}, missingLootManCount={}, missingTotalCount={}, unsupportedForm={:08X}, unsupportedType={}",
+		REX::TRACE(
+			"source=native component=workshop_material event=probe kind=build_resource_check hook_source={} recipe={:016X} recipe_readable={} recipe_form={:08X} recipe_type={} owner={:016X} owner_readable={} owner_form={:08X} owner_type={} scratch_list={:016X} scale_required_count={} original_result={} adjusted_result={} applied={} required_items={} satisfied_items={} lootman_backed_items={} evaluated={} all_satisfied={} seh_failed={} current_workshop={:08X} current_location={:08X} lootman_workshop={:08X} missing_form={:08X} missing_required={} missing_base_count={} missing_lootman_count={} missing_total_count={} unsupported_form={:08X} unsupported_type={}",
 			sourceName,
 			reinterpret_cast<std::uintptr_t>(recipe),
 			recipeProbe.recipeForm.readable,
@@ -3222,8 +3222,8 @@ namespace papyrus_lootman
 		const auto* firstRemoval = plan.componentRemovals.empty() ?
 			nullptr :
 			&plan.componentRemovals.front();
-		REX::INFO(
-			"Native workshop material probe: kind=component-consume, source={}, owner={:016X}, ownerReadable={}, ownerForm={:08X}, ownerType={}, target={:016X}, targetReadable={}, targetForm={:08X}, targetType={}, targetIsDirectItem={}, includeLinked={}, requestedCount={}, baseCount={}, lootManCount={}, consumeFromLootMan={}, componentRemovalCount={}, firstRemovalComponent={:08X}, firstRemovalRequested={}, firstRemovalBaseCount={}, firstRemovalLootManCount={}, firstRemovalConsumeFromLootMan={}, applied={}, currentWorkshop={:08X}, currentLocation={:08X}, lootManWorkshop={:08X}",
+		REX::TRACE(
+			"source=native component=workshop_material event=probe kind=component_consume hook_source={} owner={:016X} owner_readable={} owner_form={:08X} owner_type={} target={:016X} target_readable={} target_form={:08X} target_type={} target_is_direct_item={} include_linked={} requested_count={} base_count={} lootman_count={} consume_from_lootman={} component_removal_count={} first_removal_component={:08X} first_removal_requested={} first_removal_base_count={} first_removal_lootman_count={} first_removal_consume_from_lootman={} applied={} current_workshop={:08X} current_location={:08X} lootman_workshop={:08X}",
 			sourceName,
 			reinterpret_cast<std::uintptr_t>(owner),
 			ownerForm.readable,
@@ -3488,8 +3488,8 @@ namespace papyrus_lootman
 			return;
 		}
 
-		REX::INFO(
-			"Native workshop material probe: kind=workshop-object-count, source={}, scriptContext={:016X}, target={:016X}, targetReadable={}, targetForm={:08X}, targetType={}, includeLinked={}, result={}, outValue={}",
+		REX::TRACE(
+			"source=native component=workshop_material event=probe kind=workshop_object_count hook_source={} script_context={:016X} target={:016X} target_readable={} target_form={:08X} target_type={} include_linked={} result={} out_value={}",
 			sourceName,
 			reinterpret_cast<std::uintptr_t>(scriptContext),
 			reinterpret_cast<std::uintptr_t>(form),
@@ -3537,8 +3537,8 @@ namespace papyrus_lootman
 			return;
 		}
 
-		REX::INFO(
-			"Native workshop material probe: kind=current-workshop-object-count, source={}, target={:016X}, targetReadable={}, targetForm={:08X}, targetType={}, count={}, currentWorkshopHandle={:08X}, currentWorkshopReadable={}, currentWorkshop={:08X}, currentWorkshopType={}, currentLocationReadable={}, currentLocation={:08X}, currentLocationRemembered={}, nearestWorkshopReadable={}, nearestWorkshop={:08X}, nearestWorkshopType={}, nearestLocationReadable={}, nearestLocation={:08X}, nearestLocationRemembered={}",
+		REX::TRACE(
+			"source=native component=workshop_material event=probe kind=current_workshop_object_count hook_source={} target={:016X} target_readable={} target_form={:08X} target_type={} count={} current_workshop_handle={:08X} current_workshop_readable={} current_workshop={:08X} current_workshop_type={} current_location_readable={} current_location={:08X} current_location_remembered={} nearest_workshop_readable={} nearest_workshop={:08X} nearest_workshop_type={} nearest_location_readable={} nearest_location={:08X} nearest_location_remembered={}",
 			sourceName,
 			reinterpret_cast<std::uintptr_t>(form),
 			targetForm.readable,
@@ -3594,7 +3594,7 @@ namespace papyrus_lootman
 		}
 
 		auto* lootManLocation = lootManWorkshop->GetCurrentLocation();
-		REX::INFO(
+		REX::DEBUG(
 			"source=native component=workshop_supply_link event=remembered context=\"{}\" outcome=ok target_location={:08X} lootman_location={:08X} lootman_workshop={:08X}",
 			prefixText,
 			targetLocation->formID,
@@ -3621,7 +3621,7 @@ namespace papyrus_lootman
 			removed = rememberedWorkshopSupplyLinks.erase(targetLocation->formID) > 0;
 		}
 
-		REX::INFO(
+		REX::DEBUG(
 			"source=native component=workshop_supply_link event=forgot context=\"{}\" outcome=ok target_location={:08X} removed={}",
 			prefixText,
 			targetLocation->formID,
@@ -3639,7 +3639,7 @@ namespace papyrus_lootman
 		auto* lootManLocation = lootManWorkshop ? lootManWorkshop->GetCurrentLocation() : nullptr;
 		auto* workshopCaravanKeyword = GetNativeWorkshopCaravanKeyword();
 
-		REX::INFO(
+		REX::DEBUG(
 			"source=native component=workshop_supply_link event=diagnostics context=\"{}\" target_workshop={:08X} target_location={:08X} lootman_workshop={:08X} lootman_location={:08X} workshop_caravan_keyword={:08X} native_linked_location_scan=disabled_after_ctd",
 			prefixText,
 			targetWorkshop ? targetWorkshop->formID : 0,
@@ -3668,13 +3668,13 @@ namespace papyrus_lootman
 					kSharedWorkshopContainerPolicy.failurePolicyAction))
 			{
 				sharedWorkshopContainerAugmentationInstalled.store(true, std::memory_order_release);
-				REX::INFO("Installed native shared workshop container hooks");
+				REX::INFO("source=native component=native_hook event=installed family=workshop-shared-container.populate-linked");
 			}
 			else
 			{
 				sharedWorkshopContainerAugmentationInstalled.store(false, std::memory_order_release);
 				REX::ERROR(
-					"Disabled native hook feature group: featureGroup={}, family=workshop-shared-container.populate-linked, failurePolicyAction={}",
+					"source=native component=native_hook event=feature_group_disabled feature_group={} family=workshop-shared-container.populate-linked failure_policy_action={}",
 					kSharedWorkshopContainerPolicy.featureGroup,
 					kSharedWorkshopContainerPolicy.failurePolicyAction);
 			}
@@ -3853,7 +3853,7 @@ namespace papyrus_lootman
 			else
 			{
 				REX::ERROR(
-					"Disabled native hook feature group before patching: featureGroup={}, failurePolicyAction={}",
+					"source=native component=native_hook event=feature_group_disabled reason=before_patching feature_group={} failure_policy_action={}",
 					kWorkshopMaterialBehaviorPolicy.featureGroup,
 					kWorkshopMaterialBehaviorPolicy.failurePolicyAction);
 			}
@@ -3898,24 +3898,24 @@ namespace papyrus_lootman
 
 			if (behaviorInstalled && optionalDiagnosticsInstalled)
 			{
-				REX::INFO("Installed native workshop material behavior and diagnostics hooks");
+				REX::INFO("source=native component=native_hook event=installed feature_group=workshop_material behavior=installed diagnostics=installed");
 			}
 			else if (behaviorInstalled)
 			{
 				REX::WARN(
-					"Installed native workshop material behavior hooks with one or more skipped optional diagnostics: failurePolicyAction={}",
+					"source=native component=native_hook event=installed feature_group=workshop_material behavior=installed diagnostics=skipped failure_policy_action={}",
 					kWorkshopMaterialDiagnosticsPolicy.failurePolicyAction);
 			}
 			else if (optionalDiagnosticsInstalled)
 			{
 				REX::WARN(
-					"Native workshop material behavior hooks disabled; optional diagnostics hooks installed: failurePolicyAction={}",
+					"source=native component=native_hook event=installed feature_group=workshop_material behavior=disabled diagnostics=installed failure_policy_action={}",
 					kWorkshopMaterialBehaviorPolicy.failurePolicyAction);
 			}
 			else
 			{
 				REX::ERROR(
-					"Native workshop material behavior hooks disabled and optional diagnostics skipped: behaviorPolicyAction={}, diagnosticsPolicyAction={}",
+					"source=native component=native_hook event=feature_group_disabled feature_group=workshop_material behavior_policy_action={} diagnostics_policy_action={}",
 					kWorkshopMaterialBehaviorPolicy.failurePolicyAction,
 					kWorkshopMaterialDiagnosticsPolicy.failurePolicyAction);
 			}

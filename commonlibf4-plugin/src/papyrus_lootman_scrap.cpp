@@ -325,7 +325,9 @@ namespace papyrus_lootman
 					InventoryItemInfo stackInfo{};
 					if (!TryGetInventoryStackInfoSafe(*stack, modBuffer, inventory_info_full, stackInfo))
 					{
-						REX::WARN("ScrapInventoryItems: skip stack for {:08X}: stack-info-exception", form->formID);
+						REX::WARN(
+							"source=native component=scrap event=stack_skipped reason=stack_info_exception item={:08X}",
+							form->formID);
 						continue;
 					}
 
@@ -406,7 +408,9 @@ namespace papyrus_lootman
 				InventoryItemInfo stackInfo{};
 				if (!TryGetInventoryStackInfoSafe(*stack, modBuffer, inventory_info_full, stackInfo))
 				{
-					REX::WARN("ScrapInventoryItems: skip stack for {:08X}: stack-info-exception", form->formID);
+					REX::WARN(
+						"source=native component=scrap event=stack_skipped reason=stack_info_exception item={:08X}",
+						form->formID);
 					continue;
 				}
 
@@ -449,7 +453,9 @@ namespace papyrus_lootman
 				}
 				else
 				{
-					REX::WARN("ScrapInventoryItems: skip mod components for {:08X}: mod-extract-exception", form->formID);
+					REX::WARN(
+						"source=native component=scrap event=mod_components_skipped reason=mod_extract_exception item={:08X}",
+						form->formID);
 				}
 
 				if (componentData.empty())
@@ -549,7 +555,7 @@ namespace papyrus_lootman
 				if (!TryAddInventoryItemSafe(componentReceiver, scrapItem, count, {}))
 				{
 					REX::WARN(
-						"ScrapInventoryItems: component-insert-exception, owner={:08X}, source={:08X}, component={:08X}, count={}",
+						"source=native component=scrap event=component_insert_failed reason=add_exception owner={:08X} source_item={:08X} component={:08X} count={}",
 						inventoryOwner->formID,
 						entry.form->formID,
 						scrapItem ? scrapItem->formID : 0,
@@ -564,7 +570,7 @@ namespace papyrus_lootman
 			{
 				const auto rollbackSucceeded = RollBackAwardedComponents(componentReceiver, addedAwards);
 				REX::WARN(
-					"ScrapInventoryItems: source retained after component insert failure, owner={:08X}, source={:08X}, inserted_components={}, rollback_succeeded={}",
+					"source=native component=scrap event=source_retained reason=component_insert_failed owner={:08X} source_item={:08X} inserted_components={} rollback_succeeded={}",
 					inventoryOwner->formID,
 					entry.form->formID,
 					addedAwards.size(),
@@ -587,7 +593,7 @@ namespace papyrus_lootman
 			{
 				const auto rollbackSucceeded = RollBackAwardedComponents(componentReceiver, addedAwards);
 				REX::WARN(
-					"ScrapInventoryItems: source removal failed, owner={:08X}, source={:08X}, count={}, stack={}, before={}, after={}, gotBefore={}, gotAfter={}, rollback_succeeded={}",
+					"source=native component=scrap event=source_removal_failed owner={:08X} source_item={:08X} count={} stack={} before={} after={} got_before={} got_after={} rollback_succeeded={}",
 					inventoryOwner->formID,
 					entry.form->formID,
 					entry.count,
@@ -687,7 +693,7 @@ namespace papyrus_lootman
 		if (!scrappableItems.empty())
 		{
 			REX::DEBUG(
-				"ScrapInventoryItems: owner={:08X}, receiver={:08X}, itemType={}, candidates={}, components={}, elapsed_ms={:.3f}",
+				"source=native component=scrap event=summary owner={:08X} receiver={:08X} item_type={} candidates={} components={} elapsed_ms={:.3f}",
 				inventoryOwner->formID,
 				componentReceiver->formID,
 				itemType,

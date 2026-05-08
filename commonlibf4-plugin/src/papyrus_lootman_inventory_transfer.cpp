@@ -205,7 +205,9 @@ namespace papyrus_lootman
 						InventoryItemInfo stackInfo{};
 						if (!TryGetInventoryStackInfoSafe(*stack, modBuffer, requestInfoFlags, stackInfo))
 						{
-							REX::WARN("TransferInventoryItems: skip stack for {:08X}: stack-info-exception", form->formID);
+							REX::WARN(
+								"source=native component=inventory_transfer event=stack_skipped reason=stack_info_exception operation=transfer_inventory_items item={:08X}",
+								form->formID);
 							continue;
 						}
 
@@ -269,7 +271,9 @@ namespace papyrus_lootman
 					InventoryItemInfo stackInfo{};
 					if (!TryGetInventoryStackInfoSafe(*stack, modBuffer, requestInfoFlags, stackInfo))
 					{
-						REX::WARN("TransferInventoryItems: skip stack for {:08X}: stack-info-exception", form->formID);
+						REX::WARN(
+							"source=native component=inventory_transfer event=stack_skipped reason=stack_info_exception operation=transfer_inventory_items item={:08X}",
+							form->formID);
 						continue;
 					}
 					if ((stackInfo.questItem && !MatchesAnyCached(form, injection_data::include_quest_item, &matchCache)) ||
@@ -342,7 +346,7 @@ namespace papyrus_lootman
 						request.extra))
 				{
 					REX::WARN(
-						"TransferInventoryItems: instance-preserving transfer failed, src={:08X}, dest={:08X}, item={:08X}, count={}, stack={}",
+						"source=native component=inventory_transfer event=transfer_failed reason=instance_preserving_transfer_failed operation=transfer_inventory_items src={:08X} dest={:08X} item={:08X} count={} stack={}",
 						src->formID,
 						dest->formID,
 						request.object->formID,
@@ -366,7 +370,7 @@ namespace papyrus_lootman
 						request.stackIndex))
 				{
 					REX::WARN(
-						"TransferInventoryItems: transfer failed, src={:08X}, dest={:08X}, item={:08X}, remaining={}, stack={}",
+						"source=native component=inventory_transfer event=transfer_failed reason=move_failed operation=transfer_inventory_items src={:08X} dest={:08X} item={:08X} remaining={} stack={}",
 						src->formID,
 						dest->formID,
 						request.object->formID,
@@ -425,7 +429,7 @@ namespace papyrus_lootman
 			else
 			{
 				REX::WARN(
-					"TransferInventoryItems: no observed transfer for item={:08X}, requestedCount={}, srcBefore={}, srcAfter={}, destBefore={}, destAfter={}, gotSrcBefore={}, gotSrcAfter={}, gotDestBefore={}, gotDestAfter={}",
+					"source=native component=inventory_transfer event=transfer_verification_failed reason=no_observed_transfer operation=transfer_inventory_items item={:08X} requested_count={} src_before={} src_after={} dest_before={} dest_after={} got_src_before={} got_src_after={} got_dest_before={} got_dest_after={}",
 					request.object->formID,
 					request.count,
 					srcBefore,
@@ -635,7 +639,7 @@ namespace papyrus_lootman
 							request.extra))
 					{
 						REX::WARN(
-							"TransferLootableInventoryItems: instance-preserving transfer failed, src={:08X}, dest={:08X}, item={:08X}, count={}, stack={}",
+							"source=native component=inventory_transfer event=transfer_failed reason=instance_preserving_transfer_failed operation=transfer_lootable_inventory_items src={:08X} dest={:08X} item={:08X} count={} stack={}",
 							src->formID,
 							dest->formID,
 							request.object->formID,
@@ -663,7 +667,7 @@ namespace papyrus_lootman
 							request.stackIndex))
 					{
 						REX::WARN(
-							"TransferLootableInventoryItems: transfer failed, src={:08X}, dest={:08X}, item={:08X}, remaining={}, stack={}",
+							"source=native component=inventory_transfer event=transfer_failed reason=move_failed operation=transfer_lootable_inventory_items src={:08X} dest={:08X} item={:08X} remaining={} stack={}",
 							src->formID,
 							dest->formID,
 							request.object->formID,
@@ -732,7 +736,7 @@ namespace papyrus_lootman
 			else
 			{
 				REX::WARN(
-					"TransferLootableInventoryItems: no observed transfer for item={:08X}, requestedCount={}, srcBefore={}, srcAfter={}, destBefore={}, destAfter={}, gotSrcBefore={}, gotSrcAfter={}, gotDestBefore={}, gotDestAfter={}",
+					"source=native component=inventory_transfer event=transfer_verification_failed reason=no_observed_transfer operation=transfer_lootable_inventory_items item={:08X} requested_count={} src_before={} src_after={} dest_before={} dest_after={} got_src_before={} got_src_after={} got_dest_before={} got_dest_after={}",
 					request.object->formID,
 					request.count,
 					srcBefore,
@@ -877,7 +881,9 @@ namespace papyrus_lootman
 						InventoryItemInfo stackInfo{};
 						if (!TryGetInventoryStackInfoSafe(*stack, modBuffer, inventory_info_basic, stackInfo))
 						{
-							REX::WARN("MoveInventoryItem: skip stack for {:08X}: stack-info-exception", object->formID);
+							REX::WARN(
+								"source=native component=inventory_transfer event=stack_skipped reason=stack_info_exception operation=move_inventory_item item={:08X}",
+								object->formID);
 							continue;
 						}
 						if (stackInfo.totalCount <= 0)
@@ -1013,7 +1019,7 @@ namespace papyrus_lootman
 							request.extra))
 					{
 						REX::WARN(
-							"MoveInventoryItem: instance-preserving transfer failed, src={:08X}, dest={:08X}, item={:08X}, count={}, stack={}",
+							"source=native component=inventory_transfer event=transfer_failed reason=instance_preserving_transfer_failed operation=move_inventory_item src={:08X} dest={:08X} item={:08X} count={} stack={}",
 							src->formID,
 							dest->formID,
 							request.object->formID,
@@ -1037,7 +1043,7 @@ namespace papyrus_lootman
 							request.stackIndex))
 					{
 						REX::WARN(
-							"MoveInventoryItem: transfer failed, src={:08X}, dest={:08X}, item={:08X}, remaining={}, stack={}",
+							"source=native component=inventory_transfer event=transfer_failed reason=move_failed operation=move_inventory_item src={:08X} dest={:08X} item={:08X} remaining={} stack={}",
 							src->formID,
 							dest->formID,
 							item->formID,
@@ -1088,7 +1094,7 @@ namespace papyrus_lootman
 		if (movedItems > 0)
 		{
 			REX::DEBUG(
-				"MoveInventoryItems: src={:08X}, dest={:08X}, itemType={}, subType={}, moved={}, elapsed_ms={:.3f}",
+				"source=native component=inventory_transfer event=move_inventory_items_summary src={:08X} dest={:08X} item_type={} sub_type={} moved={} elapsed_ms={:.3f}",
 				src->formID,
 				dest->formID,
 				itemType,

@@ -8,7 +8,7 @@ namespace form_cache
 	{
 		if (!form)
 		{
-			REX::WARN("Failed to resolve {}", label);
+			REX::WARN("source=native component=form_cache event=form_resolution_failed label=\"{}\"", label);
 		}
 	}
 

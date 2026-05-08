@@ -72,7 +72,7 @@ namespace papyrus_lootman
 		if (!success)
 		{
 			assert(false);
-			REX::ERROR("failed to pack Form"sv);
+			REX::ERROR("source=native component=papyrus_vm event=form_pack_failed"sv);
 			a_var = nullptr;
 		}
 

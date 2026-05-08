@@ -61,7 +61,7 @@ namespace papyrus_lootman
 		if (!moved)
 		{
 			REX::WARN(
-				"LootNearbyReferences: failed to add world ref={:08X}, base={:08X}, count={} to dest={:08X}",
+				"source=native component=loot_nearby event=world_ref_add_failed ref={:08X} base={:08X} count={} dest={:08X}",
 				ref->formID,
 				object->formID,
 				worldCount,
@@ -93,7 +93,7 @@ namespace papyrus_lootman
 		}
 
 		REX::WARN(
-			"LootNearbyReferences: no observed world transfer for ref={:08X}, base={:08X}, count={}, before={}, after={}, gotBefore={}, gotAfter={}",
+			"source=native component=loot_nearby event=world_transfer_verification_failed ref={:08X} base={:08X} count={} before={} after={} got_before={} got_after={}",
 			ref->formID,
 			object->formID,
 			worldCount,
@@ -179,7 +179,7 @@ namespace papyrus_lootman
 					if (!TryMoveInventoryItemSafe(player, dest, object, chunk))
 					{
 						REX::WARN(
-							"LootNearbyEnabledReferences: deferred activation transfer failed, player={:08X}, dest={:08X}, item={:08X}, remaining={}",
+							"source=native component=loot_nearby event=deferred_activation_transfer_failed player={:08X} dest={:08X} item={:08X} remaining={}",
 							player->formID,
 							dest->formID,
 							object->formID,
@@ -365,7 +365,7 @@ namespace papyrus_lootman
 		}
 
 		REX::DEBUG(
-			"Skip container animation for ref={:08X}: nearby activation/link ref={:08X}, base={:08X}, distanceSq={}",
+			"source=native component=container_loot event=animation_skipped reason=nearby_activation_link_ref ref={:08X} nearby_ref={:08X} base={:08X} distance_sq={}",
 			ref->formID,
 			nearbyFormId,
 			nearbyBaseFormId,
@@ -381,7 +381,9 @@ namespace papyrus_lootman
 		}
 		if (HasActivationOrLinkSideEffectExtras(ref))
 		{
-			REX::DEBUG("Skip container animation for ref={:08X}: activation/link extras on container", ref->formID);
+			REX::DEBUG(
+				"source=native component=container_loot event=animation_skipped reason=activation_link_extras ref={:08X}",
+				ref->formID);
 			return false;
 		}
 		return !HasNearbyActivationOrLinkSideEffectRef(ref);
