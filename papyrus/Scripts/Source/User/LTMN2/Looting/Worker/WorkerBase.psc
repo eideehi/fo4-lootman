@@ -14,7 +14,7 @@ Function LogWorkerEvent(string eventName, string fields = "", int logLevel = 1)
     LTMN2:LootMan.LogEvent("looting_worker", eventName, fields, logLevel)
 EndFunction
 
-string Function GetThreadField() debugOnly
+string Function GetThreadField()
     Return "thread=" + GetThreadId()
 EndFunction
 
@@ -118,6 +118,6 @@ Function LootObject(ObjectReference ref)
 EndFunction
 
 ; Return the thread identifier to be output to the log. Override it in the worker's script
-string Function GetThreadId() debugOnly
+string Function GetThreadId()
     Return "UNKNOWN"
 EndFunction

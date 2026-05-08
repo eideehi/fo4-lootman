@@ -38,12 +38,12 @@ F4SE_PLUGIN_LOAD(const F4SE::LoadInterface* a_f4se)
 	F4SE::Init(a_f4se, initInfo);
 
 	log_settings::Initialize();
-	REX::INFO("LootMan plugin loading...");
+	REX::INFO("source=native component=plugin event=loading_started");
 	papyrus_lootman::InstallInventoryRebuildHooks();
 
 	if (!injection_data::Initialize())
 	{
-		REX::ERROR("Failed to initialize injection data");
+		REX::ERROR("source=native component=plugin event=load_failed reason=injection_data_initialization_failed");
 		return false;
 	}
 
@@ -52,17 +52,17 @@ F4SE_PLUGIN_LOAD(const F4SE::LoadInterface* a_f4se)
 	auto messaging = F4SE::GetMessagingInterface();
 	if (!messaging || !messaging->RegisterListener(OnMessage))
 	{
-		REX::ERROR("Failed to register messaging listener");
+		REX::ERROR("source=native component=plugin event=load_failed reason=messaging_listener_registration_failed");
 		return false;
 	}
 
 	auto papyrus = F4SE::GetPapyrusInterface();
 	if (!papyrus || !papyrus->Register(RegisterPapyrus))
 	{
-		REX::ERROR("Failed to register papyrus functions");
+		REX::ERROR("source=native component=plugin event=load_failed reason=papyrus_registration_failed");
 		return false;
 	}
 
-	REX::INFO("LootMan plugin loaded successfully");
+	REX::INFO("source=native component=plugin event=loaded");
 	return true;
 }

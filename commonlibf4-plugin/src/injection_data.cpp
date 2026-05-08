@@ -240,7 +240,7 @@ namespace injection_data
 
 	bool Initialize()
 	{
-		REX::DEBUG("[ Start initialization of injection data ]");
+		REX::DEBUG("source=native component=injection_data event=initialize_started");
 		degradedMode = false;
 		tmp.clear();
 		notifyCategoryMask = 0;
@@ -359,13 +359,13 @@ namespace injection_data
 			}
 		}
 
-		REX::DEBUG("  Initialization of injection data is complete (degraded_mode={})", degradedMode);
+		REX::DEBUG("source=native component=injection_data event=initialize_completed degraded_mode={}", degradedMode);
 		return true;
 	}
 
 	void LoadInjectionData()
 	{
-		REX::DEBUG("[ Start loading injection data ]");
+		REX::DEBUG("source=native component=injection_data event=load_started");
 		data.clear();
 		formListByKey.clear();
 		keywordListByKey.clear();
@@ -445,6 +445,6 @@ namespace injection_data
 			}
 		}
 
-		REX::DEBUG("  Loading of injection data is complete");
+		REX::DEBUG("source=native component=injection_data event=load_completed");
 	}
 }

@@ -1,5 +1,5 @@
 Scriptname LTMN2:Looting:Worker:Impl:WorkerWEAP02 extends LTMN2:Looting:Worker:WorkerBaseWEAP
 
-string Function GetThreadId() debugOnly
+string Function GetThreadId()
     Return "WEAP_02"
 EndFunction

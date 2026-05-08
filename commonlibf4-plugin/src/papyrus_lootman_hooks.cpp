@@ -1043,7 +1043,7 @@ namespace papyrus_lootman
 		auto* workshopCaravanKeyword = GetNativeWorkshopCaravanKeyword();
 
 		REX::INFO(
-			"Native shared workshop container hook probe: currentLocation={:08X}, lootManLocation={:08X}, lootManWorkshop={:08X}, workshopCaravanKeyword={:08X}, includePlayer={}, containerCount={}, containers={:016X}",
+			"source=native component=shared_workshop_container event=probe current_location={:08X} lootman_location={:08X} lootman_workshop={:08X} workshop_caravan_keyword={:08X} include_player={} container_count={} containers={:016X}",
 			locationId,
 			lootManLocation ? lootManLocation->formID : 0,
 			lootManWorkshop ? lootManWorkshop->formID : 0,
@@ -1147,7 +1147,7 @@ namespace papyrus_lootman
 
 		auto* lootManLocation = lootManWorkshop ? lootManWorkshop->GetCurrentLocation() : nullptr;
 		REX::INFO(
-			"Added LootMan workshop to native shared workshop containers: requestedLocation={:08X}, effectiveLocation={:08X}, inferredLocation={}, lootManLocation={:08X}, lootManWorkshop={:08X}, containerCount={}",
+			"source=native component=shared_workshop_container event=lootman_container_added requested_location={:08X} effective_location={:08X} inferred_location={} lootman_location={:08X} lootman_workshop={:08X} container_count={}",
 			requestedLocation ? requestedLocation->formID : 0,
 			locationId,
 			inferredLocation,
@@ -3581,7 +3581,7 @@ namespace papyrus_lootman
 		if (!targetLocation || !lootManWorkshop)
 		{
 			REX::WARN(
-				"[Papyrus] {}      [ Failed to remember native workshop supply link ] targetLocation={:08X}, lootManWorkshop={:08X}",
+				"source=native component=workshop_supply_link event=remember_failed context=\"{}\" outcome=failed reason=invalid_input target_location={:08X} lootman_workshop={:08X}",
 				prefixText,
 				targetLocationForm ? targetLocationForm->formID : 0,
 				lootManWorkshop ? lootManWorkshop->formID : 0);
@@ -3595,7 +3595,7 @@ namespace papyrus_lootman
 
 		auto* lootManLocation = lootManWorkshop->GetCurrentLocation();
 		REX::INFO(
-			"[Papyrus] {}      [ Remembered native workshop supply link ] targetLocation={:08X}, lootManLocation={:08X}, lootManWorkshop={:08X}",
+			"source=native component=workshop_supply_link event=remembered context=\"{}\" outcome=ok target_location={:08X} lootman_location={:08X} lootman_workshop={:08X}",
 			prefixText,
 			targetLocation->formID,
 			lootManLocation ? lootManLocation->formID : 0,
@@ -3609,7 +3609,7 @@ namespace papyrus_lootman
 		if (!targetLocation)
 		{
 			REX::WARN(
-				"[Papyrus] {}      [ Failed to forget native workshop supply link ] targetLocation={:08X}",
+				"source=native component=workshop_supply_link event=forget_failed context=\"{}\" outcome=failed reason=invalid_target_location target_location={:08X}",
 				prefixText,
 				targetLocationForm ? targetLocationForm->formID : 0);
 			return;
@@ -3622,7 +3622,7 @@ namespace papyrus_lootman
 		}
 
 		REX::INFO(
-			"[Papyrus] {}      [ Forgot native workshop supply link ] targetLocation={:08X}, removed={}",
+			"source=native component=workshop_supply_link event=forgot context=\"{}\" outcome=ok target_location={:08X} removed={}",
 			prefixText,
 			targetLocation->formID,
 			removed);
@@ -3640,7 +3640,7 @@ namespace papyrus_lootman
 		auto* workshopCaravanKeyword = GetNativeWorkshopCaravanKeyword();
 
 		REX::INFO(
-			"[Papyrus] {}      [ Native workshop supply diagnostics ] targetWorkshop={:08X}, targetLocation={:08X}, lootManWorkshop={:08X}, lootManLocation={:08X}, workshopCaravanKeyword={:08X}, nativeLinkedLocationScan=disabled-after-ctd",
+			"source=native component=workshop_supply_link event=diagnostics context=\"{}\" target_workshop={:08X} target_location={:08X} lootman_workshop={:08X} lootman_location={:08X} workshop_caravan_keyword={:08X} native_linked_location_scan=disabled_after_ctd",
 			prefixText,
 			targetWorkshop ? targetWorkshop->formID : 0,
 			targetLocation ? targetLocation->formID : 0,

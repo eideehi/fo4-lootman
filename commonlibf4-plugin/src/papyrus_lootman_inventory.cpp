@@ -177,15 +177,17 @@ namespace papyrus_lootman
 		const auto prefixText = prefix.c_str();
 		if (!inventoryOwner)
 		{
-			REX::INFO("[Papyrus] {}        Raw inventory: missing owner", prefixText);
+			REX::DEBUG(
+				"source=native component=inventory_diagnostics event=owner_missing context=\"{}\" outcome=failed reason=missing_owner",
+				prefixText);
 			return;
 		}
 
 		auto inventoryList = inventoryOwner->inventoryList;
 		if (!inventoryList)
 		{
-			REX::INFO(
-				"[Papyrus] {}        Raw inventory: no inventory list for owner={:08X}",
+			REX::DEBUG(
+				"source=native component=inventory_diagnostics event=inventory_list_missing context=\"{}\" outcome=failed reason=no_inventory_list owner={:08X}",
 				prefixText,
 				inventoryOwner->formID);
 			return;
@@ -196,22 +198,31 @@ namespace papyrus_lootman
 		std::uint32_t rawIndex = 1;
 
 		ReadLockGuard guard(inventoryList->rwLock);
-		REX::INFO("[Papyrus] {}        Raw inventory entries: {}", prefixText, inventoryList->data.size());
+		REX::DEBUG(
+			"source=native component=inventory_diagnostics event=entries context=\"{}\" owner={:08X} count={}",
+			prefixText,
+			inventoryOwner->formID,
+			inventoryList->data.size());
 
 		for (auto& item : inventoryList->data)
 		{
 			auto* form = item.object;
 			if (!form)
 			{
-				REX::INFO("[Papyrus] {}        [ Raw item {}: missing base form ]", prefixText, rawIndex++);
+				REX::DEBUG(
+					"source=native component=inventory_diagnostics event=item_missing_base context=\"{}\" owner={:08X} item_index={}",
+					prefixText,
+					inventoryOwner->formID,
+					rawIndex++);
 				continue;
 			}
 
 			const auto itemCount = GetRawInventoryItemCount(item);
 			totalItemCount += itemCount;
-			REX::INFO(
-				"[Papyrus] {}        [ Raw item {} ] base={:08X} \"{}\", type={}, count={}",
+			REX::DEBUG(
+				"source=native component=inventory_diagnostics event=item context=\"{}\" owner={:08X} item_index={} base={:08X} name=\"{}\" item_type={} count={}",
 				prefixText,
+				inventoryOwner->formID,
 				rawIndex,
 				form->formID,
 				GetFormName(form),
@@ -221,21 +232,34 @@ namespace papyrus_lootman
 			auto* misc = form->As<TESObjectMISC>();
 			if (!misc || !misc->componentData || misc->componentData->empty())
 			{
-				REX::INFO("[Papyrus] {}          Misc components: 0", prefixText);
+				REX::DEBUG(
+					"source=native component=inventory_diagnostics event=component_count context=\"{}\" owner={:08X} item_index={} base={:08X} count=0",
+					prefixText,
+					inventoryOwner->formID,
+					rawIndex,
+					form->formID);
 				++rawIndex;
 				continue;
 			}
 
-			REX::INFO("[Papyrus] {}          Misc components: {}", prefixText, misc->componentData->size());
+			REX::DEBUG(
+				"source=native component=inventory_diagnostics event=component_count context=\"{}\" owner={:08X} item_index={} base={:08X} count={}",
+				prefixText,
+				inventoryOwner->formID,
+				rawIndex,
+				form->formID,
+				misc->componentData->size());
 			std::uint32_t componentIndex = 1;
 			for (auto& [componentForm, componentValue] : *misc->componentData)
 			{
 				auto* component = componentForm ? componentForm->As<BGSComponent>() : nullptr;
 				if (!component)
 				{
-					REX::INFO(
-						"[Papyrus] {}          [ Component {}: invalid component form ]",
+					REX::DEBUG(
+						"source=native component=inventory_diagnostics event=component_invalid context=\"{}\" owner={:08X} item_index={} component_index={} outcome=failed reason=invalid_component_form",
 						prefixText,
+						inventoryOwner->formID,
+						rawIndex,
 						componentIndex++);
 					continue;
 				}
@@ -243,9 +267,11 @@ namespace papyrus_lootman
 				const auto perItemCount = componentValue.i;
 				const auto totalComponentCount = itemCount * perItemCount;
 				auto* scrapItem = component->scrapItem;
-				REX::INFO(
-					"[Papyrus] {}          [ Component {} ] component={:08X} \"{}\", scrap={:08X} \"{}\", perItem={}, total={}",
+				REX::DEBUG(
+					"source=native component=inventory_diagnostics event=component context=\"{}\" owner={:08X} item_index={} component_index={} component={:08X} component_name=\"{}\" scrap={:08X} scrap_name=\"{}\" per_item={} total={}",
 					prefixText,
+					inventoryOwner->formID,
+					rawIndex,
 					componentIndex,
 					component->formID,
 					GetFormName(component),
@@ -267,14 +293,19 @@ namespace papyrus_lootman
 			return lhsId < rhsId;
 		});
 
-		REX::INFO("[Papyrus] {}        Raw total item count: {}", prefixText, totalItemCount);
-		REX::INFO("[Papyrus] {}        Component totals: {}", prefixText, componentTotals.size());
+		REX::DEBUG(
+			"source=native component=inventory_diagnostics event=summary context=\"{}\" owner={:08X} total_items={} component_totals={}",
+			prefixText,
+			inventoryOwner->formID,
+			totalItemCount,
+			componentTotals.size());
 		std::uint32_t componentTotalIndex = 1;
 		for (const auto& [scrapItem, count] : componentTotals)
 		{
-			REX::INFO(
-				"[Papyrus] {}        [ Component total {} ] scrap={:08X} \"{}\", count={}",
+			REX::DEBUG(
+				"source=native component=inventory_diagnostics event=component_total context=\"{}\" owner={:08X} component_total_index={} scrap={:08X} scrap_name=\"{}\" count={}",
 				prefixText,
+				inventoryOwner->formID,
 				componentTotalIndex++,
 				scrapItem ? scrapItem->formID : 0,
 				GetFormName(scrapItem),

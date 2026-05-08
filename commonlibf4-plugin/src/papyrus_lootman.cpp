@@ -13,7 +13,7 @@ namespace papyrus_lootman
 
 	bool Register(RE::BSScript::IVirtualMachine* vm)
 	{
-		REX::DEBUG("[ Started binding papyrus functions for LootMan ]");
+		REX::DEBUG("source=native component=papyrus event=binding_started script=LTMN2:LootMan");
 
 		vm->BindNativeMethod("LTMN2:LootMan"sv, "FindNearestValidWorkshopId"sv,
 			&FindNearestValidWorkshopId, false, false);
@@ -54,7 +54,7 @@ namespace papyrus_lootman
 		vm->BindNativeMethod("LTMN2:LootMan"sv, "OnUpdateLootManProperty"sv,
 			&OnUpdateLootManProperty, false, false);
 
-		REX::DEBUG("  Papyrus functions binding is complete");
+		REX::DEBUG("source=native component=papyrus event=binding_completed script=LTMN2:LootMan");
 		return true;
 	}
 

@@ -30,7 +30,7 @@ namespace constructible_object
 
 	void Initialize()
 	{
-		REX::DEBUG("[ Start a ConstructibleObject cache associated with the object ID ]");
+		REX::DEBUG("source=native component=constructible_object event=cache_started");
 		cache.clear();
 
 		auto& allCObj = RE::TESDataHandler::GetSingleton()->GetFormArray<RE::BGSConstructibleObject>();
@@ -44,7 +44,7 @@ namespace constructible_object
 			CacheCObj(cobj->createdItem, cobj);
 		}
 
-		REX::DEBUG("  Cache size: {}", cache.size());
+		REX::DEBUG("source=native component=constructible_object event=cache_completed count={}", cache.size());
 	}
 
 	RE::BGSConstructibleObject* FromCreatedObjectId(std::uint32_t formId)

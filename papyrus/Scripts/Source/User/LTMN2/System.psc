@@ -6,7 +6,7 @@ LTMN2:System Function GetInstance() global
 EndFunction
 
 ; Format MOD_VERSION-style integers as major.minor.patch.
-string Function GetVersionString(int version) global debugOnly
+string Function GetVersionString(int version) global
     Return (version / 10000) + "." + (version / 100 % 100) + "." + (version % 100)
 EndFunction
 

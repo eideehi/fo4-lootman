@@ -44,8 +44,11 @@ Group Status
     int property LogLevel = 2 auto hidden
 EndGroup
 
+int LOG_LEVEL_TRACE = 0 const
 int LOG_LEVEL_DEBUG = 1 const
 int LOG_LEVEL_INFO = 2 const
+int LOG_LEVEL_WARN = 3 const
+int LOG_LEVEL_OFF = 6 const
 
 Actor player
 LTMN2:Properties properties
@@ -57,6 +60,29 @@ EndFunction
 
 string Function FormField(string name, Form target)
     Return name + "=" + LTMN2:LootMan.GetHexID(target)
+EndFunction
+
+bool Function IsValidLogLevel(int value)
+    Return value >= LOG_LEVEL_TRACE && value <= LOG_LEVEL_OFF
+EndFunction
+
+Function SyncLogLevelFromNative(bool refreshMenu = false)
+    int previousLogLevel = LogLevel
+    int nativeLogLevel = LTMN2:LootMan.GetLogLevel()
+
+    If (!IsValidLogLevel(nativeLogLevel))
+        LogMcmEvent("log_level_sync_failed", "reason=out_of_range native_level=" + nativeLogLevel + " previous_level=" + previousLogLevel, LOG_LEVEL_WARN)
+        nativeLogLevel = LOG_LEVEL_INFO
+    EndIf
+
+    If (LogLevel != nativeLogLevel)
+        LogLevel = nativeLogLevel
+        LogMcmEvent("log_level_synced", "native_level=" + nativeLogLevel + " previous_level=" + previousLogLevel + " changed=true", LOG_LEVEL_DEBUG)
+
+        If (refreshMenu)
+            MCM.RefreshMenu()
+        EndIf
+    EndIf
 EndFunction
 
 Event OnInit()
@@ -84,7 +110,7 @@ EndEvent
 Function Initialize()
     ; Mirror native log level and reset utility state on load.
     SetUtilityBusy(false)
-    LogLevel = LTMN2:LootMan.GetLogLevel()
+    SyncLogLevelFromNative(true)
 
     RegisterForExternalEvent("OnMCMSettingChange|LootMan", "OnMCMSettingChange")
 EndFunction
@@ -150,6 +176,7 @@ Function OnMCMSettingChange(string modName, string id)
 
     ElseIf (id == "LogLevel")
         LTMN2:LootMan.SetLogLevel(LogLevel)
+        SyncLogLevelFromNative(true)
 
     ElseIf (id == "EnableInventoryLootingOfALCH")
         properties.LootableInventoryItemType = Math.LogicalXor(properties.LootableInventoryItemType, properties.ITEM_TYPE_ALCH)

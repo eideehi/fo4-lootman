@@ -7,7 +7,7 @@ namespace vendor_chest
 
 	void Initialize()
 	{
-		REX::DEBUG("[ Start caching vendor chest IDs ]");
+		REX::DEBUG("source=native component=vendor_chest event=cache_started");
 
 		auto& allFactions = RE::TESDataHandler::GetSingleton()->GetFormArray<RE::TESFaction>();
 		for (auto* faction : allFactions)
@@ -34,7 +34,7 @@ namespace vendor_chest
 			}
 		}
 
-		REX::DEBUG("  Vendor chest cache size: {}", vendorChests.size());
+		REX::DEBUG("source=native component=vendor_chest event=cache_completed count={}", vendorChests.size());
 	}
 
 	bool IsVendorChest(const std::uint32_t formId)
