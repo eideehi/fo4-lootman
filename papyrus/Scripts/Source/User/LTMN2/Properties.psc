@@ -6,21 +6,6 @@ LTMN2:Properties Function GetInstance() global
 EndFunction
 
 Group Constants
-    ; Form type
-    int property FORM_TYPE_ACTI = 27 autoreadonly hidden
-    int property FORM_TYPE_ALCH = 48 autoreadonly hidden
-    int property FORM_TYPE_AMMO = 44 autoreadonly hidden
-    int property FORM_TYPE_ARMO = 29 autoreadonly hidden
-    int property FORM_TYPE_BOOK = 30 autoreadonly hidden
-    int property FORM_TYPE_CONT = 31 autoreadonly hidden
-    int property FORM_TYPE_FLOR = 41 autoreadonly hidden
-    int property FORM_TYPE_INGR = 33 autoreadonly hidden
-    int property FORM_TYPE_KEYM = 47 autoreadonly hidden
-    int property FORM_TYPE_MISC = 35 autoreadonly hidden
-    int property FORM_TYPE_NPC_ = 45 autoreadonly hidden
-    int property FORM_TYPE_WEAP = 43 autoreadonly hidden
-    int property FORM_TYPE_ALL = 159 autoreadonly hidden
-
     ; Item type
     int property ITEM_TYPE_ALCH = 1 autoreadonly hidden
     int property ITEM_TYPE_AMMO = 2 autoreadonly hidden
@@ -64,33 +49,7 @@ Group Status
     bool property IsInSettlement = false auto hidden
     bool property IsOverweight = false auto hidden
 
-    int property ActiveWorkerThreadsACTI = 0 auto hidden
-    int property ActiveWorkerThreadsALCH = 0 auto hidden
-    int property ActiveWorkerThreadsAMMO = 0 auto hidden
-    int property ActiveWorkerThreadsARMO = 0 auto hidden
-    int property ActiveWorkerThreadsBOOK = 0 auto hidden
-    int property ActiveWorkerThreadsCONT = 0 auto hidden
-    int property ActiveWorkerThreadsFLOR = 0 auto hidden
-    int property ActiveWorkerThreadsINGR = 0 auto hidden
-    int property ActiveWorkerThreadsKEYM = 0 auto hidden
-    int property ActiveWorkerThreadsMISC = 0 auto hidden
-    int property ActiveWorkerThreadsNPC_ = 0 auto hidden
-    int property ActiveWorkerThreadsWEAP = 0 auto hidden
-
     int property MaxItemsProcessedPerThread = 6 auto hidden
-
-    bool property TurboModeACTI = false auto hidden
-    bool property TurboModeALCH = false auto hidden
-    bool property TurboModeAMMO = false auto hidden
-    bool property TurboModeARMO = false auto hidden
-    bool property TurboModeBOOK = false auto hidden
-    bool property TurboModeCONT = false auto hidden
-    bool property TurboModeFLOR = false auto hidden
-    bool property TurboModeINGR = false auto hidden
-    bool property TurboModeKEYM = false auto hidden
-    bool property TurboModeMISC = false auto hidden
-    bool property TurboModeNPC_ = false auto hidden
-    bool property TurboModeWEAP = false auto hidden
 
     int property LootableInventoryItemType = 255 auto hidden
     int property LootableALCHItemType = 255 auto hidden
@@ -121,19 +80,6 @@ Group Config
     bool property NotLootingFromSettlement = true auto hidden
     bool property AutomaticallyLinkAndUnlinkToWorkshop = false auto hidden
     bool property UnlockLockedContainer = true auto hidden
-
-    int property MaxWorkerThreadsACTI = 4 auto hidden
-    int property MaxWorkerThreadsALCH = 4 auto hidden
-    int property MaxWorkerThreadsAMMO = 4 auto hidden
-    int property MaxWorkerThreadsARMO = 4 auto hidden
-    int property MaxWorkerThreadsBOOK = 4 auto hidden
-    int property MaxWorkerThreadsCONT = 4 auto hidden
-    int property MaxWorkerThreadsFLOR = 4 auto hidden
-    int property MaxWorkerThreadsINGR = 1 auto hidden
-    int property MaxWorkerThreadsKEYM = 4 auto hidden
-    int property MaxWorkerThreadsMISC = 4 auto hidden
-    int property MaxWorkerThreadsNPC_ = 4 auto hidden
-    int property MaxWorkerThreadsWEAP = 4 auto hidden
 
     bool property EnableObjectLootingOfACTI = true auto hidden
     bool property EnableObjectLootingOfALCH = true auto hidden

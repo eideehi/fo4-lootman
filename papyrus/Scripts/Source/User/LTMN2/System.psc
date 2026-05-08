@@ -518,19 +518,6 @@ Function StopLegacyWorkerManagers()
     If (WorkerManagerWEAP)
         WorkerManagerWEAP.Stop()
     EndIf
-
-    properties.ActiveWorkerThreadsACTI = 0
-    properties.ActiveWorkerThreadsALCH = 0
-    properties.ActiveWorkerThreadsAMMO = 0
-    properties.ActiveWorkerThreadsARMO = 0
-    properties.ActiveWorkerThreadsBOOK = 0
-    properties.ActiveWorkerThreadsCONT = 0
-    properties.ActiveWorkerThreadsFLOR = 0
-    properties.ActiveWorkerThreadsINGR = 0
-    properties.ActiveWorkerThreadsKEYM = 0
-    properties.ActiveWorkerThreadsMISC = 0
-    properties.ActiveWorkerThreadsNPC_ = 0
-    properties.ActiveWorkerThreadsWEAP = 0
 EndFunction
 
 ; Initialize runtime hooks after install or save load.
