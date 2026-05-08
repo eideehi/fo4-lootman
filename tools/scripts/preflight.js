@@ -3,17 +3,12 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-export const packagingRoot = path.resolve(__dirname, "..");
+export const projectRoot = path.resolve(__dirname, "..", "..");
 
 const COMMAND_TOOLS = {
-	clean: ["tsx"],
-	build: ["tsx"],
-	generate: ["tsx"],
+	package: ["tsx"],
+	"native-hooks": ["tsx"],
 	ghidra: ["tsx"],
-	resolve: ["tsx"],
-	verify: ["tsx"],
-	deploy: ["tsx"],
-	undeploy: ["tsx"],
 	test: ["vitest"],
 };
 
@@ -26,21 +21,23 @@ export function normalizeCommand(command) {
 }
 
 export function describeUserCommand(command) {
-	const normalized = normalizeCommand(command);
-	return normalized === "test" ? "pnpm test" : `pnpm run ${command}`;
+	if (command === "test") {
+		return "pnpm test";
+	}
+	return `pnpm run ${command}`;
 }
 
-export function assertPackagingExecutionContext(command, cwd = process.cwd(), root = packagingRoot) {
+export function assertProjectExecutionContext(command, cwd = process.cwd(), root = projectRoot) {
 	if (normalizePath(cwd) === normalizePath(root)) {
 		return;
 	}
 
 	throw new Error(
 		[
-			`Packaging commands must be run from ${root}.`,
+			`LootMan Node tooling commands must be run from ${root}.`,
 			`Current directory: ${cwd}`,
 			"Run these commands instead:",
-			"  Set-Location packaging",
+			`  Set-Location ${root}`,
 			`  ${describeUserCommand(command)}`,
 		].join("\n"),
 	);
@@ -50,7 +47,7 @@ function getShimCandidates(tool, platform = process.platform) {
 	return platform === "win32" ? [`${tool}.CMD`, `${tool}.cmd`, tool] : [tool];
 }
 
-export function findToolArtifacts(tool, root = packagingRoot, platform = process.platform) {
+export function findToolArtifacts(tool, root = projectRoot, platform = process.platform) {
 	const packageJson = path.join(root, "node_modules", tool, "package.json");
 	const shimPaths = getShimCandidates(tool, platform).map((entry) => path.join(root, "node_modules", ".bin", entry));
 
@@ -62,7 +59,7 @@ export function findToolArtifacts(tool, root = packagingRoot, platform = process
 	};
 }
 
-export function assertRequiredTools(command, root = packagingRoot, platform = process.platform) {
+export function assertRequiredTools(command, root = projectRoot, platform = process.platform) {
 	const normalized = normalizeCommand(command);
 	const tools = COMMAND_TOOLS[normalized];
 	if (!tools) {
@@ -90,22 +87,22 @@ export function assertRequiredTools(command, root = packagingRoot, platform = pr
 
 	throw new Error(
 		[
-			`Packaging dependencies are incomplete for '${command}'.`,
+			`LootMan Node tooling dependencies are incomplete for '${command}'.`,
 			...details,
-			"Repair them manually from packaging/:",
-			"  Set-Location packaging",
+			"Repair them manually from the repository root:",
+			`  Set-Location ${root}`,
 			"  pnpm install",
-			"The packaging scripts do not repair dependencies automatically.",
+			"The Node tooling scripts do not repair dependencies automatically.",
 		].join("\n"),
 	);
 }
 
 export function runPreflight(command, options = {}) {
-	const root = options.packagingRoot ?? packagingRoot;
+	const root = options.projectRoot ?? projectRoot;
 	const cwd = options.cwd ?? process.cwd();
 	const platform = options.platform ?? process.platform;
 
-	assertPackagingExecutionContext(command, cwd, root);
+	assertProjectExecutionContext(command, cwd, root);
 	assertRequiredTools(command, root, platform);
 }
 
@@ -117,7 +114,7 @@ function isCliEntry() {
 function printUsage() {
 	console.log([
 		"Usage:",
-		"  node scripts/preflight.js <clean|clean:all|clean:wsl-build|build|generate:native-hooks|generate:native-hook-bundle|ghidra:probe|resolve:native-hooks|verify:native-hooks|deploy|undeploy|test|test:watch>",
+		"  node tools/scripts/preflight.js <package:*|native-hooks:*|ghidra:probe|test|test:packaging|test:tools|test:watch>",
 	].join("\n"));
 }
 

@@ -9,7 +9,7 @@ import {
 	readNativeHookManifest,
 	validateNativeHookManifest,
 	type NativeHookAddressManifest,
-} from "../../scripts/native-hook-addresses.js";
+} from "../scripts/native-hook-addresses.js";
 
 function cloneManifest(manifest: NativeHookAddressManifest): NativeHookAddressManifest {
 	return JSON.parse(JSON.stringify(manifest)) as NativeHookAddressManifest;

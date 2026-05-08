@@ -1,5 +1,6 @@
 import fs from "fs-extra";
 import path from "node:path";
+import { fileURLToPath } from "node:url";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import {
 	buildPapyrusImportDirs,
@@ -11,6 +12,9 @@ import {
 } from "../../scripts/config.js";
 import * as windowsPath from "../../scripts/windows-path.js";
 import { createTempDir, removeTempDir } from "../helpers/temp-dir.js";
+
+const packagingRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..", "..");
+const repositoryRoot = path.resolve(packagingRoot, "..");
 
 describe("config", () => {
 	const dirs: string[] = [];
@@ -139,6 +143,30 @@ describe("config", () => {
 
 		expect(config.isWsl).toBe(true);
 		expect(config.wslStageDir).toBe(path.join(root, "stage"));
+	});
+
+	it("resolves relative PROJECT_ROOT from packaging/.env location", () => {
+		const root = createTempDir();
+		dirs.push(root);
+		const steamDir = path.join(root, "steam");
+		const gameDir = path.join(steamDir, "Fallout 4");
+		const sevenzipPath = path.join(root, "bin", "7z.exe");
+
+		fs.outputFileSync(sevenzipPath, "");
+		fs.outputFileSync(path.join(gameDir, "Tools", "Archive2", "Archive2.exe"), "");
+		fs.outputFileSync(path.join(gameDir, "Papyrus Compiler", "PapyrusCompiler.exe"), "");
+		fs.mkdirsSync(path.join(gameDir, "Data", "Scripts", "Source", "Base"));
+		fs.mkdirsSync(path.join(gameDir, "Data", "Scripts", "Source", "User"));
+		fs.outputFileSync(path.join(gameDir, "Data", "Scripts", "Source", "Base", "Institute_Papyrus_Flags.flg"), "");
+
+		process.env.STEAM_GAME_DIR = steamDir;
+		process.env.SEVENZIP_PATH = sevenzipPath;
+		process.env.PROJECT_ROOT = "../";
+		vi.spyOn(windowsPath, "detectWsl").mockReturnValue(false);
+
+		const config = createConfig();
+
+		expect(config.projectRoot).toBe(repositoryRoot);
 	});
 
 	it("createConfig throws when SEVENZIP_PATH does not exist", () => {

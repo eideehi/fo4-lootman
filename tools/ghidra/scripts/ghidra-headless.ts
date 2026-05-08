@@ -4,8 +4,8 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-export const packagingRoot = path.resolve(__dirname, "..");
-export const projectRoot = path.resolve(packagingRoot, "..");
+export const ghidraRoot = path.resolve(__dirname, "..");
+export const projectRoot = path.resolve(ghidraRoot, "..", "..");
 export const defaultGhidraHeadlessLocalConfigPath = path.join(projectRoot, "tools", "ghidra", "headless.local.json");
 export const defaultGhidraHeadlessExampleConfigPath = path.join(projectRoot, "tools", "ghidra", "headless.example.json");
 

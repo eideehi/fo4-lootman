@@ -1,4 +1,4 @@
-import "dotenv/config";
+import { config as loadDotenv } from "dotenv";
 import fs from "fs-extra";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
@@ -6,6 +6,9 @@ import { detectWsl } from "./windows-path.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const packagingRoot = path.resolve(__dirname, "..");
+const repositoryRoot = path.resolve(packagingRoot, "..");
+
+loadDotenv({ path: path.join(packagingRoot, ".env"), quiet: true });
 
 export function checkDir(dir: string): string {
 	if (!fs.existsSync(dir) || !fs.statSync(dir).isDirectory()) {
@@ -27,6 +30,10 @@ export function requireEnv(name: string): string {
 		throw new Error(`${name} is not defined in environment`);
 	}
 	return value;
+}
+
+function resolveConfigPath(value: string): string {
+	return path.isAbsolute(value) ? path.resolve(value) : path.resolve(packagingRoot, value);
 }
 
 export function isCliEntry(scriptBaseName: string): boolean {
@@ -69,18 +76,18 @@ export function buildPapyrusImportDirs(papyrusSourceDir: string): string[] {
 export function createConfig(): Config {
 	// Required environment variables
 	const steamGameDir = requireEnv("STEAM_GAME_DIR");
-	const sevenzipPath = checkFile(path.resolve(requireEnv("SEVENZIP_PATH")));
+	const sevenzipPath = checkFile(resolveConfigPath(requireEnv("SEVENZIP_PATH")));
 	const dllBuildDir = process.env.DLL_BUILD_DIR ?? "commonlibf4-plugin/build/windows/x64/{mode}";
-	const wslStageDir = path.resolve(process.env.WSL_STAGE_DIR ?? "/mnt/c/tmp/lootman-wsl-build");
+	const wslStageDir = resolveConfigPath(process.env.WSL_STAGE_DIR ?? "/mnt/c/tmp/lootman-wsl-build");
 	const isWsl = detectWsl();
 
-	// Read version from package.json
-	const packageJson = fs.readJsonSync(path.join(packagingRoot, "package.json"));
+	// Read version from root package.json.
+	const packageJson = fs.readJsonSync(path.join(repositoryRoot, "package.json"));
 	const version: string = packageJson.version;
 
 	// Resolve paths
-	const projectRoot = checkDir(path.resolve(process.env.PROJECT_ROOT ?? path.join(packagingRoot, "..")));
-	const fallout4Dir = checkDir(path.resolve(steamGameDir, "Fallout 4"));
+	const projectRoot = checkDir(resolveConfigPath(process.env.PROJECT_ROOT ?? repositoryRoot));
+	const fallout4Dir = checkDir(path.resolve(resolveConfigPath(steamGameDir), "Fallout 4"));
 	const archive2Path = checkFile(path.resolve(fallout4Dir, "Tools", "Archive2", "Archive2.exe"));
 	const papyrusCompilerPath = checkFile(path.resolve(fallout4Dir, "Papyrus Compiler", "PapyrusCompiler.exe"));
 	const papyrusSourceDir = checkDir(path.resolve(fallout4Dir, "Data", "Scripts", "Source"));

@@ -12,6 +12,8 @@
 
 # folders
 build*/
+dist/
+node_modules/
 vs*/
 
 # packaging
@@ -21,8 +23,13 @@ packaging/dist/
 packaging/.env
 .pnpm-store/
 
+# local agent state
+skills-lock.json
+
 # local tool configuration
 tools/ghidra/headless.local.json
+tools/ghidra/projects/
+tools/xedit/stage-*/
 
 # files
 *.zip

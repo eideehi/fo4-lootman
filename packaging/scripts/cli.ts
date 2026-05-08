@@ -179,10 +179,10 @@ async function runDeploy(config: Config, argv: string[]): Promise<void> {
 function printUsage(): void {
 	console.log([
 		"Usage:",
-		"  tsx scripts/cli.ts clean [--all] [--wsl-build]",
-		`  tsx scripts/cli.ts build [--mode=${DEFAULT_BUILD_MODE}] [--with-papyrus|--no-papyrus]`,
-		`  tsx scripts/cli.ts deploy [--mode=${DEFAULT_BUILD_MODE}] [--lang=en|ja] [--with-papyrus] [--full-sync] [--build]`,
-		"  tsx scripts/cli.ts undeploy",
+		"  pnpm run package:clean [-- --all|-- --wsl-build]",
+		`  pnpm run package:build -- [--mode=${DEFAULT_BUILD_MODE}] [--with-papyrus|--no-papyrus]`,
+		`  pnpm run package:deploy -- [--mode=${DEFAULT_BUILD_MODE}] [--lang=en|ja] [--with-papyrus] [--full-sync] [--build]`,
+		"  pnpm run package:undeploy",
 	].join("\n"));
 }
 

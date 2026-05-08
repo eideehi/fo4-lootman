@@ -4,9 +4,9 @@ import { afterEach, describe, expect, it } from "vitest";
 import {
 	generateNativeHookHeader,
 	type NativeHookAddressManifest,
-} from "../../scripts/native-hook-addresses.js";
-import { resolveNativeHookAddresses } from "../../scripts/native-hook-address-resolution.js";
-import { createTempDir, removeTempDir } from "../helpers/temp-dir.js";
+} from "../scripts/native-hook-addresses.js";
+import { resolveNativeHookAddresses } from "../scripts/native-hook-address-resolution.js";
+import { createTempDir, removeTempDir } from "../../tests/helpers/temp-dir.js";
 
 function createFixtureManifest(reportPath = "tools/ghidra/reports/proven-call.txt"): NativeHookAddressManifest {
 	return {

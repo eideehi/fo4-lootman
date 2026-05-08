@@ -6,8 +6,8 @@ import {
 	parseGhidraHeadlessProbeArgs,
 	readGhidraHeadlessConfig,
 	runGhidraHeadlessProbe,
-} from "../../scripts/ghidra-headless.js";
-import { createTempDir, removeTempDir } from "../helpers/temp-dir.js";
+} from "../scripts/ghidra-headless.js";
+import { createTempDir, removeTempDir } from "../../tests/helpers/temp-dir.js";
 
 function writeConfig(root: string, name: "headless.example.json" | "headless.local.json", overrides: Record<string, unknown> = {}): string {
 	const configPath = path.join(root, "tools", "ghidra", name);

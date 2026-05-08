@@ -3,7 +3,6 @@
   "projectLocation": "tools/ghidra/projects",
   "projectName": "fo4-fallout4",
   "programName": "Fallout4.exe",
-  "fallout4Exe": "G:/steam/steamapps/common/Fallout 4/Fallout4.exe",
   "scriptPath": "tools/ghidra/scripts",
   "probeReportPath": "tools/ghidra/reports/headless-probe.txt",
   "probeAddress": "0x14059D378",

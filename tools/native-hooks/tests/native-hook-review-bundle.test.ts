@@ -5,11 +5,26 @@ import {
 	generateNativeHookHeader,
 	type NativeHookAddressEntry,
 	type NativeHookAddressManifest,
-} from "../../scripts/native-hook-addresses.js";
-import { generateNativeHookReviewBundle } from "../../scripts/native-hook-review-bundle.js";
-import { createTempDir, removeTempDir } from "../helpers/temp-dir.js";
+} from "../scripts/native-hook-addresses.js";
+import { generateNativeHookReviewBundle } from "../scripts/native-hook-review-bundle.js";
+import { createTempDir, removeTempDir } from "../../tests/helpers/temp-dir.js";
 
 const IMAGE_BASE = 0x140000000;
+
+interface CandidateBundleEntry {
+	id: string;
+	candidateRvas: { rva: string }[];
+	instructionWindowAddresses: string[];
+	proofReadiness: {
+		status: string;
+		targetAbsoluteAddress?: string;
+		targetReport?: { selectedReferenceCount: number };
+		missingDirectCallSites?: string[];
+		extraSameTargetReferences?: string[];
+		targetCandidates?: { targetAbsoluteAddress: string }[];
+	};
+	unresolvedItems: unknown[];
+}
 
 function absoluteFromRva(rva: string): string {
 	return (IMAGE_BASE + Number.parseInt(rva.slice(2), 16)).toString(16);
@@ -234,8 +249,8 @@ describe("native hook review bundle", () => {
 		});
 
 		const markdown = fs.readFileSync(paths.markdown, "utf8");
-		const candidates = fs.readJsonSync(paths.candidates);
-		const sourceSlice = fs.readFileSync(paths.sourceSlice, "utf8");
+			const candidates = fs.readJsonSync(paths.candidates) as { entries: CandidateBundleEntry[] };
+			const sourceSlice = fs.readFileSync(paths.sourceSlice, "utf8");
 
 		expect(markdown).toContain("# LootMan Native Hook Address Review Bundle");
 		expect(markdown).toContain("## Candidate RVAs");
@@ -254,24 +269,31 @@ describe("native hook review bundle", () => {
 		expect(markdown).not.toContain("fixture.layout: Discovery strategy is manual");
 		expect(candidates.entries.every((entry: { proofReadiness?: unknown }) => entry.proofReadiness)).toBe(true);
 
-		const entries = new Map(candidates.entries.map((entry: { id: string }) => [entry.id, entry]));
-		expect(candidates.entries[0].candidateRvas[0].rva).toBe("0x1234");
-		expect(candidates.entries[0].instructionWindowAddresses).toEqual(["0x1234"]);
-		expect(entries.get("fixture.ready_call").proofReadiness.status).toBe("ready_for_proof_metadata");
-		expect(entries.get("fixture.ready_call").proofReadiness.targetAbsoluteAddress).toBe("0x140005678");
-		expect(entries.get("fixture.ready_call").proofReadiness.targetReport.selectedReferenceCount).toBe(1);
-		expect(entries.get("fixture.missing_window").proofReadiness.status).toBe("needs_instruction_window_refresh");
-		expect(entries.get("fixture.missing_window").proofReadiness.missingDirectCallSites).toEqual(["0x140002234"]);
-		expect(entries.get("fixture.missing_allrefs").proofReadiness.status).toBe("needs_target_allrefs_report");
-		expect(entries.get("fixture.extra_reference").proofReadiness.status).toBe("needs_exclusion_triage");
-		expect(entries.get("fixture.extra_reference").proofReadiness.extraSameTargetReferences).toEqual(["0x140004244"]);
-		expect(entries.get("fixture.rediscovery").proofReadiness.status).toBe("needs_rediscovery");
-		expect(entries.get("fixture.conflicting_targets").proofReadiness.status).toBe("needs_rediscovery");
-		expect(entries.get("fixture.conflicting_targets").proofReadiness.targetCandidates.map((
-			candidate: { targetAbsoluteAddress: string },
-		) => candidate.targetAbsoluteAddress)).toEqual(["0x140009000", "0x140009100"]);
-		expect(entries.get("fixture.layout").proofReadiness.status).toBe("not_applicable");
-		expect(entries.get("fixture.layout").unresolvedItems).toEqual([]);
+			const entries = new Map(candidates.entries.map((entry) => [entry.id, entry]));
+			const entry = (id: string): CandidateBundleEntry => {
+				const found = entries.get(id);
+				if (!found) {
+					throw new Error(`Missing candidate entry: ${id}`);
+				}
+				return found;
+			};
+			expect(candidates.entries[0].candidateRvas[0].rva).toBe("0x1234");
+			expect(candidates.entries[0].instructionWindowAddresses).toEqual(["0x1234"]);
+			expect(entry("fixture.ready_call").proofReadiness.status).toBe("ready_for_proof_metadata");
+			expect(entry("fixture.ready_call").proofReadiness.targetAbsoluteAddress).toBe("0x140005678");
+			expect(entry("fixture.ready_call").proofReadiness.targetReport?.selectedReferenceCount).toBe(1);
+			expect(entry("fixture.missing_window").proofReadiness.status).toBe("needs_instruction_window_refresh");
+			expect(entry("fixture.missing_window").proofReadiness.missingDirectCallSites).toEqual(["0x140002234"]);
+			expect(entry("fixture.missing_allrefs").proofReadiness.status).toBe("needs_target_allrefs_report");
+			expect(entry("fixture.extra_reference").proofReadiness.status).toBe("needs_exclusion_triage");
+			expect(entry("fixture.extra_reference").proofReadiness.extraSameTargetReferences).toEqual(["0x140004244"]);
+			expect(entry("fixture.rediscovery").proofReadiness.status).toBe("needs_rediscovery");
+			expect(entry("fixture.conflicting_targets").proofReadiness.status).toBe("needs_rediscovery");
+			expect(entry("fixture.conflicting_targets").proofReadiness.targetCandidates?.map((
+				candidate: { targetAbsoluteAddress: string },
+			) => candidate.targetAbsoluteAddress)).toEqual(["0x140009000", "0x140009100"]);
+			expect(entry("fixture.layout").proofReadiness.status).toBe("not_applicable");
+			expect(entry("fixture.layout").unresolvedItems).toEqual([]);
 		expect(sourceSlice).toContain("DecodeDirectCallSite");
 		expect(sourceSlice).toContain("InstallWorkshopMaterialProbeHooks");
 		expect(sourceSlice.split("\n").filter((line) => /[ \t]+$/u.test(line))).toEqual([]);
