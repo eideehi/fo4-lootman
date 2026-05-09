@@ -8,6 +8,7 @@
 #include <map>
 #include <sstream>
 #include <string>
+#include <utility>
 #include <vector>
 
 #include "form_cache.h"
@@ -35,7 +36,9 @@ namespace papyrus_lootman
 	struct DiagnosticObjectEntry
 	{
 		NiPointer<TESObjectREFR> ref;
-		TESObjectCELL* cell = nullptr;
+		std::uint32_t refFormID = 0;
+		std::uint32_t cellFormID = 0;
+		NiPoint3 position{};
 		float distanceSquared = 0.0F;
 	};
 
@@ -44,6 +47,28 @@ namespace papyrus_lootman
 		std::string ids = "none";
 		std::size_t count = 0;
 		bool truncated = false;
+	};
+
+	struct DiagnosticRowSnapshot
+	{
+		TESForm* baseForm = nullptr;
+		std::uint32_t refFormID = 0;
+		std::uint32_t baseFormID = 0;
+		std::uint32_t cellFormID = 0;
+		std::uint32_t locationFormID = 0;
+		std::uint32_t ownerFormID = 0;
+		ENUM_FORM_ID formType = ENUM_FORM_ID::kNONE;
+		NiPoint3 position{};
+		bool preconditionOk = false;
+		bool deleted = false;
+		bool disabled = false;
+		bool destroyed = false;
+		bool activationBlocked = false;
+		std::string baseSource = "None";
+		std::string baseEditorID = "none";
+		std::string baseName = "none";
+		std::string refName = "none";
+		KeywordDiagnostics keywords;
 	};
 
 	std::string FormatHex(const std::uint32_t value, const int width = 8)
@@ -162,7 +187,7 @@ namespace papyrus_lootman
 		       (extraFlags->flags & kActivationIgnored) != 0;
 	}
 
-	std::string GetInventoryStatus(
+	const char* GetInventoryStatusUnsafe(
 		TESObjectREFR* ref,
 		TESForm* baseForm,
 		const PropertiesSnapshot& props,
@@ -205,9 +230,56 @@ namespace papyrus_lootman
 					static_cast<std::size_t>(std::numeric_limits<std::uint32_t>::max())));
 		}
 
-		return HasLootableItem(inventoryList, &props, &matchCache, inspectActor)
-			? "has_lootable_items"
-			: "no_lootable_items";
+		const auto hasLootableItems = HasLootableItem(inventoryList, &props, &matchCache, inspectActor);
+		return hasLootableItems ? "has_lootable_items" : "no_lootable_items";
+	}
+
+	struct InventoryStatusProbeContext
+	{
+		TESObjectREFR* ref = nullptr;
+		TESForm* baseForm = nullptr;
+		const PropertiesSnapshot* props = nullptr;
+		MatchCache* matchCache = nullptr;
+		std::uint32_t entries = 0;
+		const char* status = "not_applicable";
+	};
+
+	void CaptureInventoryStatusCall(void* opaque)
+	{
+		auto* context = static_cast<InventoryStatusProbeContext*>(opaque);
+		context->entries = 0;
+		context->status = GetInventoryStatusUnsafe(
+			context->ref,
+			context->baseForm,
+			*context->props,
+			*context->matchCache,
+			context->entries);
+	}
+
+	bool TryGetInventoryStatusSafe(
+		TESObjectREFR* ref,
+		TESForm* baseForm,
+		const PropertiesSnapshot& props,
+		MatchCache& matchCache,
+		std::string& outStatus,
+		std::uint32_t& outEntries)
+	{
+		InventoryStatusProbeContext context{
+			ref,
+			baseForm,
+			&props,
+			&matchCache
+		};
+		if (!ExecuteSehCallSafe(&CaptureInventoryStatusCall, &context))
+		{
+			outStatus = "probe_failed";
+			outEntries = 0;
+			return false;
+		}
+
+		outStatus = context.status;
+		outEntries = context.entries;
+		return true;
 	}
 
 	std::string DetermineDiagnosticReason(
@@ -322,6 +394,227 @@ namespace papyrus_lootman
 		return "looting_candidate";
 	}
 
+	struct DiagnosticReasonProbeContext
+	{
+		TESObjectREFR* ref = nullptr;
+		TESForm* baseForm = nullptr;
+		std::uint32_t enabledFormTypeMask = 0;
+		MatchCache* matchCache = nullptr;
+		bool gotValidForm = false;
+		bool validForm = false;
+		bool gotLootableForm = false;
+		bool lootableForm = false;
+		bool gotValidObject = false;
+		bool validObject = false;
+		bool gotLootableObject = false;
+		bool lootableObject = false;
+		std::string reason = "reason_probe_failed";
+	};
+
+	void CaptureDiagnosticReasonCall(void* opaque)
+	{
+		auto* context = static_cast<DiagnosticReasonProbeContext*>(opaque);
+		context->reason = DetermineDiagnosticReason(
+			context->ref,
+			context->baseForm,
+			context->enabledFormTypeMask,
+			*context->matchCache,
+			context->gotValidForm,
+			context->validForm,
+			context->gotLootableForm,
+			context->lootableForm,
+			context->gotValidObject,
+			context->validObject,
+			context->gotLootableObject,
+			context->lootableObject);
+	}
+
+	bool TryDetermineDiagnosticReasonSafe(
+		TESObjectREFR* ref,
+		TESForm* baseForm,
+		const std::uint32_t enabledFormTypeMask,
+		MatchCache& matchCache,
+		const bool gotValidForm,
+		const bool validForm,
+		const bool gotLootableForm,
+		const bool lootableForm,
+		const bool gotValidObject,
+		const bool validObject,
+		const bool gotLootableObject,
+		const bool lootableObject,
+		std::string& outReason)
+	{
+		DiagnosticReasonProbeContext context{
+			ref,
+			baseForm,
+			enabledFormTypeMask,
+			&matchCache,
+			gotValidForm,
+			validForm,
+			gotLootableForm,
+			lootableForm,
+			gotValidObject,
+			validObject,
+			gotLootableObject,
+			lootableObject
+		};
+		if (!ExecuteSehCallSafe(&CaptureDiagnosticReasonCall, &context))
+		{
+			outReason = "reason_probe_failed";
+			return false;
+		}
+
+		outReason = std::move(context.reason);
+		return true;
+	}
+
+	struct DiagnosticCollectionProbeContext
+	{
+		TESObjectREFR* ref = nullptr;
+		TESObjectREFR* player = nullptr;
+		TESObjectCELL* cell = nullptr;
+		NiPoint3 origin{};
+		float maxDistanceSquared = 0.0F;
+		std::uint32_t refFormID = 0;
+		std::uint32_t cellFormID = 0;
+		NiPoint3 position{};
+		float distanceSquared = 0.0F;
+		bool include = false;
+	};
+
+	void CaptureDiagnosticCollectionEntryCall(void* opaque)
+	{
+		auto* context = static_cast<DiagnosticCollectionProbeContext*>(opaque);
+		auto* ref = context->ref;
+		if (!ref || ref == context->player || ref->IsPlayerRef())
+		{
+			return;
+		}
+
+		const auto position = ref->GetPosition();
+		const auto dx = context->origin.x - position.x;
+		const auto dy = context->origin.y - position.y;
+		const auto dz = context->origin.z - position.z;
+		const auto distanceSquared = dx * dx + dy * dy + dz * dz;
+		if (distanceSquared <= 0.0F || distanceSquared > context->maxDistanceSquared)
+		{
+			return;
+		}
+
+		context->refFormID = ref->formID;
+		context->cellFormID = context->cell ? context->cell->formID : 0;
+		context->position = position;
+		context->distanceSquared = distanceSquared;
+		context->include = true;
+	}
+
+	bool TryCaptureDiagnosticCollectionEntrySafe(
+		TESObjectREFR* ref,
+		TESObjectREFR* player,
+		TESObjectCELL* cell,
+		const NiPoint3& origin,
+		const float maxDistanceSquared,
+		DiagnosticObjectEntry& outEntry)
+	{
+		DiagnosticCollectionProbeContext context{
+			ref,
+			player,
+			cell,
+			origin,
+			maxDistanceSquared
+		};
+		if (!ExecuteSehCallSafe(&CaptureDiagnosticCollectionEntryCall, &context) || !context.include)
+		{
+			return false;
+		}
+
+		outEntry.refFormID = context.refFormID;
+		outEntry.cellFormID = context.cellFormID;
+		outEntry.position = context.position;
+		outEntry.distanceSquared = context.distanceSquared;
+		return true;
+	}
+
+	DiagnosticRowSnapshot BuildFallbackDiagnosticRowSnapshot(const DiagnosticObjectEntry& entry)
+	{
+		DiagnosticRowSnapshot snapshot;
+		snapshot.refFormID = entry.refFormID;
+		snapshot.cellFormID = entry.cellFormID;
+		snapshot.position = entry.position;
+		return snapshot;
+	}
+
+	struct DiagnosticRowProbeContext
+	{
+		TESObjectREFR* ref = nullptr;
+		std::uint32_t fallbackCellFormID = 0;
+		DiagnosticRowSnapshot snapshot;
+	};
+
+	void CaptureDiagnosticRowSnapshotCall(void* opaque)
+	{
+		auto* context = static_cast<DiagnosticRowProbeContext*>(opaque);
+		auto* ref = context->ref;
+		auto& snapshot = context->snapshot;
+		if (!ref)
+		{
+			return;
+		}
+
+		snapshot.refFormID = ref->formID;
+		snapshot.position = ref->GetPosition();
+		snapshot.preconditionOk = CheckPrecondition(ref);
+		snapshot.deleted = (ref->formFlags & kFormFlagDeleted) != 0;
+		snapshot.disabled = (ref->formFlags & kFormFlagDisabled) != 0;
+		snapshot.destroyed = (ref->formFlags & kFormFlagDestroyed) != 0;
+		snapshot.activationBlocked = HasActivationBlockFlag(ref);
+		snapshot.refName = SanitizeDiagnosticText(ref->GetDisplayFullName());
+
+		auto* baseForm = ref->GetObjectReference();
+		snapshot.baseForm = baseForm;
+		if (baseForm)
+		{
+			snapshot.baseFormID = baseForm->formID;
+			snapshot.formType = baseForm->GetFormType();
+			snapshot.baseSource = GetSourceIdentifier(baseForm);
+			snapshot.baseEditorID = SanitizeDiagnosticText(GetFormEditorIDOrEmpty(baseForm));
+			snapshot.baseName = SanitizeDiagnosticText(GetFormName(baseForm));
+			snapshot.keywords = GetKeywordDiagnostics(baseForm);
+		}
+
+		auto* cell = ref->GetParentCell();
+		snapshot.cellFormID = cell ? cell->formID : context->fallbackCellFormID;
+		auto* location = ref->GetCurrentLocation();
+		if (!location && cell)
+		{
+			location = cell->GetLocation();
+		}
+		snapshot.locationFormID = location ? location->formID : 0;
+
+		auto* owner = ref->GetOwner();
+		snapshot.ownerFormID = owner ? owner->formID : 0;
+	}
+
+	bool TryCaptureDiagnosticRowSnapshotSafe(
+		TESObjectREFR* ref,
+		const DiagnosticObjectEntry& entry,
+		DiagnosticRowSnapshot& outSnapshot)
+	{
+		DiagnosticRowProbeContext context{
+			ref,
+			entry.cellFormID,
+			BuildFallbackDiagnosticRowSnapshot(entry)
+		};
+		if (!ExecuteSehCallSafe(&CaptureDiagnosticRowSnapshotCall, &context))
+		{
+			outSnapshot = BuildFallbackDiagnosticRowSnapshot(entry);
+			return false;
+		}
+
+		outSnapshot = std::move(context.snapshot);
+		return true;
+	}
+
 	void CollectDiagnosticReferences(
 		TESObjectREFR* player,
 		const NiPoint3& origin,
@@ -339,19 +632,17 @@ namespace papyrus_lootman
 			for (auto& refPtr : cell->references)
 			{
 				auto* ref = refPtr.get();
-				if (!ref || ref == player || ref->IsPlayerRef())
+				DiagnosticObjectEntry entry;
+				if (TryCaptureDiagnosticCollectionEntrySafe(
+					ref,
+					player,
+					cell,
+					origin,
+					maxDistanceSquared,
+					entry))
 				{
-					continue;
-				}
-
-				const auto position = ref->GetPosition();
-				const auto dx = origin.x - position.x;
-				const auto dy = origin.y - position.y;
-				const auto dz = origin.z - position.z;
-				const auto distanceSquared = dx * dx + dy * dy + dz * dz;
-				if (distanceSquared > 0.0F && distanceSquared <= maxDistanceSquared)
-				{
-					buffer.push_back({ refPtr, cell, distanceSquared });
+					entry.ref = refPtr;
+					buffer.push_back(std::move(entry));
 				}
 			}
 		};
@@ -481,19 +772,19 @@ namespace papyrus_lootman
 
 		for (std::size_t index = 0; index < rowsToLog; ++index)
 		{
-			auto* ref = entries[index].ref.get();
-			auto* baseForm = ref ? ref->GetObjectReference() : nullptr;
-			const auto formType = baseForm ? baseForm->GetFormType() : ENUM_FORM_ID::kNONE;
+			const auto& entry = entries[index];
+			auto* ref = entry.ref.get();
+			DiagnosticRowSnapshot snapshot;
+			const auto gotRowSnapshot = TryCaptureDiagnosticRowSnapshotSafe(ref, entry, snapshot);
+
+			auto* baseForm = snapshot.baseForm;
+			const auto formType = snapshot.formType;
 			const auto formTypeName = GetFormTypeName(formType);
 			++formTypeCounts[formTypeName];
 
 			const auto enabledBit = FormTypeToEnabledBit(formType);
 			const auto supportedFormType = enabledBit != 0;
 			const auto enabledByMcm = supportedFormType && ((enabledBit & enabledFormTypeMask) != 0);
-			const auto preconditionOk = ref && CheckPrecondition(ref);
-			const auto deleted = ref && ((ref->formFlags & kFormFlagDeleted) != 0);
-			const auto disabled = ref && ((ref->formFlags & kFormFlagDisabled) != 0);
-			const auto destroyed = ref && ((ref->formFlags & kFormFlagDestroyed) != 0);
 
 			bool gotValidForm = false;
 			bool validForm = false;
@@ -521,13 +812,16 @@ namespace papyrus_lootman
 			}
 
 			std::uint32_t inventoryEntries = 0;
-			const auto inventoryStatus = GetInventoryStatus(
+			std::string inventoryStatus = "not_applicable";
+			(void)TryGetInventoryStatusSafe(
 				ref,
 				baseForm,
 				props,
 				matchCache,
+				inventoryStatus,
 				inventoryEntries);
-			const auto reason = DetermineDiagnosticReason(
+			std::string reason = "reason_probe_failed";
+			const auto gotReason = TryDetermineDiagnosticReasonSafe(
 				ref,
 				baseForm,
 				enabledFormTypeMask,
@@ -539,41 +833,35 @@ namespace papyrus_lootman
 				gotValidObject,
 				validObject,
 				gotLootableObject,
-				lootableObject);
-			const auto keywords = GetKeywordDiagnostics(baseForm);
-			auto* cell = entries[index].cell ? entries[index].cell : (ref ? ref->GetParentCell() : nullptr);
-			auto* location = ref ? ref->GetCurrentLocation() : nullptr;
-			if (!location && cell)
-			{
-				location = cell->GetLocation();
-			}
-			auto* owner = ref ? ref->GetOwner() : nullptr;
-			const auto position = ref ? ref->GetPosition() : NiPoint3{};
-			const auto distance = std::sqrt(entries[index].distanceSquared);
+				lootableObject,
+				reason);
+			const auto rowProbeFailed = !gotRowSnapshot || !gotReason;
+			const auto distance = std::sqrt(entry.distanceSquared);
 
 			REX::DEBUG(
-				"source=native component=nearby_object_diagnostics event=reference context=\"{}\" index={} ref={:08X} base={:08X} base_source={} form_type={} supported_form_type={} enabled_by_mcm={} reason={} candidate={} distance_units={:.3f} position_x={:.3f} position_y={:.3f} position_z={:.3f} cell={:08X} location={:08X} owner={:08X} precondition_ok={} deleted={} disabled={} destroyed={} got_valid_form={} valid_form={} got_lootable_form={} lootable_form={} got_valid_object={} valid_object={} got_lootable_object={} lootable_object={} inventory_status={} inventory_entries={} activation_blocked={} base_editor_id=\"{}\" base_name=\"{}\" ref_name=\"{}\" base_keywords=\"{}\" keyword_count={} keywords_truncated={}",
+				"source=native component=nearby_object_diagnostics event=reference context=\"{}\" index={} ref={:08X} base={:08X} base_source={} form_type={} supported_form_type={} enabled_by_mcm={} reason={} candidate={} row_probe_failed={} distance_units={:.3f} position_x={:.3f} position_y={:.3f} position_z={:.3f} cell={:08X} location={:08X} owner={:08X} precondition_ok={} deleted={} disabled={} destroyed={} got_valid_form={} valid_form={} got_lootable_form={} lootable_form={} got_valid_object={} valid_object={} got_lootable_object={} lootable_object={} inventory_status={} inventory_entries={} activation_blocked={} base_editor_id=\"{}\" base_name=\"{}\" ref_name=\"{}\" base_keywords=\"{}\" keyword_count={} keywords_truncated={}",
 				contextText,
 				index + 1,
-				ref ? ref->formID : 0,
-				baseForm ? baseForm->formID : 0,
-				GetSourceIdentifier(baseForm),
+				snapshot.refFormID,
+				snapshot.baseFormID,
+				snapshot.baseSource,
 				formTypeName,
 				supportedFormType,
 				enabledByMcm,
 				reason,
-				reason == "looting_candidate",
+				!rowProbeFailed && reason == "looting_candidate",
+				rowProbeFailed,
 				distance,
-				position.x,
-				position.y,
-				position.z,
-				cell ? cell->formID : 0,
-				location ? location->formID : 0,
-				owner ? owner->formID : 0,
-				preconditionOk,
-				deleted,
-				disabled,
-				destroyed,
+				snapshot.position.x,
+				snapshot.position.y,
+				snapshot.position.z,
+				snapshot.cellFormID,
+				snapshot.locationFormID,
+				snapshot.ownerFormID,
+				snapshot.preconditionOk,
+				snapshot.deleted,
+				snapshot.disabled,
+				snapshot.destroyed,
 				gotValidForm,
 				validForm,
 				gotLootableForm,
@@ -584,13 +872,13 @@ namespace papyrus_lootman
 				lootableObject,
 				inventoryStatus,
 				inventoryEntries,
-				HasActivationBlockFlag(ref),
-				SanitizeDiagnosticText(GetFormEditorIDOrEmpty(baseForm)),
-				SanitizeDiagnosticText(GetFormName(baseForm)),
-				ref ? SanitizeDiagnosticText(ref->GetDisplayFullName()) : "none",
-				keywords.ids,
-				keywords.count,
-				keywords.truncated);
+				snapshot.activationBlocked,
+				snapshot.baseEditorID,
+				snapshot.baseName,
+				snapshot.refName,
+				snapshot.keywords.ids,
+				snapshot.keywords.count,
+				snapshot.keywords.truncated);
 		}
 
 		REX::DEBUG(

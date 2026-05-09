@@ -22,6 +22,12 @@ function extractPapyrusEvent(source: string, name: string): string {
 	return match![1]!;
 }
 
+function extractCppStruct(source: string, name: string): string {
+	const match = new RegExp(`struct\\s+${name}\\s*\\{([\\s\\S]*?)\\n\\s*\\};`).exec(source);
+	expect(match, `missing C++ struct ${name}`).not.toBeNull();
+	return match![1]!;
+}
+
 function translationValue(source: string, key: string): string {
 	const line = source.split(/\r?\n/).find((entry) => entry.startsWith(`${key}\t`));
 	expect(line, `missing translation key ${key}`).toBeDefined();
@@ -141,6 +147,40 @@ describe("looting trigger policy", () => {
 		expect(translationValue(japaneseTranslations, helpKey)).toBe(
 			"周囲のオブジェクト情報をLootManのログへ詳しく書き出します。",
 		);
+	});
+
+	it("keeps nearby object diagnostics row probes behind recoverable native boundaries", () => {
+		const diagnosticObjectEntry = extractCppStruct(nativeDiagnostics, "DiagnosticObjectEntry");
+
+		expect(nativeDiagnostics).toContain("TryGetInventoryStatusSafe");
+		expect(nativeDiagnostics).toContain('"probe_failed"');
+		expect(nativeDiagnostics).toContain("TryCaptureDiagnosticRowSnapshotSafe");
+		expect(nativeDiagnostics).toContain("TryDetermineDiagnosticReasonSafe");
+		expect(nativeDiagnostics).toContain("row_probe_failed={}");
+		expect(nativeDiagnostics).toContain("cellFormID");
+		expect(diagnosticObjectEntry).not.toContain("TESObjectCELL*");
+		expect(nativeDiagnostics).not.toContain("entries[index].cell");
+		expect(nativeDiagnostics).not.toMatch(/return\s+HasLootableItem\(/);
+	});
+
+	it("rejects invalid MCM utility item types and guards missing current locations", () => {
+		const moveItemsInternal = extractPapyrusFunction(mcmScript, "MoveItemsInternal");
+		expect(moveItemsInternal).toContain("MoveItemsType < MOVE_ITEM_ALL || MoveItemsType > MOVE_ITEM_KEY");
+
+		const scrapItemsInternal = extractPapyrusFunction(mcmScript, "ScrapItemsInternal");
+		expect(scrapItemsInternal).toContain("ScrapItemsType < SCRAP_ITEM_ALL || ScrapItemsType > SCRAP_ITEM_JUNK");
+
+		const settingChange = extractPapyrusFunction(mcmScript, "OnMCMSettingChange");
+		const branchStart = settingChange.indexOf('ElseIf (id == "NotLootingFromSettlement")');
+		const branchEnd = settingChange.indexOf('ElseIf (id == "WorkerInvokeInterval")');
+		expect(branchStart, "missing NotLootingFromSettlement branch").toBeGreaterThanOrEqual(0);
+		expect(branchEnd, "missing WorkerInvokeInterval branch").toBeGreaterThan(branchStart);
+
+		const settlementBranch = settingChange.slice(branchStart, branchEnd);
+		expect(settlementBranch).toContain("bool isSettlementLocation = false");
+		expect(settlementBranch).toMatch(/If \(currentLocation\)[\s\S]*currentLocation\.HasKeyword[\s\S]*EndIf/);
+		expect(settlementBranch).toContain("If (isSettlementLocation || currentWorkshop != None)");
+		expect(settlementBranch).not.toContain("If (currentLocation.HasKeyword");
 	});
 
 	it("delivers manually looted items through the shared delivery path", () => {

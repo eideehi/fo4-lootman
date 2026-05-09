@@ -166,8 +166,13 @@ Function OnMCMSettingChange(string modName, string id)
     ElseIf (id == "NotLootingFromSettlement")
         Location currentLocation = player.GetCurrentLocation()
         WorkshopScript currentWorkshop = LTMN2:Utils.GetCurrentWorkshop(player)
+        bool isSettlementLocation = false
 
-        If (currentLocation.HasKeyword(Game.GetCommonProperties().LocTypeSettlement) || currentLocation.HasKeyword(Game.GetCommonProperties().LocTypeWorkshopSettlement) || currentWorkshop != None)
+        If (currentLocation)
+            isSettlementLocation = currentLocation.HasKeyword(Game.GetCommonProperties().LocTypeSettlement) || currentLocation.HasKeyword(Game.GetCommonProperties().LocTypeWorkshopSettlement)
+        EndIf
+
+        If (isSettlementLocation || currentWorkshop != None)
             properties.IsInSettlement = true
         Else
             properties.IsInSettlement = false
@@ -259,7 +264,7 @@ Function MoveItemsInternal()
         Return
     EndIf
 
-    If (MoveItemsType < MOVE_ITEM_ALL && MoveItemsType > MOVE_ITEM_KEY)
+    If (MoveItemsType < MOVE_ITEM_ALL || MoveItemsType > MOVE_ITEM_KEY)
         Return
     EndIf
 
@@ -311,7 +316,7 @@ Function ScrapItemsInternal()
         Return
     EndIf
 
-    If (ScrapItemsType < SCRAP_ITEM_ALL && ScrapItemsType > SCRAP_ITEM_JUNK)
+    If (ScrapItemsType < SCRAP_ITEM_ALL || ScrapItemsType > SCRAP_ITEM_JUNK)
         Return
     EndIf
 
