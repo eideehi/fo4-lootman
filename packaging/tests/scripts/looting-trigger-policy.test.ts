@@ -31,9 +31,15 @@ function translationValue(source: string, key: string): string {
 describe("looting trigger policy", () => {
 	const systemScript = readWorkspaceFile("papyrus/Scripts/Source/User/LTMN2/System.psc");
 	const mcmScript = readWorkspaceFile("papyrus/Scripts/Source/User/LTMN2/MCM.psc");
+	const lootManScript = readWorkspaceFile("papyrus/Scripts/Source/User/LTMN2/LootMan.psc");
 	const patchScript = readWorkspaceFile("papyrus/Scripts/Source/User/LTMN2/Patch.psc");
+	const papyrusBinding = readWorkspaceFile("commonlibf4-plugin/src/papyrus_lootman.cpp");
+	const papyrusInternal = readWorkspaceFile("commonlibf4-plugin/src/papyrus_lootman_internal.h");
+	const nativeDiagnostics = readWorkspaceFile("commonlibf4-plugin/src/papyrus_lootman_diagnostics.cpp");
 	const mcmConfig = JSON.parse(readWorkspaceFile("packaging/resources/lootman/common/MCM/Config/LootMan/config.json")) as {
-		pages: Array<{ content?: Array<{ id?: string; valueOptions?: { min?: number } }> }>;
+		pages: Array<{
+			content?: Array<{ id?: string; text?: string; type?: string; help?: string; valueOptions?: { allowModifierKeys?: boolean; min?: number } }>;
+		}>;
 	};
 	const keybinds = JSON.parse(readWorkspaceFile("packaging/resources/lootman/common/MCM/Config/LootMan/keybinds.json")) as {
 		keybinds: Array<{ id: string; action: { type: string; form: string; function: string; params: unknown[] } }>;
@@ -67,6 +73,74 @@ describe("looting trigger policy", () => {
 		const timer = extractPapyrusEvent(systemScript, "OnTimer");
 		expect(timer).toContain("Looting()");
 		expect(timer).not.toContain("Looting(true)");
+	});
+
+	it("wires the nearby object diagnostics hotkey to native debug logging", () => {
+		const labelKey = "$PAGE_HOTKEY_DUMP_NEARBY_OBJECT_DIAGNOSTICS";
+		const helpKey = "$PAGE_HOTKEY_DUMP_NEARBY_OBJECT_DIAGNOSTICS_HELP";
+		const diagnosticsKeybind = keybinds.keybinds.find((keybind) => keybind.id === "DumpNearbyObjectDiagnostics");
+		expect(diagnosticsKeybind?.action).toEqual({
+			type: "CallFunction",
+			form: "LootMan.esp|F9B",
+			function: "DumpNearbyObjectDiagnostics",
+			params: [],
+		});
+
+		const diagnosticsControl = mcmConfig.pages
+			.flatMap((page) => page.content ?? [])
+			.find((item) => item.id === "DumpNearbyObjectDiagnostics");
+		expect(diagnosticsControl).toMatchObject({
+			text: labelKey,
+			type: "hotkey",
+			help: helpKey,
+			valueOptions: { allowModifierKeys: true },
+		});
+
+		const dumpNearbyObjectDiagnostics = extractPapyrusFunction(mcmScript, "DumpNearbyObjectDiagnostics");
+		expect(dumpNearbyObjectDiagnostics).toContain(
+			"properties.IsNotInstalled || properties.IsNotInitialized || properties.IsUninstalled",
+		);
+		expect(dumpNearbyObjectDiagnostics).toContain('LogMcmEvent("nearby_object_diagnostics_started", "")');
+		expect(dumpNearbyObjectDiagnostics).toContain("LTMN2:LootMan.DumpNearbyObjectDiagnostics(player, context)");
+		expect(dumpNearbyObjectDiagnostics).toContain(
+			'LogMcmEvent("nearby_object_diagnostics_completed", "rows_logged=" + rowsLogged)',
+		);
+
+		expect(lootManScript).toContain(
+			'int Function DumpNearbyObjectDiagnostics(ObjectReference player, string context = "") global native',
+		);
+		expect(papyrusInternal).toMatch(
+			/std::int32_t DumpNearbyObjectDiagnostics\(\s*std::monostate, RE::TESObjectREFR\* player, RE::BSFixedString context\);/,
+		);
+		expect(papyrusBinding).toContain('"DumpNearbyObjectDiagnostics"sv');
+		expect(papyrusBinding).toContain("&DumpNearbyObjectDiagnostics");
+
+		expect(nativeDiagnostics).toContain("component=nearby_object_diagnostics event=scan_started");
+		expect(nativeDiagnostics).toContain("component=nearby_object_diagnostics event=reference");
+		expect(nativeDiagnostics).toContain("component=nearby_object_diagnostics event=summary");
+		expect(nativeDiagnostics).toContain("enabled_looting_form_type_mask");
+		expect(nativeDiagnostics).toContain("GetFile(0)");
+		expect(nativeDiagnostics).toContain("base_source=");
+		expect(nativeDiagnostics).toContain("requires_include_activator");
+		expect(nativeDiagnostics).toContain("requires_include_activation_block");
+		expect(nativeDiagnostics).toContain("requires_include_quest_item");
+		expect(nativeDiagnostics).toContain("requires_include_unique_item");
+		expect(nativeDiagnostics).toContain("requires_include_featured_item");
+		expect(nativeDiagnostics).toContain("excluded_by_injection_data");
+		expect(nativeDiagnostics).not.toContain("REX::INFO");
+
+		expect(translationValue(englishTranslations, labelKey)).toBe("Dump Nearby Object Diagnostics");
+		expect(translationValue(englishTranslations, helpKey)).toBe(
+			"Writes detailed nearby object diagnostics to the LootMan log.",
+		);
+		expect(translationValue(japaneseEnglishTranslations, labelKey)).toBe("周囲のオブジェクト診断を出力");
+		expect(translationValue(japaneseEnglishTranslations, helpKey)).toBe(
+			"周囲のオブジェクト情報をLootManのログへ詳しく書き出します。",
+		);
+		expect(translationValue(japaneseTranslations, labelKey)).toBe("周囲のオブジェクト診断を出力");
+		expect(translationValue(japaneseTranslations, helpKey)).toBe(
+			"周囲のオブジェクト情報をLootManのログへ詳しく書き出します。",
+		);
 	});
 
 	it("delivers manually looted items through the shared delivery path", () => {

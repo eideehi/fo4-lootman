@@ -19,6 +19,7 @@ namespace properties
 		max_activation_refs_per_pass,
 		use_looting_time_budget,
 		looting_time_budget_ms,
+		enabled_looting_form_type_mask,
 		not_looting_from_settlement,
 		lootable_inventory_item_type,
 		looting_legendary_only,

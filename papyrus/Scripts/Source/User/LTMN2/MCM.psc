@@ -404,6 +404,17 @@ Function ExecuteLooting()
     system.DeliverLootManInventory()
 EndFunction
 
+Function DumpNearbyObjectDiagnostics()
+    If (properties.IsNotInstalled || properties.IsNotInitialized || properties.IsUninstalled)
+        Return
+    EndIf
+
+    string context = "source=papyrus component=mcm event=nearby_object_diagnostics"
+    LogMcmEvent("nearby_object_diagnostics_started", "")
+    int rowsLogged = LTMN2:LootMan.DumpNearbyObjectDiagnostics(player, context)
+    LogMcmEvent("nearby_object_diagnostics_completed", "rows_logged=" + rowsLogged)
+EndFunction
+
 Function SetUtilityBusy(bool busy)
     IsIdleUtility = !busy
     IsBusyUtility = busy

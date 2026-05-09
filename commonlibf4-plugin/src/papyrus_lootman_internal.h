@@ -508,6 +508,11 @@ namespace papyrus_lootman
 		const RE::TESForm* form,
 		const InventoryItemInfo& info,
 		const PropertiesSnapshot* props);
+	bool HasLootableItem(
+		RE::BGSInventoryList* inventoryList,
+		const PropertiesSnapshot* props,
+		MatchCache* matchCache,
+		bool sourceIsDead);
 	bool TryIsValidFormSafe(
 		RE::TESForm* form,
 		const PropertiesSnapshot* props,
@@ -554,6 +559,8 @@ namespace papyrus_lootman
 	std::string GetFormTypeIdentifier(std::monostate, RE::TESForm* form);
 	std::string GetHexID(std::monostate, RE::TESForm* form);
 	std::string GetName(std::monostate, RE::TESForm* form);
+	std::int32_t DumpNearbyObjectDiagnostics(
+		std::monostate, RE::TESObjectREFR* player, RE::BSFixedString context);
 	void LogInventoryDiagnostics(
 		std::monostate, RE::TESObjectREFR* inventoryOwner, RE::BSFixedString prefix);
 	void LogWorkshopSupplyDiagnostics(

@@ -8,6 +8,19 @@ namespace properties
 	std::mutex lock;
 	std::unordered_map<Key, Value> papyrusProperties;
 
+	inline constexpr int kEnableFormTypeACTI = 1;
+	inline constexpr int kEnableFormTypeALCH = 2;
+	inline constexpr int kEnableFormTypeAMMO = 4;
+	inline constexpr int kEnableFormTypeARMO = 8;
+	inline constexpr int kEnableFormTypeBOOK = 16;
+	inline constexpr int kEnableFormTypeCONT = 32;
+	inline constexpr int kEnableFormTypeFLOR = 64;
+	inline constexpr int kEnableFormTypeINGR = 128;
+	inline constexpr int kEnableFormTypeKEYM = 256;
+	inline constexpr int kEnableFormTypeMISC = 512;
+	inline constexpr int kEnableFormTypeNPC_ = 1024;
+	inline constexpr int kEnableFormTypeWEAP = 2048;
+
 	bool GetPapyrusProperty(const char* propertyName, RE::BSScript::Variable& outValue)
 	{
 		const auto scriptName = "LTMN2:Properties"sv;
@@ -94,6 +107,28 @@ namespace properties
 			result.type = decimal;
 			result.data.f = RE::BSScript::get<float>(value);
 		}
+		return result;
+	}
+
+	Value BuildEnabledLootingFormTypeMask()
+	{
+		Value result;
+		result.type = integer;
+		result.data.i = 0;
+
+		if (GetBoolProperty("EnableObjectLootingOfACTI").data.b) result.data.i |= kEnableFormTypeACTI;
+		if (GetBoolProperty("EnableObjectLootingOfALCH").data.b) result.data.i |= kEnableFormTypeALCH;
+		if (GetBoolProperty("EnableObjectLootingOfAMMO").data.b) result.data.i |= kEnableFormTypeAMMO;
+		if (GetBoolProperty("EnableObjectLootingOfARMO").data.b) result.data.i |= kEnableFormTypeARMO;
+		if (GetBoolProperty("EnableObjectLootingOfBOOK").data.b) result.data.i |= kEnableFormTypeBOOK;
+		if (GetBoolProperty("EnableObjectLootingOfCONT").data.b) result.data.i |= kEnableFormTypeCONT;
+		if (GetBoolProperty("EnableObjectLootingOfFLOR").data.b) result.data.i |= kEnableFormTypeFLOR;
+		if (GetBoolProperty("EnableObjectLootingOfINGR").data.b) result.data.i |= kEnableFormTypeINGR;
+		if (GetBoolProperty("EnableObjectLootingOfKEYM").data.b) result.data.i |= kEnableFormTypeKEYM;
+		if (GetBoolProperty("EnableObjectLootingOfMISC").data.b) result.data.i |= kEnableFormTypeMISC;
+		if (GetBoolProperty("EnableObjectLootingOfNPC_").data.b) result.data.i |= kEnableFormTypeNPC_;
+		if (GetBoolProperty("EnableObjectLootingOfWEAP").data.b) result.data.i |= kEnableFormTypeWEAP;
+
 		return result;
 	}
 
@@ -202,6 +237,11 @@ namespace properties
 		if (updateAll || propertyName == updateProperty)
 		{
 			updates[looting_time_budget_ms] = GetFloatProperty(propertyName);
+		}
+
+		if (updateAll || updateProperty.rfind("EnableObjectLootingOf", 0) == 0)
+		{
+			updates[enabled_looting_form_type_mask] = BuildEnabledLootingFormTypeMask();
 		}
 
 		propertyName = "LootingRange";

@@ -1372,6 +1372,16 @@
             "allowModifierKeys": true
           },
           "groupCondition": { "AND": [1, 6] }
+        },
+        {
+          "id": "DumpNearbyObjectDiagnostics",
+          "text": "$PAGE_HOTKEY_DUMP_NEARBY_OBJECT_DIAGNOSTICS",
+          "type": "hotkey",
+          "help": "$PAGE_HOTKEY_DUMP_NEARBY_OBJECT_DIAGNOSTICS_HELP",
+          "valueOptions": {
+            "allowModifierKeys": true
+          },
+          "groupCondition": { "AND": [1, 6] }
         }
       ]
     }

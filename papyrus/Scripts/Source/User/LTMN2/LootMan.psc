@@ -21,6 +21,9 @@ Function SetLogLevel(int logLevel) global native
 ; Format a form id as uppercase hex, or None for missing forms.
 string Function GetHexID(Form form) global native
 
+; Write a one-shot nearby object diagnostic scan to the native LootMan log.
+int Function DumpNearbyObjectDiagnostics(ObjectReference player, string context = "") global native
+
 ; Register a runtime supply-link mapping for the native workshop hook.
 Function RememberWorkshopSupplyLink(Form targetLocation, ObjectReference lootManWorkshop, string prefix) global native
 

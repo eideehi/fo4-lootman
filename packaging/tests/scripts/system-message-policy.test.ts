@@ -66,6 +66,7 @@ describe("system message policy", () => {
 			"OpenLootManInventory",
 			"ToggleLinkToWorkshop",
 			"ExecuteLooting",
+			"DumpNearbyObjectDiagnostics",
 		]);
 
 		const toggleEnable = extractPapyrusFunction(mcmScript, "ToggleEnableLootMan");

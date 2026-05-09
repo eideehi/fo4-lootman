@@ -40,6 +40,16 @@
         "function": "ExecuteLooting",
         "params": []
       }
+    },
+    {
+      "id": "DumpNearbyObjectDiagnostics",
+      "desc": "$PAGE_HOTKEY_DUMP_NEARBY_OBJECT_DIAGNOSTICS_HELP",
+      "action": {
+        "type": "CallFunction",
+        "form": "LootMan.esp|F9B",
+        "function": "DumpNearbyObjectDiagnostics",
+        "params": []
+      }
     }
   ]
 }

@@ -29,6 +29,8 @@ namespace papyrus_lootman
 			&SetLogLevel, false, false);
 		vm->BindNativeMethod("LTMN2:LootMan"sv, "GetHexID"sv,
 			&GetHexID, true, false);
+		vm->BindNativeMethod("LTMN2:LootMan"sv, "DumpNearbyObjectDiagnostics"sv,
+			&DumpNearbyObjectDiagnostics, false, false);
 		vm->BindNativeMethod("LTMN2:LootMan"sv, "RememberWorkshopSupplyLink"sv,
 			&RememberWorkshopSupplyLink, false, false);
 		vm->BindNativeMethod("LTMN2:LootMan"sv, "ForgetWorkshopSupplyLink"sv,
