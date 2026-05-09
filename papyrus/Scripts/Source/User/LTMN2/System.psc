@@ -574,6 +574,20 @@ Function Patch()
     LogSystemEvent("patch_completed", "from_version=" + GetVersionString(fromVersion) + " current_version=" + GetVersionString(CurrentModVersion))
 EndFunction
 
+Function DeliverLootManInventory()
+    If (properties.LootManRef.GetItemCount() > 0)
+        int movedItems = 0
+        string destination = "workshop"
+        If (properties.LootIsDeliverToPlayer)
+            destination = "player"
+            movedItems = LTMN2:LootMan.TransferInventoryItems(properties.LootManRef, player, properties.ITEM_TYPE_ALL, -1, properties.ObjectTypeLooseMod, properties.LootingWithoutLogs)
+        Else
+            movedItems = LTMN2:LootMan.TransferInventoryItems(properties.LootManRef, properties.LootManWorkshopRef, properties.ITEM_TYPE_ALL, -1, properties.ObjectTypeLooseMod, properties.LootingWithoutLogs)
+        EndIf
+        LogSystemEvent("lootman_inventory_delivered", "destination=" + destination + " moved_forms=" + movedItems + " remaining_count=" + properties.LootManRef.GetItemCount() + " suppress_messages=" + properties.LootingWithoutLogs)
+    EndIf
+EndFunction
+
 ; Deliver queued loot, refresh carry state, and expire message throttles.
 Function Update()
     If (properties.IsNotInstalled)
@@ -592,17 +606,7 @@ Function Update()
         Return
     EndIf
 
-    If (properties.LootManRef.GetItemCount() > 0)
-        int movedItems = 0
-        string destination = "workshop"
-        If (properties.LootIsDeliverToPlayer)
-            destination = "player"
-            movedItems = LTMN2:LootMan.TransferInventoryItems(properties.LootManRef, player, properties.ITEM_TYPE_ALL, -1, properties.ObjectTypeLooseMod, properties.LootingWithoutLogs)
-        Else
-            movedItems = LTMN2:LootMan.TransferInventoryItems(properties.LootManRef, properties.LootManWorkshopRef, properties.ITEM_TYPE_ALL, -1, properties.ObjectTypeLooseMod, properties.LootingWithoutLogs)
-        EndIf
-        LogSystemEvent("lootman_inventory_delivered", "destination=" + destination + " moved_forms=" + movedItems + " remaining_count=" + properties.LootManRef.GetItemCount() + " suppress_messages=" + properties.LootingWithoutLogs)
-    EndIf
+    DeliverLootManInventory()
 
     If (!properties.IgnoreOverweight)
         bool wasOverweight = properties.IsOverweight
@@ -672,11 +676,11 @@ int Function GetEnabledLootingFormTypeMask()
     Return mask
 EndFunction
 
-Function Looting()
+Function Looting(bool force = false)
     If (properties.IsNotInstalled || properties.IsNotInitialized || properties.IsUninstalled)
         Return
     EndIf
-    If (!properties.EnableLootMan)
+    If (!force && !properties.EnableLootMan)
         Return
     EndIf
     If (properties.IsOverweight && !properties.IgnoreOverweight)

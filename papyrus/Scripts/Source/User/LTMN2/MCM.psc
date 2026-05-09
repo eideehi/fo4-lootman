@@ -400,7 +400,8 @@ Function ExecuteLooting()
         Return
     EndIf
 
-    system.Looting()
+    system.Looting(true)
+    system.DeliverLootManInventory()
 EndFunction
 
 Function SetUtilityBusy(bool busy)

@@ -35,6 +35,11 @@ EndFunction
 Function v3_0_0() global
     LTMN2:Properties properties = LTMN2:Properties.GetInstance()
 
+    If (properties.WorkerInvokeInterval == 0)
+        properties.EnableLootMan = false
+        properties.WorkerInvokeInterval = 1.0
+    EndIf
+
     If (properties.LootIsDeliverToPlayer)
         properties.LootingWithoutLogs = properties.DeliveredToPlayerWithoutLogs
     Else
