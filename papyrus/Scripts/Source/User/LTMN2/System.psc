@@ -40,7 +40,7 @@ int LOG_LEVEL_DEBUG = 1 const
 int LOG_LEVEL_INFO = 2 const
 
 Group MessageId
-    ; Quest objective message IDs.
+    ; System message IDs.
     int property MESSAGE_INSTALLED = 1 autoreadonly hidden
     int property MESSAGE_UNINSTALLED = 2 autoreadonly hidden
     int property MESSAGE_ENABLED = 3 autoreadonly hidden
@@ -162,7 +162,7 @@ Event Actor.OnLocationChange(Actor akSender, Location akOldLoc, Location akNewLo
     If (properties.AutomaticallyLinkAndUnlinkToWorkshop)
         If (autoLinkedWorkshopLocation != None && autoLinkedWorkshopLocation != currentWorkshopLocation)
             If (UnlinkWorkshopLocation(autoLinkedWorkshopLocation, prefix))
-                ShowMessage(MESSAGE_UNLINKED_TO_WORKSHOP)
+                ShowWorkshopMessageImmediate(MESSAGE_UNLINKED_TO_WORKSHOP, autoLinkedWorkshopLocation)
                 LogSystemEvent("workshop_unlinked", FormField("location", autoLinkedWorkshopLocation) + " reason=location_change")
             EndIf
             autoLinkedWorkshopLocation = none
@@ -172,7 +172,7 @@ Event Actor.OnLocationChange(Actor akSender, Location akOldLoc, Location akNewLo
             WorkshopScript oldWorkshop = properties.WorkshopParent.GetWorkshopFromLocation(akOldLoc)
             If (oldWorkshop && oldWorkshop.myLocation && oldWorkshop.myLocation != currentWorkshopLocation)
                 If (UnlinkWorkshopLocation(oldWorkshop.myLocation, prefix))
-                    ShowMessage(MESSAGE_UNLINKED_TO_WORKSHOP)
+                    ShowWorkshopMessageImmediate(MESSAGE_UNLINKED_TO_WORKSHOP, oldWorkshop.myLocation)
                     LogSystemEvent("workshop_unlinked", FormField("location", oldWorkshop.myLocation) + " reason=old_location")
                 EndIf
             EndIf
@@ -180,7 +180,7 @@ Event Actor.OnLocationChange(Actor akSender, Location akOldLoc, Location akNewLo
 
         If (currentWorkshop && currentWorkshop.OwnedByPlayer)
             If (LinkWorkshop(currentWorkshop, prefix))
-                ShowMessage(MESSAGE_LINKED_TO_WORKSHOP)
+                ShowWorkshopMessageImmediate(MESSAGE_LINKED_TO_WORKSHOP, currentWorkshop.myLocation)
                 LogSystemEvent("workshop_linked", FormField("workshop", currentWorkshop) + " " + FormField("location", currentWorkshop.myLocation) + " reason=location_change")
             EndIf
             currentWorkshopLocation = currentWorkshop.myLocation
@@ -356,6 +356,10 @@ Function SetAutoLinkedWorkshopLocation(Location workshopLocation)
     autoLinkedWorkshopLocation = workshopLocation
 EndFunction
 
+Location Function GetAutoLinkedWorkshopLocation()
+    Return autoLinkedWorkshopLocation
+EndFunction
+
 bool Function UnlinkAutoLinkedWorkshopLocation(string prefix)
     If (autoLinkedWorkshopLocation && UnlinkWorkshopLocation(autoLinkedWorkshopLocation, prefix))
         autoLinkedWorkshopLocation = none
@@ -430,8 +434,7 @@ Function Install()
 
     StartTimer(1, TIMER_INITIALIZE)
 
-    self.SetObjectiveDisplayed(MESSAGE_INSTALLED)
-    self.SetObjectiveSkipped(MESSAGE_INSTALLED)
+    LTMN2:LootMan.ShowSystemMessage(MESSAGE_INSTALLED)
 
     LogSystemEvent("install_completed", "native_looting_scheduler=true")
 EndFunction
@@ -465,8 +468,7 @@ Function Uninstall()
 
     StopLegacyWorkerManagers()
 
-    self.SetObjectiveDisplayed(MESSAGE_UNINSTALLED)
-    self.SetObjectiveSkipped(MESSAGE_UNINSTALLED)
+    LTMN2:LootMan.ShowSystemMessage(MESSAGE_UNINSTALLED)
 
     LTMN2:Utils.MoveInventoryItems(properties.LootManRef, player, properties.ITEM_TYPE_ALL)
     LTMN2:Utils.MoveInventoryItems(properties.LootManWorkshopRef, player, properties.ITEM_TYPE_ALL)
@@ -608,6 +610,7 @@ Function Update()
         bool overweight = workshopWeight > properties.CarryWeight
         If (!wasOverweight && overweight)
             properties.IsOverweight = true
+            ShowMessage(MESSAGE_HAS_OVERWEIGHT)
             LogSystemEvent("overweight_changed", "overweight=true workshop_weight=" + workshopWeight + " carry_weight=" + properties.CarryWeight)
         ElseIf (wasOverweight && overweight)
             ShowMessage(MESSAGE_HAS_OVERWEIGHT)
@@ -624,10 +627,7 @@ Function Update()
     int messageId = MESSAGE_COUNT
     While messageId
         messageId -= 1
-        If (lastMessageDisplayTime[messageId] > 0 && (time - lastMessageDisplayTime[messageId]) >= 600)
-            lastMessageDisplayTime[messageId] = 0
-            messageDisplayCount[messageId] = 0
-        EndIf
+        ResetMessageThrottleIfExpired(messageId, time)
     EndWhile
 EndFunction
 
@@ -706,32 +706,67 @@ Function ResetLootingTimer()
     EndIf
 EndFunction
 
-; Throttle quest-objective messages to avoid repeated HUD spam.
-Function ShowMessage(int messageId, float interval = 30.0, int maxDisplayCount = 3)
+bool Function CanShowSystemMessage(int messageId)
     If (properties.IsNotInstalled || properties.IsNotInitialized || properties.IsUninstalled)
+        Return false
+    EndIf
+    If (!properties.DisplaySystemMessage)
+        Return false
+    EndIf
+    If (messageId <= 0 || messageId > MESSAGE_COUNT)
+        Return false
+    EndIf
+
+    Return true
+EndFunction
+
+Function ResetMessageThrottleIfExpired(int arrayIndex, float time)
+    If (lastMessageDisplayTime[arrayIndex] > 0 && (time - lastMessageDisplayTime[arrayIndex]) >= 600)
+        lastMessageDisplayTime[arrayIndex] = 0
+        messageDisplayCount[arrayIndex] = 0
+    EndIf
+EndFunction
+
+; Throttle system messages to avoid repeated HUD spam.
+Function ShowMessage(int messageId, float interval = 30.0, int maxDisplayCount = 0)
+    If (!CanShowSystemMessage(messageId))
         Return
     EndIf
     If (!properties.EnableLootMan)
         Return
     EndIf
-    If (!properties.DisplaySystemMessage)
-        Return
-    EndIf
 
     int arrayIndex = messageId - 1
+    float time = Utility.GetCurrentRealTime()
+    ResetMessageThrottleIfExpired(arrayIndex, time)
+
     int count = messageDisplayCount[arrayIndex]
-    If (count >= maxDisplayCount)
+    If (maxDisplayCount > 0 && count >= maxDisplayCount)
         Return
     EndIf
 
-    float time = Utility.GetCurrentRealTime()
-    If ((time - lastMessageDisplayTime[arrayIndex]) < interval)
+    If (count > 0 && (time - lastMessageDisplayTime[arrayIndex]) < interval)
         Return
     EndIf
 
     messageDisplayCount[arrayIndex] = count + 1
     lastMessageDisplayTime[arrayIndex] = time
 
-    self.SetObjectiveDisplayed(messageId)
-    self.SetObjectiveSkipped(messageId)
+    LTMN2:LootMan.ShowSystemMessage(messageId)
+EndFunction
+
+Function ShowMessageImmediate(int messageId)
+    If (!CanShowSystemMessage(messageId))
+        Return
+    EndIf
+
+    LTMN2:LootMan.ShowSystemMessage(messageId)
+EndFunction
+
+Function ShowWorkshopMessageImmediate(int messageId, Location workshopLocation)
+    If (!CanShowSystemMessage(messageId))
+        Return
+    EndIf
+
+    LTMN2:LootMan.ShowSystemMessageWithName(messageId, workshopLocation)
 EndFunction

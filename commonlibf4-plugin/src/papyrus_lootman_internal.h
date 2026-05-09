@@ -547,6 +547,8 @@ namespace papyrus_lootman
 		RE::BSFixedString eventName,
 		RE::BSFixedString fields,
 		std::int32_t logLevel);
+	void ShowSystemMessage(std::monostate, std::int32_t messageId);
+	void ShowSystemMessageWithName(std::monostate, std::int32_t messageId, RE::TESForm* nameSource);
 	std::int32_t GetLogLevel(std::monostate);
 	void SetLogLevel(std::monostate, std::int32_t logLevel);
 	std::string GetFormTypeIdentifier(std::monostate, RE::TESForm* form);

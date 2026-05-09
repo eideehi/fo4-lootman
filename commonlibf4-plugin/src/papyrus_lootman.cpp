@@ -19,6 +19,10 @@ namespace papyrus_lootman
 			&FindNearestValidWorkshopId, false, false);
 		vm->BindNativeMethod("LTMN2:LootMan"sv, "LogEvent"sv,
 			&LogEvent, false, false);
+		vm->BindNativeMethod("LTMN2:LootMan"sv, "ShowSystemMessage"sv,
+			&ShowSystemMessage, false, false);
+		vm->BindNativeMethod("LTMN2:LootMan"sv, "ShowSystemMessageWithName"sv,
+			&ShowSystemMessageWithName, false, false);
 		vm->BindNativeMethod("LTMN2:LootMan"sv, "GetLogLevel"sv,
 			&GetLogLevel, true, false);
 		vm->BindNativeMethod("LTMN2:LootMan"sv, "SetLogLevel"sv,

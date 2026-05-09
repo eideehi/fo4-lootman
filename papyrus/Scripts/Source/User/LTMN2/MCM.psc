@@ -103,7 +103,7 @@ Event OnTimer(int aiTimerId)
     EndIf
 
     Utility.Wait(0.5)
-    system.ShowMessage(system.MESSAGE_UTILITY_PROCESS_COMPLETE)
+    system.ShowMessageImmediate(system.MESSAGE_UTILITY_PROCESS_COMPLETE)
     SetUtilityBusy(false)
 EndEvent
 
@@ -126,6 +126,7 @@ Function OnMCMSettingChange(string modName, string id)
     If (id == "AutomaticallyLinkAndUnlinkToWorkshop")
         WorkshopScript workshop = LTMN2:Utils.GetCurrentWorkshop(player)
         Location workshopLocation = none
+        Location removedWorkshopLocation = none
         If (workshop)
             workshopLocation = workshop.myLocation
         EndIf
@@ -133,25 +134,28 @@ Function OnMCMSettingChange(string modName, string id)
         If (workshop && workshop.OwnedByPlayer)
             If (properties.AutomaticallyLinkAndUnlinkToWorkshop)
                 If (system.LinkWorkshop(workshop, prefix))
-                    system.ShowMessage(system.MESSAGE_LINKED_TO_WORKSHOP)
+                    system.ShowWorkshopMessageImmediate(system.MESSAGE_LINKED_TO_WORKSHOP, workshop.myLocation)
                     LogMcmEvent("workshop_linked", "id=" + id + " " + FormField("workshop", workshop) + " " + FormField("location", workshop.myLocation))
                 EndIf
                 workshopLocation = workshop.myLocation
                 system.SetAutoLinkedWorkshopLocation(workshopLocation)
             Else
+                removedWorkshopLocation = system.GetAutoLinkedWorkshopLocation()
                 bool removedLink = system.UnlinkAutoLinkedWorkshopLocation(prefix)
                 If (!removedLink)
+                    removedWorkshopLocation = workshopLocation
                     removedLink = system.UnlinkWorkshopLocation(workshopLocation, prefix)
                 EndIf
                 If (removedLink)
-                    system.ShowMessage(system.MESSAGE_UNLINKED_TO_WORKSHOP)
-                    LogMcmEvent("workshop_unlinked", "id=" + id + " " + FormField("location", workshopLocation))
+                    system.ShowWorkshopMessageImmediate(system.MESSAGE_UNLINKED_TO_WORKSHOP, removedWorkshopLocation)
+                    LogMcmEvent("workshop_unlinked", "id=" + id + " " + FormField("location", removedWorkshopLocation))
                 EndIf
             EndIf
         ElseIf (!properties.AutomaticallyLinkAndUnlinkToWorkshop)
+            removedWorkshopLocation = system.GetAutoLinkedWorkshopLocation()
             If (system.UnlinkAutoLinkedWorkshopLocation(prefix))
-                system.ShowMessage(system.MESSAGE_UNLINKED_TO_WORKSHOP)
-                LogMcmEvent("workshop_unlinked", "id=" + id + " reason=auto_link_disabled")
+                system.ShowWorkshopMessageImmediate(system.MESSAGE_UNLINKED_TO_WORKSHOP, removedWorkshopLocation)
+                LogMcmEvent("workshop_unlinked", "id=" + id + " " + FormField("location", removedWorkshopLocation) + " reason=auto_link_disabled")
             Else
                 LogMcmEvent("workshop_link_unchanged", "id=" + id + " reason=no_auto_link", LOG_LEVEL_DEBUG)
             EndIf
@@ -347,9 +351,9 @@ Function ToggleEnableLootMan()
 
     properties.EnableLootMan = !properties.EnableLootMan
     If (properties.EnableLootMan)
-        system.ShowMessage(system.MESSAGE_ENABLED)
+        system.ShowMessageImmediate(system.MESSAGE_ENABLED)
     Else
-        system.ShowMessage(system.MESSAGE_DISABLED)
+        system.ShowMessageImmediate(system.MESSAGE_DISABLED)
     EndIf
 EndFunction
 
@@ -377,16 +381,16 @@ Function ToggleLinkToWorkshop()
 
         If (system.IsWorkshopLinkedToLootMan(workshopLocation, prefix))
             system.UnlinkWorkshopLocation(workshopLocation, prefix)
-            system.ShowMessage(system.MESSAGE_UNLINKED_TO_WORKSHOP)
+            system.ShowWorkshopMessageImmediate(system.MESSAGE_UNLINKED_TO_WORKSHOP, workshopLocation)
             LogMcmEvent("workshop_unlinked", FormField("workshop", workshop) + " " + FormField("location", workshopLocation) + " reason=manual_toggle")
         Else
             If (system.LinkWorkshop(workshop, prefix))
-                system.ShowMessage(system.MESSAGE_LINKED_TO_WORKSHOP)
+                system.ShowWorkshopMessageImmediate(system.MESSAGE_LINKED_TO_WORKSHOP, workshop.myLocation)
                 LogMcmEvent("workshop_linked", FormField("workshop", workshop) + " " + FormField("location", workshop.myLocation) + " reason=manual_toggle")
             EndIf
         EndIf
     Else
-        system.ShowMessage(system.MESSAGE_WORKSHOP_NOT_FOUND)
+        system.ShowMessageImmediate(system.MESSAGE_WORKSHOP_NOT_FOUND)
         LogMcmEvent("workshop_link_failed", "reason=no_workshop", LOG_LEVEL_INFO)
     EndIf
 EndFunction

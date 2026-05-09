@@ -6,6 +6,12 @@ int Function FindNearestValidWorkshopId(ObjectReference ref) global native
 ; Write a structured Papyrus event to the native LootMan log.
 Function LogEvent(string component, string eventName, string fields = "", int logLevel = 2) global native
 
+; Queue a localized LootMan system HUD notification in native code.
+Function ShowSystemMessage(int messageId) global native
+
+; Queue a localized LootMan system HUD notification with a display name token.
+Function ShowSystemMessageWithName(int messageId, Form nameSource) global native
+
 ; Get the native LootMan log level. Values match trace=0 through off=6.
 int Function GetLogLevel() global native
 

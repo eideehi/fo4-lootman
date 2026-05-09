@@ -19,16 +19,26 @@ namespace message_queue
 
 		constexpr auto kDisplayInterval = std::chrono::milliseconds(1500);
 
+		enum class PendingMessageType
+		{
+			pickup,
+			localizedText,
+		};
+
 		struct PendingMessage
 		{
+			PendingMessageType type = PendingMessageType::pickup;
 			std::uint32_t formId = 0;
 			std::string itemName;
 			std::int32_t count = 0;
+			std::string translationKey;
+			std::string fallbackText;
+			std::vector<TextReplacement> replacements;
 		};
 
 		std::deque<PendingMessage> queue;
 		std::mutex queueMutex;
-		SteadyClock::time_point lastDisplayTime{};
+		SteadyClock::time_point lastPickupDisplayTime{};
 		bool initialized = false;
 		std::unordered_map<std::string, std::string> translations;
 
@@ -184,7 +194,7 @@ namespace message_queue
 			return buffer;
 		}
 
-		std::string FormatMessage(const PendingMessage& msg)
+		std::string FormatPickupMessage(const PendingMessage& msg)
 		{
 			auto itemName = msg.itemName.empty() ? FormatFallbackName(msg.formId) : msg.itemName;
 			const auto* translationKey = msg.count == 1
@@ -199,31 +209,84 @@ namespace message_queue
 			return text;
 		}
 
+		std::string FormatLocalizedTextMessage(const PendingMessage& msg)
+		{
+			const auto it = translations.find(msg.translationKey);
+			auto text = it == translations.end() ? msg.fallbackText : it->second;
+			for (const auto& replacement : msg.replacements)
+			{
+				text = ReplaceAll(std::move(text), replacement.token, replacement.value);
+			}
+			return text;
+		}
+
+		std::string FormatMessage(const PendingMessage& msg)
+		{
+			switch (msg.type)
+			{
+			case PendingMessageType::pickup:
+				return FormatPickupMessage(msg);
+			case PendingMessageType::localizedText:
+				return FormatLocalizedTextMessage(msg);
+			default:
+				return {};
+			}
+		}
+
 		void ClearQueue()
 		{
 			std::lock_guard lock(queueMutex);
 			queue.clear();
-			lastDisplayTime = {};
+			lastPickupDisplayTime = {};
+		}
+
+		bool TakeNextLocalizedTextMessage(PendingMessage& out)
+		{
+			std::lock_guard lock(queueMutex);
+			for (auto it = queue.begin(); it != queue.end(); ++it)
+			{
+				if (it->type == PendingMessageType::localizedText)
+				{
+					out = std::move(*it);
+					queue.erase(it);
+					return true;
+				}
+			}
+
+			return false;
+		}
+
+		bool TakeNextPickupMessage(PendingMessage& out)
+		{
+			std::lock_guard lock(queueMutex);
+			const auto now = SteadyClock::now();
+			if (now - lastPickupDisplayTime < kDisplayInterval)
+			{
+				return false;
+			}
+
+			for (auto it = queue.begin(); it != queue.end(); ++it)
+			{
+				if (it->type == PendingMessageType::pickup)
+				{
+					out = std::move(*it);
+					queue.erase(it);
+					lastPickupDisplayTime = now;
+					return true;
+				}
+			}
+
+			return false;
 		}
 
 		bool TakeNextMessage(PendingMessage& out)
 		{
-			std::lock_guard lock(queueMutex);
-			if (queue.empty())
+			if (TakeNextLocalizedTextMessage(out))
 			{
-				return false;
+				return true;
 			}
 
-			const auto now = SteadyClock::now();
-			if (now - lastDisplayTime < kDisplayInterval)
-			{
-				return false;
-			}
-
-			out = std::move(queue.front());
-			queue.pop_front();
-			lastDisplayTime = now;
-			return true;
+			return TakeNextPickupMessage(out);
 		}
 
 		void Tick()
@@ -278,7 +341,7 @@ namespace message_queue
 		std::lock_guard lock(queueMutex);
 		for (auto it = queue.begin(); it != queue.end(); ++it)
 		{
-			if (it->formId == formId && it->itemName == itemName)
+			if (it->type == PendingMessageType::pickup && it->formId == formId && it->itemName == itemName)
 			{
 				count = SaturatingAdd(it->count, count);
 				queue.erase(it);
@@ -286,6 +349,31 @@ namespace message_queue
 			}
 		}
 
-		queue.push_back(PendingMessage{ formId, std::move(itemName), count });
+		PendingMessage msg;
+		msg.type = PendingMessageType::pickup;
+		msg.formId = formId;
+		msg.itemName = std::move(itemName);
+		msg.count = count;
+		queue.push_back(std::move(msg));
+	}
+
+	void EnqueueLocalizedText(
+		std::string translationKey,
+		std::string fallbackText,
+		std::vector<TextReplacement> replacements)
+	{
+		if (translationKey.empty() && fallbackText.empty())
+		{
+			return;
+		}
+
+		PendingMessage msg;
+		msg.type = PendingMessageType::localizedText;
+		msg.translationKey = std::move(translationKey);
+		msg.fallbackText = std::move(fallbackText);
+		msg.replacements = std::move(replacements);
+
+		std::lock_guard lock(queueMutex);
+		queue.push_back(std::move(msg));
 	}
 }
