@@ -76,6 +76,7 @@ For setup details, see `packaging/README.md`.
 
 ## Documentation
 
+- `docs/user-guide.md` - player-facing install, update, configuration, troubleshooting, and uninstall guide.
 - `docs/project-map.md` - LLM-first repository map and routing rules.
 - `docs/workflows/packaging.md` - release packaging workflow.
 - `docs/workflows/native-hooks.md` - native hook address maintenance.

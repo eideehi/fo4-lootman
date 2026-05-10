@@ -1,128 +1,76 @@
-name: Bug Report
-description: File a bug report to help us improve
-title: "[ TITLE THAT SUCCINCTLY DESCRIBES THE BUG ]"
+name: Bug report
+description: Report a bug or broken behavior
+title: ""
 body:
   - type: markdown
     attributes:
       value: |
-        ## Please read first
-        ### About "Issues"
-        This Issues section is operated solely as a bug tracker. For questions, requests, and suggestions, please post them on our [Discord server](https://discord.gg/DDQqxkK7s6). Posts other than bug reports submitted in Issues will generally be ignored and closed without further consideration.
-        ### Regarding Bug Reports
-        - Bug reports must be written in English. If you are not proficient in English, we recommend using translation services such as Google Translate, DeepL, ChatGPT, or similar.
-        - Unless it's an exceptionally straightforward bug (e.g., the game doesn't start after installing the mod), please provide a detailed description of the bug.
-        - If possible, attach the logs from when the bug occurred.
-        - Be precise in describing the bug report. I will attempt to reproduce the bug based on your report. If your report is inaccurate, I can only respond with, "It works in my environment."
-        ## Forms
+        Thank you for reporting a bug.
+
+        A helpful report usually includes what you expected, what you did, and what happened instead.
+        If you can reproduce the issue reliably, detailed steps can help with investigation.
+        Logs, screenshots, videos, and config files are optional, but they are especially helpful for crashes or unclear behavior.
+        Reports without enough detail may need follow-up before they can be investigated.
 
   - type: checkboxes
     id: searched-existing-issue
     attributes:
-      label: Is there an existing issue for this bug?
-      description: Please search for ["Issues"](/eideehi/fo4-lootman/issues?q=is:issue) and make sure that there is no existing issue with the same content.
+      label: Existing issues
+      description: Please search the existing issues before submitting a new bug report.
       options:
-        - label: I have searched the existing issue
+        - label: I have searched the existing issues for a matching bug.
           required: true
 
   - type: dropdown
     id: version
     attributes:
       label: Mod version
-      description: |
-        **NOTE: With a few exceptions, bug fixes are always done for the latest version. Although it is not prohibited to report bugs for older versions as a means of sharing information with other users, submitted bug reports will be closed with the labels "older version" and "wontfix", and no fixes will be made for the bugs, so please be aware of that.**
       options:
-        - 2.2.0
-        - 2.1.0
-        - 2.0.9
-        - 2.0.8
-        - 2.0.7
-        - 2.0.6
-        - 2.0.5
-        - 2.0.4
-        - 2.0.3
-        - 2.0.2
-        - 2.0.1
-        - 2.0.0
-        - 1.3.9
-        - 1.3.8
-        - 1.3.7
-        - 1.3.6
-        - 1.3.5
-        - 1.3.4
-        - 1.3.3
-        - 1.3.2
-        - 1.3.1
-        - 1.3.0
-        - 1.2.8
-        - 1.2.7
-        - 1.2.6
-        - 1.2.5
-        - 1.2.4
-        - 1.2.3
-        - 1.2.2
-        - 1.2.1
-        - 1.2.0
-        - 1.1.0
-        - 1.0.2
-        - 1.0.1
-        - 1.0.0
+        - 3.0.0
+        - older version
+        - development build / unknown
     validations:
       required: true
 
   - type: textarea
     id: bug-detail
     attributes:
-      label: What happened?
-      description: Please tell me the details of the issue. What were you expecting, how did it not work, and please provide as much detail as possible.
+      label: What did you expect, what did you do, and what happened?
+      description: At minimum, tell us what you expected, what you did, and what happened instead.
       placeholder: |
-        I changed the interval for the feature to 10 seconds, but it still runs every 1 second.
-    validations:
-      required: true
-
-  - type: dropdown
-    id: standalone-bug
-    attributes:
-      label: Does the bug occur even when only this Mod is enabled?
-      description: |
-        Please check whether the bug occurs when other mods (excluding mods in dependencies) are disabled.
-      options:
-        - Yes, the bug occurs even when other Mods are disabled
-        - No, the bug does not occur if other Mods are disabled
+        Expected: I expected items matching my filters to be looted.
+        Did: I enabled LootMan, set the filter, and stood near the container.
+        Happened: The matching items stayed in the container.
     validations:
       required: true
 
   - type: textarea
-    id: mods-to-reproduce-bug
+    id: reproduction-steps
     attributes:
-      label: List of Mods required to reproduce the bug
-      description: Please provide the minimal list of Mods required to reproduce this bug. Do not submit a list of dozens or hundreds of Mods.
+      label: Detailed reproduction steps
+      description: Optional. If you can reproduce the bug reliably, list the exact steps.
       placeholder: |
-        Awecome Config Manager v1.2.3
+        1. Install LootMan 3.0.0.
+        2. Open MCM and enable LootMan.
+        3. Set the relevant filter.
+        4. Stand near the affected object or container.
+        5. The issue happens.
+
+  - type: textarea
+    id: other-mods
+    attributes:
+      label: Other mods involved
+      description: Optional. If another mod may be involved, list the relevant mods and versions.
+      placeholder: |
+        Awesome Config Manager v1.2.3
         Awesome NPC Core v4.5.6
-        Awesome NPC v4.5.6
-
-  - type: textarea
-    id: steps-to-reproduce-bug
-    attributes:
-      label: Steps to reproduce the bug
-      description: |
-        Please provide detailed instructions on how to reproduce the bug, and make sure to confirm that the bug can be reproduced by following these steps alone.
-      placeholder: |
-        1. Open the mod's configuration in the main menu.
-        2. Change the interval to 10 in the configuration.
-        3. Load the saved data.
-        4. The mod is still operating every 1 second.
-    validations:
-      required: true
 
   - type: textarea
     id: file-attachments
     attributes:
-      label: File attachments
-      description: |
-        You can optionally attach screenshots, demo videos, log files, config files, etc. Please see ["Attaching files - GitHub"](https://docs.github.com/en/get-started/writing-on-github/working-with-advanced-formatting/attaching-files) for more information about file attachments.
+      label: Logs, screenshots, videos, config files, etc.
+      description: Optional. Drag and drop any files that help explain the issue.
 
   - type: markdown
     attributes:
-      value: |
-        ### Thank you for your cooperation on the bug report.
+      value: Thank you for the report.

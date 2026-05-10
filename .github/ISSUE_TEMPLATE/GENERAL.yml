@@ -1,0 +1,31 @@
+name: Question / Suggestion / Request
+description: Ask a question, share feedback, or make a request
+title: ""
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thank you for opening an issue.
+
+        Questions, suggestions, requests, feedback, and rough reports are welcome here.
+        If you are reporting a clear bug, the bug report form may be easier to triage.
+        Please include enough detail to explain what you want to ask, suggest, request, or report.
+
+  - type: textarea
+    id: details
+    attributes:
+      label: Details
+      description: Tell us what you want to ask, suggest, request, or report.
+      placeholder: Describe your question, suggestion, request, feedback, or rough report here.
+    validations:
+      required: true
+
+  - type: textarea
+    id: file-attachments
+    attributes:
+      label: Logs, screenshots, videos, config files, etc.
+      description: Optional. Drag and drop any files that help explain the issue.
+
+  - type: markdown
+    attributes:
+      value: Thank you for your feedback.
