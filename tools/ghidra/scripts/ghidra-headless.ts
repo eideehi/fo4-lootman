@@ -71,6 +71,20 @@ function requirePositiveInteger(value: unknown, label: string): number {
 	return value;
 }
 
+function expandEnvironmentPlaceholders(value: string, label: string): string {
+	return value.replace(/\$\{([A-Za-z_][A-Za-z0-9_]*)\}/g, (_match, name: string) => {
+		const envValue = process.env[name];
+		if (envValue === undefined || envValue === "") {
+			throw new Error(`${label} references unset environment variable ${name}.`);
+		}
+		return envValue;
+	});
+}
+
+function requireExpandedString(value: unknown, label: string): string {
+	return expandEnvironmentPlaceholders(requireString(value, label), label);
+}
+
 function resolveWorkspacePath(root: string, value: string): string {
 	return path.isAbsolute(value) ? value : path.resolve(root, value);
 }
@@ -99,15 +113,18 @@ export function readGhidraHeadlessConfig(options: ReadGhidraHeadlessConfigOption
 	}
 
 	return {
-		analyzeHeadless: resolveCommand(root, requireString(rawConfig.analyzeHeadless, "analyzeHeadless")),
-		projectLocation: resolveWorkspacePath(root, requireString(rawConfig.projectLocation, "projectLocation")),
+		analyzeHeadless: resolveCommand(root, requireExpandedString(rawConfig.analyzeHeadless, "analyzeHeadless")),
+		projectLocation: resolveWorkspacePath(
+			root,
+			requireExpandedString(rawConfig.projectLocation, "projectLocation"),
+		),
 		projectName: requireString(rawConfig.projectName, "projectName"),
 		programName: requireString(rawConfig.programName, "programName"),
 		fallout4Exe: typeof rawConfig.fallout4Exe === "string" && rawConfig.fallout4Exe.trim() !== ""
-			? rawConfig.fallout4Exe
+			? expandEnvironmentPlaceholders(rawConfig.fallout4Exe, "fallout4Exe")
 			: undefined,
-		scriptPath: resolveWorkspacePath(root, requireString(rawConfig.scriptPath, "scriptPath")),
-		probeReportPath: resolveWorkspacePath(root, requireString(rawConfig.probeReportPath, "probeReportPath")),
+		scriptPath: resolveWorkspacePath(root, requireExpandedString(rawConfig.scriptPath, "scriptPath")),
+		probeReportPath: resolveWorkspacePath(root, requireExpandedString(rawConfig.probeReportPath, "probeReportPath")),
 		probeAddress: requireString(rawConfig.probeAddress, "probeAddress"),
 		probeInstructionCount: requirePositiveInteger(rawConfig.probeInstructionCount, "probeInstructionCount"),
 	};

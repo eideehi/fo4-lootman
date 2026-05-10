@@ -1,10 +1,10 @@
 {
   "analyzeHeadless": "analyzeHeadless",
-  "projectLocation": "tools/ghidra/projects",
+  "projectLocation": "${FO4_GHIDRA_PROJECT_DIR}",
   "projectName": "fo4-fallout4",
   "programName": "Fallout4.exe",
   "scriptPath": "tools/ghidra/scripts",
-  "probeReportPath": "tools/ghidra/reports/headless-probe.txt",
+  "probeReportPath": "tools/ghidra/reports/local/headless-probe.txt",
   "probeAddress": "0x14059D378",
   "probeInstructionCount": 1
 }

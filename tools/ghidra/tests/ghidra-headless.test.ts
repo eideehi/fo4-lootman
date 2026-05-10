@@ -18,7 +18,7 @@ function writeConfig(root: string, name: "headless.example.json" | "headless.loc
 		programName: "Fallout4.exe",
 		fallout4Exe: "G:/steam/steamapps/common/Fallout 4/Fallout4.exe",
 		scriptPath: "tools/ghidra/scripts",
-		probeReportPath: "tools/ghidra/reports/headless-probe.txt",
+		probeReportPath: "tools/ghidra/reports/local/headless-probe.txt",
 		probeAddress: "0x14059D378",
 		probeInstructionCount: 1,
 		...overrides,
@@ -33,6 +33,7 @@ describe("ghidra headless", () => {
 		for (const dir of dirs.splice(0)) {
 			removeTempDir(dir);
 		}
+		vi.unstubAllEnvs();
 	});
 
 	it("reads the example config and resolves workspace paths", () => {
@@ -45,8 +46,34 @@ describe("ghidra headless", () => {
 		expect(config.analyzeHeadless).toBe("analyzeHeadless");
 		expect(config.projectLocation).toBe(path.join(root, "tools", "ghidra", "projects"));
 		expect(config.scriptPath).toBe(path.join(root, "tools", "ghidra", "scripts"));
-		expect(config.probeReportPath).toBe(path.join(root, "tools", "ghidra", "reports", "headless-probe.txt"));
+		expect(config.probeReportPath).toBe(path.join(root, "tools", "ghidra", "reports", "local", "headless-probe.txt"));
 		expect(config.programName).toBe("Fallout4.exe");
+	});
+
+	it("expands projectLocation environment placeholders", () => {
+		const root = createTempDir();
+		const projectDir = path.join(root, "external-ghidra-projects", "fo4");
+		dirs.push(root);
+		vi.stubEnv("FO4_GHIDRA_PROJECT_DIR", projectDir);
+		writeConfig(root, "headless.example.json", {
+			projectLocation: "${FO4_GHIDRA_PROJECT_DIR}",
+		});
+
+		const config = readGhidraHeadlessConfig({ projectRoot: root });
+
+		expect(config.projectLocation).toBe(projectDir);
+	});
+
+	it("fails clearly when a projectLocation environment placeholder is unset", () => {
+		const root = createTempDir();
+		dirs.push(root);
+		writeConfig(root, "headless.example.json", {
+			projectLocation: "${FO4_GHIDRA_PROJECT_DIR}",
+		});
+
+		expect(() => readGhidraHeadlessConfig({ projectRoot: root })).toThrow(
+			/projectLocation references unset environment variable FO4_GHIDRA_PROJECT_DIR/,
+		);
 	});
 
 	it("prefers a local config when present", () => {
@@ -78,7 +105,7 @@ describe("ghidra headless", () => {
 			path.join(root, "tools", "ghidra", "scripts"),
 			"-postScript",
 			"DumpFo4InstructionWindow",
-			path.join(root, "tools", "ghidra", "reports", "headless-probe.txt"),
+			path.join(root, "tools", "ghidra", "reports", "local", "headless-probe.txt"),
 			"1",
 			"0x14059D378",
 		]);
@@ -107,7 +134,7 @@ describe("ghidra headless", () => {
 		const result = await runGhidraHeadlessProbe({ projectRoot: root, execaFn });
 
 		expect(result.exitCode).toBe(0);
-		expect(result.reportPath).toBe(path.join(root, "tools", "ghidra", "reports", "headless-probe.txt"));
+		expect(result.reportPath).toBe(path.join(root, "tools", "ghidra", "reports", "local", "headless-probe.txt"));
 		expect(execaFn).toHaveBeenCalledWith("analyzeHeadless", expect.arrayContaining(["-readOnly", "-noanalysis"]), {
 			cwd: root,
 			reject: false,

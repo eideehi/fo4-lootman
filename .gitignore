@@ -25,10 +25,12 @@ packaging/.env
 
 # local agent state
 skills-lock.json
+plans/
 
 # local tool configuration
 tools/ghidra/headless.local.json
 tools/ghidra/projects/
+tools/ghidra/reports/local/
 tools/xedit/stage-*/
 
 # files

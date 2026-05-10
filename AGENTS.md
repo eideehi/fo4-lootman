@@ -52,6 +52,16 @@ path is exercised consistently.
 - Assume `packaging/.env`, root `pnpm install`, and Windows tool reachability
   are prerequisites for DLL builds.
 
+## Ghidra Local Artifacts
+
+- Keep Ghidra project databases outside this repository. Configure the
+  Fallout 4 project directory through `FO4_GHIDRA_PROJECT_DIR`.
+- Do not commit `tools/ghidra/projects/`; it is ignored spillover for local
+  project databases only.
+- Put reusable development-only reports under `tools/ghidra/reports/local/`.
+- Do not commit generated `tools/ghidra/reports/` output unless it is required
+  durable evidence for native-hook or Ghidra work.
+
 ## xEdit VMAD Cleanup
 
 When editing staged plugin VMAD data, do not improvise. Use
