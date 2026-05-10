@@ -58,7 +58,7 @@ Environment:
 
 - Create `packaging/.env` from `packaging/.env.example`.
 - Set `PROJECT_ROOT` to the repository root as a WSL path, keep the default `../`, or omit it to use the repository root.
-- Set `STEAM_GAME_DIR` to the Steam `steamapps/common` directory as a WSL path.
+- Set `FO4_GAME_DIR` to the Fallout 4 install directory as a WSL path.
 - Set `SEVENZIP_PATH` to `7z.exe` as a WSL path.
 - Leave `DLL_BUILD_DIR` at its default unless the native DLL output directory has been customized.
 - Optionally set `WSL_STAGE_DIR` if you want the DLL build staging directory somewhere other than `/mnt/c/tmp/lootman-wsl-build`.
@@ -78,13 +78,13 @@ Windows tools reachable from WSL:
 Fallout 4 and Papyrus prerequisites:
 
 - Install Fallout 4 and Creation Kit.
-- Confirm `PapyrusCompiler.exe` exists at `<STEAM_GAME_DIR>/Fallout 4/Papyrus Compiler/PapyrusCompiler.exe`.
-- Confirm `Archive2.exe` exists at `<STEAM_GAME_DIR>/Fallout 4/Tools/Archive2/Archive2.exe`.
-- Confirm `<STEAM_GAME_DIR>/Fallout 4/Data/Scripts/Source` exists.
-- Install F4SE Papyrus sources under `<STEAM_GAME_DIR>/Fallout 4/Data/Scripts/Source/F4SE/**/*.psc`.
-- Install MCM Papyrus sources under `<STEAM_GAME_DIR>/Fallout 4/Data/Scripts/Source/User/**/*.psc`.
-- Confirm `Institute_Papyrus_Flags.flg` exists at `<STEAM_GAME_DIR>/Fallout 4/Data/Scripts/Source/Base/Institute_Papyrus_Flags.flg`.
-- Confirm both `<STEAM_GAME_DIR>/Fallout 4/Data/Scripts/Source/Base` and `<STEAM_GAME_DIR>/Fallout 4/Data/Scripts/Source/User` exist.
+- Confirm `PapyrusCompiler.exe` exists at `<FO4_GAME_DIR>/Papyrus Compiler/PapyrusCompiler.exe`.
+- Confirm `Archive2.exe` exists at `<FO4_GAME_DIR>/Tools/Archive2/Archive2.exe`.
+- Confirm `<FO4_GAME_DIR>/Data/Scripts/Source` exists.
+- Install F4SE Papyrus sources under `<FO4_GAME_DIR>/Data/Scripts/Source/F4SE/**/*.psc`.
+- Install MCM Papyrus sources under `<FO4_GAME_DIR>/Data/Scripts/Source/User/**/*.psc`.
+- Confirm `Institute_Papyrus_Flags.flg` exists at `<FO4_GAME_DIR>/Data/Scripts/Source/Base/Institute_Papyrus_Flags.flg`.
+- Confirm both `<FO4_GAME_DIR>/Data/Scripts/Source/Base` and `<FO4_GAME_DIR>/Data/Scripts/Source/User` exist.
 
 One-time validation commands from the repository root:
 
@@ -94,16 +94,16 @@ cp packaging/.env.example packaging/.env
 pnpm install
 pnpm run test:packaging
 xmake --version
-steamGameDir=/mnt/z/SteamLibrary/steamapps/common
-test -f "$steamGameDir/Fallout 4/Papyrus Compiler/PapyrusCompiler.exe"
-test -f "$steamGameDir/Fallout 4/Tools/Archive2/Archive2.exe"
-test -f "$steamGameDir/Fallout 4/Data/Scripts/Source/Base/Institute_Papyrus_Flags.flg"
-test -d "$steamGameDir/Fallout 4/Data/Scripts/Source/F4SE"
-test -d "$steamGameDir/Fallout 4/Data/Scripts/Source/User"
+fo4GameDir="/mnt/z/SteamLibrary/steamapps/common/Fallout 4"
+test -f "$fo4GameDir/Papyrus Compiler/PapyrusCompiler.exe"
+test -f "$fo4GameDir/Tools/Archive2/Archive2.exe"
+test -f "$fo4GameDir/Data/Scripts/Source/Base/Institute_Papyrus_Flags.flg"
+test -d "$fo4GameDir/Data/Scripts/Source/F4SE"
+test -d "$fo4GameDir/Data/Scripts/Source/User"
 pnpm run package:build
 ```
 
-The shell checks above use a local `steamGameDir` variable. The packaging CLI
+The shell checks above use a local `fo4GameDir` variable. The packaging CLI
 loads `packaging/.env` itself; copying `.env.example` does not export variables
 into the current shell.
 

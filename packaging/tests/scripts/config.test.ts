@@ -79,11 +79,19 @@ describe("config", () => {
 		expect(dirs[1].replaceAll("\\", "/")).toContain("/papyrus/User");
 	});
 
+	it("createConfig rejects legacy parent game directory env without FO4_GAME_DIR", () => {
+		const legacyGameDirEnv = ["STEAM", "GAME", "DIR"].join("_");
+
+		delete process.env.FO4_GAME_DIR;
+		process.env[legacyGameDirEnv] = "/tmp/steamapps/common";
+
+		expect(() => createConfig()).toThrow("FO4_GAME_DIR is not defined in environment");
+	});
+
 	it("createConfig resolves required fields from environment and filesystem", () => {
 		const root = createTempDir();
 		dirs.push(root);
-		const steamDir = path.join(root, "steam");
-		const gameDir = path.join(steamDir, "Fallout 4");
+		const gameDir = path.join(root, "steamapps", "common", "Fallout 4");
 		const projectRoot = path.join(root, "project");
 		const sevenzipPath = path.join(root, "bin", "7z.exe");
 
@@ -95,7 +103,7 @@ describe("config", () => {
 		fs.mkdirsSync(path.join(gameDir, "Data", "Scripts", "Source", "User"));
 		fs.outputFileSync(path.join(gameDir, "Data", "Scripts", "Source", "Base", "Institute_Papyrus_Flags.flg"), "");
 
-		process.env.STEAM_GAME_DIR = steamDir;
+		process.env.FO4_GAME_DIR = gameDir;
 		process.env.SEVENZIP_PATH = sevenzipPath;
 		process.env.PROJECT_ROOT = projectRoot;
 		delete process.env.DLL_BUILD_DIR;
@@ -120,8 +128,7 @@ describe("config", () => {
 	it("createConfig respects WSL stage override", () => {
 		const root = createTempDir();
 		dirs.push(root);
-		const steamDir = path.join(root, "steam");
-		const gameDir = path.join(steamDir, "Fallout 4");
+		const gameDir = path.join(root, "steamapps", "common", "Fallout 4");
 		const projectRoot = path.join(root, "project");
 		const sevenzipPath = path.join(root, "bin", "7z.exe");
 
@@ -133,7 +140,7 @@ describe("config", () => {
 		fs.mkdirsSync(path.join(gameDir, "Data", "Scripts", "Source", "User"));
 		fs.outputFileSync(path.join(gameDir, "Data", "Scripts", "Source", "Base", "Institute_Papyrus_Flags.flg"), "");
 
-		process.env.STEAM_GAME_DIR = steamDir;
+		process.env.FO4_GAME_DIR = gameDir;
 		process.env.SEVENZIP_PATH = sevenzipPath;
 		process.env.PROJECT_ROOT = projectRoot;
 		process.env.WSL_STAGE_DIR = path.join(root, "stage");
@@ -148,8 +155,7 @@ describe("config", () => {
 	it("resolves relative PROJECT_ROOT from packaging/.env location", () => {
 		const root = createTempDir();
 		dirs.push(root);
-		const steamDir = path.join(root, "steam");
-		const gameDir = path.join(steamDir, "Fallout 4");
+		const gameDir = path.join(root, "steamapps", "common", "Fallout 4");
 		const sevenzipPath = path.join(root, "bin", "7z.exe");
 
 		fs.outputFileSync(sevenzipPath, "");
@@ -159,7 +165,7 @@ describe("config", () => {
 		fs.mkdirsSync(path.join(gameDir, "Data", "Scripts", "Source", "User"));
 		fs.outputFileSync(path.join(gameDir, "Data", "Scripts", "Source", "Base", "Institute_Papyrus_Flags.flg"), "");
 
-		process.env.STEAM_GAME_DIR = steamDir;
+		process.env.FO4_GAME_DIR = gameDir;
 		process.env.SEVENZIP_PATH = sevenzipPath;
 		process.env.PROJECT_ROOT = "../";
 		vi.spyOn(windowsPath, "detectWsl").mockReturnValue(false);
@@ -172,8 +178,7 @@ describe("config", () => {
 	it("createConfig throws when SEVENZIP_PATH does not exist", () => {
 		const root = createTempDir();
 		dirs.push(root);
-		const steamDir = path.join(root, "steam");
-		const gameDir = path.join(steamDir, "Fallout 4");
+		const gameDir = path.join(root, "steamapps", "common", "Fallout 4");
 		const projectRoot = path.join(root, "project");
 
 		fs.mkdirsSync(projectRoot);
@@ -182,7 +187,7 @@ describe("config", () => {
 		fs.mkdirsSync(path.join(gameDir, "Data", "Scripts", "Source", "Base"));
 		fs.mkdirsSync(path.join(gameDir, "Data", "Scripts", "Source", "User"));
 
-		process.env.STEAM_GAME_DIR = steamDir;
+		process.env.FO4_GAME_DIR = gameDir;
 		process.env.SEVENZIP_PATH = path.join(root, "bin", "missing-7z.exe");
 		process.env.PROJECT_ROOT = projectRoot;
 		vi.spyOn(windowsPath, "detectWsl").mockReturnValue(false);

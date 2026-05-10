@@ -13,7 +13,7 @@ pnpm run test:packaging
 
 Configure `packaging/.env` with WSL paths:
 
-- `STEAM_GAME_DIR`: Steam `steamapps/common` directory.
+- `FO4_GAME_DIR`: Fallout 4 install directory.
 - `SEVENZIP_PATH`: path to `7z.exe`.
 - `PROJECT_ROOT`: optional repository root override. The default `../` is resolved from `packaging/`.
 - `DLL_BUILD_DIR`: optional native DLL output override.

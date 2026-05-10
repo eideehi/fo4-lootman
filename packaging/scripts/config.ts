@@ -75,7 +75,7 @@ export function buildPapyrusImportDirs(papyrusSourceDir: string): string[] {
 
 export function createConfig(): Config {
 	// Required environment variables
-	const steamGameDir = requireEnv("STEAM_GAME_DIR");
+	const fo4GameDir = requireEnv("FO4_GAME_DIR");
 	const sevenzipPath = checkFile(resolveConfigPath(requireEnv("SEVENZIP_PATH")));
 	const dllBuildDir = process.env.DLL_BUILD_DIR ?? "commonlibf4-plugin/build/windows/x64/{mode}";
 	const wslStageDir = resolveConfigPath(process.env.WSL_STAGE_DIR ?? "/mnt/c/tmp/lootman-wsl-build");
@@ -87,7 +87,7 @@ export function createConfig(): Config {
 
 	// Resolve paths
 	const projectRoot = checkDir(resolveConfigPath(process.env.PROJECT_ROOT ?? repositoryRoot));
-	const fallout4Dir = checkDir(path.resolve(resolveConfigPath(steamGameDir), "Fallout 4"));
+	const fallout4Dir = checkDir(resolveConfigPath(fo4GameDir));
 	const archive2Path = checkFile(path.resolve(fallout4Dir, "Tools", "Archive2", "Archive2.exe"));
 	const papyrusCompilerPath = checkFile(path.resolve(fallout4Dir, "Papyrus Compiler", "PapyrusCompiler.exe"));
 	const papyrusSourceDir = checkDir(path.resolve(fallout4Dir, "Data", "Scripts", "Source"));
