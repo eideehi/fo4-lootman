@@ -12,8 +12,8 @@
             <optionalFileGroups order="Explicit">
                 <group name="About Compatibility" type="SelectExactlyOne">
                     <plugins order="Explicit">
-                        <plugin name="LootMan 2.x.x is not compatible with 1.x.x">
-                            <description>LootMan 2.0.0 has been stripped of 1.x.x compatibility and some features that existed in 1.x.x to improve performance and development experience. When starting to use LootMan version 2.0.0 or later with saved data in which LootMan version 1.x.x has been installed, please uninstall LootMan version 1.x.x and perform a clean save beforehand.</description>
+                        <plugin name="LootMan 3.0.0 update compatibility">
+                            <description>LootMan 3.0.0 supports overwrite updates from LootMan 2.x. LootMan 3.0.0 does not support overwrite updates from LootMan 1.x. If you are upgrading from 1.x, uninstall 1.x and make a clean save before installing 3.0.0.</description>
                             <typeDescriptor>
                                 <type name="Required"/>
                             </typeDescriptor>
