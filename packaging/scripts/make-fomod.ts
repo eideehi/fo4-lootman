@@ -2,6 +2,7 @@ import fs from "fs-extra";
 import path from "node:path";
 import { execa } from "execa";
 import { type Config, createConfig, isCliEntry } from "./config.js";
+import { assertNoForbiddenPapyrusDistributionSources } from "./distribution-source-guard.js";
 import { runWhile } from "./progress.js";
 import { runWindowsExe } from "./windows-exec.js";
 import { toWindowsPath } from "./windows-path.js";
@@ -13,8 +14,16 @@ export interface MakeFomodOpts {
 	toWindowsPathFn?: typeof toWindowsPath;
 }
 
+const staleLooseFomodFiles = ["ModuleConfig.xml", "info.xml"];
+
 export function appendWindowsWildcard(dir: string): string {
 	return dir.endsWith("\\") ? `${dir}*` : `${dir}\\*`;
+}
+
+export function removeStaleLooseFomodFiles(outDir: string): void {
+	for (const file of staleLooseFomodFiles) {
+		fs.removeSync(path.join(outDir, file));
+	}
 }
 
 export async function makeFomod(config: Config, opts?: MakeFomodOpts): Promise<void> {
@@ -26,7 +35,9 @@ export async function makeFomod(config: Config, opts?: MakeFomodOpts): Promise<v
 	const outFile = path.join(outDir, `${config.archiveName}.7z`);
 
 	fs.mkdirsSync(outDir);
+	removeStaleLooseFomodFiles(outDir);
 	fs.removeSync(outFile);
+	assertNoForbiddenPapyrusDistributionSources(config);
 
 	console.log("Creating FOMOD archive...");
 	const sevenzipPath = config.isWsl ? toWindowsPathFn(config.sevenzipPath, { isWsl: true }) : config.sevenzipPath;

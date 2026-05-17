@@ -9,6 +9,7 @@ import {
 	compilePapyrus,
 	deployPex,
 	formatResolvedPapyrusImports,
+	getPapyrusOverlayDir,
 	getResolvedRequiredPapyrusImports,
 	parseArgs,
 	prepareF4SEOverlay,
@@ -253,6 +254,9 @@ describe("compilePapyrus", () => {
 		fs.outputFileSync(path.join(modeCacheDir, "LTMN", "Test.pex"), "compiled-binary");
 		await compilePapyrus(config, { mode: "product", execaFn });
 
+		const overlayDir = getPapyrusOverlayDir(config, "product");
+		expect(fs.readFileSync(path.join(overlayDir, "OverlayOnly.psc"), "utf8")).toBe("ScriptName OverlayOnly");
+		expect(fs.existsSync(path.join(config.buildTempDir, "files", "papyrus", "product", "overlay"))).toBe(false);
 		expect(execaFn).toHaveBeenCalledTimes(1);
 		expect(fs.existsSync(hashesPath)).toBe(true);
 		expect(fs.existsSync(deployedPex)).toBe(true);
@@ -296,7 +300,7 @@ describe("compilePapyrus", () => {
 		dirs.push(root);
 		const { config, sourceDir, modeCacheDir } = seedCompileLayout(root);
 		config.isWsl = true;
-		const overlayDir = path.join(config.buildTempDir, "files", "papyrus", "product", "overlay", "f4se");
+		const overlayDir = getPapyrusOverlayDir(config, "product");
 		let compiledProject = "";
 		const runWindowsExeFn = vi.fn().mockImplementation(async (_file: string, args: string[]) => {
 			compiledProject = fs.readFileSync(args[0]!.replace("WIN:", ""), "utf8");

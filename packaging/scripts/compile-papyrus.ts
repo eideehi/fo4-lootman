@@ -157,6 +157,10 @@ function getPapyrusF4SESourceDir(papyrusSourceDir: string): string {
 	return path.resolve(papyrusSourceDir, "F4SE");
 }
 
+export function getPapyrusOverlayDir(config: Config, mode: BuildMode): string {
+	return path.join(config.buildDirRoot, "work", "papyrus", mode, "overlay", "f4se");
+}
+
 export async function prepareF4SEOverlay(sourceF4SEDir: string, overlayDir: string): Promise<void> {
 	fs.removeSync(overlayDir);
 	fs.mkdirsSync(overlayDir);
@@ -239,7 +243,6 @@ export async function compilePapyrus(config: Config, opts?: CompilePapyrusOpts):
 	const papyrusDirRoot = path.join(config.buildTempDir, "files", "papyrus");
 	const productDir = path.join(papyrusDirRoot, "product");
 	const sourceDir = path.join(productDir, "source");
-	const overlayRootDir = path.join(productDir, "overlay");
 	const modeOutDir = path.join(papyrusDirRoot, mode, "binary");
 
 	// PPJ template
@@ -256,7 +259,7 @@ export async function compilePapyrus(config: Config, opts?: CompilePapyrusOpts):
 	}
 	// Remove legacy overlay location under source so it never gets compiled as scripts.
 	fs.removeSync(path.join(sourceDir, "__overlay__"));
-	const overlayDir = path.join(overlayRootDir, "f4se");
+	const overlayDir = getPapyrusOverlayDir(config, mode);
 	await prepareF4SEOverlay(f4seSourceDir, overlayDir);
 
 	const importSearchDirs = buildPapyrusImportSearchDirs(sourceDir, overlayDir, config.papyrusImportDirs);
