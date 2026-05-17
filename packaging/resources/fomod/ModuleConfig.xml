@@ -4,16 +4,21 @@
 
     <requiredInstallFiles>
         <folder source="files/resources/common" destination="."/>
+        <folder source="files/dll/product" destination="F4SE/Plugins"/>
+        <folder source="files/ba2/product"  destination="."/>
     </requiredInstallFiles>
 
     <installSteps order="Explicit">
 
         <installStep name="Notice">
             <optionalFileGroups order="Explicit">
-                <group name="About Compatibility" type="SelectExactlyOne">
+                <group name="About Compatibility" type="SelectAny">
                     <plugins order="Explicit">
                         <plugin name="LootMan 3.0.0 update compatibility">
                             <description>LootMan 3.0.0 supports overwrite updates from LootMan 2.x. LootMan 3.0.0 does not support overwrite updates from LootMan 1.x. If you are upgrading from 1.x, uninstall 1.x and make a clean save before installing 3.0.0.</description>
+                            <conditionFlags>
+                                <flag name="compatibility_notice_read">selected</flag>
+                            </conditionFlags>
                             <typeDescriptor>
                                 <type name="Required"/>
                             </typeDescriptor>
@@ -30,6 +35,9 @@
                     <plugins order="Explicit">
                         <plugin name="English">
                             <description>English is here.</description>
+                            <files>
+                                <folder source="files/resources/en" destination="."/>
+                            </files>
                             <conditionFlags>
                                 <flag name="language_en">selected</flag>
                             </conditionFlags>
@@ -40,6 +48,9 @@
 
                         <plugin name="Japanese">
                             <description>日本語はこちら。</description>
+                            <files>
+                                <folder source="files/resources/ja"  destination="."/>
+                            </files>
                             <conditionFlags>
                                 <flag name="language_ja">selected</flag>
                             </conditionFlags>
@@ -50,39 +61,15 @@
                     </plugins>
                 </group>
 
-                <group name="Select your game version." type="SelectExactlyOne">
+                <group name="Select your game version." type="SelectAny">
                     <plugins order="Explicit">
-                        <plugin name="1.10.163">
+                        <plugin name="1.11.191">
                             <description>Fallout4.exe version.</description>
                             <conditionFlags>
-                                <flag name="runtime_1_10_163">selected</flag>
+                                <flag name="runtime_1_11_191">selected</flag>
                             </conditionFlags>
                             <typeDescriptor>
                                 <type name="Required"/>
-                            </typeDescriptor>
-                        </plugin>
-                    </plugins>
-                </group>
-
-                <group name="Do you want to install the debug version to output the debug log?" type="SelectExactlyOne">
-                    <plugins order="Explicit">
-                        <plugin name="No">
-                            <description>Normally, please select this option.</description>
-                            <conditionFlags>
-                                <flag name="install_product">selected</flag>
-                            </conditionFlags>
-                            <typeDescriptor>
-                                <type name="Recommended"/>
-                            </typeDescriptor>
-                        </plugin>
-
-                        <plugin name="Yes">
-                            <description>The debug log is quite a storage hog, so don't use it regularly.</description>
-                            <conditionFlags>
-                                <flag name="install_debug">selected</flag>
-                            </conditionFlags>
-                            <typeDescriptor>
-                                <type name="Optional"/>
                             </typeDescriptor>
                         </plugin>
                     </plugins>
@@ -102,6 +89,9 @@
 
                         <plugin name="Yes">
                             <description>Select this option when you want to investigate the cause of a bug.</description>
+                            <files>
+                                <folder source="files/papyrus/product/source" destination="Scripts/Source/User"/>
+                            </files>
                             <conditionFlags>
                                 <flag name="install_source">selected</flag>
                             </conditionFlags>
@@ -116,60 +106,5 @@
         </installStep>
 
     </installSteps>
-
-    <conditionalFileInstalls>
-        <patterns>
-
-            <pattern>
-                <dependencies>
-                    <flagDependency flag="language_en" value="selected"/>
-                </dependencies>
-                <files>
-                    <folder source="files/resources/en" destination="."/>
-                </files>
-            </pattern>
-
-            <pattern>
-                <dependencies>
-                    <flagDependency flag="language_ja" value="selected"/>
-                </dependencies>
-                <files>
-                    <folder source="files/resources/ja"  destination="."/>
-                </files>
-            </pattern>
-
-            <pattern>
-                <dependencies operator="And">
-                    <flagDependency flag="runtime_1_10_163" value="selected"/>
-                    <flagDependency flag="install_product" value="selected"/>
-                </dependencies>
-                <files>
-                    <folder source="files/dll/product/1_10_163" destination="F4SE/Plugins"/>
-                    <folder source="files/ba2/product"  destination="."/>
-                </files>
-            </pattern>
-
-            <pattern>
-                <dependencies operator="And">
-                    <flagDependency flag="runtime_1_10_163" value="selected"/>
-                    <flagDependency flag="install_debug" value="selected"/>
-                </dependencies>
-                <files>
-                    <folder source="files/dll/debug/1_10_163" destination="F4SE/Plugins"/>
-                    <folder source="files/ba2/debug" destination="."/>
-                </files>
-            </pattern>
-
-            <pattern>
-                <dependencies>
-                    <flagDependency flag="install_source" value="selected"/>
-                </dependencies>
-                <files>
-                    <folder source="files/papyrus/debug/source" destination="Scripts/Source/User"/>
-                </files>
-            </pattern>
-
-        </patterns>
-    </conditionalFileInstalls>
 
 </config>

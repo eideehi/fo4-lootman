@@ -24,7 +24,7 @@ localized assets, and a FOMOD installer.
 Before installing, make sure your setup supports the mod's current packaged
 requirements:
 
-- Fallout 4 with the runtime option exposed by the installer: `1.10.163`.
+- Fallout 4 with the runtime option exposed by the installer: `1.11.191`.
 - MCM version 2 or later.
 - F4SE and a load order setup capable of loading native F4SE plugins.
 
@@ -39,13 +39,10 @@ dependency's own release page when setting up F4SE or MCM.
 The current FOMOD installer exposes these options:
 
 - Language: English or Japanese.
-- Game version: `1.10.163`.
-- DLL type: product or debug.
+- Game version: `1.11.191`.
 - Papyrus source code: optional.
 
-Choose the product DLL for normal play. The debug DLL writes much more log
-output and is intended for troubleshooting. Papyrus source files are not needed
-for normal play.
+Papyrus source files are not needed for normal play.
 
 ### Updating From Older Versions
 
