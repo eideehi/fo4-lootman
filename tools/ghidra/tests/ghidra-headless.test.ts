@@ -67,6 +67,7 @@ describe("ghidra headless", () => {
 	it("fails clearly when a projectLocation environment placeholder is unset", () => {
 		const root = createTempDir();
 		dirs.push(root);
+		vi.stubEnv("FO4_GHIDRA_PROJECT_DIR", undefined);
 		writeConfig(root, "headless.example.json", {
 			projectLocation: "${FO4_GHIDRA_PROJECT_DIR}",
 		});
