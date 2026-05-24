@@ -429,6 +429,113 @@ unknown value, the native plugin logs a warning and starts the next session at
 MCM `Native Log Level` dropdown or fix the file value and restart Fallout 4 to
 restore the level you want.
 
+### Injection Data (`Data/LootMan/*.json`)
+
+Injection data is separate from the native plugin config above. It is advanced
+configuration for players and modlist maintainers who need to tune special
+looting rules, exclusions, advanced item classification, or native pickup item
+notification filters.
+
+LootMan ships the default data as
+`Data/LootMan/injection-data-default.json`. The native plugin loads regular
+`.json` files from `Data/LootMan` on startup, in sorted file order. Make edits
+while Fallout 4 is closed, then restart before testing. Prefer a separate
+custom file, such as `Data/LootMan/zzz-custom-injection-data.json`, instead of
+editing the packaged default file directly; back up local edits before
+updating.
+
+Injection data refines special cases. It does not globally override disabled
+MCM object or inventory categories, native preconditions, settlement exclusion,
+locked-container checks, carry-weight checks, or advanced subtype toggles. For
+example, adding a form to a subtype list helps LootMan classify it, but the
+matching MCM subtype still needs to be enabled before LootMan takes it.
+
+Use identifiers in this format:
+
+```text
+PluginFilename|localHexFormID
+```
+
+The filename can be an `.esm`, `.esp`, or another loaded plugin filename. The
+form ID is hexadecimal and belongs to that source plugin's local record, not
+the current load-order-prefixed runtime ID. For example,
+`Fallout4.esm|03000C` refers to the `03000C` record from `Fallout4.esm`.
+
+Custom files should use arrays of strings:
+
+```json
+{
+    "include": {
+        "activator": [
+            "Fallout4.esm|03000C"
+        ]
+    },
+    "exclude": {
+        "form": [
+            "Fallout4.esm|1A62D4"
+        ]
+    },
+    "notify": {
+        "item": [
+            "Fallout4.esm|03000C"
+        ],
+        "category": [
+            "ALCH",
+            "AMMO",
+            "MISC"
+        ],
+        "legendary-equipment": true
+    }
+}
+```
+
+List paths add array values across sorted files. Do not use scalar strings in
+custom files unless you intentionally want to replace that path. The
+recommended player format is arrays.
+
+`/notify/category` replaces the previous category mask whenever a later sorted
+file contains it. Use the full final category list in that file. Supported
+tokens are `ALCH`, `AMMO`, `ARMO`, `BOOK`, `INGR`, `KEYM`, `MISC`, and `WEAP`.
+`/notify/legendary-equipment` replaces the previous boolean whenever a later
+sorted file contains it. Use the final `true` or `false` value in that file.
+
+Supported paths:
+
+| JSON pointer | Values | Behavior |
+| --- | --- | --- |
+| `/include/activation-block` | Forms or keywords | Allows listed activation-blocked or activation-ignored objects through that special protection. |
+| `/include/activator` | Forms or keywords | Allows listed activator objects to be considered for looting. |
+| `/include/featured-item` | Forms or keywords | Allows listed featured items through the featured-item protection. |
+| `/include/quest-item` | Forms or keywords | Allows listed quest items or quest-flagged world objects through the quest-item protection. |
+| `/include/unique-item` | Forms or keywords | Allows listed unique items through the unique-item protection. |
+| `/exclude/form` | Forms | Prevents listed forms from being looted. |
+| `/exclude/keyword` | Keywords | Prevents forms or objects with listed keywords from being looted. |
+| `/notify/item` | Forms or keywords | Shows native pickup item notifications when a looted item matches one of these entries. |
+| `/notify/category` | Category tokens | Replaces the native pickup item notification category mask. |
+| `/notify/legendary-equipment` | Boolean | Shows native pickup item notifications for legendary armor and weapons when `true`. |
+| `/alch-type/alcohol` | Forms or keywords | Classifies matching chemistry / food items as Alcohol for the Advanced Filter. |
+| `/alch-type/chemistry` | Forms or keywords | Classifies matching chemistry / food items as Chemistry. |
+| `/alch-type/food` | Forms or keywords | Classifies matching chemistry / food items as Food. |
+| `/alch-type/nuka-cola` | Forms or keywords | Classifies matching chemistry / food items as Nuka-Cola. |
+| `/alch-type/stimpak` | Forms or keywords | Classifies matching chemistry / food items as Stimpak. |
+| `/alch-type/syringe-ammo` | Forms or keywords | Classifies matching chemistry / food items as Syringer Ammo. |
+| `/alch-type/water` | Forms or keywords | Classifies matching chemistry / food items as Water. |
+| `/book-type/perk-magazine` | Forms or keywords | Classifies matching books as Perk Magazine. Prefer this spelling in new custom files. |
+| `/book-type/park-magazine` | Forms or keywords | Compatibility spelling accepted by LootMan and used by the shipped default file; it maps to Perk Magazine. |
+| `/misc-type/bobblehead` | Forms or keywords | Classifies matching junk / mod items as Bobblehead. |
+| `/weap-type/grenade` | Forms or keywords | Classifies matching weapons as Grenade. |
+| `/weap-type/mine` | Forms or keywords | Classifies matching weapons as Mine. |
+
+The `notify` paths control native pickup item notifications only. They do not
+change the system HUD message table or the `Display System Message` behavior
+described later in this guide.
+
+Malformed JSON can prevent LootMan's native plugin from loading. Invalid item
+types inside a valid JSON file are logged and skipped or degraded where
+possible. Unresolved form identifiers are logged and skipped after the game
+loads. If `Data/LootMan` or `injection-data-default.json` is removed, restore
+the packaged injection data directory or reinstall LootMan.
+
 ## Troubleshooting
 
 Check MCM first:
@@ -461,8 +568,17 @@ Check MCM first:
   again after LootMan is installed and initialized.
 - If an expected HUD message does not appear, it may be throttled (see the
   throttle rules above) or `Display System Message` may be off.
+- If LootMan stops loading after you edit injection data, check the LootMan log
+  for JSON parse errors, then fix or remove the malformed custom file and
+  restart Fallout 4. If `Data/LootMan` or the packaged default JSON file is
+  missing, restore it from the installer or reinstall LootMan.
+- If a custom injection-data entry does not work, check the plugin filename and
+  source-local hexadecimal form ID. Unresolved identifiers are logged and
+  skipped.
 - If you need detailed object information for a bug report, use
-  `Dump Nearby Object Diagnostics` and inspect the LootMan log.
+  `Dump Nearby Object Diagnostics` and inspect the LootMan log. Injection-data
+  reasons include `excluded_by_injection_data` and `requires_include_*` values
+  such as `requires_include_activator` or `requires_include_quest_item`.
 
 To raise or lower the native log verbosity without opening MCM, edit
 `Data/F4SE/Plugins/LootMan/config.json` while the game is closed and restart
