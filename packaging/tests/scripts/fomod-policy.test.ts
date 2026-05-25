@@ -22,6 +22,10 @@ function getPluginBlocks(moduleConfig: string): string[] {
 	return [...moduleConfig.matchAll(/<plugin\b[\s\S]*?<\/plugin>/g)].map((match) => match[0]!);
 }
 
+function getGroup(moduleConfig: string, name: string): string {
+	return moduleConfig.match(new RegExp(`<group name="${name}"[\\s\\S]*?<\\/group>`))?.[0] ?? "";
+}
+
 describe("FOMOD release policy", () => {
 	it("states the 3.0.0 update compatibility policy", () => {
 		const notice = getCompatibilityNotice(readModuleConfig());
@@ -55,6 +59,32 @@ describe("FOMOD release policy", () => {
 		expect(moduleConfig).not.toContain("install_debug");
 	});
 
+	it("keeps installer language choices scoped to ESP resources while MCM translations are shared", () => {
+		const moduleConfig = readModuleConfig();
+		const languageGroup = getGroup(moduleConfig, "Select plugin language.");
+		const translationsGroup = getGroup(moduleConfig, "MCM translation files");
+		const folderSources = getFolderSources(languageGroup);
+
+		expect(moduleConfig).toContain('<folder source="files/resources/common" destination="."/>');
+		expect(folderSources).toEqual(["files/resources/en", "files/resources/ja"]);
+		expect(languageGroup).toContain('<plugin name="English">');
+		expect(languageGroup).toContain("Installs the English LootMan.esp.");
+		expect(languageGroup).toContain('<plugin name="Japanese">');
+		expect(languageGroup).toContain("日本語版の LootMan.esp をインストールします。");
+		expect(languageGroup).not.toContain("German");
+		expect(languageGroup).not.toContain("files/resources/de");
+		expect(languageGroup).not.toContain("files/resources/ptbr");
+
+		expect(translationsGroup).toContain('<plugin name="Included">');
+		expect(translationsGroup).toContain('<flag name="mcm_translations_included">selected</flag>');
+		expect(translationsGroup).toContain('<type name="Required"/>');
+		expect(translationsGroup).toContain(
+			"MCM translation files are installed for all supported Fallout 4 language codes.",
+		);
+		expect(translationsGroup).toContain("German and Japanese include localized MCM text");
+		expect(translationsGroup).toContain("other non-English languages use English fallback text");
+	});
+
 	it("does not use conditional flag dependencies that MO2 logs as non-matches", () => {
 		const moduleConfig = readModuleConfig();
 
@@ -65,11 +95,14 @@ describe("FOMOD release policy", () => {
 	it("does not use exactly-one groups for single required plugins", () => {
 		const moduleConfig = readModuleConfig();
 		const notice = getCompatibilityNotice(moduleConfig);
+		const translationsGroup = getGroup(moduleConfig, "MCM translation files");
 		const runtimeGroup = moduleConfig.match(/<group name="Select your game version\."[\s\S]*?<\/group>/)?.[0] ?? "";
 
 		expect(notice).toContain('group name="About Compatibility" type="SelectAny"');
+		expect(translationsGroup).toContain('group name="MCM translation files" type="SelectAny"');
 		expect(runtimeGroup).toContain('group name="Select your game version." type="SelectAny"');
 		expect(notice).not.toContain('type="SelectExactlyOne"');
+		expect(translationsGroup).not.toContain('type="SelectExactlyOne"');
 		expect(runtimeGroup).not.toContain('type="SelectExactlyOne"');
 	});
 

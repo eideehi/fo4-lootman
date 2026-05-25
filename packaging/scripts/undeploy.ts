@@ -3,13 +3,14 @@ import { globSync } from "glob";
 import path from "node:path";
 import { type Config, createConfig, isCliEntry } from "./config.js";
 
+const translationLanguageCodes = ["en", "fr", "it", "de", "es", "pl", "ptbr", "ru", "cn", "ja"];
+
 const targets = [
 	"LootMan",
 	"MCM/Config/LootMan",
 	"Meshes/SetDressing/SteamerTrunk/LootManTrunkClean.nif",
 	"Meshes/SetDressing/SteamerTrunk/LootManTrunkDirty.nif",
-	"Interface/Translations/LootMan_en.txt",
-	"Interface/Translations/LootMan_ja.txt",
+	...translationLanguageCodes.map((lang) => `Interface/Translations/LootMan_${lang}.txt`),
 	"LootMan.esp",
 	"F4SE/Plugins/lootman.dll",
 	"F4SE/Plugins/lootman.ini",

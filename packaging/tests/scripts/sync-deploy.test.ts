@@ -12,6 +12,18 @@ function seedBaseDeployArtifacts(config: ReturnType<typeof createTestConfig>, la
 	fs.outputFileSync(path.join(filesRoot, "dll", "product", "lootman.dll"), "dll");
 }
 
+function seedSharedTranslationDeployArtifacts(config: ReturnType<typeof createTestConfig>, lang: "en" | "ja"): void {
+	const filesRoot = path.join(config.buildTempDir, "files");
+	fs.outputFileSync(path.join(filesRoot, "resources", "common", "Interface", "Translations", "LootMan_en.txt"), "common-en");
+	fs.outputFileSync(path.join(filesRoot, "resources", "common", "Interface", "Translations", "LootMan_de.txt"), "common-de");
+	fs.outputFileSync(path.join(filesRoot, "resources", "common", "Interface", "Translations", "LootMan_ptbr.txt"), "common-ptbr");
+	fs.outputFileSync(path.join(filesRoot, "resources", lang, "LootMan.esp"), `${lang}-esp`);
+	if (lang === "ja") {
+		fs.outputFileSync(path.join(filesRoot, "resources", "ja", "Interface", "Translations", "LootMan_en.txt"), "ja-en-override");
+	}
+	fs.outputFileSync(path.join(filesRoot, "dll", "product", "lootman.dll"), "dll");
+}
+
 describe("sync-deploy", () => {
 	const dirs: string[] = [];
 
@@ -119,6 +131,23 @@ describe("sync-deploy", () => {
 		expect(result).toEqual({ copied: 1, removed: 1, skipped: 2, total: 3 });
 		expect(fs.existsSync(path.join(dataDir, "Interface", "Translations", "LootMan_en.txt"))).toBe(false);
 		expect(fs.readFileSync(path.join(dataDir, "Interface", "Translations", "LootMan_ja.txt"), "utf8")).toBe("lang");
+	});
+
+	it.each(["en", "ja"] as const)("copies shared MCM translations when deploying %s resources", (lang) => {
+		const root = createTempDir();
+		dirs.push(root);
+		const config = createTestConfig(root);
+		const dataDir = path.join(config.fallout4Dir, "Data");
+
+		seedSharedTranslationDeployArtifacts(config, lang);
+		syncDeploy(config, { mode: "product", lang });
+
+		expect(fs.readFileSync(path.join(dataDir, "Interface", "Translations", "LootMan_de.txt"), "utf8")).toBe("common-de");
+		expect(fs.readFileSync(path.join(dataDir, "Interface", "Translations", "LootMan_ptbr.txt"), "utf8")).toBe("common-ptbr");
+		expect(fs.readFileSync(path.join(dataDir, "LootMan.esp"), "utf8")).toBe(`${lang}-esp`);
+		expect(fs.readFileSync(path.join(dataDir, "Interface", "Translations", "LootMan_en.txt"), "utf8")).toBe(
+			lang === "ja" ? "ja-en-override" : "common-en",
+		);
 	});
 
 	it("throws when no deployable artifacts exist", () => {

@@ -5,6 +5,8 @@ import { undeploy } from "../../scripts/undeploy.js";
 import { createTestConfig } from "../helpers/config-fixture.js";
 import { createTempDir, removeTempDir } from "../helpers/temp-dir.js";
 
+const translationLanguageCodes = ["en", "fr", "it", "de", "es", "pl", "ptbr", "ru", "cn", "ja"];
+
 describe("undeploy", () => {
 	const dirs: string[] = [];
 
@@ -24,6 +26,9 @@ describe("undeploy", () => {
 		fs.outputFileSync(path.join(dataDir, "F4SE", "Plugins", "lootman.dll"), "dll");
 		fs.outputFileSync(path.join(dataDir, "F4SE", "Plugins", "lootman.ini"), "ini");
 		fs.outputFileSync(path.join(dataDir, "Scripts", "LTMN", "Nested", "A.pex"), "pex");
+		for (const lang of translationLanguageCodes) {
+			fs.outputFileSync(path.join(dataDir, "Interface", "Translations", `LootMan_${lang}.txt`), lang);
+		}
 
 		const result = undeploy(config);
 
@@ -32,6 +37,10 @@ describe("undeploy", () => {
 		expect(result.removed).toContain("F4SE/Plugins/lootman.ini");
 		expect(result.removed).toContain("Scripts/LTMN");
 		expect(result.skipped).toContain("Scripts/LTMN/**/*.pex");
+		for (const lang of translationLanguageCodes) {
+			expect(result.removed).toContain(`Interface/Translations/LootMan_${lang}.txt`);
+			expect(fs.existsSync(path.join(dataDir, "Interface", "Translations", `LootMan_${lang}.txt`))).toBe(false);
+		}
 		expect(fs.existsSync(path.join(dataDir, "LootMan"))).toBe(false);
 		expect(fs.existsSync(path.join(dataDir, "F4SE", "Plugins", "lootman.dll"))).toBe(false);
 		expect(fs.existsSync(path.join(dataDir, "F4SE", "Plugins", "lootman.ini"))).toBe(false);

@@ -31,10 +31,10 @@
         <installStep name="Choose Option">
             <optionalFileGroups order="Explicit">
 
-                <group name="Select your language." type="SelectExactlyOne">
+                <group name="Select plugin language." type="SelectExactlyOne">
                     <plugins order="Explicit">
                         <plugin name="English">
-                            <description>English is here.</description>
+                            <description>Installs the English LootMan.esp.</description>
                             <files>
                                 <folder source="files/resources/en" destination="."/>
                             </files>
@@ -47,7 +47,7 @@
                         </plugin>
 
                         <plugin name="Japanese">
-                            <description>日本語はこちら。</description>
+                            <description>日本語版の LootMan.esp をインストールします。</description>
                             <files>
                                 <folder source="files/resources/ja"  destination="."/>
                             </files>
@@ -56,6 +56,20 @@
                             </conditionFlags>
                             <typeDescriptor>
                                 <type name="Optional"/>
+                            </typeDescriptor>
+                        </plugin>
+                    </plugins>
+                </group>
+
+                <group name="MCM translation files" type="SelectAny">
+                    <plugins order="Explicit">
+                        <plugin name="Included">
+                            <description>MCM translation files are installed for all supported Fallout 4 language codes. German and Japanese include localized MCM text; other non-English languages use English fallback text.</description>
+                            <conditionFlags>
+                                <flag name="mcm_translations_included">selected</flag>
+                            </conditionFlags>
+                            <typeDescriptor>
+                                <type name="Required"/>
                             </typeDescriptor>
                         </plugin>
                     </plugins>

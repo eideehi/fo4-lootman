@@ -104,3 +104,4 @@ Before shipping a release candidate:
 The following people have contributed to LootMan:
 
 - [Al12rs](https://github.com/Al12rs)
+- [UserNo84](https://github.com/UserNo84)
