@@ -38,24 +38,28 @@ dependency's own release page when setting up F4SE or MCM.
 
 The current FOMOD installer presents the following groups in order:
 
-1. **About Compatibility** — a required acknowledgement of the 3.0.0 update
+1. **About Compatibility** — a required acknowledgement of the 3.0.1 update
    compatibility notice. You cannot deselect it.
-2. **Select your language** — choose exactly one of English or Japanese.
-3. **Select your game version** — `1.11.191` is the only option and is
+2. **Select plugin language.** — choose exactly one of English or Japanese for
+   `LootMan.esp`.
+3. **MCM translation files** — required shared MCM text for supported Fallout 4
+   language codes. German and Japanese include localized text; other
+   non-English languages use English fallback text.
+4. **Select your game version.** — `1.11.191` is the only option and is
    required.
-4. **Do you want to install the papyrus source code?** — choose `No`
+5. **Do you want to install the papyrus source code?** — choose `No`
    (recommended) or `Yes`. Papyrus source files are not needed for normal play.
 
 ### Updating From Older Versions
 
-LootMan 3.0.0 supports overwrite updates from LootMan 2.x.
+LootMan 3.0.1 supports overwrite updates from LootMan 2.x and 3.0.0.
 
-LootMan 3.0.0 does not support overwrite updates from LootMan 1.x. If you are
+LootMan 3.0.1 does not support overwrite updates from LootMan 1.x. If you are
 upgrading from 1.x, uninstall 1.x and make a clean save before installing
-3.0.0.
+3.0.1.
 
-When a save from 2.x is loaded under 3.0.0, the script runs a one-time
-migration that can change two MCM settings:
+When a save from 2.x is loaded under 3.0.1, the v3.0.0 save migration can
+change two MCM settings:
 
 - If your 2.x save was using manual-only looting (`Looting Interval` set to
   `0`), `Enable LootMan` is turned off and `Looting Interval` is reset to
@@ -155,7 +159,7 @@ limits enforced by the MCM sliders.
 | `Native Log Level` | dropdown | Trace, Debug, Info, Warn, Error, Critical, Off | Controls the native DLL log level. Changes are saved to `Data/F4SE/Plugins/LootMan/config.json`. |
 | `Play Pickup Sound` | switch | on / off | Plays sound effects when items are looted. |
 | `Play Container Animation` | switch | on / off | Plays the open animation on containers LootMan loots from. |
-| `Looting Range` | slider | 1.0 – 256, step 0.5 (meters) | Distance from the player searched on each looting pass. The native plugin clamps the effective range at 200 meters, so slider values above 200 do not enlarge the search beyond 200 meters in 3.0.0. |
+| `Looting Range` | slider | 1.0 – 256, step 0.5 (meters) | Distance from the player searched on each looting pass. The native plugin clamps the effective range at 200 meters, so slider values above 200 do not enlarge the search beyond 200 meters in 3.0.1. |
 | `Carry Weight` | slider | 100 – 10000, step 100 (pounds) | LootMan's maximum carry weight. |
 | `Ignore Overweight` | switch | on / off | When on, LootMan continues looting past the carry-weight limit and suppresses the overweight HUD message. |
 | `Loot Is Deliver To Player` | switch | on / off | When on, looted items are added to the player inventory instead of LootMan's inventory. |
@@ -591,8 +595,9 @@ uninstallation completion message. Uninstall attempts to return LootMan-held
 and LootMan-workshop-held items to the player; verify the player inventory
 before deleting the mod files.
 
-For LootMan 1.x to 3.0.0 upgrades, uninstall 1.x and make a clean save before
-installing 3.0.0. For LootMan 2.x to 3.0.0, overwrite updates are supported.
+For LootMan 1.x to 3.0.1 upgrades, uninstall 1.x and make a clean save before
+installing 3.0.1. For LootMan 2.x or 3.0.0 to 3.0.1, overwrite updates are
+supported.
 
 ## Source, Credits, and Licensing
 
@@ -633,7 +638,7 @@ install / uninstall completion messages, which are routed directly through the
 native plugin and always display.
 
 One additional localized string ships with LootMan but is not displayed by
-the current 3.0.0 code paths:
+the current 3.0.1 code paths:
 
 - `[LootMan] Locked container ignored because there is no Bobby pin.`
 

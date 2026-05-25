@@ -14,8 +14,8 @@
             <optionalFileGroups order="Explicit">
                 <group name="About Compatibility" type="SelectAny">
                     <plugins order="Explicit">
-                        <plugin name="LootMan 3.0.0 update compatibility">
-                            <description>LootMan 3.0.0 supports overwrite updates from LootMan 2.x. LootMan 3.0.0 does not support overwrite updates from LootMan 1.x. If you are upgrading from 1.x, uninstall 1.x and make a clean save before installing 3.0.0.</description>
+                        <plugin name="LootMan 3.0.1 update compatibility">
+                            <description>LootMan 3.0.1 supports overwrite updates from LootMan 2.x and 3.0.0. LootMan 3.0.1 does not support overwrite updates from LootMan 1.x. If you are upgrading from 1.x, uninstall 1.x and make a clean save before installing 3.0.1.</description>
                             <conditionFlags>
                                 <flag name="compatibility_notice_read">selected</flag>
                             </conditionFlags>
