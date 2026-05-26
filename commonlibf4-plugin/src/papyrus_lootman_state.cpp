@@ -182,5 +182,6 @@ namespace papyrus_lootman
 			std::lock_guard<std::mutex> guard(recentWorldLootLock);
 			recentlyLootedWorldRefs.clear();
 		}
+		ClearWorkshopRuntimeState("preload");
 	}
 }

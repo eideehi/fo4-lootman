@@ -226,6 +226,8 @@ namespace papyrus_lootman
 	WorkshopObjectCountFn originalWorkshopObjectCount = nullptr;
 	CurrentWorkshopObjectCountFn originalCurrentWorkshopObjectCount = nullptr;
 	std::atomic_bool sharedWorkshopContainerAugmentationInstalled{ false };
+	std::atomic_bool hasRememberedWorkshopSupplyLinks{ false };
+	std::atomic<std::uint64_t> workshopRuntimeStateGeneration{ 0 };
 	std::mutex rememberedWorkshopSupplyLinkLock;
 	std::mutex sharedWorkshopContainerProbeLogLock;
 	std::unordered_map<TESFormID, TESFormID> rememberedWorkshopSupplyLinks;
@@ -755,6 +757,33 @@ namespace papyrus_lootman
 		return rememberedWorkshopSupplyLinks.find(locationId) != rememberedWorkshopSupplyLinks.end();
 	}
 
+	bool HasRememberedWorkshopSupplyLinks()
+	{
+		return hasRememberedWorkshopSupplyLinks.load(std::memory_order_acquire);
+	}
+
+	bool CanUseWorkshopMaterialAugmentation()
+	{
+		if (!HasRememberedWorkshopSupplyLinks())
+		{
+			return false;
+		}
+		if (!properties::GetBool(properties::is_installed, false))
+		{
+			return false;
+		}
+		if (!properties::GetBool(properties::is_initialized, false))
+		{
+			return false;
+		}
+		if (properties::GetBool(properties::is_uninstalled, false))
+		{
+			return false;
+		}
+
+		return true;
+	}
+
 	void FillFormProbeSnapshot(FormProbeSnapshot& snapshot, TESForm* form)
 	{
 		if (!form)
@@ -1198,9 +1227,14 @@ namespace papyrus_lootman
 		BGSLocation* currentLocation,
 		bool includePlayer)
 	{
-		if (originalPopulateLinkedWorkshopContainers)
+		if (!originalPopulateLinkedWorkshopContainers)
 		{
-			originalPopulateLinkedWorkshopContainers(containers, currentLocation, includePlayer);
+			return;
+		}
+		originalPopulateLinkedWorkshopContainers(containers, currentLocation, includePlayer);
+		if (!CanUseWorkshopMaterialAugmentation())
+		{
+			return;
 		}
 		LogSharedWorkshopContainerHookProbe(containers, currentLocation, includePlayer);
 		AddRememberedLootManWorkshopSharedContainer(containers, currentLocation);
@@ -1239,7 +1273,10 @@ namespace papyrus_lootman
 		{
 			originalRebuildWorkshopSupply(owner);
 		}
-		LogRebuildWorkshopSupplyProbe(sourceId, sourceName, owner);
+		if (kVerboseWorkshopMaterialDiagnostics)
+		{
+			LogRebuildWorkshopSupplyProbe(sourceId, sourceName, owner);
+		}
 	}
 
 	void HookedRebuildWorkshopSupplySourceA1(void* owner)
@@ -1565,14 +1602,20 @@ namespace papyrus_lootman
 		const bool result = originalComponentCountHelper ?
 			originalComponentCountHelper(owner, outCount, form, includeLinked) :
 			false;
-		(void)ApplyRememberedWorkshopMaterialCount(
-			sourceId,
-			owner,
-			outCount,
-			form,
-			includeLinked,
-			result);
-		LogComponentCountProbe(sourceId, sourceName, owner, outCount, form, includeLinked, result);
+		if (CanUseWorkshopMaterialAugmentation())
+		{
+			(void)ApplyRememberedWorkshopMaterialCount(
+				sourceId,
+				owner,
+				outCount,
+				form,
+				includeLinked,
+				result);
+		}
+		if (kVerboseWorkshopMaterialDiagnostics)
+		{
+			LogComponentCountProbe(sourceId, sourceName, owner, outCount, form, includeLinked, result);
+		}
 		return result;
 	}
 
@@ -1663,19 +1706,41 @@ namespace papyrus_lootman
 		const auto baseCount = originalDirectComponentCount ?
 			originalDirectComponentCount(owner, component, includeLinked) :
 			0;
+		if (!CanUseWorkshopMaterialAugmentation())
+		{
+			if (kVerboseWorkshopMaterialDiagnostics)
+			{
+				WorkshopMaterialCountAdjustment adjustment;
+				adjustment.baseCount = baseCount;
+				adjustment.totalCount = baseCount;
+				LogDirectComponentCountProbe(
+					sourceId,
+					sourceName,
+					owner,
+					component,
+					includeLinked,
+					baseCount,
+					adjustment);
+			}
+			return baseCount;
+		}
+
 		const auto adjustment = ApplyRememberedWorkshopDirectComponentCount(
 			owner,
 			component,
 			includeLinked,
 			baseCount);
-		LogDirectComponentCountProbe(
-			sourceId,
-			sourceName,
-			owner,
-			component,
-			includeLinked,
-			baseCount,
-			adjustment);
+		if (kVerboseWorkshopMaterialDiagnostics)
+		{
+			LogDirectComponentCountProbe(
+				sourceId,
+				sourceName,
+				owner,
+				component,
+				includeLinked,
+				baseCount,
+				adjustment);
+		}
 		return adjustment.applied ? adjustment.totalCount : baseCount;
 	}
 
@@ -1901,6 +1966,7 @@ namespace papyrus_lootman
 
 	struct PendingWorkshopBuildConsumptionContext
 	{
+		std::uint64_t generation = 0;
 		TESFormID currentWorkshopId = 0;
 		TESFormID currentLocationId = 0;
 		TESFormID lootManWorkshopId = 0;
@@ -1911,6 +1977,64 @@ namespace papyrus_lootman
 	};
 
 	thread_local PendingWorkshopBuildConsumptionContext pendingWorkshopBuildConsumption;
+
+	std::uint64_t GetWorkshopRuntimeStateGeneration()
+	{
+		return workshopRuntimeStateGeneration.load(std::memory_order_acquire);
+	}
+
+	bool IsWorkshopRuntimeStateGenerationCurrent(std::uint64_t generation)
+	{
+		return generation == GetWorkshopRuntimeStateGeneration();
+	}
+
+	bool HasCurrentPendingWorkshopBuildConsumption()
+	{
+		if (!pendingWorkshopBuildConsumption.active)
+		{
+			return false;
+		}
+		if (IsWorkshopRuntimeStateGenerationCurrent(pendingWorkshopBuildConsumption.generation))
+		{
+			return true;
+		}
+
+		pendingWorkshopBuildConsumption = {};
+		return false;
+	}
+
+	void ClearWorkshopRuntimeState(const char* context)
+	{
+		// Bump before and after cleanup so thread-local pending contexts on other threads are invalidated.
+		workshopRuntimeStateGeneration.fetch_add(1, std::memory_order_acq_rel);
+		{
+			std::lock_guard<std::mutex> guard(rememberedWorkshopSupplyLinkLock);
+			rememberedWorkshopSupplyLinks.clear();
+			hasRememberedWorkshopSupplyLinks.store(false, std::memory_order_release);
+		}
+
+		{
+			std::lock_guard<std::mutex> guard(sharedWorkshopContainerProbeLogLock);
+			loggedLootManSharedContainerLocations.clear();
+			loggedSharedWorkshopContainerProbeKeys.clear();
+			loggedWorkshopMaterialProbeKeys.clear();
+			loggedWorkshopMaterialAdjustmentKeys.clear();
+			loggedWorkshopMaterialConsumptionKeys.clear();
+			loggedWorkshopResourceStatusKeys.clear();
+			loggedWorkshopMenuAvailabilityKeys.clear();
+			loggedWorkshopCheckAndSetPlacementKeys.clear();
+			loggedWorkshopPlacementTransitionKeys.clear();
+			loggedWorkshopPlacementStateKeys.clear();
+			loggedWorkshopBuildResourceCheckKeys.clear();
+		}
+
+		pendingWorkshopBuildConsumption = {};
+		workshopRuntimeStateGeneration.fetch_add(1, std::memory_order_acq_rel);
+
+		REX::DEBUG(
+			"source=native component=workshop_runtime_state event=cleared context=\"{}\"",
+			context ? context : "");
+	}
 
 	struct WorkshopResourceStatusEvaluationContext
 	{
@@ -2061,6 +2185,11 @@ namespace papyrus_lootman
 		TESObjectREFR* ownerWorkshop = nullptr,
 		bool requireOwnerWorkshop = false)
 	{
+		if (!CanUseWorkshopMaterialAugmentation())
+		{
+			return {};
+		}
+
 		WorkshopResourceStatusEvaluationContext context;
 		context.selectedRecipe = selectedRecipe;
 		context.ownerWorkshop = ownerWorkshop;
@@ -2087,6 +2216,7 @@ namespace papyrus_lootman
 
 	void UpdatePendingWorkshopBuildConsumption(
 		std::uint32_t sourceId,
+		std::uint64_t runtimeStateGeneration,
 		const SelectedWorkshopRecipeProbeSnapshot& recipeProbe,
 		bool originalResult,
 		bool adjustedResult,
@@ -2109,6 +2239,7 @@ namespace papyrus_lootman
 			return;
 		}
 
+		pendingWorkshopBuildConsumption.generation = runtimeStateGeneration;
 		pendingWorkshopBuildConsumption.currentWorkshopId = evaluation.currentWorkshop->formID;
 		pendingWorkshopBuildConsumption.currentLocationId = evaluation.currentLocation->formID;
 		pendingWorkshopBuildConsumption.lootManWorkshopId = evaluation.lootManWorkshop->formID;
@@ -2124,7 +2255,7 @@ namespace papyrus_lootman
 		BGSLocation* currentLocation,
 		TESObjectREFR* lootManWorkshop)
 	{
-		if (!pendingWorkshopBuildConsumption.active ||
+		if (!HasCurrentPendingWorkshopBuildConsumption() ||
 			!currentWorkshop ||
 			!currentLocation ||
 			!lootManWorkshop)
@@ -2145,7 +2276,7 @@ namespace papyrus_lootman
 
 	void NotePendingWorkshopBuildConsumptionCall(TESObjectREFR* currentWorkshop)
 	{
-		if (!pendingWorkshopBuildConsumption.active ||
+		if (!HasCurrentPendingWorkshopBuildConsumption() ||
 			!currentWorkshop ||
 			pendingWorkshopBuildConsumption.currentWorkshopId != currentWorkshop->formID)
 		{
@@ -2280,12 +2411,19 @@ namespace papyrus_lootman
 		const auto originalStatus = originalWorkshopResourceStatus ?
 			originalWorkshopResourceStatus() :
 			0u;
+		if (!CanUseWorkshopMaterialAugmentation())
+		{
+			return originalStatus;
+		}
+		if (originalStatus != kWorkshopResourceStatusMissingResources)
+		{
+			return originalStatus;
+		}
 
 		const auto selectedRecipe = CaptureSelectedWorkshopRecipeProbe();
 		auto evaluation = EvaluateWorkshopResourceStatus(selectedRecipe);
 		auto adjustedStatus = originalStatus;
-		if (originalStatus == kWorkshopResourceStatusMissingResources &&
-			evaluation.evaluated &&
+		if (evaluation.evaluated &&
 			evaluation.allSatisfied &&
 			evaluation.lootManBackedItemCount > 0)
 		{
@@ -2387,18 +2525,24 @@ namespace papyrus_lootman
 		const char* sourceName)
 	{
 		const auto beforeOut = outValue ? *outValue : 0;
-		auto selectedRecipe = CaptureWorkshopMenuRecipeProbe(row, menuResult);
 		const bool result = originalWorkshopMenuAvailability ?
 			originalWorkshopMenuAvailability(outValue, row, menuResult) :
 			false;
 		const auto originalOut = outValue ? *outValue : 0;
+		if (!CanUseWorkshopMaterialAugmentation())
+		{
+			return result;
+		}
+		if (!result || !outValue || originalOut != 0)
+		{
+			return result;
+		}
+
+		auto selectedRecipe = CaptureWorkshopMenuRecipeProbe(row, menuResult);
 		auto evaluation = EvaluateWorkshopResourceStatus(selectedRecipe);
 		auto adjustedOut = originalOut;
 		bool adjusted = false;
-		if (result &&
-			outValue &&
-			originalOut == 0 &&
-			evaluation.evaluated &&
+		if (evaluation.evaluated &&
 			evaluation.allSatisfied &&
 			evaluation.lootManBackedItemCount > 0)
 		{
@@ -2499,6 +2643,15 @@ namespace papyrus_lootman
 		std::uint32_t sourceId,
 		const char* sourceName)
 	{
+		if (!kVerboseWorkshopMaterialDiagnostics)
+		{
+			if (originalWorkshopCheckAndSetPlacement)
+			{
+				originalWorkshopCheckAndSetPlacement(menu);
+			}
+			return;
+		}
+
 		const auto beforeRecipe = CaptureSelectedWorkshopRecipeProbe();
 		const auto beforeEvaluation = EvaluateWorkshopResourceStatus(beforeRecipe);
 		const auto beforePlacement = CapturePlacementItemProbe();
@@ -2698,6 +2851,13 @@ namespace papyrus_lootman
 		std::uint32_t sourceId,
 		const char* sourceName)
 	{
+		if (!kVerboseWorkshopMaterialDiagnostics)
+		{
+			return originalWorkshopMenuSelect ?
+				originalWorkshopMenuSelect(forward, context) :
+				false;
+		}
+
 		const auto before = CaptureSelectedWorkshopRecipeProbe();
 		const bool result = originalWorkshopMenuSelect ?
 			originalWorkshopMenuSelect(forward, context) :
@@ -2745,6 +2905,15 @@ namespace papyrus_lootman
 		std::uint32_t sourceId,
 		const char* sourceName)
 	{
+		if (!kVerboseWorkshopMaterialDiagnostics)
+		{
+			if (originalWorkshopStartPlacement)
+			{
+				originalWorkshopStartPlacement(menuContext, allowPlacement, createPreview);
+			}
+			return;
+		}
+
 		const auto selectedRecipe = CaptureSelectedWorkshopRecipeProbe();
 		const auto evaluation = EvaluateWorkshopResourceStatus(selectedRecipe);
 		const auto placementBefore = CapturePlacementItemProbe();
@@ -2958,10 +3127,45 @@ namespace papyrus_lootman
 		std::uint32_t sourceId,
 		const char* sourceName)
 	{
-		const bool originalResult = originalWorkshopBuildResourceCheck ?
-			originalWorkshopBuildResourceCheck(recipe, owner, scratchList, scaleRequiredCount) :
-			false;
+		if (!originalWorkshopBuildResourceCheck)
+		{
+			pendingWorkshopBuildConsumption = {};
+			return false;
+		}
 
+		const bool originalResult = originalWorkshopBuildResourceCheck(
+			recipe,
+			owner,
+			scratchList,
+			scaleRequiredCount);
+		if (!CanUseWorkshopMaterialAugmentation())
+		{
+			pendingWorkshopBuildConsumption = {};
+			return originalResult;
+		}
+		if (originalResult)
+		{
+			pendingWorkshopBuildConsumption = {};
+			if (kVerboseWorkshopMaterialDiagnostics)
+			{
+				const auto recipeProbe = CaptureWorkshopRecipePointerProbe(recipe);
+				WorkshopResourceStatusEvaluation evaluation;
+				LogWorkshopBuildResourceCheck(
+					sourceId,
+					sourceName,
+					recipe,
+					owner,
+					scratchList,
+					scaleRequiredCount,
+					originalResult,
+					originalResult,
+					recipeProbe,
+					evaluation);
+			}
+			return originalResult;
+		}
+
+		const auto runtimeStateGeneration = GetWorkshopRuntimeStateGeneration();
 		const auto recipeProbe = CaptureWorkshopRecipePointerProbe(recipe);
 		auto evaluation = EvaluateWorkshopResourceStatus(recipeProbe, owner);
 		auto adjustedResult = originalResult;
@@ -2973,8 +3177,14 @@ namespace papyrus_lootman
 			adjustedResult = true;
 			evaluation.applied = true;
 		}
+		if (!IsWorkshopRuntimeStateGenerationCurrent(runtimeStateGeneration))
+		{
+			pendingWorkshopBuildConsumption = {};
+			return originalResult;
+		}
 		UpdatePendingWorkshopBuildConsumption(
 			sourceId,
+			runtimeStateGeneration,
 			recipeProbe,
 			originalResult,
 			adjustedResult,
@@ -2985,17 +3195,20 @@ namespace papyrus_lootman
 			pendingWorkshopBuildConsumption = {};
 		}
 
-		LogWorkshopBuildResourceCheck(
-			sourceId,
-			sourceName,
-			recipe,
-			owner,
-			scratchList,
-			scaleRequiredCount,
-			originalResult,
-			adjustedResult,
-			recipeProbe,
-			evaluation);
+		if (kVerboseWorkshopMaterialDiagnostics)
+		{
+			LogWorkshopBuildResourceCheck(
+				sourceId,
+				sourceName,
+				recipe,
+				owner,
+				scratchList,
+				scaleRequiredCount,
+				originalResult,
+				adjustedResult,
+				recipeProbe,
+				evaluation);
+		}
 		return adjustedResult;
 	}
 
@@ -3257,6 +3470,19 @@ namespace papyrus_lootman
 		std::uint32_t sourceId,
 		const char* sourceName)
 	{
+		if (!originalWorkshopConsumeComponent)
+		{
+			pendingWorkshopBuildConsumption = {};
+			return;
+		}
+
+		if (!CanUseWorkshopMaterialAugmentation())
+		{
+			originalWorkshopConsumeComponent(form, count);
+			pendingWorkshopBuildConsumption = {};
+			return;
+		}
+
 		auto* currentWorkshop = ResolveActiveRememberedWorkshop();
 		auto* currentLocation = currentWorkshop ? currentWorkshop->GetCurrentLocation() : nullptr;
 		auto* lootManWorkshop = GetRememberedLootManWorkshopForLocation(currentLocation);
@@ -3271,10 +3497,7 @@ namespace papyrus_lootman
 			true,
 			allowDirectItem);
 
-		if (originalWorkshopConsumeComponent)
-		{
-			originalWorkshopConsumeComponent(form, count);
-		}
+		originalWorkshopConsumeComponent(form, count);
 
 		if (plan.consumeFromLootMan > 0 &&
 			plan.lootManWorkshop &&
@@ -3314,13 +3537,16 @@ namespace papyrus_lootman
 			}
 		}
 
-		LogWorkshopMaterialConsumption(
-			sourceId,
-			sourceName,
-			currentWorkshop,
-			form,
-			true,
-			plan);
+		if (kVerboseWorkshopMaterialDiagnostics)
+		{
+			LogWorkshopMaterialConsumption(
+				sourceId,
+				sourceName,
+				currentWorkshop,
+				form,
+				true,
+				plan);
+		}
 		NotePendingWorkshopBuildConsumptionCall(currentWorkshop);
 	}
 
@@ -3356,6 +3582,23 @@ namespace papyrus_lootman
 		std::uint32_t sourceId,
 		const char* sourceName)
 	{
+		if (!CanUseWorkshopMaterialAugmentation())
+		{
+			if (originalRemoveComponents)
+			{
+				originalRemoveComponents(
+					owner,
+					form,
+					count,
+					includeLinked,
+					extraData,
+					allowFallback,
+					uiMessageId,
+					uiMessageContext);
+			}
+			return;
+		}
+
 		const auto plan = BuildRememberedWorkshopMaterialConsumptionPlan(
 			owner,
 			form,
@@ -3412,13 +3655,16 @@ namespace papyrus_lootman
 			}
 		}
 
-		LogWorkshopMaterialConsumption(
-			sourceId,
-			sourceName,
-			owner,
-			form,
-			includeLinked,
-			plan);
+		if (kVerboseWorkshopMaterialDiagnostics)
+		{
+			LogWorkshopMaterialConsumption(
+				sourceId,
+				sourceName,
+				owner,
+				form,
+				includeLinked,
+				plan);
+		}
 	}
 
 	void HookedRemoveComponentsSourceF1(
@@ -3507,14 +3753,17 @@ namespace papyrus_lootman
 		const bool result = originalWorkshopObjectCount ?
 			originalWorkshopObjectCount(scriptContext, form, includeLinked, outValue) :
 			false;
-		LogWorkshopObjectCountProbe(
-			scriptContext,
-			form,
-			includeLinked,
-			outValue,
-			result,
-			site.sourceId,
-			site.label);
+		if (kVerboseWorkshopMaterialDiagnostics)
+		{
+			LogWorkshopObjectCountProbe(
+				scriptContext,
+				form,
+				includeLinked,
+				outValue,
+				result,
+				site.sourceId,
+				site.label);
+		}
 		return result;
 	}
 
@@ -3566,7 +3815,10 @@ namespace papyrus_lootman
 		const auto count = originalCurrentWorkshopObjectCount ?
 			originalCurrentWorkshopObjectCount(form) :
 			0;
-		LogCurrentWorkshopObjectCountProbe(form, count, site.sourceId, site.label);
+		if (kVerboseWorkshopMaterialDiagnostics)
+		{
+			LogCurrentWorkshopObjectCountProbe(form, count, site.sourceId, site.label);
+		}
 		return count;
 	}
 
@@ -3591,6 +3843,7 @@ namespace papyrus_lootman
 		{
 			std::lock_guard<std::mutex> guard(rememberedWorkshopSupplyLinkLock);
 			rememberedWorkshopSupplyLinks[targetLocation->formID] = lootManWorkshop->formID;
+			hasRememberedWorkshopSupplyLinks.store(true, std::memory_order_release);
 		}
 
 		auto* lootManLocation = lootManWorkshop->GetCurrentLocation();
@@ -3616,9 +3869,12 @@ namespace papyrus_lootman
 		}
 
 		bool removed = false;
+		bool hasLinks = false;
 		{
 			std::lock_guard<std::mutex> guard(rememberedWorkshopSupplyLinkLock);
 			removed = rememberedWorkshopSupplyLinks.erase(targetLocation->formID) > 0;
+			hasLinks = !rememberedWorkshopSupplyLinks.empty();
+			hasRememberedWorkshopSupplyLinks.store(hasLinks, std::memory_order_release);
 		}
 
 		REX::DEBUG(
@@ -3626,6 +3882,11 @@ namespace papyrus_lootman
 			prefixText,
 			targetLocation->formID,
 			removed);
+	}
+
+	void ResetWorkshopRuntimeState(std::monostate, BSFixedString context)
+	{
+		ClearWorkshopRuntimeState(context.c_str());
 	}
 
 	void LogWorkshopSupplyDiagnostics(

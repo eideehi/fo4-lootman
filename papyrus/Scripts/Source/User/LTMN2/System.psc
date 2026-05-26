@@ -425,6 +425,7 @@ Function Install()
 
     properties.IsInstalled = true
     properties.IsNotInstalled = false
+    LTMN2:LootMan.OnUpdateLootManProperty("")
 
     LogSystemEvent("install_started", "version=" + GetVersionString(MOD_VERSION))
 
@@ -453,6 +454,12 @@ Function Uninstall()
 
     properties.IsUninstalled = true
     properties.IsNotUninstalled = false
+    properties.IsInstalled = false
+    properties.IsNotInstalled = true
+    properties.IsInitialized = false
+    properties.IsNotInitialized = true
+    LTMN2:LootMan.OnUpdateLootManProperty("")
+    LTMN2:LootMan.ResetWorkshopRuntimeState("uninstall")
 
     LogSystemEvent("uninstall_started")
 
@@ -474,9 +481,6 @@ Function Uninstall()
     LTMN2:Utils.MoveInventoryItems(properties.LootManWorkshopRef, player, properties.ITEM_TYPE_ALL)
 
     LogSystemEvent("uninstall_completed", "items_returned=true")
-
-    properties.IsInstalled = false
-    properties.IsInitialized = false
 
     properties.Stop()
     self.Stop()
@@ -541,7 +545,6 @@ Function Initialize()
 
     LogSystemEvent("initialize_started")
 
-    LTMN2:LootMan.OnUpdateLootManProperty("")
     LTMN2:MCM.GetInstance().Initialize()
 
     StopLegacyWorkerManagers()
@@ -553,6 +556,7 @@ Function Initialize()
 
     properties.IsInitialized = true
     properties.IsNotInitialized = false
+    LTMN2:LootMan.OnUpdateLootManProperty("")
     LogSystemEvent("initialize_completed", "worker_interval=" + properties.WorkerInvokeInterval)
 EndFunction
 

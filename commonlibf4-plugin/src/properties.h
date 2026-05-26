@@ -11,6 +11,9 @@ namespace properties
 	// Keep this enum synchronized with `Update()` in properties.cpp.
 	enum Key
 	{
+		is_installed,
+		is_initialized,
+		is_uninstalled,
 		looting_range,
 		max_items_processed_per_thread,
 		max_lootable_objects_per_pass,

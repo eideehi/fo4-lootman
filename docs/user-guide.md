@@ -127,6 +127,11 @@ The trunk's in-world placement is defined by `LootMan.esp`. Look for it in
 your in-game workshop build menu in settlements where you intend to use
 workshop-linked workflows.
 
+The workshop menu entry is stored as static ESP workshop menu records. MCM
+uninstall clears LootMan runtime state, but it cannot remove those already-loaded
+static workshop menu records from an existing save after `LootMan.esp` has been
+loaded.
+
 ## How to Use LootMan
 
 1. Install LootMan with the normal product DLL.
@@ -273,7 +278,8 @@ actions:
   Use it if LootMan is not installed after exiting Vault 111.
 - The `Uninstall` section exposes an `Execute Uninstall` switch. Turning it on
   reveals a warning and a `[ Yes ]` button that starts LootMan's in-game
-  uninstall process and disables all LootMan features.
+  uninstall process, clears LootMan runtime state, and disables runtime LootMan
+  behavior.
 
 Use the in-game uninstall process before removing the mod or before
 reinstalling to troubleshoot a broken setup.
@@ -591,9 +597,15 @@ Fallout 4.
 ## Uninstalling
 
 Use `MCM -> System -> Uninstall` before removing the mod. Wait for the
-uninstallation completion message. Uninstall attempts to return LootMan-held
-and LootMan-workshop-held items to the player; verify the player inventory
-before deleting the mod files.
+uninstallation completion message. MCM uninstall clears LootMan runtime state
+and attempts to return LootMan-held and LootMan-workshop-held items to the
+player; verify the player inventory before deleting the mod files.
+
+MCM uninstall cannot remove static ESP workshop menu records that are already
+loaded into an existing save. After uninstalling, make a cleanup save before
+removing files. If you hard-remove `LootMan.esp` or its assets from a save that
+still references those static records, another workshop-menu mod may still warn
+about the missing LootMan Trunk entry.
 
 For LootMan 1.x to 3.0.1 upgrades, uninstall 1.x and make a clean save before
 installing 3.0.1. For LootMan 2.x or 3.0.0 to 3.0.1, overwrite updates are

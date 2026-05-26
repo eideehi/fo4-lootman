@@ -30,6 +30,9 @@ Function RememberWorkshopSupplyLink(Form targetLocation, ObjectReference lootMan
 ; Remove a runtime supply-link mapping from the native workshop hook.
 Function ForgetWorkshopSupplyLink(Form targetLocation, string prefix) global native
 
+; Clear native workshop runtime state after uninstall or save preload.
+Function ResetWorkshopRuntimeState(string context = "") global native
+
 ; Transfer lootable items of the specified item type from one inventory to another.
 int Function TransferLootableInventoryItems(ObjectReference src, ObjectReference dest, int itemType) global native
 

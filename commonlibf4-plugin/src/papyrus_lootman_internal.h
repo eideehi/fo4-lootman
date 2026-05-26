@@ -575,6 +575,8 @@ namespace papyrus_lootman
 		RE::BSFixedString prefix);
 	void ForgetWorkshopSupplyLink(
 		std::monostate, RE::TESForm* targetLocationForm, RE::BSFixedString prefix);
+	void ResetWorkshopRuntimeState(std::monostate, RE::BSFixedString context);
+	void ClearWorkshopRuntimeState(const char* context);
 	std::vector<RE::TESForm*> GetInventoryItemsWithItemType(
 		std::monostate, RE::TESObjectREFR* inventoryOwner, std::uint32_t itemType);
 	std::vector<RE::TESForm*> GetLootableItems(

@@ -35,6 +35,8 @@ namespace papyrus_lootman
 			&RememberWorkshopSupplyLink, false, false);
 		vm->BindNativeMethod("LTMN2:LootMan"sv, "ForgetWorkshopSupplyLink"sv,
 			&ForgetWorkshopSupplyLink, false, false);
+		vm->BindNativeMethod("LTMN2:LootMan"sv, "ResetWorkshopRuntimeState"sv,
+			&ResetWorkshopRuntimeState, false, false);
 		vm->BindNativeMethod("LTMN2:LootMan"sv, "TransferLootableInventoryItems"sv,
 			&TransferLootableInventoryItems, false, false);
 		vm->BindNativeMethod("LTMN2:LootMan"sv, "TransferInventoryItems"sv,

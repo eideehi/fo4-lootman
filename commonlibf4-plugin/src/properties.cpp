@@ -180,6 +180,7 @@ namespace properties
 		propertiesQuest = utility::LookupForm("LootMan.esp|000F9A");
 		{
 			std::lock_guard<std::mutex> guard(lock);
+			papyrusProperties.clear();
 			lootManWorkshopRef = nullptr;
 		}
 		if (!propertiesQuest)
@@ -197,7 +198,25 @@ namespace properties
 		RE::TESObjectREFR* updatedLootManWorkshopRef = nullptr;
 		bool updateLootManWorkshopRef = false;
 
-		auto propertyName = "MaxItemsProcessedPerThread";
+		auto propertyName = "IsInstalled";
+		if (updateAll || propertyName == updateProperty)
+		{
+			updates[is_installed] = GetBoolProperty(propertyName);
+		}
+
+		propertyName = "IsInitialized";
+		if (updateAll || propertyName == updateProperty)
+		{
+			updates[is_initialized] = GetBoolProperty(propertyName);
+		}
+
+		propertyName = "IsUninstalled";
+		if (updateAll || propertyName == updateProperty)
+		{
+			updates[is_uninstalled] = GetBoolProperty(propertyName);
+		}
+
+		propertyName = "MaxItemsProcessedPerThread";
 		if (updateAll || propertyName == updateProperty)
 		{
 			updates[max_items_processed_per_thread] = GetIntProperty(propertyName);
