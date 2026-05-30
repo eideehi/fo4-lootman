@@ -103,4 +103,57 @@ describe("mcm fallback config delivery", () => {
 		expect(setBool).toContain("WriteSettableBool");
 		expect(setBool).toContain("Return");
 	});
+
+	const FRAGMENT_DIR = "papyrus/Scripts/Source/User/LTMN2/Fragments/Terminals";
+
+	it("ships property-free terminal fragments matching the frozen ITID counts", () => {
+		const fragments = [
+			{ name: "TERM_ConfigGeneral_FB8", count: 14 },
+			{ name: "TERM_ConfigObjectFilter_FB9", count: 12 },
+			{ name: "TERM_ConfigLogLevel_FBA", count: 7 },
+			{ name: "TERM_ConfigUtility_FBB", count: 4 },
+		];
+		for (const frag of fragments) {
+			const file = `${FRAGMENT_DIR}/${frag.name}.psc`;
+			expect(fs.existsSync(path.resolve(file)), `missing fragment ${frag.name}`).toBe(true);
+			const src = readWorkspaceFile(file);
+			expect(src, `${frag.name} must extend Terminal`).toMatch(
+				/Scriptname\s+LTMN2:Fragments:Terminals:\w+\s+extends\s+Terminal/i,
+			);
+			// Property-free: no `<Type> Property <name>` declarations (a comment
+			// mentioning "Property-free" does not match the `Property\s+\w+` shape).
+			expect(src, `${frag.name} must be property-free`).not.toMatch(/\bProperty\s+\w+/);
+			// Phase A is toggle-only and uses no absolute set (check calls, not the
+			// words, so explanatory comments mentioning them don't trip the guard).
+			expect(src, `${frag.name} must not call ToggleBit (Phase A has no packed ids)`).not.toMatch(/\.ToggleBit\(/);
+			expect(src, `${frag.name} must not absolute-set via SetBool`).not.toMatch(/\.SetBool\(/);
+			// Contiguous, zero-padded, 1-based Fragment_Terminal_NN(ObjectReference) set.
+			const indices = [...src.matchAll(/Function\s+Fragment_Terminal_(\d{2})\(ObjectReference\s+\w+\)/gi)].map((m) =>
+				Number(m[1]),
+			);
+			expect(indices, `${frag.name} fragment indices`).toEqual(Array.from({ length: frag.count }, (_, i) => i + 1));
+		}
+	});
+
+	it("binds representative Phase-A items to the contracted facade/actions", () => {
+		const general = readWorkspaceFile(`${FRAGMENT_DIR}/TERM_ConfigGeneral_FB8.psc`);
+		// EnableLootMan routes through the MCM action for its localized HUD message.
+		expect(extractPapyrusFunction(general, "Fragment_Terminal_01")).toContain("ToggleEnableLootMan()");
+		expect(extractPapyrusFunction(general, "Fragment_Terminal_08")).toContain('Toggle("NotLootingFromSettlement")');
+		expect(extractPapyrusFunction(general, "Fragment_Terminal_11")).toMatch(/AdjustFloat\("LootingRange", 0\.5, 1\.0, 256\.0\)/);
+		expect(extractPapyrusFunction(general, "Fragment_Terminal_13")).toMatch(/AdjustInt\("CarryWeight", 100, 100, 10000\)/);
+
+		const object = readWorkspaceFile(`${FRAGMENT_DIR}/TERM_ConfigObjectFilter_FB9.psc`);
+		expect(extractPapyrusFunction(object, "Fragment_Terminal_01")).toContain('Toggle("EnableObjectLootingOfACTI")');
+		expect(extractPapyrusFunction(object, "Fragment_Terminal_12")).toContain('Toggle("EnableObjectLootingOfWEAP")');
+
+		const log = readWorkspaceFile(`${FRAGMENT_DIR}/TERM_ConfigLogLevel_FBA.psc`);
+		expect(extractPapyrusFunction(log, "Fragment_Terminal_01")).toContain("SetLogLevel(0)");
+		expect(extractPapyrusFunction(log, "Fragment_Terminal_07")).toContain("SetLogLevel(6)");
+
+		const util = readWorkspaceFile(`${FRAGMENT_DIR}/TERM_ConfigUtility_FBB.psc`);
+		expect(extractPapyrusFunction(util, "Fragment_Terminal_01")).toContain("ExecuteLooting()");
+		expect(extractPapyrusFunction(util, "Fragment_Terminal_02")).toContain("OpenLootManInventory()");
+		expect(extractPapyrusFunction(util, "Fragment_Terminal_04")).toContain("Uninstall()");
+	});
 });
