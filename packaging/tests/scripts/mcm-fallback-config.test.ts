@@ -21,19 +21,31 @@ describe("mcm fallback config delivery", () => {
 	const systemScript = readWorkspaceFile(SYSTEM_SCRIPT);
 	const patchScript = readWorkspaceFile(PATCH_SCRIPT);
 	const mcmScript = readWorkspaceFile(MCM_SCRIPT);
+	const configScript = readWorkspaceFile(CONFIG_SCRIPT);
+	const modVersion = Number(/int\s+MOD_VERSION\s*=\s*(\d+)\s+const/.exec(systemScript)?.[1] ?? "0");
 
 	it("bumps MOD_VERSION past the 3.0.x line so existing saves migrate", () => {
-		const match = /int\s+MOD_VERSION\s*=\s*(\d+)\s+const/.exec(systemScript);
-		expect(match, "missing MOD_VERSION").not.toBeNull();
 		// Existing 3.0.x saves stored CurrentModVersion 30000; the bump must exceed
 		// it or Patch() never runs for the current player base.
-		expect(Number(match![1])).toBeGreaterThan(30000);
+		expect(modVersion).toBeGreaterThan(30000);
+	});
+
+	it("keeps package.json version and MOD_VERSION in lockstep", () => {
+		const pkg = JSON.parse(readWorkspaceFile("package.json")) as { version: string };
+		const [major, minor, patch] = pkg.version.split(".").map(Number);
+		// GetVersionString encodes Major*10000 + Minor*100 + Patch (System.psc).
+		expect(major * 10000 + minor * 100 + patch, "package.json version must match MOD_VERSION encoding").toBe(modVersion);
 	});
 
 	it("wires a version-gated migration grant reachable from 3.0.x saves", () => {
 		const patch = extractPapyrusFunction(systemScript, "Patch");
-		const gate = /If\s*\(CurrentModVersion\s*<\s*(\d+)\)\s*LTMN2:Patch\.v3_1_0\(\)/s.exec(patch);
+		// Anchor to one physical gate line so the bound cannot be captured from an
+		// unrelated CurrentModVersion check elsewhere in Patch().
+		const gate = /If\s*\(CurrentModVersion\s*<\s*(\d+)\)\s*\r?\n\s*LTMN2:Patch\.v3_1_0\(\)/.exec(patch);
 		expect(gate, "Patch() does not wire a gated LTMN2:Patch.v3_1_0 call").not.toBeNull();
+		// The gate must equal MOD_VERSION (so the step is live) and exceed 30000 (so
+		// saves stored at 30000 still run it).
+		expect(Number(gate![1])).toBe(modVersion);
 		expect(Number(gate![1]), "migration gate must be passable by saves at 30000").toBeGreaterThan(30000);
 
 		const migration = extractPapyrusFunction(patchScript, "v3_1_0");
@@ -44,29 +56,51 @@ describe("mcm fallback config delivery", () => {
 	it("grants the holotape idempotently by form id from both install and migration", () => {
 		const grant = extractPapyrusFunction(systemScript, "GrantConfigHolotape");
 		expect(grant).toContain("0x000FB6");
-		expect(grant, "grant must be count-checked").toMatch(/GetItemCount\([^)]*\)\s*==\s*0/);
+		// Count-check and add must target the same actor, or idempotency breaks.
+		expect(grant, "grant must be count-checked on the actor it adds to").toMatch(/target\.GetItemCount\([^)]*\)\s*==\s*0/);
+		expect(grant).toContain("target.AddItem(");
 
 		const install = extractPapyrusFunction(systemScript, "Install");
 		expect(install).toContain("GrantConfigHolotape(player)");
 	});
 
 	it("routes the config facade through the shared MCM dispatcher", () => {
-		expect(fs.existsSync(path.resolve(CONFIG_SCRIPT)), "Config.psc facade is missing").toBe(true);
-		const configScript = readWorkspaceFile(CONFIG_SCRIPT);
-
 		for (const fn of ["SetBool", "Toggle", "ToggleBit", "AdjustFloat", "AdjustInt", "SetLogLevel", "Notify"]) {
 			expect(configScript, `facade missing ${fn}`).toContain(`Function ${fn}(`);
 		}
 
-		// Single shared state: the facade applies through MCM and never calls the
-		// native refresh directly, so the terminal and the MCM cannot drift.
-		expect(configScript).toContain("ApplySettingSideEffects");
-		expect(configScript, "facade must route through ApplySettingSideEffects, not call native refresh").not.toMatch(
-			/LTMN2:LootMan\.OnUpdateLootManProperty/,
-		);
+		// Single shared state: the facade must route through MCM in code (not just a
+		// doc comment) and never call the native refresh directly, so the terminal
+		// and the MCM cannot drift.
+		const configCode = configScript
+			.split(/\r?\n/)
+			.filter((line) => !line.trim().startsWith(";"))
+			.join("\n");
+		const routeHits = configCode.split("ApplySettingSideEffects(").length - 1;
+		expect(routeHits, "facade must route through ApplySettingSideEffects in code, not only a comment").toBeGreaterThanOrEqual(5);
+		expect(configCode, "facade must not call the native refresh directly").not.toMatch(/LTMN2:LootMan\.OnUpdateLootManProperty/);
 
+		// The thin wrapper must keep the modName guard before delegating.
 		const onChange = extractPapyrusFunction(mcmScript, "OnMCMSettingChange");
-		expect(onChange).toContain("ApplySettingSideEffects(id)");
+		expect(onChange).toContain('If (modName != "LootMan")');
+		expect(onChange, "wrapper must guard modName before delegating").toMatch(/modName != "LootMan"[\s\S]*Return[\s\S]*ApplySettingSideEffects\(id\)/);
 		expect(mcmScript).toContain("Function ApplySettingSideEffects(string id)");
+	});
+
+	it("keeps packed-bitmask ids out of the absolute SetBool path", () => {
+		// SetBool writes via WriteSettableBool, which must not handle packed-bitmask
+		// ids; those are toggle-only because ApplySettingSideEffects XORs the packed
+		// int, so an absolute set would desync the bool and the int.
+		const settable = extractPapyrusFunction(configScript, "WriteSettableBool");
+		const packedWriter = extractPapyrusFunction(configScript, "WritePackedBool");
+		for (const packed of ["EnableInventoryLootingOfALCH", "EnableALCHItemFood", "EnableBOOKItemPerkMagazine", "EnableMISCItemBobblehead", "EnableWEAPItemGrenade"]) {
+			expect(settable, `WriteSettableBool must not handle packed id ${packed}`).not.toContain(packed);
+			expect(packedWriter, `WritePackedBool must handle packed id ${packed}`).toContain(packed);
+		}
+
+		// SetBool must bail when the id is not absolute-settable.
+		const setBool = extractPapyrusFunction(configScript, "SetBool");
+		expect(setBool).toContain("WriteSettableBool");
+		expect(setBool).toContain("Return");
 	});
 });

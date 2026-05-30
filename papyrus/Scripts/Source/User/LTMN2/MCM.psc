@@ -139,6 +139,15 @@ Function ApplySettingSideEffects(string id)
         player = Game.GetPlayer()
     EndIf
 
+    ; Skip side effects unless the mod is in an installed, usable state. MCM hides
+    ; its config controls until install, but the holotape terminal can reach this
+    ; entry directly, so guard here too. IsNotInitialized is intentionally not
+    ; gated: MCM can fire legitimately in the brief post-load re-init window.
+    If (properties.IsNotInstalled || properties.IsUninstalled)
+        LogMcmEvent("setting_change_skipped", "id=" + id + " reason=not_installed", LOG_LEVEL_DEBUG)
+        Return
+    EndIf
+
     string prefix = "source=papyrus component=mcm event=setting_changed id=" + id
     LogMcmEvent("setting_changed", "id=" + id)
 

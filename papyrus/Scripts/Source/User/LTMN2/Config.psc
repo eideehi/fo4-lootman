@@ -20,7 +20,13 @@ Scriptname LTMN2:Config native hidden
 ; unconditionally, so an absolute set there would flip an already-correct bit.
 Function SetBool(string id, bool value) global
     LTMN2:Properties properties = LTMN2:Properties.GetInstance()
-    WriteBool(properties, id, value)
+    If (!WriteSettableBool(properties, id, value))
+        ; Packed-bitmask ids are toggle-only: ApplySettingSideEffects XORs the
+        ; packed int unconditionally, so an absolute set would desync. Reject here
+        ; so the contract is enforced, not just documented; callers use ToggleBit.
+        LTMN2:LootMan.LogEvent("config", "set_bool_rejected", "id=" + id + " reason=toggle_only", 3)
+        Return
+    EndIf
     LTMN2:MCM.GetInstance().ApplySettingSideEffects(id)
 EndFunction
 
@@ -81,6 +87,14 @@ EndFunction
 ; Set the log level. Mirrors the value on LTMN2:MCM (F9B) and lets
 ; ApplySettingSideEffects push it to native via SetLogLevel and re-sync.
 Function SetLogLevel(int value) global
+    ; Valid native levels are trace(0)..off(6). Reject out-of-range input so the
+    ; mirrored value never diverges from native -- a divergence would make the
+    ; LogLevel resync call MCM.RefreshMenu, reaching into the MCM framework this
+    ; fallback exists to work around.
+    If (value < 0 || value > 6)
+        LTMN2:LootMan.LogEvent("config", "set_log_level_rejected", "value=" + value + " reason=out_of_range", 3)
+        Return
+    EndIf
     LTMN2:MCM mcmQuest = LTMN2:MCM.GetInstance()
     mcmQuest.LogLevel = value
     mcmQuest.ApplySettingSideEffects("LogLevel")
@@ -101,7 +115,10 @@ EndFunction
 
 Function FlipBool(string id) global
     LTMN2:Properties properties = LTMN2:Properties.GetInstance()
-    WriteBool(properties, id, !ReadBool(properties, id))
+    bool next = !ReadBool(properties, id)
+    If (!WriteSettableBool(properties, id, next))
+        WritePackedBool(properties, id, next)
+    EndIf
     LTMN2:MCM.GetInstance().ApplySettingSideEffects(id)
 EndFunction
 
@@ -238,7 +255,10 @@ bool Function ReadBool(LTMN2:Properties properties, string id) global
     Return false
 EndFunction
 
-Function WriteBool(LTMN2:Properties properties, string id, bool value) global
+; Write a plain or object-filter bool (the absolute-settable classes). Returns true
+; if id matched one of these, false otherwise (e.g. a packed-bitmask id, which
+; SetBool must not write). With WritePackedBool this also serves FlipBool.
+bool Function WriteSettableBool(LTMN2:Properties properties, string id, bool value) global
     ; Plain config bools
     If (id == "EnableLootMan")
         properties.EnableLootMan = value
@@ -292,9 +312,18 @@ Function WriteBool(LTMN2:Properties properties, string id, bool value) global
         properties.EnableObjectLootingOfNPC_ = value
     ElseIf (id == "EnableObjectLootingOfWEAP")
         properties.EnableObjectLootingOfWEAP = value
+    Else
+        Return false
+    EndIf
+    Return true
+EndFunction
 
+; Write a packed-bitmask backing bool (the bool the MCM switcher binds to). These
+; are toggle-only: ApplySettingSideEffects XORs the matching packed int, so they
+; are reached only through FlipBool, never the absolute SetBool path.
+Function WritePackedBool(LTMN2:Properties properties, string id, bool value) global
     ; Packed-bitmask backing bools: inventory filter
-    ElseIf (id == "EnableInventoryLootingOfALCH")
+    If (id == "EnableInventoryLootingOfALCH")
         properties.EnableInventoryLootingOfALCH = value
     ElseIf (id == "EnableInventoryLootingOfAMMO")
         properties.EnableInventoryLootingOfAMMO = value
