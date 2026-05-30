@@ -1,0 +1,11 @@
+Program: Fallout4-1.11.221.exe
+Image base: 140000000
+
+================================================================================
+Target 14059d388
+  14059d388: CALL 0x14037de70
+  14059d38d: MOV EAX,EAX
+  14059d38f: XORPS XMM0,XMM0
+  14059d392: CVTSI2SS XMM0,RAX
+  14059d397: MOVSS dword ptr [RBX],XMM0
+  14059d39b: MOV ECX,dword ptr [0x143e5c6d8]

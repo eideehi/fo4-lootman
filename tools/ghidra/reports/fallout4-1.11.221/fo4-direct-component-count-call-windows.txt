@@ -1,0 +1,56 @@
+Program: Fallout4-1.11.221.exe
+Image base: 140000000
+
+================================================================================
+Target 1403bc3fd
+  1403bc3fd: CALL 0x140507a10
+  1403bc402: ADD ESI,EAX
+  1403bc404: CMP ESI,EBP
+  1403bc406: JC 0x1403bc4a3
+  1403bc40c: MOV EAX,ESI
+  1403bc40e: XORPS XMM1,XMM1
+
+================================================================================
+Target 14039f28f
+  14039f28f: CALL 0x140507a10
+  14039f294: ADD EBP,EAX
+  14039f296: MOV RCX,R14
+  14039f299: CALL 0x140315dd0
+  14039f29e: MOV R9,RAX
+  14039f2a1: MOV dword ptr [RSP + 0x28],R12D
+
+================================================================================
+Target 1405076e5
+  1405076e5: CALL 0x140507a10
+  1405076ea: JMP 0x1405079c4
+  1405076ef: MOV RAX,qword ptr [R8]
+  1405076f2: MOV RCX,R14
+  1405076f5: CALL qword ptr [RAX + 0x170]
+  1405076fb: TEST AL,AL
+
+================================================================================
+Target 140b32efb
+  140b32efb: CALL 0x140507a10
+  140b32f00: ADD EBP,EAX
+  140b32f02: MOV RCX,qword ptr [0x143268ab8]
+  140b32f09: MOV RDX,RSI
+  140b32f0c: CALL 0x1410482b0
+  140b32f11: TEST AL,AL
+
+================================================================================
+Target 140b378a8
+  140b378a8: CALL 0x140507a10
+  140b378ad: ADD EDI,EAX
+  140b378af: JMP 0x140b378b6
+  140b378b1: MOV EDI,0x3e7
+  140b378b6: MOV RAX,qword ptr [RBX + 0x18]
+  140b378ba: CMP byte ptr [RAX],R13B
+
+================================================================================
+Target 140b2d1be
+  140b2d1be: CALL 0x140507a10
+  140b2d1c3: ADD dword ptr [RBP + 0xf0],EAX
+  140b2d1c9: TEST R14B,0x2
+  140b2d1cd: JZ 0x140b2d1f2
+  140b2d1cf: MOV RCX,qword ptr [0x143268ab8]
+  140b2d1d6: MOV RDX,RSI

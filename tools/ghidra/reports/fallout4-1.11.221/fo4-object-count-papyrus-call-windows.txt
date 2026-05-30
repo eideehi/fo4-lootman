@@ -1,0 +1,11 @@
+Program: Fallout4-1.11.221.exe
+Image base: 140000000
+
+================================================================================
+Target 1405dd494
+  1405dd494: CALL 0x14059d370
+  1405dd499: ADD RSP,0xc0
+  1405dd4a0: POP RBX
+  1405dd4a1: RET
+  1405dd4a2: XOR AL,AL
+  1405dd4a4: ADD RSP,0xc0

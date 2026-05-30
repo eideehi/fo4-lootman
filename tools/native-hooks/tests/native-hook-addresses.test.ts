@@ -98,19 +98,19 @@ describe("native hook address manifest", () => {
 
 		expect(entry.discoveryStrategy.status).toBe("proven");
 		expect(entry.expectedCount).toBe(5);
-		expect(proof.targetAbsoluteAddress).toBe("0x140507A00");
+		expect(proof.targetAbsoluteAddress).toBe("0x140507A10");
 		expect(proof.sites?.map((site) => site.siteId)).toEqual(entry.sites?.map((site) => site.id));
 		expect(proof.sites?.map((site) => site.absoluteAddress)).toEqual([
-			"0x1403BC3ED",
-			"0x14039F27F",
-			"0x140B3308B",
-			"0x140B37A38",
-			"0x140B2D34E",
+			"0x1403BC3FD",
+			"0x14039F28F",
+			"0x140B32EFB",
+			"0x140B378A8",
+			"0x140B2D1BE",
 		]);
 		expect(proof.excludedReferences).toEqual([
 			{
-				absoluteAddress: "0x1405076D5",
-				reason: "Component helper internal fallback path, not one of the five direct component count hook sites; see tools/ghidra/reports/fo4-component-helper-callers.txt.",
+				absoluteAddress: "0x1405076E5",
+				reason: "Component helper internal fallback path, not one of the five direct component count hook sites; see tools/ghidra/reports/fallout4-1.11.221/fo4-direct-component-count-target-functions.txt.",
 			},
 		]);
 	});
@@ -124,16 +124,15 @@ describe("native hook address manifest", () => {
 
 		expect(entry.discoveryStrategy.status).toBe("proven");
 		expect(entry.expectedCount).toBe(2);
-		expect(proof.report).toBe("tools/ghidra/reports/fo4-component-helper-callers.txt");
+		expect(proof.report).toBe("tools/ghidra/reports/fallout4-1.11.221/fo4-component-count-helper-target-functions.txt");
 		expect(proof.instructionReports).toEqual([
-			"tools/ghidra/reports/fo4-get-component-count.txt",
-			"tools/ghidra/reports/fo4-component-ui-caller.txt",
+			"tools/ghidra/reports/fallout4-1.11.221/fo4-component-count-helper-call-windows.txt",
 		]);
-		expect(proof.targetAbsoluteAddress).toBe("0x140507660");
+		expect(proof.targetAbsoluteAddress).toBe("0x140507670");
 		expect(proof.sites?.map((site) => site.siteId)).toEqual(entry.sites?.map((site) => site.id));
 		expect(proof.sites?.map((site) => site.absoluteAddress)).toEqual([
-			"0x14059BC2A",
-			"0x14117501B",
+			"0x14059BC3A",
+			"0x1411751BB",
 		]);
 		expect(proof.excludedReferences).toBeUndefined();
 	});
@@ -147,15 +146,15 @@ describe("native hook address manifest", () => {
 
 		expect(entry.discoveryStrategy.status).toBe("proven");
 		expect(entry.expectedCount).toBe(2);
-		expect(proof.report).toBe("tools/ghidra/reports/fo4-selected-menu-helper-functions.txt");
+		expect(proof.report).toBe("tools/ghidra/reports/fallout4-1.11.221/fo4-menu-select-target-functions.txt");
 		expect(proof.instructionReports).toEqual([
-			"tools/ghidra/reports/fo4-workshopmenu-placement-writes.txt",
+			"tools/ghidra/reports/fallout4-1.11.221/fo4-menu-select-call-windows.txt",
 		]);
-		expect(proof.targetAbsoluteAddress).toBe("0x140396DB0");
+		expect(proof.targetAbsoluteAddress).toBe("0x140396DC0");
 		expect(proof.sites?.map((site) => site.siteId)).toEqual(entry.sites?.map((site) => site.id));
 		expect(proof.sites?.map((site) => site.absoluteAddress)).toEqual([
-			"0x140B2C8AA",
-			"0x140B2CB67",
+			"0x140B2C71A",
+			"0x140B2C9D7",
 		]);
 		expect(proof.excludedReferences).toBeUndefined();
 	});
@@ -260,7 +259,7 @@ describe("native hook address manifest", () => {
 		expect(first).toContain("#include <REL/ID.h>");
 		expect(first).toContain("inline constexpr REL::ID kEncounterZoneResetElapsedFromDetachId{ 2200355 };");
 		expect(first).toContain("inline constexpr REL::ID kWorkshopCaravanKeywordGlobalId{ 4797310 };");
-		expect(first).toContain("Address Library: RE::ID::Workshop::GetSelectedWorkshopMenuNode @ 0x389A80");
+		expect(first).toContain("Address Library: RE::ID::Workshop::GetSelectedWorkshopMenuNode @ 0x389A90");
 		expect(path.relative(projectRoot, headerPath).replaceAll("\\", "/")).toBe(manifest.generatedHeader);
 	});
 });

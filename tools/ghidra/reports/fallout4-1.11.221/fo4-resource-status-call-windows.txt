@@ -1,0 +1,20 @@
+Program: Fallout4-1.11.221.exe
+Image base: 140000000
+
+================================================================================
+Target 140b2f130
+  140b2f130: CALL 0x140b32e20
+  140b2f135: MOV RCX,qword ptr [RBX + 0x20]
+  140b2f139: TEST EAX,EAX
+  140b2f13b: MOV R15,qword ptr [RSP + 0x348]
+  140b2f143: MOV R14D,0x17
+  140b2f149: SETNZ AL
+
+================================================================================
+Target 140b2d0d6
+  140b2d0d6: CALL 0x140b32e20
+  140b2d0db: LEA RCX,[RBP + -0x8]
+  140b2d0df: MOV dword ptr [RBP + -0x48],EAX
+  140b2d0e2: MOV EBX,EAX
+  140b2d0e4: CALL 0x140385910
+  140b2d0e9: MOV RDX,RAX

@@ -1,0 +1,11 @@
+Program: Fallout4-1.11.221.exe
+Image base: 140000000
+
+================================================================================
+Target 1404d23d4
+  1404d23d4: CALL 0x140494b40
+  1404d23d9: MOV byte ptr [RBP + 0x67],AL
+  1404d23dc: XOR BL,BL
+  1404d23de: JMP 0x1404d2400
+  1404d23e0: XOR AL,AL
+  1404d23e2: MOV byte ptr [RBP + 0x67],AL

@@ -1,0 +1,29 @@
+Program: Fallout4-1.11.221.exe
+Image base: 140000000
+
+================================================================================
+Target 140398e16
+  140398e16: CALL 0x14042bcd0
+  140398e1b: TEST AL,AL
+  140398e1d: JZ 0x14039964d
+  140398e23: MOV RCX,RBX
+  140398e26: MOVAPS xmmword ptr [RSP + 0x2b0],XMM8
+  140398e2f: MOV byte ptr [RBP + 0x248],0x1
+
+================================================================================
+Target 140392524
+  140392524: CALL 0x14042bcd0
+  140392529: TEST AL,AL
+  14039252b: JZ 0x140392981
+  140392531: JMP 0x140392538
+  140392533: MOV R13,qword ptr [RSP + 0x30]
+  140392538: MOV R14,qword ptr [R12 + 0x38]
+
+================================================================================
+Target 1403b7c5e
+  1403b7c5e: CALL 0x14042bcd0
+  1403b7c63: MOV RCX,qword ptr [RBX + 0x18]
+  1403b7c67: LEA RDX,[RSP + 0x38]
+  1403b7c6c: MOV R9B,0x1
+  1403b7c6f: MOV R8,RDI
+  1403b7c72: MOV RCX,qword ptr [RCX + 0x50]

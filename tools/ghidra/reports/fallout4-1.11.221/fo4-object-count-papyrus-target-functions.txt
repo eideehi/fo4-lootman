@@ -1,0 +1,61 @@
+Program: Fallout4-1.11.221.exe
+Image base: 140000000
+
+================================================================================
+Target 14059d370
+Function: FUN_14059d370
+Entry: 14059d370
+Body: [[14059d370, 14059d3fb]]
+
+References to entry:
+  143edbb34 -> 14059d370 type=DATA
+  1405dd494 -> 14059d370 type=UNCONDITIONAL_CALL
+  142eec950 -> 14059d370 type=DATA
+
+Outgoing references from function body:
+  14059d383 -> 14059d39b type=CONDITIONAL_JUMP
+  14059d388 -> 14037de70 type=UNCONDITIONAL_CALL
+  14059d3b7 -> 14059d3f4 type=CONDITIONAL_JUMP
+  14059d3b9 -> 14037e110 type=UNCONDITIONAL_CALL
+  14059d3c0 -> 14059d3d5 type=CONDITIONAL_JUMP
+  14059d3d0 -> 14103bd30 type=UNCONDITIONAL_CALL
+  14059d3ef -> 14103bd30 type=UNCONDITIONAL_CALL
+
+Instructions:
+  14059d370: PUSH RBX
+  14059d372: SUB RSP,0x20
+  14059d376: MOV dword ptr [R9],0x0
+  14059d37d: MOV RBX,R9
+  14059d380: TEST RDX,RDX
+  14059d383: JZ 0x14059d39b
+  14059d385: MOV RCX,RDX
+  14059d388: CALL 0x14037de70
+  14059d38d: MOV EAX,EAX
+  14059d38f: XORPS XMM0,XMM0
+  14059d392: CVTSI2SS XMM0,RAX
+  14059d397: MOVSS dword ptr [RBX],XMM0
+  14059d39b: MOV ECX,dword ptr [0x143e5c6d8]
+  14059d3a1: MOV RAX,qword ptr GS:[0x58]
+  14059d3aa: MOV EDX,0x830
+  14059d3af: MOV RAX,qword ptr [RAX + RCX*0x8]
+  14059d3b3: CMP byte ptr [RDX + RAX*0x1],0x0
+  14059d3b7: JZ 0x14059d3f4
+  14059d3b9: CALL 0x14037e110
+  14059d3be: TEST AL,AL
+  14059d3c0: JNZ 0x14059d3d5
+  14059d3c2: MOV RCX,qword ptr [0x1430ed338]
+  14059d3c9: LEA RDX,[0x1424aad78]
+  14059d3d0: CALL 0x14103bd30
+  14059d3d5: MOVSS XMM2,dword ptr [RBX]
+  14059d3d9: LEA RDX,[0x1424aadb0]
+  14059d3e0: MOV RCX,qword ptr [0x1430ed338]
+  14059d3e7: CVTPS2PD XMM2,XMM2
+  14059d3ea: MOVQ R8,XMM2
+  14059d3ef: CALL 0x14103bd30
+  14059d3f4: MOV AL,0x1
+  14059d3f6: ADD RSP,0x20
+  14059d3fa: POP RBX
+  14059d3fb: RET
+
+Decompiled C:
+  <decompile failed: >

@@ -1,0 +1,20 @@
+Program: Fallout4-1.11.221.exe
+Image base: 140000000
+
+================================================================================
+Target 140b2c71a
+  140b2c71a: CALL 0x140396dc0
+  140b2c71f: MOVZX ECX,word ptr [0x1430ebe98]
+  140b2c726: LEA RDX,[RBP + 0xe8]
+  140b2c72d: MOVZX ESI,AL
+  140b2c730: CALL 0x140389a90
+  140b2c735: MOVZX EDX,word ptr [0x1430ebe98]
+
+================================================================================
+Target 140b2c9d7
+  140b2c9d7: CALL 0x140396dc0
+  140b2c9dc: MOVZX ECX,word ptr [0x1430ebe98]
+  140b2c9e3: LEA RDX,[RBP + 0xe0]
+  140b2c9ea: MOVZX ESI,AL
+  140b2c9ed: CALL 0x140389a90
+  140b2c9f2: MOVZX EDX,word ptr [0x1430ebe98]

@@ -1,0 +1,113 @@
+Program: Fallout4-1.11.221.exe
+Image base: 140000000
+
+================================================================================
+Target 14042bcd0
+Function: FUN_14042bcd0
+Entry: 14042bcd0
+Body: [[14042bcd0, 14042bdbf]]
+
+References to entry:
+  143ebea7c -> 14042bcd0 type=DATA
+  142b3c43c -> 14042bcd0 type=DATA
+  142b3c44c -> 14042bcd0 type=DATA
+  140398e16 -> 14042bcd0 type=UNCONDITIONAL_CALL
+  140392524 -> 14042bcd0 type=UNCONDITIONAL_CALL
+  1403b7c5e -> 14042bcd0 type=UNCONDITIONAL_CALL
+
+Outgoing references from function body:
+  14042bcf8 -> 140503960 type=UNCONDITIONAL_CALL
+  14042bcff -> 14042bda6 type=CONDITIONAL_JUMP
+  14042bd12 -> 14042bd2b type=CONDITIONAL_JUMP
+  14042bd19 -> 14042bd2b type=CONDITIONAL_JUMP
+  14042bd1e -> 141659df0 type=UNCONDITIONAL_CALL
+  14042bd2e -> 14042bda2 type=CONDITIONAL_JUMP
+  14042bd36 -> 14042bda2 type=CONDITIONAL_JUMP
+  14042bd47 -> 14042bda2 type=CONDITIONAL_JUMP
+  14042bd5a -> 14038bc80 type=UNCONDITIONAL_CALL
+  14042bd79 -> 14042c7f0 type=UNCONDITIONAL_CALL
+  14042bd80 -> 14042bd8c type=CONDITIONAL_JUMP
+  14042bd85 -> 14042bd8c type=CONDITIONAL_JUMP
+  14042bd8a -> 14042bd8f type=UNCONDITIONAL_JUMP
+  14042bd96 -> 14042bd50 type=CONDITIONAL_JUMP
+  14042bda0 -> 14042bda6 type=CONDITIONAL_JUMP
+  14042bda4 -> 14042bda8 type=UNCONDITIONAL_JUMP
+
+Instructions:
+  14042bcd0: MOV qword ptr [RSP + 0x10],RBX
+  14042bcd5: MOV qword ptr [RSP + 0x18],RBP
+  14042bcda: PUSH RSI
+  14042bcdb: PUSH R12
+  14042bcdd: PUSH R13
+  14042bcdf: PUSH R14
+  14042bce1: PUSH R15
+  14042bce3: SUB RSP,0x30
+  14042bce7: MOV R15,qword ptr [RCX + 0x50]
+  14042bceb: MOVZX R13D,R9B
+  14042bcef: MOV RCX,RDX
+  14042bcf2: MOV R14,R8
+  14042bcf5: MOV RBX,RDX
+  14042bcf8: CALL 0x140503960
+  14042bcfd: TEST AL,AL
+  14042bcff: JZ 0x14042bda6
+  14042bd05: MOV R12,qword ptr [RBX + 0xf8]
+  14042bd0c: MOV SIL,0x1
+  14042bd0f: TEST R14,R14
+  14042bd12: JZ 0x14042bd2b
+  14042bd14: CMP qword ptr [R14 + 0x8],0x0
+  14042bd19: JZ 0x14042bd2b
+  14042bd1b: MOV RCX,R14
+  14042bd1e: CALL 0x141659df0
+  14042bd23: MOV dword ptr [R14 + 0x18],0x0
+  14042bd2b: TEST R15,R15
+  14042bd2e: JZ 0x14042bda2
+  14042bd30: MOV EAX,dword ptr [R15 + 0x10]
+  14042bd34: TEST EAX,EAX
+  14042bd36: JZ 0x14042bda2
+  14042bd38: MOV RBX,qword ptr [R15]
+  14042bd3b: MOV EBP,EAX
+  14042bd3d: SHL RBP,0x4
+  14042bd41: ADD RBP,RBX
+  14042bd44: CMP RBX,RBP
+  14042bd47: JZ 0x14042bda2
+  14042bd49: MOV qword ptr [RSP + 0x60],RDI
+  14042bd4e: NOP
+  14042bd50: MOV EDX,dword ptr [RBX + 0x8]
+  14042bd53: MOVZX ECX,R13B
+  14042bd57: MOV RDI,qword ptr [RBX]
+  14042bd5a: CALL 0x14038bc80
+  14042bd5f: MOV R9,R14
+  14042bd62: MOV qword ptr [RSP + 0x28],R15
+  14042bd67: MOV R8D,EAX
+  14042bd6a: MOV qword ptr [RSP + 0x20],0x0
+  14042bd73: MOV RDX,RDI
+  14042bd76: MOV RCX,R12
+  14042bd79: CALL 0x14042c7f0
+  14042bd7e: TEST AL,AL
+  14042bd80: JZ 0x14042bd8c
+  14042bd82: TEST SIL,SIL
+  14042bd85: JZ 0x14042bd8c
+  14042bd87: MOV SIL,0x1
+  14042bd8a: JMP 0x14042bd8f
+  14042bd8c: XOR SIL,SIL
+  14042bd8f: ADD RBX,0x10
+  14042bd93: CMP RBX,RBP
+  14042bd96: JNZ 0x14042bd50
+  14042bd98: MOV RDI,qword ptr [RSP + 0x60]
+  14042bd9d: TEST SIL,SIL
+  14042bda0: JZ 0x14042bda6
+  14042bda2: MOV AL,0x1
+  14042bda4: JMP 0x14042bda8
+  14042bda6: XOR AL,AL
+  14042bda8: MOV RBX,qword ptr [RSP + 0x68]
+  14042bdad: MOV RBP,qword ptr [RSP + 0x70]
+  14042bdb2: ADD RSP,0x30
+  14042bdb6: POP R15
+  14042bdb8: POP R14
+  14042bdba: POP R13
+  14042bdbc: POP R12
+  14042bdbe: POP RSI
+  14042bdbf: RET
+
+Decompiled C:
+  <decompile failed: >

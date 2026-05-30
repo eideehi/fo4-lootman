@@ -1,0 +1,38 @@
+Program: Fallout4-1.11.221.exe
+Image base: 140000000
+
+================================================================================
+Target 140a65436
+  140a65436: CALL 0x140b29500
+  140a6543b: CMP qword ptr [RSP + 0x28],0x0
+  140a65441: MOV RDI,qword ptr [RSP + 0x40]
+  140a65446: MOV RBP,qword ptr [RSP + 0x58]
+  140a6544b: JZ 0x140a6545f
+  140a6544d: LEA RCX,[RSP + 0x20]
+
+================================================================================
+Target 140a5f149
+  140a5f149: CALL 0x140b29500
+  140a5f14e: MOV RAX,qword ptr [RDI]
+  140a5f151: XOR EDX,EDX
+  140a5f153: MOV RCX,RDI
+  140a5f156: CALL qword ptr [RAX + 0x178]
+  140a5f15c: CALL 0x140389df0
+
+================================================================================
+Target 140a6056c
+  140a6056c: CALL 0x140b29500
+  140a60571: CMP qword ptr [RBP + -0x60],0x0
+  140a60576: JZ 0x140a60588
+  140a60578: LEA RCX,[RBP + -0x68]
+  140a6057c: CALL 0x141659df0
+  140a60581: MOV dword ptr [RBP + -0x50],0x0
+
+================================================================================
+Target 140aefbf9
+  140aefbf9: CALL 0x140b29500
+  140aefbfe: MOV RBX,qword ptr [RDI]
+  140aefc01: MOV RCX,RDI
+  140aefc04: CALL 0x140a61670
+  140aefc09: MOV EDX,EAX
+  140aefc0b: MOV RCX,RDI

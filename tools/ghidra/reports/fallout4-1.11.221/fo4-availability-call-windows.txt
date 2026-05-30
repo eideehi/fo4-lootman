@@ -1,0 +1,173 @@
+Program: Fallout4-1.11.221.exe
+Image base: 140000000
+
+================================================================================
+Target 140396e65
+  140396e65: CALL 0x1403997b0
+  140396e6a: TEST AL,AL
+  140396e6c: JZ 0x140396e7a
+  140396e6e: CMP dword ptr [RSP + 0x50],EDI
+  140396e72: JBE 0x140396e7a
+  140396e74: MOVZX EBX,R14B
+
+================================================================================
+Target 1403b7fb2
+  1403b7fb2: CALL 0x1403997b0
+  1403b7fb7: TEST AL,AL
+  1403b7fb9: JZ 0x1403b7ff7
+  1403b7fbb: CMP dword ptr [RSP + 0xa0],0x0
+  1403b7fc3: JZ 0x1403b7ff7
+  1403b7fc5: MOV EAX,dword ptr [0x1430da200]
+
+================================================================================
+Target 1403c18af
+  1403c18af: CALL 0x1403997b0
+  1403c18b4: TEST AL,AL
+  1403c18b6: JZ 0x1403c18f4
+  1403c18b8: CMP dword ptr [RSP + 0x98],0x0
+  1403c18c0: JZ 0x1403c18f4
+  1403c18c2: MOV EAX,dword ptr [0x1430da200]
+
+================================================================================
+Target 140b2ea54
+  140b2ea54: CALL 0x1403997b0
+  140b2ea59: MOV ECX,dword ptr [RSP + 0x70]
+  140b2ea5d: TEST AL,AL
+  140b2ea5f: MOV RBX,qword ptr [RSP + 0x78]
+  140b2ea64: CMOVZ ECX,EDI
+  140b2ea67: TEST ECX,ECX
+
+================================================================================
+Target 140b2ed7f
+  140b2ed7f: CALL 0x1403997b0
+  140b2ed84: MOV ECX,dword ptr [RSP + 0x4c]
+  140b2ed88: TEST AL,AL
+  140b2ed8a: CMOVZ ECX,R15D
+  140b2ed8e: TEST ECX,ECX
+  140b2ed90: JNZ 0x140b2ed97
+
+================================================================================
+Target 140b303db
+  140b303db: CALL 0x1403997b0
+  140b303e0: TEST AL,AL
+  140b303e2: JZ 0x140b303f5
+  140b303e4: CMP dword ptr [RSP + 0x48],0x0
+  140b303e9: JA 0x140b303f5
+  140b303eb: MOVSS XMM1,dword ptr [0x142f237a8]
+
+================================================================================
+Target 140b361c8
+  140b361c8: CALL 0x1403997b0
+  140b361cd: MOV ECX,dword ptr [RBP + -0x79]
+  140b361d0: TEST AL,AL
+  140b361d2: MOV dword ptr [RSP + 0x38],R15D
+  140b361d7: MOV EAX,0x1
+  140b361dc: MOV R15,qword ptr [RBP + 0x67]
+
+================================================================================
+Target 140b376b0
+  140b376b0: CALL 0x1403997b0
+  140b376b5: MOV ECX,dword ptr [RSP + 0x88]
+  140b376bc: TEST AL,AL
+  140b376be: MOV EAX,dword ptr [RSP + 0x90]
+  140b376c5: MOVZX R9D,SI
+  140b376c9: MOV RDX,qword ptr [R14 + 0x10]
+
+================================================================================
+Target 140b2b914
+  140b2b914: CALL 0x1403997b0
+  140b2b919: MOV ECX,dword ptr [RSP + 0x24]
+  140b2b91d: TEST AL,AL
+  140b2b91f: CMOVZ ECX,R14D
+  140b2b923: TEST ECX,ECX
+  140b2b925: JZ 0x140b2b95a
+
+================================================================================
+Target 140b32425
+  140b32425: CALL 0x1403997b0
+  140b3242a: TEST AL,AL
+  140b3242c: JZ 0x140b3243f
+  140b3242e: CMP dword ptr [RBP + 0x1b0],R14D
+  140b32435: JA 0x140b3243f
+  140b32437: MOVSS XMM7,dword ptr [0x142f237a8]
+
+================================================================================
+Target 140b2c6de
+  140b2c6de: CALL 0x1403997b0
+  140b2c6e3: MOV ECX,dword ptr [RBP + 0xf8]
+  140b2c6e9: LEA RDX,[R14 + 0x28]
+  140b2c6ed: TEST AL,AL
+  140b2c6ef: CMOVZ ECX,R12D
+  140b2c6f3: TEST ECX,ECX
+
+================================================================================
+Target 140b2c747
+  140b2c747: CALL 0x1403997b0
+  140b2c74c: MOV ECX,dword ptr [RBP + -0x60]
+  140b2c74f: TEST AL,AL
+  140b2c751: CMOVZ ECX,R12D
+  140b2c755: TEST ECX,ECX
+  140b2c757: SETNZ AL
+
+================================================================================
+Target 140b2c99e
+  140b2c99e: CALL 0x1403997b0
+  140b2c9a3: MOV ECX,dword ptr [RBP + -0x5c]
+  140b2c9a6: LEA RDX,[R14 + 0x28]
+  140b2c9aa: TEST AL,AL
+  140b2c9ac: CMOVZ ECX,R12D
+  140b2c9b0: TEST ECX,ECX
+
+================================================================================
+Target 140b2ca04
+  140b2ca04: CALL 0x1403997b0
+  140b2ca09: MOV ECX,dword ptr [RBP + -0x58]
+  140b2ca0c: TEST AL,AL
+  140b2ca0e: CMOVZ ECX,R12D
+  140b2ca12: TEST ECX,ECX
+  140b2ca14: SETNZ AL
+
+================================================================================
+Target 140b2d7df
+  140b2d7df: CALL 0x1403997b0
+  140b2d7e4: MOV ECX,dword ptr [RBP + -0x3c]
+  140b2d7e7: TEST AL,AL
+  140b2d7e9: CMOVZ ECX,R12D
+  140b2d7ed: TEST ECX,ECX
+  140b2d7ef: JZ 0x140b2d864
+
+================================================================================
+Target 140b2d911
+  140b2d911: CALL 0x1403997b0
+  140b2d916: MOV ECX,dword ptr [RBP + -0x38]
+  140b2d919: TEST AL,AL
+  140b2d91b: CMOVZ ECX,R12D
+  140b2d91f: TEST ECX,ECX
+  140b2d921: JZ 0x140b2d92d
+
+================================================================================
+Target 140b366d1
+  140b366d1: CALL 0x1403997b0
+  140b366d6: MOV R8D,dword ptr [RBP + -0x51]
+  140b366da: LEA RDX,[RBX + 0x2f0]
+  140b366e1: TEST AL,AL
+  140b366e3: MOV dword ptr [RSP + 0x38],R15D
+  140b366e8: MOV EAX,0x1
+
+================================================================================
+Target 140b3775b
+  140b3775b: CALL 0x1403997b0
+  140b37760: MOV R9D,dword ptr [RSP + 0x70]
+  140b37765: LEA RDX,[RBX + 0x2f0]
+  140b3776c: MOV R8D,dword ptr [RSP + 0x80]
+  140b37774: TEST AL,AL
+  140b37776: MOV dword ptr [RSP + 0x38],R8D
+
+================================================================================
+Target 140b3316c
+  140b3316c: CALL 0x1403997b0
+  140b33171: MOV ECX,dword ptr [RSP + 0x38]
+  140b33175: XOR EDX,EDX
+  140b33177: TEST AL,AL
+  140b33179: CMOVZ ECX,EDX
+  140b3317c: TEST ECX,ECX

@@ -1,0 +1,65 @@
+Program: Fallout4-1.11.221.exe
+Image base: 140000000
+
+================================================================================
+Target 140b2b16f
+  140b2b16f: CALL 0x140b2ffb0
+  140b2b174: MOV RCX,RSI
+  140b2b177: CALL 0x140b2e9c0
+  140b2b17c: CALL 0x1409de1f0
+  140b2b181: MOV RCX,RAX
+  140b2b184: CALL 0x140a37090
+
+================================================================================
+Target 140b2b9d4
+  140b2b9d4: CALL 0x140b2ffb0
+  140b2b9d9: XOR EDX,EDX
+  140b2b9db: MOV RCX,RSI
+  140b2b9de: CALL 0x140b30a60
+  140b2b9e3: MOV RCX,RSI
+  140b2b9e6: CALL 0x140b2eac0
+
+================================================================================
+Target 140b2c85a
+  140b2c85a: CALL 0x140b2ffb0
+  140b2c85f: MOV EAX,dword ptr [RBP + 0x30]
+  140b2c862: SHR EAX,0x6
+  140b2c865: TEST AL,0x1
+  140b2c867: JZ 0x140b2cb35
+  140b2c86d: MOV R8,qword ptr [RBP + 0x38]
+
+================================================================================
+Target 140b2cb15
+  140b2cb15: CALL 0x140b2ffb0
+  140b2cb1a: MOV EAX,dword ptr [RBP + 0x50]
+  140b2cb1d: SHR EAX,0x6
+  140b2cb20: TEST AL,0x1
+  140b2cb22: JZ 0x140b2cb35
+  140b2cb24: MOV R8,qword ptr [RBP + 0x58]
+
+================================================================================
+Target 140b2d980
+  140b2d980: CALL 0x140b2ffb0
+  140b2d985: JMP 0x140b2da3d
+  140b2d98a: LEA RCX,[R15 + -0x10]
+  140b2d98e: CALL 0x140b2e500
+  140b2d993: JMP 0x140b2da48
+  140b2d998: TEST RSI,RSI
+
+================================================================================
+Target 140b2e6f6
+  140b2e6f6: CALL 0x140b2ffb0
+  140b2e6fb: MOV RCX,RDI
+  140b2e6fe: CALL 0x140b2e9c0
+  140b2e703: CMP dword ptr [RBP + 0x20],R12D
+  140b2e707: JNZ 0x140b2e730
+  140b2e709: MOVSD XMM0,qword ptr [0x14291fcd0]
+
+================================================================================
+Target 140b2e97f
+  140b2e97f: CALL 0x140b2ffb0
+  140b2e984: XOR EDX,EDX
+  140b2e986: MOV RCX,RSI
+  140b2e989: CALL 0x140b30a60
+  140b2e98e: MOV RCX,RSI
+  140b2e991: CALL 0x140b2f270

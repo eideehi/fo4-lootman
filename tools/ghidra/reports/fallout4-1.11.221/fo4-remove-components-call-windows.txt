@@ -1,0 +1,20 @@
+Program: Fallout4-1.11.221.exe
+Image base: 140000000
+
+================================================================================
+Target 14114e6e3
+  14114e6e3: CALL 0x141182740
+  14114e6e8: JMP 0x14114e7a4
+  14114e6ed: MOVZX R8D,word ptr [RBP + 0x28]
+  14114e6f2: TEST R8W,R8W
+  14114e6f6: JZ 0x14114e743
+  14114e6f8: CMP dword ptr [RBP + 0x24],0x1
+
+================================================================================
+Target 14114ecb9
+  14114ecb9: CALL 0x141182740
+  14114ecbe: ADD RBX,0x10
+  14114ecc2: CMP RBX,R14
+  14114ecc5: JNZ 0x14114ec90
+  14114ecc7: LEA RDX,[RBP + 0x6f]
+  14114eccb: MOV RCX,RDI

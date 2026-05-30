@@ -1,0 +1,38 @@
+Program: Fallout4-1.11.221.exe
+Image base: 140000000
+
+================================================================================
+Target 140b2b177
+  140b2b177: CALL 0x140b2e9c0
+  140b2b17c: CALL 0x1409de1f0
+  140b2b181: MOV RCX,RAX
+  140b2b184: CALL 0x140a37090
+  140b2b189: MOV RCX,RSI
+  140b2b18c: CALL 0x140b2f270
+
+================================================================================
+Target 140b2c762
+  140b2c762: CALL 0x140b2e9c0
+  140b2c767: TEST SIL,SIL
+  140b2c76a: JZ 0x140b2cb35
+  140b2c770: CMP word ptr [0x1430ebe98],R12W
+  140b2c778: JBE 0x140b2c785
+  140b2c77a: XOR EDX,EDX
+
+================================================================================
+Target 140b2ca1f
+  140b2ca1f: CALL 0x140b2e9c0
+  140b2ca24: TEST SIL,SIL
+  140b2ca27: JZ 0x140b2cb35
+  140b2ca2d: CMP word ptr [0x1430ebe98],R12W
+  140b2ca35: JBE 0x140b2ca42
+  140b2ca37: XOR EDX,EDX
+
+================================================================================
+Target 140b2e6fe
+  140b2e6fe: CALL 0x140b2e9c0
+  140b2e703: CMP dword ptr [RBP + 0x20],R12D
+  140b2e707: JNZ 0x140b2e730
+  140b2e709: MOVSD XMM0,qword ptr [0x14291fcd0]
+  140b2e711: COMISD XMM0,qword ptr [RDI + 0x420]
+  140b2e719: JA 0x140b2e730

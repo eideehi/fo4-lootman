@@ -1,0 +1,104 @@
+Program: Fallout4-1.11.221.exe
+Image base: 140000000
+
+================================================================================
+Target 140b2e9c0
+Function: FUN_140b2e9c0
+Entry: 140b2e9c0
+Body: [[140b2e9c0, 140b2eab8]]
+
+References to entry:
+  143f3ef60 -> 140b2e9c0 type=DATA
+  140b2b177 -> 140b2e9c0 type=UNCONDITIONAL_CALL
+  140b2c762 -> 140b2e9c0 type=UNCONDITIONAL_CALL
+  140b2ca1f -> 140b2e9c0 type=UNCONDITIONAL_CALL
+  140b2e6fe -> 140b2e9c0 type=UNCONDITIONAL_CALL
+
+Outgoing references from function body:
+  140b2e9dc -> 140389a90 type=UNCONDITIONAL_CALL
+  140b2e9e4 -> 1403970b0 type=UNCONDITIONAL_CALL
+  140b2e9eb -> 140b2e9fc type=CONDITIONAL_JUMP
+  140b2e9ef -> 14039e510 type=UNCONDITIONAL_CALL
+  140b2e9f6 -> 140b2eaae type=CONDITIONAL_JUMP
+  140b2e9ff -> 140b2eaae type=CONDITIONAL_JUMP
+  140b2ea09 -> 140b2eaae type=CONDITIONAL_JUMP
+  140b2ea0f -> 14037d3a0 type=UNCONDITIONAL_CALL
+  140b2ea1b -> 140b2eaae type=CONDITIONAL_JUMP
+  140b2ea2d -> 1403894d0 type=UNCONDITIONAL_CALL
+  140b2ea3e -> 14021e170 type=UNCONDITIONAL_CALL
+  140b2ea54 -> 1403997b0 type=UNCONDITIONAL_CALL
+  140b2ea69 -> 140b2ea79 type=CONDITIONAL_JUMP
+  140b2ea6e -> 140b2ea82 type=CONDITIONAL_JUMP
+  140b2ea70 -> 1403970b0 type=UNCONDITIONAL_CALL
+  140b2ea77 -> 140b2ea80 type=UNCONDITIONAL_JUMP
+  140b2ea80 -> 140b2ea8c type=CONDITIONAL_JUMP
+  140b2ea87 -> 1403969f0 type=UNCONDITIONAL_CALL
+  140b2ea8f -> 140b2eaae type=CONDITIONAL_JUMP
+  140b2eaa6 -> 140b2eaae type=CONDITIONAL_JUMP
+
+Instructions:
+  140b2e9c0: MOV qword ptr [RSP + 0x8],RBX
+  140b2e9c5: PUSH RDI
+  140b2e9c6: SUB RSP,0x50
+  140b2e9ca: MOVZX ECX,word ptr [0x1430ebe98]
+  140b2e9d1: LEA RDX,[RSP + 0x68]
+  140b2e9d6: XOR EDI,EDI
+  140b2e9d8: MOV dword ptr [RSP + 0x68],EDI
+  140b2e9dc: CALL 0x140389a90
+  140b2e9e1: MOV RBX,RAX
+  140b2e9e4: CALL 0x1403970b0
+  140b2e9e9: TEST AL,AL
+  140b2e9eb: JZ 0x140b2e9fc
+  140b2e9ed: MOV CL,0x1
+  140b2e9ef: CALL 0x14039e510
+  140b2e9f4: TEST AL,AL
+  140b2e9f6: JZ 0x140b2eaae
+  140b2e9fc: TEST RBX,RBX
+  140b2e9ff: JZ 0x140b2eaae
+  140b2ea05: CMP qword ptr [RBX + 0x28],RDI
+  140b2ea09: JZ 0x140b2eaae
+  140b2ea0f: CALL 0x14037d3a0
+  140b2ea14: COMISS XMM0,dword ptr [0x14291fc98]
+  140b2ea1b: JNC 0x140b2eaae
+  140b2ea21: MOV RDX,qword ptr [0x1432d22e0]
+  140b2ea28: LEA RCX,[RSP + 0x20]
+  140b2ea2d: CALL 0x1403894d0
+  140b2ea32: LEA RDX,[0x1430ec600]
+  140b2ea39: LEA RCX,[RSP + 0x78]
+  140b2ea3e: CALL 0x14021e170
+  140b2ea43: MOVZX EDX,word ptr [0x1430ebe98]
+  140b2ea4a: LEA RCX,[RSP + 0x70]
+  140b2ea4f: MOV R8D,dword ptr [RSP + 0x68]
+  140b2ea54: CALL 0x1403997b0
+  140b2ea59: MOV ECX,dword ptr [RSP + 0x70]
+  140b2ea5d: TEST AL,AL
+  140b2ea5f: MOV RBX,qword ptr [RSP + 0x78]
+  140b2ea64: CMOVZ ECX,EDI
+  140b2ea67: TEST ECX,ECX
+  140b2ea69: JZ 0x140b2ea79
+  140b2ea6b: TEST RBX,RBX
+  140b2ea6e: JZ 0x140b2ea82
+  140b2ea70: CALL 0x1403970b0
+  140b2ea75: TEST AL,AL
+  140b2ea77: JMP 0x140b2ea80
+  140b2ea79: CMP byte ptr [0x142ed3f38],DIL
+  140b2ea80: JNZ 0x140b2ea8c
+  140b2ea82: LEA RCX,[RSP + 0x20]
+  140b2ea87: CALL 0x1403969f0
+  140b2ea8c: TEST RBX,RBX
+  140b2ea8f: JZ 0x140b2eaae
+  140b2ea91: LEA RCX,[RBX + 0x20]
+  140b2ea95: MOV EAX,0xffffffff
+  140b2ea9a: XADD.LOCK dword ptr [RCX + 0x8],EAX
+  140b2ea9f: DEC EAX
+  140b2eaa1: TEST EAX,0x3ff
+  140b2eaa6: JNZ 0x140b2eaae
+  140b2eaa8: MOV RAX,qword ptr [RCX]
+  140b2eaab: CALL qword ptr [RAX + 0x8]
+  140b2eaae: MOV RBX,qword ptr [RSP + 0x60]
+  140b2eab3: ADD RSP,0x50
+  140b2eab7: POP RDI
+  140b2eab8: RET
+
+Decompiled C:
+  <decompile failed: >

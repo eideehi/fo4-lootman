@@ -1,0 +1,39 @@
+Program: Fallout4-1.11.221.exe
+Image base: 140000000
+
+================================================================================
+Target 140494b40
+Function: FUN_140494b40
+Entry: 140494b40
+Body: [[140494b40, 140494b6b]]
+
+References to entry:
+  143ec61a4 -> 140494b40 type=DATA
+  1404d23d4 -> 140494b40 type=UNCONDITIONAL_CALL
+
+Outgoing references from function body:
+  140494b4d -> 140494b64 type=CONDITIONAL_JUMP
+  140494b52 -> 1404c9000 type=UNCONDITIONAL_CALL
+  140494b5a -> 140494b64 type=CONDITIONAL_JUMP
+
+Instructions:
+  140494b40: PUSH RBX
+  140494b42: SUB RSP,0x20
+  140494b46: CMP dword ptr [RCX + 0x40],0x0
+  140494b4a: MOV RBX,RCX
+  140494b4d: JZ 0x140494b64
+  140494b4f: MOV RCX,RDX
+  140494b52: CALL 0x1404c9000
+  140494b57: CMP EAX,dword ptr [RBX + 0x40]
+  140494b5a: JNC 0x140494b64
+  140494b5c: MOV AL,0x1
+  140494b5e: ADD RSP,0x20
+  140494b62: POP RBX
+  140494b63: RET
+  140494b64: XOR AL,AL
+  140494b66: ADD RSP,0x20
+  140494b6a: POP RBX
+  140494b6b: RET
+
+Decompiled C:
+  <decompile failed: >
