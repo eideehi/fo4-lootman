@@ -197,7 +197,7 @@ namespace papyrus_lootman
 		auto* context = static_cast<MoveInventoryItemCallContext*>(opaque);
 		TESObjectREFR::RemoveItemData removeData(context->object, context->count);
 		removeData.reason = ITEM_REMOVE_REASON::kStoreContainer;
-		removeData.a_otherContainer = context->dest;
+		removeData.otherContainer = context->dest;
 		if (context->stackIndex)
 		{
 			removeData.stackData.push_back(*context->stackIndex);
