@@ -24,7 +24,7 @@ localized assets, and a FOMOD installer.
 Before installing, make sure your setup supports the mod's current packaged
 requirements:
 
-- Fallout 4 with the runtime option exposed by the installer: `1.11.191`.
+- Fallout 4 with the runtime option exposed by the installer: `1.11.221`.
 - MCM version 2 or later.
 - F4SE and a load order setup capable of loading native F4SE plugins.
 
@@ -45,7 +45,7 @@ The current FOMOD installer presents the following groups in order:
 3. **MCM translation files** — required shared MCM text for supported Fallout 4
    language codes. German and Japanese include localized text; other
    non-English languages use English fallback text.
-4. **Select your game version.** — `1.11.191` is the only option and is
+4. **Select your game version.** — `1.11.221` is the only option and is
    required.
 5. **Do you want to install the papyrus source code?** — choose `No`
    (recommended) or `Yes`. Papyrus source files are not needed for normal play.

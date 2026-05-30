@@ -121,8 +121,8 @@ describe("FOMOD release policy", () => {
 	it("targets the supported Fallout 4 runtime", () => {
 		const moduleConfig = readModuleConfig();
 
-		expect(moduleConfig).toContain('<plugin name="1.11.191">');
-		expect(moduleConfig).toContain('<flag name="runtime_1_11_191">selected</flag>');
+		expect(moduleConfig).toContain('<plugin name="1.11.221">');
+		expect(moduleConfig).toContain('<flag name="runtime_1_11_221">selected</flag>');
 		expect(moduleConfig).not.toContain("1.10.163");
 		expect(moduleConfig).not.toContain("runtime_1_10_163");
 	});

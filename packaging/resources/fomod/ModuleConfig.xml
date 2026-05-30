@@ -77,10 +77,10 @@
 
                 <group name="Select your game version." type="SelectAny">
                     <plugins order="Explicit">
-                        <plugin name="1.11.191">
+                        <plugin name="1.11.221">
                             <description>Fallout4.exe version.</description>
                             <conditionFlags>
-                                <flag name="runtime_1_11_191">selected</flag>
+                                <flag name="runtime_1_11_221">selected</flag>
                             </conditionFlags>
                             <typeDescriptor>
                                 <type name="Required"/>
