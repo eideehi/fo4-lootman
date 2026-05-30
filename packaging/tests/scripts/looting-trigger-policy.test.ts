@@ -170,7 +170,7 @@ describe("looting trigger policy", () => {
 		const scrapItemsInternal = extractPapyrusFunction(mcmScript, "ScrapItemsInternal");
 		expect(scrapItemsInternal).toContain("ScrapItemsType < SCRAP_ITEM_ALL || ScrapItemsType > SCRAP_ITEM_JUNK");
 
-		const settingChange = extractPapyrusFunction(mcmScript, "OnMCMSettingChange");
+		const settingChange = extractPapyrusFunction(mcmScript, "ApplySettingSideEffects");
 		const branchStart = settingChange.indexOf('ElseIf (id == "NotLootingFromSettlement")');
 		const branchEnd = settingChange.indexOf('ElseIf (id == "WorkerInvokeInterval")');
 		expect(branchStart, "missing NotLootingFromSettlement branch").toBeGreaterThanOrEqual(0);

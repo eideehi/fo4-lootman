@@ -120,6 +120,25 @@ Function OnMCMSettingChange(string modName, string id)
         Return
     EndIf
 
+    ApplySettingSideEffects(id)
+EndFunction
+
+; Apply the per-id side effects and the native cache refresh for one changed
+; setting. Shared by the MCM external-event callback and the holotape terminal
+; facade (LTMN2:Config) so both front-ends drive one identical state machine and
+; cannot drift. Members are lazily resolved here because the terminal can invoke
+; this before OnInit has populated them, which would otherwise None-deref.
+Function ApplySettingSideEffects(string id)
+    If (!properties)
+        properties = LTMN2:Properties.GetInstance()
+    EndIf
+    If (!system)
+        system = LTMN2:System.GetInstance()
+    EndIf
+    If (!player)
+        player = Game.GetPlayer()
+    EndIf
+
     string prefix = "source=papyrus component=mcm event=setting_changed id=" + id
     LogMcmEvent("setting_changed", "id=" + id)
 

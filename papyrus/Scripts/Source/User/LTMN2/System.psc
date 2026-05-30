@@ -11,7 +11,7 @@ string Function GetVersionString(int version) global
 EndFunction
 
 ; Version encoding: Major{1}.Minor{2}.Patch{2}; 10234 is 1.2.34.
-int MOD_VERSION = 30000 const
+int MOD_VERSION = 30100 const
 
 ; Timer IDs consumed by OnTimer.
 int TIMER_INSTALL = 1 const
@@ -411,6 +411,18 @@ bool Function CanInstall()
     EndIf
 EndFunction
 
+; Grant the MCM-fallback config holotape once. Count-checked so it is safe to call
+; on every install and from the save-migration patch. Returns true when a tape was
+; added. Resolves by FormID so no filled quest property is required.
+bool Function GrantConfigHolotape(Actor target) global
+    Form configTape = Game.GetFormFromFile(0x000FB6, "LootMan.esp")
+    If (configTape && target.GetItemCount(configTape) == 0)
+        target.AddItem(configTape, 1, true)
+        Return true
+    EndIf
+    Return false
+EndFunction
+
 ; Register events and start initialization after the install gate passes.
 Function Install()
     If (properties.IsInstalled)
@@ -436,6 +448,10 @@ Function Install()
     StartTimer(1, TIMER_INITIALIZE)
 
     LTMN2:LootMan.ShowSystemMessage(MESSAGE_INSTALLED)
+
+    If (GrantConfigHolotape(player))
+        LogSystemEvent("config_holotape_granted", "reason=install")
+    EndIf
 
     LogSystemEvent("install_completed", "native_looting_scheduler=true")
 EndFunction
@@ -571,6 +587,9 @@ Function Patch()
     EndIf
     If (CurrentModVersion < 30000)
         LTMN2:Patch.v3_0_0()
+    EndIf
+    If (CurrentModVersion < 30100)
+        LTMN2:Patch.v3_1_0()
     EndIf
 
     CurrentModVersion = MOD_VERSION

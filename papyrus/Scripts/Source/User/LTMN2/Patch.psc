@@ -47,3 +47,14 @@ Function v3_0_0() global
     EndIf
     properties.DeliveredToPlayerWithoutLogs = false
 EndFunction
+
+Function v3_1_0() global
+    LTMN2:Properties properties = LTMN2:Properties.GetInstance()
+
+    ; Reach already-installed saves with the MCM-fallback config holotape. Fresh
+    ; installs receive it from System.Install instead. Not-yet-installed saves get
+    ; it when they install, so the grant is gated on install state here.
+    If (properties.IsInstalled)
+        LTMN2:System.GrantConfigHolotape(Game.GetPlayer())
+    EndIf
+EndFunction

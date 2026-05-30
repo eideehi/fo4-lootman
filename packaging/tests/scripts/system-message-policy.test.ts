@@ -83,7 +83,7 @@ describe("system message policy", () => {
 		expect(timer).toContain("system.ShowMessageImmediate(system.MESSAGE_UTILITY_PROCESS_COMPLETE)");
 		expect(timer).not.toContain("system.ShowMessage(");
 
-		const settingChange = extractPapyrusFunction(mcmScript, "OnMCMSettingChange");
+		const settingChange = extractPapyrusFunction(mcmScript, "ApplySettingSideEffects");
 		expect(settingChange).toContain("system.ShowWorkshopMessageImmediate(system.MESSAGE_LINKED_TO_WORKSHOP, workshop.myLocation)");
 		expect(settingChange).toContain("system.ShowWorkshopMessageImmediate(system.MESSAGE_UNLINKED_TO_WORKSHOP, removedWorkshopLocation)");
 
