@@ -27,17 +27,17 @@ function getGroup(moduleConfig: string, name: string): string {
 }
 
 describe("FOMOD release policy", () => {
-	it("states the 3.0.2 update compatibility policy", () => {
+	it("states the 3.1.0 update compatibility policy", () => {
 		const notice = getCompatibilityNotice(readModuleConfig());
 
 		expect(notice).toContain('group name="About Compatibility"');
-		expect(notice).toContain('plugin name="LootMan 3.0.2 update compatibility"');
+		expect(notice).toContain('plugin name="LootMan 3.1.0 update compatibility"');
 		expect(notice).toContain('<flag name="compatibility_notice_read">selected</flag>');
 		expect(notice).toContain(
-			"LootMan 3.0.2 supports overwrite updates from LootMan 2.x and earlier 3.0.x releases.",
+			"LootMan 3.1.0 supports overwrite updates from LootMan 2.x and 3.0.x releases.",
 		);
-		expect(notice).toContain("LootMan 3.0.2 does not support overwrite updates from LootMan 1.x.");
-		expect(notice).toContain("If you are upgrading from 1.x, uninstall 1.x and make a clean save before installing 3.0.2.");
+		expect(notice).toContain("LootMan 3.1.0 does not support overwrite updates from LootMan 1.x.");
+		expect(notice).toContain("If you are upgrading from 1.x, uninstall 1.x and make a clean save before installing 3.1.0.");
 		expect(notice).toContain('<type name="Required"/>');
 		expect(notice).not.toContain("2.0.0");
 		expect(notice).not.toContain("2.x.x");

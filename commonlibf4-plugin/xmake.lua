@@ -6,7 +6,7 @@ add_requires("nlohmann_json")
 
 -- set project constants
 set_project("lootman")
-set_version("3.0.2")
+set_version("3.1.0")
 set_license("GPL-3.0")
 set_languages("c++23")
 set_warnings("allextra")
