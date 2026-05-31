@@ -151,5 +151,281 @@
       <Source>_LootManLocation</Source>
       <Dest>_LootManLocation</Dest>
     </String>
+    <String List="0">
+      <EDID>LTMN_ConfigHolotape</EDID>
+      <REC>NOTE:FULL</REC>
+      <Source>LootMan Configuration</Source>
+      <Dest>LootMan 設定</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_TERM_ConfigRoot</EDID>
+      <REC>TERM:FULL</REC>
+      <Source>LootMan Configuration</Source>
+      <Dest>LootMan 設定</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_TERM_ConfigRoot</EDID>
+      <REC id="0">TERM:ITXT</REC>
+      <Source>General Settings</Source>
+      <Dest>基本設定</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_TERM_ConfigRoot</EDID>
+      <REC id="1">TERM:ITXT</REC>
+      <Source>Object Looting Filters</Source>
+      <Dest>オブジェクト収集フィルター</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_TERM_ConfigRoot</EDID>
+      <REC id="2">TERM:ITXT</REC>
+      <Source>Log Level</Source>
+      <Dest>ログレベル</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_TERM_ConfigRoot</EDID>
+      <REC id="3">TERM:ITXT</REC>
+      <Source>Utilities &amp; System</Source>
+      <Dest>ユーティリティ / システム</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_TERM_ConfigGeneral</EDID>
+      <REC>TERM:FULL</REC>
+      <Source>General Settings</Source>
+      <Dest>基本設定</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_TERM_ConfigGeneral</EDID>
+      <REC id="0">TERM:ITXT</REC>
+      <Source>Toggle LootMan</Source>
+      <Dest>LootMan の切替</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_TERM_ConfigGeneral</EDID>
+      <REC id="1">TERM:ITXT</REC>
+      <Source>Toggle system messages</Source>
+      <Dest>システムメッセージの切替</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_TERM_ConfigGeneral</EDID>
+      <REC id="2">TERM:ITXT</REC>
+      <Source>Toggle pickup sound</Source>
+      <Dest>効果音の切替</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_TERM_ConfigGeneral</EDID>
+      <REC id="3">TERM:ITXT</REC>
+      <Source>Toggle container animation</Source>
+      <Dest>コンテナアニメの切替</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_TERM_ConfigGeneral</EDID>
+      <REC id="4">TERM:ITXT</REC>
+      <Source>Toggle ignore overweight</Source>
+      <Dest>重量オーバー無視の切替</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_TERM_ConfigGeneral</EDID>
+      <REC id="5">TERM:ITXT</REC>
+      <Source>Toggle deliver to player</Source>
+      <Dest>プレイヤーへ渡すの切替</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_TERM_ConfigGeneral</EDID>
+      <REC id="6">TERM:ITXT</REC>
+      <Source>Toggle silent looting</Source>
+      <Dest>サイレント収集の切替</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_TERM_ConfigGeneral</EDID>
+      <REC id="7">TERM:ITXT</REC>
+      <Source>Toggle no looting in settlement</Source>
+      <Dest>居住地で収集しないの切替</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_TERM_ConfigGeneral</EDID>
+      <REC id="8">TERM:ITXT</REC>
+      <Source>Toggle auto workshop link</Source>
+      <Dest>ワークショップ自動リンクの切替</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_TERM_ConfigGeneral</EDID>
+      <REC id="9">TERM:ITXT</REC>
+      <Source>Toggle unlock containers</Source>
+      <Dest>コンテナ解錠の切替</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_TERM_ConfigGeneral</EDID>
+      <REC id="10">TERM:ITXT</REC>
+      <Source>Looting range +</Source>
+      <Dest>収集範囲 +</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_TERM_ConfigGeneral</EDID>
+      <REC id="11">TERM:ITXT</REC>
+      <Source>Looting range -</Source>
+      <Dest>収集範囲 -</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_TERM_ConfigGeneral</EDID>
+      <REC id="12">TERM:ITXT</REC>
+      <Source>Carry weight +</Source>
+      <Dest>所持重量 +</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_TERM_ConfigGeneral</EDID>
+      <REC id="13">TERM:ITXT</REC>
+      <Source>Carry weight -</Source>
+      <Dest>所持重量 -</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_TERM_ConfigObjectFilter</EDID>
+      <REC>TERM:FULL</REC>
+      <Source>Object Looting Filters</Source>
+      <Dest>オブジェクト収集フィルター</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_TERM_ConfigObjectFilter</EDID>
+      <REC id="0">TERM:ITXT</REC>
+      <Source>Toggle activators (ACTI)</Source>
+      <Dest>アクティベーター (ACTI) の切替</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_TERM_ConfigObjectFilter</EDID>
+      <REC id="1">TERM:ITXT</REC>
+      <Source>Toggle aid (ALCH)</Source>
+      <Dest>薬品・食料 (ALCH) の切替</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_TERM_ConfigObjectFilter</EDID>
+      <REC id="2">TERM:ITXT</REC>
+      <Source>Toggle ammo (AMMO)</Source>
+      <Dest>弾薬 (AMMO) の切替</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_TERM_ConfigObjectFilter</EDID>
+      <REC id="3">TERM:ITXT</REC>
+      <Source>Toggle armor (ARMO)</Source>
+      <Dest>防具 (ARMO) の切替</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_TERM_ConfigObjectFilter</EDID>
+      <REC id="4">TERM:ITXT</REC>
+      <Source>Toggle books (BOOK)</Source>
+      <Dest>本 (BOOK) の切替</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_TERM_ConfigObjectFilter</EDID>
+      <REC id="5">TERM:ITXT</REC>
+      <Source>Toggle containers (CONT)</Source>
+      <Dest>コンテナ (CONT) の切替</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_TERM_ConfigObjectFilter</EDID>
+      <REC id="6">TERM:ITXT</REC>
+      <Source>Toggle flora (FLOR)</Source>
+      <Dest>植物 (FLOR) の切替</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_TERM_ConfigObjectFilter</EDID>
+      <REC id="7">TERM:ITXT</REC>
+      <Source>Toggle ingredients (INGR)</Source>
+      <Dest>材料 (INGR) の切替</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_TERM_ConfigObjectFilter</EDID>
+      <REC id="8">TERM:ITXT</REC>
+      <Source>Toggle keys (KEYM)</Source>
+      <Dest>鍵 (KEYM) の切替</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_TERM_ConfigObjectFilter</EDID>
+      <REC id="9">TERM:ITXT</REC>
+      <Source>Toggle misc (MISC)</Source>
+      <Dest>ジャンク・モジュール (MISC) の切替</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_TERM_ConfigObjectFilter</EDID>
+      <REC id="10">TERM:ITXT</REC>
+      <Source>Toggle corpses (NPC_)</Source>
+      <Dest>死体 (NPC_) の切替</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_TERM_ConfigObjectFilter</EDID>
+      <REC id="11">TERM:ITXT</REC>
+      <Source>Toggle weapons (WEAP)</Source>
+      <Dest>武器 (WEAP) の切替</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_TERM_ConfigLogLevel</EDID>
+      <REC>TERM:FULL</REC>
+      <Source>Log Level</Source>
+      <Dest>ログレベル</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_TERM_ConfigLogLevel</EDID>
+      <REC id="0">TERM:ITXT</REC>
+      <Source>Trace</Source>
+      <Dest>Trace</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_TERM_ConfigLogLevel</EDID>
+      <REC id="1">TERM:ITXT</REC>
+      <Source>Debug</Source>
+      <Dest>Debug</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_TERM_ConfigLogLevel</EDID>
+      <REC id="2">TERM:ITXT</REC>
+      <Source>Info</Source>
+      <Dest>Info</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_TERM_ConfigLogLevel</EDID>
+      <REC id="3">TERM:ITXT</REC>
+      <Source>Warn</Source>
+      <Dest>Warn</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_TERM_ConfigLogLevel</EDID>
+      <REC id="4">TERM:ITXT</REC>
+      <Source>Error</Source>
+      <Dest>Error</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_TERM_ConfigLogLevel</EDID>
+      <REC id="5">TERM:ITXT</REC>
+      <Source>Critical</Source>
+      <Dest>Critical</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_TERM_ConfigLogLevel</EDID>
+      <REC id="6">TERM:ITXT</REC>
+      <Source>Off</Source>
+      <Dest>Off</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_TERM_ConfigUtility</EDID>
+      <REC>TERM:FULL</REC>
+      <Source>Utilities &amp; System</Source>
+      <Dest>ユーティリティ / システム</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_TERM_ConfigUtility</EDID>
+      <REC id="0">TERM:ITXT</REC>
+      <Source>Loot now</Source>
+      <Dest>今すぐ収集</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_TERM_ConfigUtility</EDID>
+      <REC id="1">TERM:ITXT</REC>
+      <Source>Install LootMan</Source>
+      <Dest>LootMan をインストール</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_TERM_ConfigUtility</EDID>
+      <REC id="2">TERM:ITXT</REC>
+      <Source>Uninstall LootMan</Source>
+      <Dest>LootMan をアンインストール</Dest>
+    </String>
   </Content>
 </SSTXMLRessources>
