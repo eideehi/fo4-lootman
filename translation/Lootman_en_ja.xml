@@ -412,18 +412,12 @@
     <String List="0">
       <EDID>LTMN_TERM_ConfigUtility</EDID>
       <REC id="0">TERM:ITXT</REC>
-      <Source>Loot now</Source>
-      <Dest>今すぐ収集</Dest>
-    </String>
-    <String List="0">
-      <EDID>LTMN_TERM_ConfigUtility</EDID>
-      <REC id="1">TERM:ITXT</REC>
       <Source>Install LootMan</Source>
       <Dest>LootMan をインストール</Dest>
     </String>
     <String List="0">
       <EDID>LTMN_TERM_ConfigUtility</EDID>
-      <REC id="2">TERM:ITXT</REC>
+      <REC id="1">TERM:ITXT</REC>
       <Source>Uninstall LootMan</Source>
       <Dest>LootMan をアンインストール</Dest>
     </String>

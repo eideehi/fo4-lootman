@@ -8,7 +8,7 @@
     TERM 0xFB8  LTMN_TERM_ConfigGeneral       + 14 Display-Text items (ITID 1..14)
     TERM 0xFB9  LTMN_TERM_ConfigObjectFilter  + 12 items (ITID 1..12)
     TERM 0xFBA  LTMN_TERM_ConfigLogLevel      + 7 items  (ITID 1..7)
-    TERM 0xFBB  LTMN_TERM_ConfigUtility       + 4 items  (ITID 1..4; FixUtilityMenu later drops item 2)
+    TERM 0xFBB  LTMN_TERM_ConfigUtility       + 4 items  (ITID 1..4; later fixes drop "Open LootMan storage" and "Loot now" -> final 2)
     COBJ 0xFBC  LTMN_CO_ConfigHolotape  (cloned from 0xFB5; CNAM->0xFB6)
   and binds each leaf TERM's fragment VMAD by ITID (Fragment Index == ITID,
   fragmentName = Fragment_Terminal_NN, no properties) to the compiled scripts

@@ -111,7 +111,7 @@ describe("mcm fallback config delivery", () => {
 			{ name: "TERM_ConfigGeneral_FB8", count: 14 },
 			{ name: "TERM_ConfigObjectFilter_FB9", count: 12 },
 			{ name: "TERM_ConfigLogLevel_FBA", count: 7 },
-			{ name: "TERM_ConfigUtility_FBB", count: 3 },
+			{ name: "TERM_ConfigUtility_FBB", count: 2 },
 		];
 		for (const frag of fragments) {
 			const file = `${FRAGMENT_DIR}/${frag.name}.psc`;
@@ -152,12 +152,13 @@ describe("mcm fallback config delivery", () => {
 		expect(extractPapyrusFunction(log, "Fragment_Terminal_07")).toContain("SetLogLevel(6)");
 
 		const util = readWorkspaceFile(`${FRAGMENT_DIR}/TERM_ConfigUtility_FBB.psc`);
-		expect(extractPapyrusFunction(util, "Fragment_Terminal_01")).toContain("ExecuteLooting()");
-		// "Open LootMan storage" was removed (a container UI cannot open over a live
-		// terminal), so Install/Uninstall shifted up to ITID 2/3.
-		expect(extractPapyrusFunction(util, "Fragment_Terminal_02")).toContain("Install()");
-		expect(extractPapyrusFunction(util, "Fragment_Terminal_03")).toContain("Uninstall()");
+		// "Open LootMan storage" and "Loot now" were removed (a container UI cannot open
+		// over a live terminal, and ExecuteLooting had no effect from a terminal), so the
+		// Utility page is just Install (ITID 1) and Uninstall (ITID 2).
+		expect(extractPapyrusFunction(util, "Fragment_Terminal_01")).toContain("Install()");
+		expect(extractPapyrusFunction(util, "Fragment_Terminal_02")).toContain("Uninstall()");
 		expect(util, "OpenLootManInventory must be gone from the terminal").not.toContain("OpenLootManInventory");
+		expect(util, "ExecuteLooting (Loot now) must be gone from the terminal").not.toMatch(/ExecuteLooting\(/);
 	});
 
 	it("emits localized config-change notifications through the native HUD path", () => {
