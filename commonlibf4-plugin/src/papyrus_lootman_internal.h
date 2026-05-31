@@ -554,6 +554,13 @@ namespace papyrus_lootman
 		std::int32_t logLevel);
 	void ShowSystemMessage(std::monostate, std::int32_t messageId);
 	void ShowSystemMessageWithName(std::monostate, std::int32_t messageId, RE::TESForm* nameSource);
+	// Config-terminal change notifications: "[LootMan] <label>: <value>", localized.
+	// labelKey reuses the existing $PAGE_* MCM label keys; valueKey reuses value label
+	// keys (e.g. log-level names). Visible while a terminal is open (native HUD path).
+	void ShowConfigBool(std::monostate, RE::BSFixedString labelKey, bool value);
+	void ShowConfigInt(std::monostate, RE::BSFixedString labelKey, std::int32_t value);
+	void ShowConfigFloat(std::monostate, RE::BSFixedString labelKey, float value);
+	void ShowConfigText(std::monostate, RE::BSFixedString labelKey, RE::BSFixedString valueKey);
 	std::int32_t GetLogLevel(std::monostate);
 	void SetLogLevel(std::monostate, std::int32_t logLevel);
 	std::string GetFormTypeIdentifier(std::monostate, RE::TESForm* form);

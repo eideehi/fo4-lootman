@@ -147,6 +147,11 @@ other types select a sound/scene/unused member.
   the decider now selects. Creating the record from scratch (clean union) avoids
   the donor mismatch. (Setting the member to a same-file FormID still hits the
   self-reference limit above — so a self-ref union member is GUI-only too.)
+- **Reading a union by its signature can give a false "unset".**
+  `GetElementEditValues(rec, 'SNAM')` returned empty even though the member was
+  correctly set — the value lives in the active member's child. Read the member
+  path (`'SNAM\Terminal'`) or call `LinksTo` on the union element; a naive read
+  looked like a failed write and wrongly cast doubt on a correct GUI edit.
 
 ## Copying elements between records
 
@@ -170,14 +175,91 @@ names) and clear inherited properties. Fragment bindings keyed by string/index
 
 ```pascal
 item := ElementAssign(arr, HighInteger, nil, False);   // append a new element
-while ElementCount(arr) > 0 do RemoveByIndex(arr, 0, False); // empty, keep array
 SetElementEditValues(item, 'ITXT', 'Label');           // string field
 SetElementNativeValues(item, 'ANAM', 8);               // enum/int field
 ```
 
-Prefer emptying an array (`RemoveByIndex` in a loop) over `RemoveElement` on the
-whole array: removing the array element can drop its count and malform the
-parent struct on save.
+**`Add(rec, 'SomeArray', True)` seeds the array with one default (empty)
+element.** Appending real items after it leaves a stray empty element at index 0
+(e.g. a blank terminal menu item, with `ISIZ` off by one). Drop the seed right
+after `Add`:
+
+```pascal
+items := Add(term, 'Menu Items', True);
+while ElementCount(items) > 0 do RemoveByIndex(items, 0, False); // drop Add's default
+```
+
+**`RemoveByIndex` can silently no-op — never loop on it unguarded.** It empties
+some arrays (`Menu Items`, VMAD `Fragments`) but did **nothing** on COBJ `FVPA`
+(Components): `ElementCount` stayed put and `while ElementCount(arr) > 0 do
+RemoveByIndex(...)` spun forever (a real, CPU-pegging infinite loop). Cap every
+such loop so a non-decrementing call cannot hang:
+
+```pascal
+guard := 0;
+while (ElementCount(arr) > 0) and (guard < 64) do begin
+  RemoveByIndex(arr, 0, False);
+  guard := guard + 1;
+end;
+```
+
+To clear a subrecord that resists element removal, remove the **whole subrecord**
+by its index on the parent record (this cleared `FVPA` and an orphaned VMAD
+fragment cleanly):
+
+```pascal
+for i := 0 to Pred(ElementCount(rec)) do
+  if Signature(ElementByIndex(rec, i)) = 'FVPA' then begin
+    RemoveByIndex(rec, i, False);   // drop the entire Components subrecord -> free recipe
+    Break;
+  end;
+```
+
+The older "prefer emptying over removing the whole array" rule still holds for an
+array nested in a struct with a sibling count, but a standalone subrecord (`FVPA`,
+an extra `VMAD` fragment) is safe — and sometimes the only way — to remove whole.
+
+## Terminal (TERM) menu item types and "Force Redraw"
+
+A `TERM` menu item's on-select behavior is its `ANAM` "Type" enum. Values read off
+vanilla `Fallout4.esm` terminals (confirm on your xEdit build by dumping a vanilla
+item's `ANAM` native value):
+
+| ANAM | Type | On select |
+| --- | --- | --- |
+| 4 | Submenu - Terminal | open the `TNAM` sub-terminal |
+| 5 | Submenu - Return to Top Level | return to the root page |
+| 6 | Submenu - Force Redraw | run the item's fragment, then redraw the SAME page |
+| 8 | Display Text | show the item's body text as a result page |
+
+For a toggle/action that runs a script fragment and should stay on the menu, use
+**Force Redraw (6)**. Display Text (8) navigates to a result page — blank if the
+item has no body text, forcing the player to Tab back. Force Redraw runs the
+fragment first, then re-renders the current page (re-evaluating item conditions),
+so the player never leaves the menu. The fragment binding is independent of
+`ANAM`: it is keyed by VMAD Fragment Index == item `ITID`.
+
+## COBJ: choosing the crafting bench and category
+
+A constructable object (`COBJ`) appears at the workbench named by its **`BNAM`
+Workbench Keyword** and under the tab named by its **`FNAM` Category** keyword.
+Both reference `Fallout4.esm` keywords, so they are cross-master refs and **are
+scriptable** (unlike same-file refs). Cloning a donor COBJ inherits the donor's
+bench: cloning a settlement-workshop recipe leaves it stuck in the build menu
+(`BNAM = WorkshopWorkbenchTypeFurniture 0005B5E3`), wrong for an inventory item.
+Repoint it (e.g. to the Chemistry Station, Utility tab):
+
+```pascal
+SetElementNativeValues(cobj, 'BNAM', GetLoadOrderFormID(chemBench)); // WorkbenchChemlab 00102158
+kw := ElementByIndex(ElementBySignature(cobj, 'FNAM'), 0);           // the Category keyword
+SetNativeValue(kw, GetLoadOrderFormID(utilCat));                     // RecipeUtility 0006980C
+```
+
+Chem-station category tabs are `Recipe*` keywords (`RecipeUtility 0006980C`,
+`RecipeHealing 00102150`, `RecipeDrug`, `RecipeMines`, `RecipeGrenade`,
+`RecipePoison`, …). For other benches, scan vanilla COBJ `BNAM`/`FNAM` to find the
+right keywords rather than guessing. Remove the `FVPA` Components subrecord (see
+above) to make a recipe free to craft.
 
 ## Editing a light plugin as a regular ESP (flag strip)
 
@@ -223,6 +305,12 @@ grep -aqF "Menu item label" out.esp && echo present            # menu-item text
 grep -aoiE "myns:fragments:[a-z0-9_:]+|Fragment_Terminal_[0-9]{2}" out.esp | sort | uniq -c
 xxd -s 8 -l 4 -p out.esp                                        # confirm ESL flag bit
 ```
+
+For structured fields — a FormID ref resolved to its target, an enum value's
+name, an array count — a read-only `-script` that `AddMessage`s
+`GetElementEditValues` / `ElementCount` (parsed from the `-R:` log) beats grepping
+the binary: grep cannot resolve a ref or name an enum. A small recursive dumper
+over `ElementByIndex` prints a record's whole subtree for a sanity diff.
 
 Authoritative checks (record errors, in-game behavior) still need the GUI
 "Check for Errors" pass and a game launch; the CLI greps are fast confidence

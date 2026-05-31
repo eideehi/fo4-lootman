@@ -53,6 +53,7 @@ float Function AdjustFloat(string id, float delta, float minValue, float maxValu
     float value = ClampFloat(ReadFloat(properties, id) + delta, minValue, maxValue)
     WriteFloat(properties, id, value)
     LTMN2:MCM.GetInstance().ApplySettingSideEffects(id)
+    LTMN2:LootMan.ShowConfigFloat(GetLabelKey(id), value)
     Return value
 EndFunction
 
@@ -63,6 +64,7 @@ int Function AdjustInt(string id, int delta, int minValue, int maxValue) global
     int value = ClampInt(ReadInt(properties, id) + delta, minValue, maxValue)
     WriteInt(properties, id, value)
     LTMN2:MCM.GetInstance().ApplySettingSideEffects(id)
+    LTMN2:LootMan.ShowConfigInt(GetLabelKey(id), value)
     Return value
 EndFunction
 
@@ -98,15 +100,7 @@ Function SetLogLevel(int value) global
     LTMN2:MCM mcmQuest = LTMN2:MCM.GetInstance()
     mcmQuest.LogLevel = value
     mcmQuest.ApplySettingSideEffects("LogLevel")
-EndFunction
-
-; ---------------------------------------------------------------------------
-; HUD helper
-; ---------------------------------------------------------------------------
-
-; Show a transient HUD notification; terminals cannot re-render a live value.
-Function Notify(string text) global
-    Debug.Notification(text)
+    LTMN2:LootMan.ShowConfigText("$PAGE_GENERAL_SETTINGS_LOG_LEVEL", LogLevelValueKey(value))
 EndFunction
 
 ; ---------------------------------------------------------------------------
@@ -120,6 +114,7 @@ Function FlipBool(string id) global
         WritePackedBool(properties, id, next)
     EndIf
     LTMN2:MCM.GetInstance().ApplySettingSideEffects(id)
+    LTMN2:LootMan.ShowConfigBool(GetLabelKey(id), next)
 EndFunction
 
 float Function ClampFloat(float value, float minValue, float maxValue) global
@@ -138,6 +133,87 @@ int Function ClampInt(int value, int minValue, int maxValue) global
         Return maxValue
     EndIf
     Return value
+EndFunction
+
+; Map a setting id to its localized label translation key. These reuse the MCM
+; $PAGE_* label keys (resolved by native message_queue against LootMan_<lang>.txt),
+; so the terminal and MCM show identical localized names with no MCM dependency.
+; Unknown ids fall back to the raw id so a mismatch is at least visible.
+string Function GetLabelKey(string id) global
+    ; General settings
+    If (id == "EnableLootMan")
+        Return "$PAGE_GENERAL_SETTINGS_ENABLE_LOOTMAN"
+    ElseIf (id == "DisplaySystemMessage")
+        Return "$PAGE_GENERAL_SETTINGS_DISPLAY_SYSTEM_MESSAGE"
+    ElseIf (id == "PlayPickupSound")
+        Return "$PAGE_GENERAL_SETTINGS_PLAY_PICKUP_SOUND"
+    ElseIf (id == "PlayContainerAnimation")
+        Return "$PAGE_GENERAL_SETTINGS_PLAY_CONTAINER_ANIMATION"
+    ElseIf (id == "IgnoreOverweight")
+        Return "$PAGE_GENERAL_SETTINGS_IGNORE_OVERWEIGHT"
+    ElseIf (id == "LootIsDeliverToPlayer")
+        Return "$PAGE_GENERAL_SETTINGS_LOOT_IS_DELIVER_TO_PLAYER"
+    ElseIf (id == "LootingWithoutLogs")
+        ; The property was renamed DeliveredToPlayerWithoutLogs -> LootingWithoutLogs;
+        ; use the key the MCM config.json binds to this id so the HUD label matches MCM.
+        Return "$PAGE_GENERAL_SETTINGS_LOOTING_WITHOUT_LOGS"
+    ElseIf (id == "NotLootingFromSettlement")
+        Return "$PAGE_GENERAL_SETTINGS_NOT_LOOTING_FROM_SETTLEMENT"
+    ElseIf (id == "AutomaticallyLinkAndUnlinkToWorkshop")
+        Return "$PAGE_GENERAL_SETTINGS_AUTOMATICALLY_LINK_AND_UNLINK_TO_WORKSHOP"
+    ElseIf (id == "UnlockLockedContainer")
+        Return "$PAGE_GENERAL_SETTINGS_UNLOCK_LOCKED_CONTAINER"
+    ElseIf (id == "LootingRange")
+        Return "$PAGE_GENERAL_SETTINGS_LOOTING_RANGE"
+    ElseIf (id == "CarryWeight")
+        Return "$PAGE_GENERAL_SETTINGS_CARRY_WEIGHT"
+
+    ; Object-type filters
+    ElseIf (id == "EnableObjectLootingOfACTI")
+        Return "$PAGE_LOOTING_WORKER_OBJECT_FILTER_ACTI"
+    ElseIf (id == "EnableObjectLootingOfALCH")
+        Return "$PAGE_LOOTING_WORKER_OBJECT_FILTER_ALCH"
+    ElseIf (id == "EnableObjectLootingOfAMMO")
+        Return "$PAGE_LOOTING_WORKER_OBJECT_FILTER_AMMO"
+    ElseIf (id == "EnableObjectLootingOfARMO")
+        Return "$PAGE_LOOTING_WORKER_OBJECT_FILTER_ARMO"
+    ElseIf (id == "EnableObjectLootingOfBOOK")
+        Return "$PAGE_LOOTING_WORKER_OBJECT_FILTER_BOOK"
+    ElseIf (id == "EnableObjectLootingOfCONT")
+        Return "$PAGE_LOOTING_WORKER_OBJECT_FILTER_CONT"
+    ElseIf (id == "EnableObjectLootingOfFLOR")
+        Return "$PAGE_LOOTING_WORKER_OBJECT_FILTER_FLOR"
+    ElseIf (id == "EnableObjectLootingOfINGR")
+        Return "$PAGE_LOOTING_WORKER_OBJECT_FILTER_INGR"
+    ElseIf (id == "EnableObjectLootingOfKEYM")
+        Return "$PAGE_LOOTING_WORKER_OBJECT_FILTER_KEYM"
+    ElseIf (id == "EnableObjectLootingOfMISC")
+        Return "$PAGE_LOOTING_WORKER_OBJECT_FILTER_MISC"
+    ElseIf (id == "EnableObjectLootingOfNPC_")
+        Return "$PAGE_LOOTING_WORKER_OBJECT_FILTER_NPC_"
+    ElseIf (id == "EnableObjectLootingOfWEAP")
+        Return "$PAGE_LOOTING_WORKER_OBJECT_FILTER_WEAP"
+    EndIf
+
+    Return id
+EndFunction
+
+; Map a native log level (trace 0 .. off 6) to its localized value label key.
+string Function LogLevelValueKey(int value) global
+    If (value == 0)
+        Return "$PAGE_GENERAL_SETTINGS_LOG_LEVEL_TRACE"
+    ElseIf (value == 1)
+        Return "$PAGE_GENERAL_SETTINGS_LOG_LEVEL_DEBUG"
+    ElseIf (value == 2)
+        Return "$PAGE_GENERAL_SETTINGS_LOG_LEVEL_INFO"
+    ElseIf (value == 3)
+        Return "$PAGE_GENERAL_SETTINGS_LOG_LEVEL_WARN"
+    ElseIf (value == 4)
+        Return "$PAGE_GENERAL_SETTINGS_LOG_LEVEL_ERROR"
+    ElseIf (value == 5)
+        Return "$PAGE_GENERAL_SETTINGS_LOG_LEVEL_CRITICAL"
+    EndIf
+    Return "$PAGE_GENERAL_SETTINGS_LOG_LEVEL_OFF"
 EndFunction
 
 bool Function ReadBool(LTMN2:Properties properties, string id) global

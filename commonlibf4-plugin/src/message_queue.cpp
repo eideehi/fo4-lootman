@@ -376,4 +376,12 @@ namespace message_queue
 		std::lock_guard lock(queueMutex);
 		queue.push_back(std::move(msg));
 	}
+
+	std::string ResolveText(const std::string& translationKey, const std::string& fallbackText)
+	{
+		// translations is loaded once during Initialize and never mutated afterwards,
+		// so this read needs no lock (same as the Tick formatter).
+		const auto it = translations.find(translationKey);
+		return it == translations.end() ? fallbackText : it->second;
+	}
 }

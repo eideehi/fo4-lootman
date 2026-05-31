@@ -61,6 +61,14 @@ namespace papyrus_lootman
 			&FinalizeWorldPickup, false, false);
 		vm->BindNativeMethod("LTMN2:LootMan"sv, "OnUpdateLootManProperty"sv,
 			&OnUpdateLootManProperty, false, false);
+		vm->BindNativeMethod("LTMN2:LootMan"sv, "ShowConfigBool"sv,
+			&ShowConfigBool, false, false);
+		vm->BindNativeMethod("LTMN2:LootMan"sv, "ShowConfigInt"sv,
+			&ShowConfigInt, false, false);
+		vm->BindNativeMethod("LTMN2:LootMan"sv, "ShowConfigFloat"sv,
+			&ShowConfigFloat, false, false);
+		vm->BindNativeMethod("LTMN2:LootMan"sv, "ShowConfigText"sv,
+			&ShowConfigText, false, false);
 
 		REX::DEBUG("source=native component=papyrus event=binding_completed script=LTMN2:LootMan");
 		return true;

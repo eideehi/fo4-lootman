@@ -65,7 +65,7 @@ describe("mcm fallback config delivery", () => {
 	});
 
 	it("routes the config facade through the shared MCM dispatcher", () => {
-		for (const fn of ["SetBool", "Toggle", "ToggleBit", "AdjustFloat", "AdjustInt", "SetLogLevel", "Notify"]) {
+		for (const fn of ["SetBool", "Toggle", "ToggleBit", "AdjustFloat", "AdjustInt", "SetLogLevel"]) {
 			expect(configScript, `facade missing ${fn}`).toContain(`Function ${fn}(`);
 		}
 
@@ -111,7 +111,7 @@ describe("mcm fallback config delivery", () => {
 			{ name: "TERM_ConfigGeneral_FB8", count: 14 },
 			{ name: "TERM_ConfigObjectFilter_FB9", count: 12 },
 			{ name: "TERM_ConfigLogLevel_FBA", count: 7 },
-			{ name: "TERM_ConfigUtility_FBB", count: 4 },
+			{ name: "TERM_ConfigUtility_FBB", count: 3 },
 		];
 		for (const frag of fragments) {
 			const file = `${FRAGMENT_DIR}/${frag.name}.psc`;
@@ -153,7 +153,95 @@ describe("mcm fallback config delivery", () => {
 
 		const util = readWorkspaceFile(`${FRAGMENT_DIR}/TERM_ConfigUtility_FBB.psc`);
 		expect(extractPapyrusFunction(util, "Fragment_Terminal_01")).toContain("ExecuteLooting()");
-		expect(extractPapyrusFunction(util, "Fragment_Terminal_02")).toContain("OpenLootManInventory()");
-		expect(extractPapyrusFunction(util, "Fragment_Terminal_04")).toContain("Uninstall()");
+		// "Open LootMan storage" was removed (a container UI cannot open over a live
+		// terminal), so Install/Uninstall shifted up to ITID 2/3.
+		expect(extractPapyrusFunction(util, "Fragment_Terminal_02")).toContain("Install()");
+		expect(extractPapyrusFunction(util, "Fragment_Terminal_03")).toContain("Uninstall()");
+		expect(util, "OpenLootManInventory must be gone from the terminal").not.toContain("OpenLootManInventory");
+	});
+
+	it("emits localized config-change notifications through the native HUD path", () => {
+		// Debug.Notification is suppressed in release builds, so the facade must route
+		// change feedback through the native message_queue (which is visible while a
+		// terminal is open) and reuse the existing $PAGE_* MCM label keys via GetLabelKey.
+		expect(extractPapyrusFunction(configScript, "FlipBool")).toContain("LTMN2:LootMan.ShowConfigBool(GetLabelKey(id)");
+		expect(extractPapyrusFunction(configScript, "AdjustFloat")).toContain("LTMN2:LootMan.ShowConfigFloat(GetLabelKey(id)");
+		expect(extractPapyrusFunction(configScript, "AdjustInt")).toContain("LTMN2:LootMan.ShowConfigInt(GetLabelKey(id)");
+		expect(extractPapyrusFunction(configScript, "SetLogLevel")).toContain("LTMN2:LootMan.ShowConfigText(");
+		// Debug.Notification does nothing in release; the facade must not rely on it.
+		expect(configScript, "facade must not use Debug.Notification").not.toContain("Debug.Notification");
+		// GetLabelKey must reuse a real $PAGE_* key for a representative id.
+		expect(extractPapyrusFunction(configScript, "GetLabelKey")).toContain('"$PAGE_LOOTING_WORKER_OBJECT_FILTER_ACTI"');
+
+		// The native HUD entry points must be declared global native on LTMN2:LootMan.
+		const lootManScript = readWorkspaceFile("papyrus/Scripts/Source/User/LTMN2/LootMan.psc");
+		for (const fn of ["ShowConfigBool", "ShowConfigInt", "ShowConfigFloat", "ShowConfigText"]) {
+			expect(lootManScript, `LootMan.psc must declare ${fn} native`).toMatch(
+				new RegExp(`Function\\s+${fn}\\([^)]*\\)\\s+global\\s+native`, "i"),
+			);
+		}
+	});
+
+	it("keeps GetLabelKey label keys resolvable and consistent with the MCM config", () => {
+		// Build id/propertyName -> label key from the MCM config, so a terminal HUD
+		// label can be checked against the MCM label for the same setting. (A stale
+		// LootingWithoutLogs key that differed from the MCM motivated this guard.)
+		const mcm = JSON.parse(readWorkspaceFile("packaging/resources/lootman/common/MCM/Config/LootMan/config.json")) as unknown;
+		const labelByProperty = new Map<string, string>();
+		const walk = (node: unknown): void => {
+			if (!node || typeof node !== "object") return;
+			if (Array.isArray(node)) {
+				node.forEach(walk);
+				return;
+			}
+			const obj = node as Record<string, unknown>;
+			const text = typeof obj.text === "string" ? obj.text : undefined;
+			if (text && text.startsWith("$")) {
+				const opts = obj.valueOptions as Record<string, unknown> | undefined;
+				if (opts && typeof opts.propertyName === "string") {
+					labelByProperty.set(opts.propertyName, text);
+				}
+				if (typeof obj.id === "string") {
+					labelByProperty.set(obj.id, text);
+				}
+			}
+			Object.values(obj).forEach(walk);
+		};
+		walk(mcm);
+		expect(labelByProperty.size, "MCM config parsed no settings").toBeGreaterThan(20);
+
+		// Keys present in the shipped English translation.
+		const enKeys = new Set<string>();
+		const enText = fs
+			.readFileSync(path.resolve("packaging/resources/lootman/en/Interface/Translations/LootMan_en.txt"))
+			.toString("utf16le")
+			.replace(/^﻿/, "");
+		for (const line of enText.split(/\r?\n/)) {
+			const tab = line.indexOf("\t");
+			if (tab > 0) {
+				enKeys.add(line.slice(0, tab));
+			}
+		}
+
+		// Every GetLabelKey mapping must resolve in the translation file and, where the
+		// MCM binds the same id, must equal the MCM's label key (no stale/forked labels).
+		const getLabelKey = extractPapyrusFunction(configScript, "GetLabelKey");
+		const pairs = [
+			...getLabelKey.matchAll(/\(id == "([^"]+)"\)\s*\r?\n(?:\s*;[^\n]*\r?\n)*\s*Return\s+"(\$[^"]+)"/gi),
+		];
+		expect(pairs.length, "GetLabelKey should map the General + ObjectFilter menu ids").toBeGreaterThanOrEqual(24);
+		for (const [, id, key] of pairs) {
+			expect(enKeys.has(key!), `GetLabelKey("${id}") -> ${key} is missing from LootMan_en.txt`).toBe(true);
+			const mcmKey = labelByProperty.get(id!);
+			if (mcmKey !== undefined) {
+				expect(key, `GetLabelKey("${id}") must use the same label key the MCM binds for that setting`).toBe(mcmKey);
+			}
+		}
+
+		// Log-level value labels must also resolve.
+		const logLevelValueKey = extractPapyrusFunction(configScript, "LogLevelValueKey");
+		for (const [, key] of logLevelValueKey.matchAll(/Return\s+"(\$[^"]+)"/gi)) {
+			expect(enKeys.has(key!), `LogLevelValueKey ${key} is missing from LootMan_en.txt`).toBe(true);
+		}
 	});
 });

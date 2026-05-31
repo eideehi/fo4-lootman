@@ -48,17 +48,17 @@ Function Fragment_Terminal_10(ObjectReference akTerminalRef)
 EndFunction
 
 Function Fragment_Terminal_11(ObjectReference akTerminalRef)
-    LTMN2:Config.Notify("" + LTMN2:Config.AdjustFloat("LootingRange", 0.5, 1.0, 256.0))
+    LTMN2:Config.AdjustFloat("LootingRange", 0.5, 1.0, 256.0)
 EndFunction
 
 Function Fragment_Terminal_12(ObjectReference akTerminalRef)
-    LTMN2:Config.Notify("" + LTMN2:Config.AdjustFloat("LootingRange", -0.5, 1.0, 256.0))
+    LTMN2:Config.AdjustFloat("LootingRange", -0.5, 1.0, 256.0)
 EndFunction
 
 Function Fragment_Terminal_13(ObjectReference akTerminalRef)
-    LTMN2:Config.Notify("" + LTMN2:Config.AdjustInt("CarryWeight", 100, 100, 10000))
+    LTMN2:Config.AdjustInt("CarryWeight", 100, 100, 10000)
 EndFunction
 
 Function Fragment_Terminal_14(ObjectReference akTerminalRef)
-    LTMN2:Config.Notify("" + LTMN2:Config.AdjustInt("CarryWeight", -100, 100, 10000))
+    LTMN2:Config.AdjustInt("CarryWeight", -100, 100, 10000)
 EndFunction

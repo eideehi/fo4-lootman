@@ -12,6 +12,14 @@ Function ShowSystemMessage(int messageId) global native
 ; Queue a localized LootMan system HUD notification with a display name token.
 Function ShowSystemMessageWithName(int messageId, Form nameSource) global native
 
+; Queue a localized config-change HUD notification ("[LootMan] <label>: <value>").
+; labelKey/valueKey reuse existing $PAGE_* / value-label translation keys. Visible
+; while a config terminal is open (uses the native HUD path, not Debug.Notification).
+Function ShowConfigBool(string labelKey, bool value) global native
+Function ShowConfigInt(string labelKey, int value) global native
+Function ShowConfigFloat(string labelKey, float value) global native
+Function ShowConfigText(string labelKey, string valueKey) global native
+
 ; Get the native LootMan log level. Values match trace=0 through off=6.
 int Function GetLogLevel() global native
 

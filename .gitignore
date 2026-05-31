@@ -32,6 +32,7 @@ tools/ghidra/headless.local.json
 tools/ghidra/projects/
 tools/ghidra/reports/local/
 tools/xedit/stage-*/
+tools/xedit/*.log
 
 # files
 *.zip
