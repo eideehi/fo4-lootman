@@ -45,4 +45,5 @@ owns release artifacts; `tools/` owns maintenance and analysis tooling.
 - Native hooks: `docs/workflows/native-hooks.md`
 - Ghidra: `docs/workflows/ghidra.md`
 - xEdit VMAD cleanup: `docs/workflows/xedit-vmad-cleanup.md`
+- xEdit scripting (patterns/gotchas): `docs/workflows/xedit-scripting.md`
 - CommonLibF4 hazards: `docs/constraints/commonlibf4-hazards.md`
