@@ -11,6 +11,8 @@ the player inventory, or a nearby workshop depending on your settings.
   categories.
 - Optional delivery to the player inventory or workshop-linked workflows.
 - MCM pages for setup, looting filters, utilities, system actions, and hotkeys.
+- A craftable in-game config holotape that mirrors common MCM settings from a
+  terminal menu.
 - In-game uninstall support for clean removal and broken-install recovery.
 
 This guide is for players. Build steps, release packaging, and contributor
@@ -300,6 +302,96 @@ page.
 
 Hotkey actions do nothing when LootMan is not installed, not initialized, or
 already uninstalled.
+
+### Config Holotape (In-Game Terminal)
+
+LootMan ships an in-game config holotape named `LootMan Configuration`.
+Activating it opens a terminal that adjusts a subset of the MCM settings. The
+holotape and the MCM read and write the same settings, so a change made on one
+surface is reflected on the other and the two cannot drift apart.
+
+You can obtain the holotape two ways:
+
+- It is added to your inventory automatically when LootMan installs. Saves that
+  already have LootMan installed also receive it once when you update to 3.1.0,
+  so existing 3.0.x saves are covered. You do not get a duplicate: the grant is
+  skipped when you already hold one.
+- You can craft it for free at any Chemistry Station, under the Utility recipe
+  category. It needs no components and has no perk or other craft condition.
+
+The terminal's root menu, `LootMan Configuration`, has four pages.
+
+**General Settings**
+
+| Terminal item | Effect |
+| --- | --- |
+| `Toggle LootMan` | Toggles `Enable LootMan`. |
+| `Toggle system messages` | Toggles `Display System Message`. |
+| `Toggle pickup sound` | Toggles `Play Pickup Sound`. |
+| `Toggle container animation` | Toggles `Play Container Animation`. |
+| `Toggle ignore overweight` | Toggles `Ignore Overweight`. |
+| `Toggle deliver to player` | Toggles `Loot Is Deliver To Player`. |
+| `Toggle silent looting` | Toggles `Suppress Looting Pickup Messages`. |
+| `Toggle no looting in settlement` | Toggles `Not Looting From Settlement`. |
+| `Toggle auto workshop link` | Toggles `Automatically Link / Unlink To Workshop`. |
+| `Toggle unlock containers` | Toggles `Unlock Locked Container`. |
+| `Looting range +` | Raises `Looting Range` by 0.5 (meters), clamped to 1.0 – 256.0. |
+| `Looting range -` | Lowers `Looting Range` by 0.5 (meters), clamped to 1.0 – 256.0. |
+| `Carry weight +` | Raises `Carry Weight` by 100 (pounds), clamped to 100 – 10000. |
+| `Carry weight -` | Lowers `Carry Weight` by 100 (pounds), clamped to 100 – 10000. |
+
+The `Looting range +` / `Looting range -` and `Carry weight +` / `Carry weight -`
+items step the same `Looting Range` and `Carry Weight` values as the MCM
+`General Settings` sliders. Select an item repeatedly to move the value in steps.
+
+**Object Looting Filters**
+
+Twelve toggles enable or disable looting per world object type, the same set as
+the Object Filter on the MCM Looting page:
+
+- `Toggle activators (ACTI)`
+- `Toggle aid (ALCH)`
+- `Toggle ammo (AMMO)`
+- `Toggle armor (ARMO)`
+- `Toggle books (BOOK)`
+- `Toggle containers (CONT)`
+- `Toggle flora (FLOR)`
+- `Toggle ingredients (INGR)`
+- `Toggle keys (KEYM)`
+- `Toggle misc (MISC)`
+- `Toggle corpses (NPC_)`
+- `Toggle weapons (WEAP)`
+
+**Log Level**
+
+Seven options set the native DLL log level, writing the same value as the MCM
+`Native Log Level` dropdown and `Data/F4SE/Plugins/LootMan/config.json`:
+`Trace`, `Debug`, `Info`, `Warn`, `Error`, `Critical`, `Off`.
+
+**Utilities & System**
+
+| Terminal item | Effect |
+| --- | --- |
+| `Install LootMan` | Runs the install action, the same as `System -> Force Install` in the MCM. |
+| `Uninstall LootMan` | Runs the in-game uninstall action, the same as `System -> Uninstall` in the MCM. |
+
+Both actions are guarded by install state. `Uninstall LootMan` follows the same
+in-game uninstall flow described in the `System` section above and under
+`Uninstalling` below: it clears LootMan runtime state and attempts to return
+held items to the player. Make a cleanup save afterward as described there.
+
+When you change a setting from the holotape, LootMan shows a confirmation line in
+the format `[LootMan] <label>: <value>` (for example, `[LootMan] Play Pickup
+Sound: On`). The line appears while the terminal is open and reuses the same
+localized setting names as the MCM. `Toggle LootMan` is the one exception: like
+the `Toggle Enable LootMan` hotkey, it shows the enable or disable message
+instead. Selecting a toggle keeps you on the same page, so you can flip several
+settings in a row without backing out.
+
+The holotape exposes only a subset of the MCM. It does not include the
+`Looting Interval` and `Native Looting Budget` controls, the Inventory Filter,
+the Advanced Filter subtypes, the Move Items / Scrap Items utilities, or the
+Hotkeys. Use the MCM pages above for those settings.
 
 ## Behavior Reference
 
