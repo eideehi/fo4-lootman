@@ -190,10 +190,10 @@ while ElementCount(items) > 0 do RemoveByIndex(items, 0, False); // drop Add's d
 ```
 
 **`RemoveByIndex` can silently no-op — never loop on it unguarded.** It empties
-some arrays (`Menu Items`, VMAD `Fragments`) but did **nothing** on COBJ `FVPA`
-(Components): `ElementCount` stayed put and `while ElementCount(arr) > 0 do
-RemoveByIndex(...)` spun forever (a real, CPU-pegging infinite loop). Cap every
-such loop so a non-decrementing call cannot hang:
+`Menu Items` fine, but did **nothing** on COBJ `FVPA` (Components): `ElementCount`
+stayed put and `while ElementCount(arr) > 0 do RemoveByIndex(...)` spun forever (a
+real, CPU-pegging infinite loop). Cap every such loop so a non-decrementing call
+cannot hang:
 
 ```pascal
 guard := 0;
@@ -203,9 +203,8 @@ while (ElementCount(arr) > 0) and (guard < 64) do begin
 end;
 ```
 
-To clear a subrecord that resists element removal, remove the **whole subrecord**
-by its index on the parent record (this cleared `FVPA` and an orphaned VMAD
-fragment cleanly):
+To clear a whole standalone subrecord (e.g. `FVPA`), remove it by its index on the
+parent record — this persists and freed the COBJ recipe:
 
 ```pascal
 for i := 0 to Pred(ElementCount(rec)) do
@@ -215,9 +214,25 @@ for i := 0 to Pred(ElementCount(rec)) do
   end;
 ```
 
-The older "prefer emptying over removing the whole array" rule still holds for an
-array nested in a struct with a sibling count, but a standalone subrecord (`FVPA`,
-an extra `VMAD` fragment) is safe — and sometimes the only way — to remove whole.
+The "prefer emptying over removing the whole array" rule still holds for an array
+nested in a struct with a sibling count; a standalone subrecord is safe to remove
+whole.
+
+**In-place edits to an existing `VMAD` do not persist — re-author it instead.**
+`RemoveByIndex` on an existing record's `Script Fragments\Fragments` (to drop one
+fragment) succeeds in memory — `ElementCount` drops and a dump shows the new count —
+but the **saved** file still has the old fragments: the VMAD blob is re-serialized
+from a stale structure. To change an existing VMAD, re-author the whole subrecord
+(the same donor-copy that created it), which does persist:
+
+```pascal
+RemoveElement(term, 'VMAD');
+vmad := wbCopyElementToRecord(donorVMAD, term, False, True);
+// then clear Scripts / fragment Properties and rebuild Script Fragments\Fragments
+```
+
+This is how an orphaned Utility terminal fragment was finally removed after an
+in-place `RemoveByIndex` had silently failed to persist.
 
 ## Terminal (TERM) menu item types and "Force Redraw"
 
