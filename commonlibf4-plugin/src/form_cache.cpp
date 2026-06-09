@@ -40,6 +40,11 @@ namespace form_cache
 	void Initialize()
 	{
 		const auto dh = RE::TESDataHandler::GetSingleton();
+		if (!dh)
+		{
+			REX::ERROR("source=native component=form_cache event=initialize_failed reason=data_handler_unavailable");
+			return;
+		}
 
 		keyword::featuredItem = dh->LookupForm<RE::BGSKeyword>(0x1B3FAC, "Fallout4.esm"sv);
 		keyword::unscrappableObject = dh->LookupForm<RE::BGSKeyword>(0x1CC46A, "Fallout4.esm"sv);

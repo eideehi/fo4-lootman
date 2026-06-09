@@ -33,7 +33,14 @@ namespace constructible_object
 		REX::DEBUG("source=native component=constructible_object event=cache_started");
 		cache.clear();
 
-		auto& allCObj = RE::TESDataHandler::GetSingleton()->GetFormArray<RE::BGSConstructibleObject>();
+		auto* dh = RE::TESDataHandler::GetSingleton();
+		if (!dh)
+		{
+			REX::ERROR("source=native component=constructible_object event=initialize_failed reason=data_handler_unavailable");
+			return;
+		}
+
+		auto& allCObj = dh->GetFormArray<RE::BGSConstructibleObject>();
 		cache.reserve(allCObj.size());
 		for (auto* cobj : allCObj)
 		{

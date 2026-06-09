@@ -9,7 +9,19 @@ namespace vendor_chest
 	{
 		REX::DEBUG("source=native component=vendor_chest event=cache_started");
 
-		auto& allFactions = RE::TESDataHandler::GetSingleton()->GetFormArray<RE::TESFaction>();
+		auto* dh = RE::TESDataHandler::GetSingleton();
+		if (!dh)
+		{
+			REX::ERROR("source=native component=vendor_chest event=initialize_failed reason=data_handler_unavailable");
+			return;
+		}
+
+		{
+			std::lock_guard<std::mutex> guard(vendorChestsMutex);
+			vendorChests.clear();
+		}
+
+		auto& allFactions = dh->GetFormArray<RE::TESFaction>();
 		for (auto* faction : allFactions)
 		{
 			if (!faction)
