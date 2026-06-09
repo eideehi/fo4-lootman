@@ -1242,6 +1242,11 @@ namespace papyrus_lootman
 
 	void LogRebuildWorkshopSupplyProbe(std::uint32_t sourceId, const char* sourceName, void* owner)
 	{
+		if (!kVerboseWorkshopMaterialDiagnostics)
+		{
+			return;
+		}
+
 		const auto ownerSnapshot = CaptureWorkshopSupplyOwnerProbe(owner);
 		const auto ownerForm = CaptureFormProbeSnapshot(reinterpret_cast<TESForm*>(owner));
 		const auto key = MakePointerProbeKey(sourceId, ownerSnapshot.owner, ownerForm.formID);
@@ -1312,6 +1317,11 @@ namespace papyrus_lootman
 		bool includeLinked,
 		bool result)
 	{
+		if (!kVerboseWorkshopMaterialDiagnostics)
+		{
+			return;
+		}
+
 		const auto ownerForm = CaptureFormProbeSnapshot(reinterpret_cast<TESForm*>(owner));
 		const auto targetForm = CaptureFormProbeSnapshot(form);
 		const auto context = sourceId == 0xB2 ?
@@ -1384,6 +1394,11 @@ namespace papyrus_lootman
 		TESForm* form,
 		const WorkshopMaterialCountAdjustment& adjustment)
 	{
+		if (!kVerboseWorkshopMaterialDiagnostics)
+		{
+			return;
+		}
+
 		const auto targetForm = CaptureFormProbeSnapshot(form);
 		const auto locationId = adjustment.currentLocation ? adjustment.currentLocation->formID : 0;
 		const auto key = MakePointerProbeKey(
@@ -1652,6 +1667,11 @@ namespace papyrus_lootman
 		std::int32_t baseCount,
 		const WorkshopMaterialCountAdjustment& adjustment)
 	{
+		if (!kVerboseWorkshopMaterialDiagnostics)
+		{
+			return;
+		}
+
 		const auto ownerForm = CaptureFormProbeSnapshot(reinterpret_cast<TESForm*>(owner));
 		const auto componentForm = CaptureFormProbeSnapshot(component);
 		const auto context = CaptureWorkshopMaterialContextProbe();
@@ -3071,6 +3091,11 @@ namespace papyrus_lootman
 		const SelectedWorkshopRecipeProbeSnapshot& recipeProbe,
 		const WorkshopResourceStatusEvaluation& evaluation)
 	{
+		if (!kVerboseWorkshopMaterialDiagnostics)
+		{
+			return;
+		}
+
 		const auto ownerForm = CaptureFormProbeSnapshot(owner);
 		const auto key = MakePointerProbeKey(
 			sourceId,
@@ -3421,6 +3446,11 @@ namespace papyrus_lootman
 		bool includeLinked,
 		const WorkshopMaterialConsumptionPlan& plan)
 	{
+		if (!kVerboseWorkshopMaterialDiagnostics)
+		{
+			return;
+		}
+
 		const auto ownerForm = CaptureFormProbeSnapshot(owner);
 		const auto targetForm = CaptureFormProbeSnapshot(form);
 		const auto key = MakePointerProbeKey(
@@ -3724,6 +3754,11 @@ namespace papyrus_lootman
 		std::uint32_t sourceId,
 		const char* sourceName)
 	{
+		if (!kVerboseWorkshopMaterialDiagnostics)
+		{
+			return;
+		}
+
 		const auto targetForm = CaptureFormProbeSnapshot(form);
 		const auto key = MakePointerProbeKey(
 			sourceId,
@@ -3773,6 +3808,11 @@ namespace papyrus_lootman
 		std::uint32_t sourceId,
 		const char* sourceName)
 	{
+		if (!kVerboseWorkshopMaterialDiagnostics)
+		{
+			return;
+		}
+
 		const auto targetForm = CaptureFormProbeSnapshot(form);
 		const auto context = CaptureWorkshopMaterialContextProbe();
 		const auto key = MakePointerProbeKey(
