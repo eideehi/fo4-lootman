@@ -44,10 +44,6 @@ namespace papyrus_lootman
 
 		std::int32_t beforeCount = 0;
 		const bool gotBefore = TryGetReferenceItemCountSafe(dest, object, beforeCount);
-		if (playPickupSound)
-		{
-			PlayPickUpSound(std::monostate{}, player, ref);
-		}
 
 		const auto moved = [&]()
 		{
@@ -73,6 +69,12 @@ namespace papyrus_lootman
 		const bool gotAfter = TryGetReferenceItemCountSafe(dest, object, afterCount);
 		if (gotBefore && gotAfter && afterCount > beforeCount)
 		{
+			// Play the pickup cue only now that the transfer is confirmed, so the
+			// player never hears a pickup sound for an item that failed to move.
+			if (playPickupSound)
+			{
+				PlayPickUpSound(std::monostate{}, player, ref);
+			}
 			FinalizeWorldPickup(std::monostate{}, ref);
 			const auto movedCount = GetObservedMovedCount(
 				beforeCount,
@@ -203,7 +205,13 @@ namespace papyrus_lootman
 
 		if (movedCount > 0 && capacity)
 		{
-			capacity->Accept(acceptedWeight);
+			// Charge the capacity budget for what actually moved, not the full
+			// world count: a partial activation delta would otherwise over-debit
+			// the shared budget and wrongly reject later lootable items.
+			const float chargedWeight = (capacity->enabled && movedCount < worldCount)
+				? unitWeight * static_cast<float>(movedCount)
+				: acceptedWeight;
+			capacity->Accept(chargedWeight);
 		}
 
 		if (movedCount > 0 && ShouldNotifyLootDestination(dest))
