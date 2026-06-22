@@ -337,20 +337,42 @@ namespace papyrus_lootman
 			return false;
 		}
 
-		if (!TryAddInventoryItemSafe(dest, object, static_cast<std::uint32_t>(count), std::move(extra)))
+		// Remove from the source first. The destination add and the source removal
+		// cannot be made atomic, so order them for the safe failure mode: if the
+		// removal faults (TryRemoveScrapSourceSafe returns false under SEH), the
+		// item is still in the source and nothing was added to the destination.
+		// Adding first and then failing to remove would leave the instance-bearing
+		// stack in BOTH containers, i.e. a genuine item duplication.
+		if (!TryRemoveScrapSourceSafe(src, object, count, stackIndex))
 		{
 			return false;
 		}
 
-		if (!TryRemoveScrapSourceSafe(src, object, count, stackIndex))
+		if (!TryAddInventoryItemSafe(dest, object, static_cast<std::uint32_t>(count), extra))
 		{
-			REX::WARN(
-				"source=native component=inventory_transfer event=source_removal_failed reason=post_instance_preserving_add src={:08X} dest={:08X} item={:08X} count={} stack={}",
-				src->formID,
-				dest->formID,
-				object->formID,
-				count,
-				stackIndex ? static_cast<std::int32_t>(*stackIndex) : -1);
+			// The destination add failed after the source removal already
+			// succeeded. Restore the stack to the source so the item is not lost;
+			// the preserved extra data keeps the instance intact.
+			if (!TryAddInventoryItemSafe(src, object, static_cast<std::uint32_t>(count), std::move(extra)))
+			{
+				REX::WARN(
+					"source=native component=inventory_transfer event=instance_preserving_move_unrecoverable reason=dest_add_and_source_restore_failed src={:08X} dest={:08X} item={:08X} count={} stack={}",
+					src->formID,
+					dest->formID,
+					object->formID,
+					count,
+					stackIndex ? static_cast<std::int32_t>(*stackIndex) : -1);
+			}
+			else
+			{
+				REX::WARN(
+					"source=native component=inventory_transfer event=instance_preserving_move_rolled_back reason=dest_add_failed src={:08X} dest={:08X} item={:08X} count={} stack={}",
+					src->formID,
+					dest->formID,
+					object->formID,
+					count,
+					stackIndex ? static_cast<std::int32_t>(*stackIndex) : -1);
+			}
 			return false;
 		}
 
