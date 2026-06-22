@@ -20,14 +20,19 @@ namespace papyrus_lootman
 	};
 
 	std::unordered_map<std::uint32_t, LockedObjectEntry> lockedObjects;
-	std::unordered_set<std::uint32_t> recentlyLootedWorldRefs;
+	std::unordered_set<std::uint64_t> recentlyLootedWorldRefs;
 	Clock::time_point lastLockedObjectCleanupAt{};
+
+	// Created refs are keyed by their 32-bit handle value, persistent refs by
+	// their formID. Those two 32-bit ranges overlap, so tag handle-derived keys
+	// in the high word to keep the two key spaces disjoint within one set.
+	inline constexpr std::uint64_t kRecentLootHandleTag = std::uint64_t{ 1 } << 32;
 
 	inline constexpr auto kLockedObjectStaleTimeout = std::chrono::minutes(5);
 	inline constexpr auto kLockedObjectCleanupInterval = std::chrono::seconds(1);
 	inline constexpr std::size_t kLockedObjectCleanupMaxPerPass = 32;
 
-	std::uint32_t GetRecentlyLootedWorldRefKey(const TESObjectREFR* ref)
+	std::uint64_t GetRecentlyLootedWorldRefKey(const TESObjectREFR* ref)
 	{
 		if (!ref)
 		{
@@ -36,7 +41,7 @@ namespace papyrus_lootman
 
 		if (!ref->IsCreated())
 		{
-			return ref->formID;
+			return static_cast<std::uint64_t>(ref->formID);
 		}
 
 		auto* mutableRef = const_cast<TESObjectREFR*>(ref);
@@ -44,21 +49,21 @@ namespace papyrus_lootman
 		auto handleKey = handle.get_handle();
 		if (handleKey != 0)
 		{
-			return handleKey;
+			return kRecentLootHandleTag | static_cast<std::uint64_t>(handleKey);
 		}
-		return ref->formID;
+		return static_cast<std::uint64_t>(ref->formID);
 	}
 
-	bool IsRecentlyLootedWorldRef(std::uint32_t formId)
+	bool IsRecentlyLootedWorldRef(std::uint64_t key)
 	{
 		std::lock_guard<std::mutex> guard(recentWorldLootLock);
-		return recentlyLootedWorldRefs.find(formId) != recentlyLootedWorldRefs.end();
+		return recentlyLootedWorldRefs.find(key) != recentlyLootedWorldRefs.end();
 	}
 
-	bool TryMarkRecentlyLootedWorldRef(std::uint32_t formId)
+	bool TryMarkRecentlyLootedWorldRef(std::uint64_t key)
 	{
 		std::lock_guard<std::mutex> guard(recentWorldLootLock);
-		return recentlyLootedWorldRefs.insert(formId).second;
+		return recentlyLootedWorldRefs.insert(key).second;
 	}
 
 	bool IsRecentlyLootedWorldRef(const TESObjectREFR* ref)
