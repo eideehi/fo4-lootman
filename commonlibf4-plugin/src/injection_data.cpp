@@ -304,11 +304,17 @@ namespace injection_data
 			}
 			catch (const nlohmann::json::parse_error& e)
 			{
+				// A single malformed supplemental file must not disable the whole
+				// mod. The user guide invites third parties to drop their own .json
+				// patches into this directory, so a stray syntax error in any one of
+				// them should degrade (skip that file) like the sibling error paths
+				// above, not fail the entire plugin load.
+				degradedMode = true;
 				REX::ERROR(
 					"source=native component=injection_data event=json_parse_failed path=\"{}\" reason=\"{}\"",
 					file.string(),
 					e.what());
-				return false;
+				continue;
 			}
 
 			for (const auto& info : info_list)
