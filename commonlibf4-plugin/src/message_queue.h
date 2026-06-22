@@ -15,6 +15,9 @@ namespace message_queue
 	// Asynchronous HUD message queue used by native looting and system notification code.
 	// Pickup messages are throttled on a permanent F4SE task so loot workers can enqueue without blocking.
 	void Initialize();
+	// Drop every pending queued message. Called when a save is about to load so a
+	// backlog from the previous session cannot bleed into the next one.
+	void Reset();
 	void Enqueue(std::uint32_t formId, std::string itemName, std::int32_t count);
 	void EnqueueLocalizedText(
 		std::string translationKey,

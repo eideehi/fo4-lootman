@@ -22,6 +22,9 @@ void OnMessage(F4SE::MessagingInterface::Message* a_msg)
 	{
 		// Clear transient handles from the previous runtime before another save is loaded.
 		papyrus_lootman::OnPreLoadGame();
+		// Drop any queued HUD messages so a backlog from the previous session
+		// cannot surface in the newly loaded game.
+		message_queue::Reset();
 	}
 }
 

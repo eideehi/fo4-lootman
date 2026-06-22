@@ -19,6 +19,10 @@ namespace message_queue
 
 		constexpr auto kDisplayInterval = std::chrono::milliseconds(1500);
 
+		// Pickups drain at most one per kDisplayInterval, so an unbounded backlog
+		// from a single large loot pass would trail HUD messages for minutes.
+		constexpr std::size_t kMaxPickupBacklog = 32;
+
 		enum class PendingMessageType
 		{
 			pickup,
@@ -331,6 +335,11 @@ namespace message_queue
 		REX::DEBUG("source=native component=message_queue event=initialized");
 	}
 
+	void Reset()
+	{
+		ClearQueue();
+	}
+
 	void Enqueue(std::uint32_t formId, std::string itemName, std::int32_t count)
 	{
 		if (count <= 0)
@@ -355,6 +364,30 @@ namespace message_queue
 		msg.itemName = std::move(itemName);
 		msg.count = count;
 		queue.push_back(std::move(msg));
+
+		// Bound the pickup backlog so a single diverse loot pass cannot produce
+		// minutes of trailing notifications. Drop the oldest pickup(s) past the
+		// cap; localized-text messages are untouched.
+		std::size_t pickupCount = 0;
+		for (const auto& pending : queue)
+		{
+			if (pending.type == PendingMessageType::pickup)
+			{
+				++pickupCount;
+			}
+		}
+		while (pickupCount > kMaxPickupBacklog)
+		{
+			for (auto it = queue.begin(); it != queue.end(); ++it)
+			{
+				if (it->type == PendingMessageType::pickup)
+				{
+					queue.erase(it);
+					--pickupCount;
+					break;
+				}
+			}
+		}
 	}
 
 	void EnqueueLocalizedText(
