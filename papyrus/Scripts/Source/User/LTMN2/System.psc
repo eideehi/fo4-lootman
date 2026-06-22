@@ -148,12 +148,22 @@ Event Actor.OnLocationChange(Actor akSender, Location akOldLoc, Location akNewLo
         currentWorkshopLocation = currentWorkshop.myLocation
     EndIf
 
-    If (properties.NotLootingFromSettlement && akNewLoc != None)
-        If (akNewLoc.HasKeyword(Game.GetCommonProperties().LocTypeSettlement) || akNewLoc.HasKeyword(Game.GetCommonProperties().LocTypeWorkshopSettlement) || currentWorkshop != None)
+    If (properties.NotLootingFromSettlement)
+        ; Evaluate settlement state even when the new cell carries no Location (many
+        ; FO4 interiors fire OnLocationChange with akNewLoc == None). Otherwise the
+        ; flag could get stuck true and silently keep looting disabled until the
+        ; next non-None location change. Keyword checks only apply when a Location
+        ; exists; workshop proximity applies on either path.
+        Bool nowInSettlement = currentWorkshop != None
+        If (!nowInSettlement && akNewLoc != None)
+            nowInSettlement = akNewLoc.HasKeyword(Game.GetCommonProperties().LocTypeSettlement) || akNewLoc.HasKeyword(Game.GetCommonProperties().LocTypeWorkshopSettlement)
+        EndIf
+
+        If (nowInSettlement && !properties.IsInSettlement)
             properties.IsInSettlement = true
             ShowMessage(MESSAGE_REMIND_NOT_LOOTING_IN_SETTLEMENT)
             LogSystemEvent("settlement_state_changed", FormField("old_location", akOldLoc) + " " + FormField("new_location", akNewLoc) + " in_settlement=true workshop_nearby=" + (currentWorkshop != None))
-        Else
+        ElseIf (!nowInSettlement && properties.IsInSettlement)
             properties.IsInSettlement = false
             LogSystemEvent("settlement_state_changed", FormField("old_location", akOldLoc) + " " + FormField("new_location", akNewLoc) + " in_settlement=false workshop_nearby=" + (currentWorkshop != None))
         EndIf
