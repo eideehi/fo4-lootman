@@ -138,6 +138,7 @@ namespace papyrus_lootman
 		std::size_t maxContainers = 4;
 		std::size_t maxActors = 4;
 		std::size_t maxActivationRefs = 8;
+		std::size_t scannedObjects = 0;
 		std::size_t processedObjects = 0;
 		std::size_t processedContainers = 0;
 		std::size_t processedActors = 0;

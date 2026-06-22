@@ -54,12 +54,23 @@ namespace papyrus_lootman
 			hitObjectLimit = true;
 			return true;
 		}
-		if (useTimeBudget && processedObjects > 0 &&
-			ElapsedMilliseconds(startedAt) >= timeBudgetMs)
+		if (useTimeBudget)
 		{
-			hitTimeBudget = true;
-			return true;
+			// Time-stop once at least one object has been looted (so a pass always
+			// makes progress), or, when a dense cell keeps rejecting every
+			// candidate (processedObjects stays 0), on a bounded scan cadence so
+			// the elapsed-time guard cannot be starved into an unbounded
+			// main-thread scan. The cadence caps the worst-case overrun at ~64
+			// candidate evaluations past the budget.
+			const bool timeCheckDue =
+				processedObjects > 0 || (scannedObjects > 0 && (scannedObjects & 0x3F) == 0);
+			if (timeCheckDue && ElapsedMilliseconds(startedAt) >= timeBudgetMs)
+			{
+				hitTimeBudget = true;
+				return true;
+			}
 		}
+		++scannedObjects;
 		return false;
 	}
 
