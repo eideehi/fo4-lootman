@@ -12,6 +12,7 @@
 #include <vector>
 
 #include "form_cache.h"
+#include "log_settings.h"
 #include "properties.h"
 
 namespace papyrus_lootman
@@ -712,6 +713,16 @@ namespace papyrus_lootman
 			REX::DEBUG(
 				"source=native component=nearby_object_diagnostics event=scan_failed context=\"{}\" outcome=failed reason=missing_player",
 				contextText);
+			return 0;
+		}
+
+		// The entire scan exists only to emit per-row REX::DEBUG lines (a full grid
+		// collection, per-row SEH probes, and a ~40-argument vformat per row). When
+		// debug output is suppressed by the current log level that work is built and
+		// thrown away, so skip it outright - mirroring LogPapyrusEvent's gate and
+		// the workshop-probe fix in commit 630e640.
+		if (!log_settings::ShouldLog(static_cast<std::int32_t>(spdlog::level::debug)))
+		{
 			return 0;
 		}
 
