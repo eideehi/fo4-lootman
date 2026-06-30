@@ -101,20 +101,35 @@ namespace message_queue
 			return out;
 		}
 
-		std::string ReplaceAll(std::string text, std::string_view token, std::string_view replacement)
+		// Substitute every {token} in the template in a single left-to-right pass, emitting each match's
+		// replacement verbatim. Unlike chained whole-string replacement, a value substituted for one token is
+		// never rescanned for a later token, so an item display name that literally contains another token
+		// (for example "{count}") cannot corrupt the formatted line.
+		std::string SubstituteTokens(std::string_view templateText, const std::vector<TextReplacement>& replacements)
 		{
-			if (token.empty())
+			std::string out;
+			out.reserve(templateText.size());
+			for (std::size_t i = 0; i < templateText.size();)
 			{
-				return text;
+				bool matched = false;
+				for (const auto& replacement : replacements)
+				{
+					const std::string_view token = replacement.token;
+					if (!token.empty() && templateText.substr(i, token.size()) == token)
+					{
+						out.append(replacement.value);
+						i += token.size();
+						matched = true;
+						break;
+					}
+				}
+				if (!matched)
+				{
+					out.push_back(templateText[i]);
+					++i;
+				}
 			}
-
-			std::size_t pos = 0;
-			while ((pos = text.find(token, pos)) != std::string::npos)
-			{
-				text.replace(pos, token.length(), replacement);
-				pos += replacement.length();
-			}
-			return text;
+			return out;
 		}
 
 		void LoadTranslationsFile(const std::filesystem::path& file)
@@ -213,20 +228,18 @@ namespace message_queue
 			auto text = it == translations.end()
 				? (msg.count == 1 ? "{itemName} Added." : "{itemName} ({count}) Added.")
 				: it->second;
-			text = ReplaceAll(std::move(text), "{itemName}"sv, itemName);
-			text = ReplaceAll(std::move(text), "{count}"sv, std::to_string(msg.count));
-			return text;
+			const std::vector<TextReplacement> replacements{
+				{"{itemName}", std::move(itemName)},
+				{"{count}", std::to_string(msg.count)},
+			};
+			return SubstituteTokens(text, replacements);
 		}
 
 		std::string FormatLocalizedTextMessage(const PendingMessage& msg)
 		{
 			const auto it = translations.find(msg.translationKey);
 			auto text = it == translations.end() ? msg.fallbackText : it->second;
-			for (const auto& replacement : msg.replacements)
-			{
-				text = ReplaceAll(std::move(text), replacement.token, replacement.value);
-			}
-			return text;
+			return SubstituteTokens(text, msg.replacements);
 		}
 
 		std::string FormatMessage(const PendingMessage& msg)
