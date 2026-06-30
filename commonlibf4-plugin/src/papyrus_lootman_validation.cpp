@@ -481,6 +481,126 @@ namespace papyrus_lootman
 #endif
 	}
 
+	// The helpers below wrap individual engine-memory reads in their own SEH frame so that an access
+	// violation on a corrupt inventory entry is converted into a false return instead of unwinding. Each
+	// keeps the __try frame free of objects requiring C++ unwinding (MSVC C2712), mirroring the existing
+	// Try...Safe wrappers, so callers can hold a lock across the scan without risking a skipped destructor.
+	bool TryGetInventoryItemCountSafe(BGSInventoryList* inventoryList, std::uint32_t& outCount)
+	{
+#if defined(_MSC_VER)
+		__try
+		{
+			outCount = static_cast<std::uint32_t>(inventoryList->data.size());
+			return true;
+		}
+		__except (SehFilterRecoverable(GetExceptionCode()))
+		{
+			return false;
+		}
+#else
+		outCount = static_cast<std::uint32_t>(inventoryList->data.size());
+		return true;
+#endif
+	}
+
+	bool TryGetInventoryEntrySafe(BGSInventoryList* inventoryList, std::uint32_t index,
+		TESForm*& outForm, BGSInventoryItem::Stack*& outFirstStack)
+	{
+#if defined(_MSC_VER)
+		__try
+		{
+			auto& item = inventoryList->data[index];
+			outForm = item.object;
+			outFirstStack = item.stackData.get();
+			return true;
+		}
+		__except (SehFilterRecoverable(GetExceptionCode()))
+		{
+			return false;
+		}
+#else
+		auto& item = inventoryList->data[index];
+		outForm = item.object;
+		outFirstStack = item.stackData.get();
+		return true;
+#endif
+	}
+
+	bool TryGetFormTypeSafe(const TESForm* form, ENUM_FORM_ID& outFormType)
+	{
+#if defined(_MSC_VER)
+		__try
+		{
+			outFormType = form->GetFormType();
+			return true;
+		}
+		__except (SehFilterRecoverable(GetExceptionCode()))
+		{
+			return false;
+		}
+#else
+		outFormType = form->GetFormType();
+		return true;
+#endif
+	}
+
+	bool TryGetNextStackSafe(BGSInventoryItem::Stack* stack, BGSInventoryItem::Stack*& outNext)
+	{
+#if defined(_MSC_VER)
+		__try
+		{
+			outNext = stack->nextStack.get();
+			return true;
+		}
+		__except (SehFilterRecoverable(GetExceptionCode()))
+		{
+			return false;
+		}
+#else
+		outNext = stack->nextStack.get();
+		return true;
+#endif
+	}
+
+	bool TryBuildFallbackStackInfoSafe(const BGSInventoryItem::Stack& stack, InventoryItemInfo& outInfo)
+	{
+#if defined(_MSC_VER)
+		__try
+		{
+			outInfo = BuildFallbackStackInfo(stack);
+			return true;
+		}
+		__except (SehFilterRecoverable(GetExceptionCode()))
+		{
+			return false;
+		}
+#else
+		outInfo = BuildFallbackStackInfo(stack);
+		return true;
+#endif
+	}
+
+	bool TryIsLootableInventoryItemSafe(const TESForm* form, const InventoryItemInfo& info,
+		const PropertiesSnapshot* props, MatchCache* matchCache, bool& outResult)
+	{
+#if defined(_MSC_VER)
+		__try
+		{
+			outResult = IsValidInventoryItem(form, info, matchCache) &&
+			            IsLootableInventoryItem(form, info, props);
+			return true;
+		}
+		__except (SehFilterRecoverable(GetExceptionCode()))
+		{
+			return false;
+		}
+#else
+		outResult = IsValidInventoryItem(form, info, matchCache) &&
+		            IsLootableInventoryItem(form, info, props);
+		return true;
+#endif
+	}
+
 	bool HasLootableItem(BGSInventoryList* inventoryList, const PropertiesSnapshot* props = nullptr,
 		MatchCache* matchCache = nullptr, bool sourceIsDead = false,
 		std::vector<BGSMod::Attachment::Mod*>* modBuffer)
@@ -500,14 +620,33 @@ namespace papyrus_lootman
 		std::vector<BGSMod::Attachment::Mod*> localModBuffer;
 		std::vector<BGSMod::Attachment::Mod*>& modBufferRef = modBuffer ? *modBuffer : localModBuffer;
 		const auto lootableInventoryItemType = props->lootableInventoryItemType;
+		// Hold the inventory read lock for the whole scan. Every engine-memory access below is routed through
+		// an SEH-guarded Try...Safe helper that returns a value on an access violation instead of unwinding
+		// past this frame, so the only exit while the lock is held is a normal C++ return and ~ReadLockGuard
+		// always runs. Under /EHsc an SEH unwind skips C++ destructors, so an unguarded fault here would leak
+		// the read lock and deadlock the next engine writer to this inventory.
 		ReadLockGuard guard(inventoryList->rwLock);
 
-		for (auto& item : inventoryList->data)
+		std::uint32_t itemCount = 0;
+		if (!TryGetInventoryItemCountSafe(inventoryList, itemCount))
 		{
-			auto form = item.object;
-			if (!form) continue;
+			return result;
+		}
 
-			auto formType = form->GetFormType();
+		for (std::uint32_t index = 0; index < itemCount && !result; ++index)
+		{
+			TESForm* form = nullptr;
+			BGSInventoryItem::Stack* stack = nullptr;
+			if (!TryGetInventoryEntrySafe(inventoryList, index, form, stack) || !form)
+			{
+				continue;
+			}
+
+			ENUM_FORM_ID formType{};
+			if (!TryGetFormTypeSafe(form, formType))
+			{
+				continue;
+			}
 			if (!IsFormTypeMatchesItemType(formType, lootableInventoryItemType))
 			{
 				continue;
@@ -525,58 +664,68 @@ namespace papyrus_lootman
 				continue;
 			}
 
-			for (auto stack = item.stackData.get(); stack; stack = stack->nextStack.get())
+			while (stack)
 			{
+				bool stackLootable = false;
+
 				InventoryItemInfo stackInfo{};
-				if (!TryGetInventoryStackInfoSafe(*stack, modBufferRef, inventory_info_full, stackInfo))
+				if (TryGetInventoryStackInfoSafe(*stack, modBufferRef, inventory_info_full, stackInfo))
 				{
-					auto fallbackInfo = BuildFallbackStackInfo(*stack);
-					auto resolvedFallbackCount = fallbackInfo.totalCount;
-					if (resolvedFallbackCount <= 0 && fallbackInfo.equipped)
+					auto resolvedCount = stackInfo.totalCount;
+					if (resolvedCount <= 0 && stackInfo.equipped)
 					{
-						resolvedFallbackCount = 1;
+						resolvedCount = 1;
 					}
-					if (resolvedFallbackCount <= 0 && sourceIsDead && formType == ENUM_FORM_ID::kWEAP)
+					if (resolvedCount <= 0 && sourceIsDead && formType == ENUM_FORM_ID::kWEAP)
 					{
-						resolvedFallbackCount = 1;
+						resolvedCount = 1;
 					}
-					if (resolvedFallbackCount <= 0)
+					bool lootableStack = false;
+					if (resolvedCount > 0 &&
+					    TryIsLootableInventoryItemSafe(form, stackInfo, props, matchCache, lootableStack) &&
+					    lootableStack)
 					{
-						continue;
+						stackLootable = true;
 					}
-					if (!IsValidInventoryItem(form, fallbackInfo, matchCache) ||
-					    !IsLootableInventoryItem(form, fallbackInfo, props))
+				}
+				else
+				{
+					// The stack-info read above already faulted on this stack; build the fallback through an
+					// SEH guard too, because BuildFallbackStackInfo dereferences the same suspect stack.
+					InventoryItemInfo fallbackInfo{};
+					if (TryBuildFallbackStackInfoSafe(*stack, fallbackInfo))
 					{
-						continue;
+						auto resolvedFallbackCount = fallbackInfo.totalCount;
+						if (resolvedFallbackCount <= 0 && fallbackInfo.equipped)
+						{
+							resolvedFallbackCount = 1;
+						}
+						if (resolvedFallbackCount <= 0 && sourceIsDead && formType == ENUM_FORM_ID::kWEAP)
+						{
+							resolvedFallbackCount = 1;
+						}
+						bool lootableFallbackStack = false;
+						if (resolvedFallbackCount > 0 &&
+						    TryIsLootableInventoryItemSafe(form, fallbackInfo, props, matchCache, lootableFallbackStack) &&
+						    lootableFallbackStack)
+						{
+							stackLootable = true;
+						}
 					}
+				}
+
+				if (stackLootable)
+				{
 					result = true;
 					break;
 				}
 
-				auto resolvedCount = stackInfo.totalCount;
-				if (resolvedCount <= 0 && stackInfo.equipped)
+				BGSInventoryItem::Stack* nextStack = nullptr;
+				if (!TryGetNextStackSafe(stack, nextStack))
 				{
-					resolvedCount = 1;
+					break;
 				}
-				if (resolvedCount <= 0 && sourceIsDead && formType == ENUM_FORM_ID::kWEAP)
-				{
-					resolvedCount = 1;
-				}
-				if (resolvedCount <= 0)
-				{
-					continue;
-				}
-				if (!IsValidInventoryItem(form, stackInfo, matchCache) ||
-				    !IsLootableInventoryItem(form, stackInfo, props))
-				{
-					continue;
-				}
-				result = true;
-				break;
-			}
-			if (result)
-			{
-				break;
+				stack = nextStack;
 			}
 		}
 
