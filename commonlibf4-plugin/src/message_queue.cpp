@@ -171,7 +171,12 @@ namespace message_queue
 			}
 
 			auto file = dir / ("LootMan_" + language + ".txt");
-			if (!std::filesystem::exists(file))
+			// LoadTranslations runs inside F4SE_PLUGIN_LOAD, whose C entry point has no catch, and the
+			// path is partly built from the untrusted sLanguage INI value. The non-throwing exists()
+			// overload keeps a pathological/too-long path from throwing out of plugin load (startup CTD);
+			// any error falls back to the bundled English table.
+			std::error_code ec;
+			if (!std::filesystem::exists(file, ec) || ec)
 			{
 				file = dir / "LootMan_en.txt";
 			}

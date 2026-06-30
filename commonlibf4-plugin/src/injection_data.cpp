@@ -112,7 +112,7 @@ namespace injection_data
 						"source=native component=injection_data event=config_category_unknown path={} file=\"{}\" category=\"{}\"",
 						kNotifyCategoryPath,
 						file.string(),
-						category);
+						utility::SanitizeLogText(category));
 					continue;
 				}
 				mask |= bit;
@@ -132,7 +132,7 @@ namespace injection_data
 					"source=native component=injection_data event=config_category_unknown path={} file=\"{}\" category=\"{}\"",
 					kNotifyCategoryPath,
 					file.string(),
-					category);
+					utility::SanitizeLogText(category));
 			}
 			notifyCategoryMask = bit;
 			return;
@@ -264,24 +264,42 @@ namespace injection_data
 		REX::W32::GetModuleFileNameW(nullptr, modulePath, REX::W32::MAX_PATH);
 		std::filesystem::path dir = std::filesystem::path(modulePath).parent_path() / "DATA" / "LootMan";
 
-		if (!std::filesystem::exists(dir))
+		std::error_code existsEc;
+		if (!std::filesystem::exists(dir, existsEc) || existsEc)
 		{
-			REX::ERROR("source=native component=injection_data event=directory_missing outcome=failed path=\"{}\"", dir.string());
+			REX::ERROR(
+				"source=native component=injection_data event=directory_missing outcome=failed path=\"{}\" reason=\"{}\"",
+				dir.string(),
+				existsEc.message());
 			return false;
 		}
 
 		std::vector<std::filesystem::path> files;
-		for (const auto& entry : std::filesystem::directory_iterator(dir))
+		try
 		{
-			const auto& file = entry.path();
-			if (!entry.is_regular_file()) continue;
-
-			auto ext = file.extension().string();
-			std::transform(ext.begin(), ext.end(), ext.begin(), [](unsigned char c) { return static_cast<char>(std::tolower(c)); });
-			if (ext == ".json")
+			// directory_iterator construction and increment throw on I/O errors. This runs inside
+			// F4SE_PLUGIN_LOAD (no enclosing catch), so an uncaught filesystem_error would std::terminate
+			// the game at startup; degrade to whatever we collected instead.
+			for (const auto& entry : std::filesystem::directory_iterator(dir))
 			{
-				files.push_back(file);
+				const auto& file = entry.path();
+				if (!entry.is_regular_file()) continue;
+
+				auto ext = file.extension().string();
+				std::transform(ext.begin(), ext.end(), ext.begin(), [](unsigned char c) { return static_cast<char>(std::tolower(c)); });
+				if (ext == ".json")
+				{
+					files.push_back(file);
+				}
 			}
+		}
+		catch (const std::filesystem::filesystem_error& e)
+		{
+			degradedMode = true;
+			REX::ERROR(
+				"source=native component=injection_data event=directory_scan_failed path=\"{}\" reason=\"{}\"",
+				dir.string(),
+				e.what());
 		}
 
 		// Stable ordering keeps override behavior deterministic across runs.
@@ -360,8 +378,8 @@ namespace injection_data
 					degradedMode = true;
 					tmp.erase(tmpIt);
 					REX::WARN(
-						"source=native component=injection_data event=config_entry_invalid reason=invalid_type value={}",
-						value.dump());
+						"source=native component=injection_data event=config_entry_invalid reason=invalid_type value=\"{}\"",
+						utility::SanitizeLogText(value.dump()));
 				}
 			}
 
@@ -425,7 +443,7 @@ namespace injection_data
 				{
 					REX::WARN(
 						"source=native component=injection_data event=form_resolution_failed reason=not_found data_id=\"{}\"",
-						dataId);
+						utility::SanitizeLogText(dataId));
 					continue;
 				}
 
@@ -465,7 +483,7 @@ namespace injection_data
 				{
 					REX::WARN(
 						"source=native component=injection_data event=form_resolution_failed reason=illegal_form_type data_id=\"{}\"",
-						dataId);
+						utility::SanitizeLogText(dataId));
 					continue;
 				}
 

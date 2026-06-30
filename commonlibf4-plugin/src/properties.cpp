@@ -1,11 +1,19 @@
 #include "properties.h"
 #include "utility.h"
 
+#include <atomic>
+#include <shared_mutex>
+
 namespace properties
 {
-	RE::TESForm* propertiesQuest = nullptr;
+	// Resolved on the main thread in Initialize() (kGameLoaded) but read from VM worker threads via
+	// GetPapyrusProperty(); kept atomic so a reload cannot tear the pointer out from under a reader.
+	std::atomic<RE::TESForm*> propertiesQuest = nullptr;
 	RE::TESObjectREFR* lootManWorkshopRef = nullptr;
-	std::mutex lock;
+	// Read-mostly (written only by Initialize()/Update() on MCM/load events) but read per-container from
+	// concurrent VM worker threads; a shared_mutex lets those reads run in parallel instead of
+	// serializing on an exclusive lock, matching the vendor_chest cache.
+	std::shared_mutex lock;
 	std::unordered_map<Key, Value> papyrusProperties;
 
 	inline constexpr int kEnableFormTypeACTI = 1;
@@ -24,7 +32,8 @@ namespace properties
 	bool GetPapyrusProperty(const char* propertyName, RE::BSScript::Variable& outValue)
 	{
 		const auto scriptName = "LTMN2:Properties"sv;
-		if (!propertiesQuest || !propertyName)
+		auto* quest = propertiesQuest.load(std::memory_order_acquire);
+		if (!quest || !propertyName)
 		{
 			return false;
 		}
@@ -44,8 +53,8 @@ namespace properties
 		// Resolve the bound script instance on the quest object, then read its property slot.
 		auto& handles = vm->GetObjectHandlePolicy();
 		auto handle = handles.GetHandleForObject(
-			static_cast<std::uint32_t>(propertiesQuest->GetFormType()),
-			propertiesQuest);
+			static_cast<std::uint32_t>(quest->GetFormType()),
+			quest);
 
 		RE::BSTSmartPointer<RE::BSScript::ObjectTypeInfo> typeInfo;
 		if (!vm->GetScriptObjectType(scriptName, typeInfo) || !typeInfo)
@@ -145,7 +154,7 @@ namespace properties
 
 	Value Get(const Key key)
 	{
-		std::lock_guard<std::mutex> guard(lock);
+		std::shared_lock<std::shared_mutex> guard(lock);
 		const auto it = papyrusProperties.find(key);
 		return it != papyrusProperties.end() ? it->second : Value();
 	}
@@ -170,20 +179,21 @@ namespace properties
 
 	RE::TESObjectREFR* GetLootManWorkshopRef()
 	{
-		std::lock_guard<std::mutex> guard(lock);
+		std::shared_lock<std::shared_mutex> guard(lock);
 		return lootManWorkshopRef;
 	}
 
 	void Initialize()
 	{
 		// LTMN_Properties is a fixed quest record in LootMan.esp; native code reads its script properties directly.
-		propertiesQuest = utility::LookupForm("LootMan.esp|000F9A");
+		auto* quest = utility::LookupForm("LootMan.esp|000F9A");
+		propertiesQuest.store(quest, std::memory_order_release);
 		{
-			std::lock_guard<std::mutex> guard(lock);
+			std::unique_lock<std::shared_mutex> guard(lock);
 			papyrusProperties.clear();
 			lootManWorkshopRef = nullptr;
 		}
-		if (!propertiesQuest)
+		if (!quest)
 		{
 			REX::WARN("source=native component=properties event=properties_quest_resolution_failed form=LootMan.esp|000F9A");
 		}
@@ -361,7 +371,7 @@ namespace properties
 			return;
 		}
 
-		std::lock_guard<std::mutex> guard(lock);
+		std::unique_lock<std::shared_mutex> guard(lock);
 		for (auto& [propertyKey, value] : updates)
 		{
 			papyrusProperties[propertyKey] = value;

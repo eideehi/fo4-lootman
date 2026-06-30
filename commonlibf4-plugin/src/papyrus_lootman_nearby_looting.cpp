@@ -223,7 +223,11 @@ namespace papyrus_lootman
 
 			auto* baseObj = obj->GetObjectReference();
 			if (!baseObj) continue;
-			if (UsesWorldReferenceTransfer(matchType) && IsRecentlyLootedWorldRef(obj))
+			// Gate on the ref's actual base-form type, not the request matchType: in loot-all (kTotal)
+			// mode UsesWorldReferenceTransfer(matchType) is false, which would skip recently-looted-ref
+			// suppression and let an already-disabled/pending-delete ref be returned again.
+			const auto actualFormType = baseObj->GetFormType();
+			if (UsesWorldReferenceTransfer(actualFormType) && IsRecentlyLootedWorldRef(obj))
 			{
 				continue;
 			}
@@ -368,7 +372,6 @@ namespace papyrus_lootman
 		std::reverse(refs.begin(), refs.end());
 
 		const auto candidateCount = refs.size();
-		const auto matchType = static_cast<ENUM_FORM_ID>(formType);
 		std::unique_lock<std::mutex> capacityGuard;
 		if (!properties::GetBool(properties::ignore_overweight, true))
 		{
@@ -467,7 +470,10 @@ namespace papyrus_lootman
 				continue;
 			}
 
-			if (UsesWorldReferenceTransfer(matchType))
+			// Use the ref's actual base-form type: with matchType==kTotal (loot-all) the request-level
+			// UsesWorldReferenceTransfer is false, so loose world items (ALCH/AMMO/MISC/...) would never
+			// be looted on this legacy path.
+			if (UsesWorldReferenceTransfer(actualFormType))
 			{
 				if (TryLootWorldReference(ref, dest, player, playPickupSound, &capacity))
 				{

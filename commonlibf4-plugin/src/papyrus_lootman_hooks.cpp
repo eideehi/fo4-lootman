@@ -2053,7 +2053,7 @@ namespace papyrus_lootman
 
 		REX::DEBUG(
 			"source=native component=workshop_runtime_state event=cleared context=\"{}\"",
-			context ? context : "");
+			SanitizeDiagnosticText(context));
 	}
 
 	struct WorkshopResourceStatusEvaluationContext
@@ -3868,7 +3868,7 @@ namespace papyrus_lootman
 		TESObjectREFR* lootManWorkshop,
 		BSFixedString prefix)
 	{
-		const auto prefixText = prefix.c_str();
+		const auto prefixText = SanitizeDiagnosticText(prefix.c_str());
 		auto* targetLocation = targetLocationForm ? targetLocationForm->As<BGSLocation>() : nullptr;
 		if (!targetLocation || !lootManWorkshop)
 		{
@@ -3897,7 +3897,7 @@ namespace papyrus_lootman
 
 	void ForgetWorkshopSupplyLink(std::monostate, TESForm* targetLocationForm, BSFixedString prefix)
 	{
-		const auto prefixText = prefix.c_str();
+		const auto prefixText = SanitizeDiagnosticText(prefix.c_str());
 		auto* targetLocation = targetLocationForm ? targetLocationForm->As<BGSLocation>() : nullptr;
 		if (!targetLocation)
 		{
@@ -3935,7 +3935,7 @@ namespace papyrus_lootman
 		TESObjectREFR* lootManWorkshop,
 		BSFixedString prefix)
 	{
-		const auto prefixText = prefix.c_str();
+		const auto prefixText = SanitizeDiagnosticText(prefix.c_str());
 		auto* targetLocation = targetWorkshop ? targetWorkshop->GetCurrentLocation() : nullptr;
 		auto* lootManLocation = lootManWorkshop ? lootManWorkshop->GetCurrentLocation() : nullptr;
 		auto* workshopCaravanKeyword = GetNativeWorkshopCaravanKeyword();

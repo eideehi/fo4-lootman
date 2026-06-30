@@ -79,14 +79,16 @@ namespace papyrus_lootman
 		if (!setWantsDeleteOk || !disableOk ||
 			(!ref->IsDisabled() && !ref->IsDeleted()))
 		{
-			const auto* refName = ref->GetDisplayFullName();
+			// Display names are arbitrary modded text; sanitize before logging so they cannot inject
+			// CR/LF record splits or forged key=value fields into the structured log.
+			const auto refName = SanitizeDiagnosticText(ref->GetDisplayFullName());
 			auto* baseForm = ref->GetObjectReference();
 			std::string baseName;
 			std::uint32_t baseFormId = 0;
 			std::uint32_t baseFormType = 0;
 			if (baseForm)
 			{
-				baseName = TESFullName::GetFullName(*baseForm);
+				baseName = SanitizeDiagnosticText(std::string(TESFullName::GetFullName(*baseForm)));
 				baseFormId = baseForm->formID;
 				baseFormType = static_cast<std::uint32_t>(baseForm->GetFormType());
 			}
@@ -94,7 +96,7 @@ namespace papyrus_lootman
 			REX::WARN(
 				"source=native component=world_pickup event=finalize_incomplete ref={:08X} ref_name=\"{}\" base={:08X} base_name=\"{}\" base_form_type={} marked_recent={} set_wants_delete_ok={} disable_ok={} disabled={} deleted={} created={}",
 				ref->formID,
-				refName ? refName : "",
+				refName,
 				baseFormId,
 				baseName,
 				baseFormType,

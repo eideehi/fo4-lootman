@@ -360,6 +360,11 @@ namespace papyrus_lootman
 	const char* GetFormEditorIDOrEmpty(const RE::TESForm* form);
 	std::string GetFormName(RE::TESForm* form);
 	std::string GetFormTypeName(RE::ENUM_FORM_ID formType);
+	// Collapse control/whitespace runs and neutralize quotes in attacker-influenced free text (form
+	// display names, Papyrus-supplied prefixes) before it is interpolated into structured key="..."
+	// logs, so a crafted value cannot inject CR/LF record splits or forged key=value tokens.
+	std::string SanitizeDiagnosticText(const std::string& value);
+	std::string SanitizeDiagnosticText(const char* value);
 	void EnsureItemTypeCache();
 	ALCH GetALCHType(const RE::TESForm* form);
 	BOOK GetBOOKType(const RE::TESForm* form);
@@ -513,7 +518,8 @@ namespace papyrus_lootman
 		RE::BGSInventoryList* inventoryList,
 		const PropertiesSnapshot* props,
 		MatchCache* matchCache,
-		bool sourceIsDead);
+		bool sourceIsDead,
+		std::vector<RE::BGSMod::Attachment::Mod*>* modBuffer = nullptr);
 	bool TryIsValidFormSafe(
 		RE::TESForm* form,
 		const PropertiesSnapshot* props,
@@ -668,8 +674,19 @@ namespace papyrus_lootman
 
 namespace RE::BSScript::detail
 {
-	// Keep these specializations visible to the Register() translation unit:
-	// BindNativeMethod instantiates NativeFunction return packing there.
+	// These detail:: specializations only intercept packing that routes through detail::PackVariable:
+	// std::vector<T*> return elements, struct field inserts, and nullable wrappers. That is why native
+	// methods returning std::vector<TESForm*>/std::vector<TESObjectREFR*> marshal safely.
+	//
+	// They do NOT cover a native method that returns a *bare* scalar TESForm-derived pointer: that path
+	// is NativeFunction::MarshallAndDispatch's unqualified PackVariable(retVal, ...), which resolves to
+	// RE::BSScript::PackVariable (not detail::) and hits the default object-pointer overload whose
+	// CreateObject call is the broken-vtable hazard (#3) crash. So: never bind a native method that
+	// returns a scalar TESForm*/TESObjectREFR*/TESForm-derived pointer — return std::vector<T*> (even a
+	// single element) or pack manually via PackFormSafe/PackObjectReferenceSafe.
+	//
+	// Keep these specializations visible to the Register() translation unit so they are in scope before
+	// BindNativeMethod instantiates the return-packing path there.
 	template <>
 	struct _is_structure_wrapper<papyrus_lootman::MiscComponent> :
 		std::true_type

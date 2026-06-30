@@ -1,5 +1,7 @@
 #include "form_cache.h"
 
+#include <shared_mutex>
+
 namespace form_cache
 {
 	// Frequently queried vanilla forms are cached once per game load.
@@ -29,10 +31,16 @@ namespace form_cache
 	namespace form_list
 	{
 		RE::BGSListForm* uniqueItems = nullptr;
+		// uniqueItemIds is rebuilt by Initialize() on the main thread (kGameLoaded, incl. mid-session save
+		// loads) but read per-form from VM worker threads on the loot-validation hot path. A shared_mutex
+		// plus build-local-then-swap keeps a reader from traversing the set mid-clear()/rehash (data race /
+		// use-after-free), matching the sibling constructible_object / vendor_chest caches.
+		std::shared_mutex uniqueItemIdsMutex;
 		std::unordered_set<RE::TESFormID> uniqueItemIds;
 
 		bool IsUniqueItem(RE::TESFormID formID)
 		{
+			std::shared_lock<std::shared_mutex> guard(uniqueItemIdsMutex);
 			return uniqueItemIds.find(formID) != uniqueItemIds.end();
 		}
 	}
@@ -59,18 +67,24 @@ namespace form_cache
 
 		form_list::uniqueItems = dh->LookupForm<RE::BGSListForm>(0x17C668, "Fallout4.esm"sv);
 		LogMissing("form_list::uniqueItems", form_list::uniqueItems);
-		form_list::uniqueItemIds.clear();
+		// Build into a local set, then publish under the exclusive lock so a concurrent reader never
+		// observes a half-rebuilt / mid-rehash set.
+		std::unordered_set<RE::TESFormID> rebuiltUniqueItemIds;
 		if (form_list::uniqueItems)
 		{
 			// Precompute IDs so hot-path checks avoid list traversal.
-			form_list::uniqueItemIds.reserve(form_list::uniqueItems->arrayOfForms.size());
+			rebuiltUniqueItemIds.reserve(form_list::uniqueItems->arrayOfForms.size());
 			for (auto* form : form_list::uniqueItems->arrayOfForms)
 			{
 				if (form)
 				{
-					form_list::uniqueItemIds.emplace(form->formID);
+					rebuiltUniqueItemIds.emplace(form->formID);
 				}
 			}
+		}
+		{
+			std::unique_lock<std::shared_mutex> guard(form_list::uniqueItemIdsMutex);
+			form_list::uniqueItemIds = std::move(rebuiltUniqueItemIds);
 		}
 
 		faction::playerFaction = dh->LookupForm<RE::TESFaction>(0x1C21C, "Fallout4.esm"sv);

@@ -1,8 +1,13 @@
 #include "vendor_chest.h"
 
+#include <shared_mutex>
+
 namespace vendor_chest
 {
-	std::mutex vendorChestsMutex;
+	// Read-mostly: rebuilt only by Initialize() on the main thread (kGameLoaded) but probed per
+	// container on the per-loot-item hot path from VM worker threads. A shared_mutex lets those
+	// concurrent reads run in parallel instead of serializing on an exclusive lock.
+	std::shared_mutex vendorChestsMutex;
 	std::unordered_set<std::uint32_t> vendorChests;
 
 	void Initialize()
@@ -16,11 +21,9 @@ namespace vendor_chest
 			return;
 		}
 
-		{
-			std::lock_guard<std::mutex> guard(vendorChestsMutex);
-			vendorChests.clear();
-		}
-
+		// Build into a local set, then publish it under one exclusive lock so readers never observe a
+		// half-rebuilt cache (and we do not re-acquire the lock per inserted entry).
+		std::unordered_set<std::uint32_t> rebuilt;
 		auto& allFactions = dh->GetFormArray<RE::TESFaction>();
 		for (auto* faction : allFactions)
 		{
@@ -40,18 +43,23 @@ namespace vendor_chest
 				auto baseObj = faction->vendorData.merchantContainer->GetObjectReference();
 				if (baseObj)
 				{
-					std::lock_guard<std::mutex> guard(vendorChestsMutex);
-					vendorChests.emplace(baseObj->formID);
+					rebuilt.emplace(baseObj->formID);
 				}
 			}
 		}
 
-		REX::DEBUG("source=native component=vendor_chest event=cache_completed count={}", vendorChests.size());
+		const auto count = rebuilt.size();
+		{
+			std::unique_lock<std::shared_mutex> guard(vendorChestsMutex);
+			vendorChests = std::move(rebuilt);
+		}
+
+		REX::DEBUG("source=native component=vendor_chest event=cache_completed count={}", count);
 	}
 
 	bool IsVendorChest(const std::uint32_t formId)
 	{
-		std::lock_guard<std::mutex> guard(vendorChestsMutex);
+		std::shared_lock<std::shared_mutex> guard(vendorChestsMutex);
 		return vendorChests.find(formId) != vendorChests.end();
 	}
 }

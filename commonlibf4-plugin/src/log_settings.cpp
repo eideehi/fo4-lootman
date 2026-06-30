@@ -1,6 +1,8 @@
 #include "log_settings.h"
+#include "utility.h"
 
 #include <array>
+#include <atomic>
 #include <cctype>
 #include <optional>
 #include <string_view>
@@ -22,8 +24,10 @@ namespace log_settings
 		"off"sv,
 	};
 
-	std::mutex lock;
-	std::int32_t currentLogLevel = kDefaultLogLevel;
+	// Read on the per-event logging fast path (ShouldLog) from multiple VM worker threads. It is a lone
+	// 32-bit value with no invariant tying it to other state, so an atomic lets the gate stay lock-free
+	// instead of serializing every gate check on a global mutex.
+	std::atomic<std::int32_t> currentLogLevel = kDefaultLogLevel;
 
 	std::int32_t NormalizeLogLevel(const std::int32_t logLevel)
 	{
@@ -151,7 +155,7 @@ namespace log_settings
 			REX::WARN(
 				"source=native component=log_settings event=config_level_unknown path=\"{}\" value=\"{}\"",
 				path.string(),
-				levelIt->get<std::string>());
+				utility::SanitizeLogText(levelIt->get<std::string>()));
 			return false;
 		}
 
@@ -250,8 +254,7 @@ namespace log_settings
 
 	std::int32_t GetLogLevel()
 	{
-		std::lock_guard<std::mutex> guard(lock);
-		return currentLogLevel;
+		return currentLogLevel.load(std::memory_order_relaxed);
 	}
 
 	bool ShouldLog(const std::int32_t logLevel)
@@ -262,18 +265,15 @@ namespace log_settings
 			return false;
 		}
 
-		std::lock_guard<std::mutex> guard(lock);
-		return currentLogLevel != static_cast<std::int32_t>(spdlog::level::off) &&
-			normalized >= currentLogLevel;
+		const auto current = currentLogLevel.load(std::memory_order_relaxed);
+		return current != static_cast<std::int32_t>(spdlog::level::off) &&
+			normalized >= current;
 	}
 
 	void SetLogLevel(const std::int32_t logLevel)
 	{
 		const auto normalized = NormalizeLogLevel(logLevel);
-		{
-			std::lock_guard<std::mutex> guard(lock);
-			currentLogLevel = normalized;
-		}
+		currentLogLevel.store(normalized, std::memory_order_relaxed);
 
 		ApplyLogLevel(normalized);
 		(void)SaveLogLevel(GetConfigPath(), normalized);
@@ -298,10 +298,7 @@ namespace log_settings
 			(void)ReadLogLevel(path, logLevel);
 		}
 
-		{
-			std::lock_guard<std::mutex> guard(lock);
-			currentLogLevel = logLevel;
-		}
+		currentLogLevel.store(logLevel, std::memory_order_relaxed);
 		ApplyLogLevel(logLevel);
 
 		if (!exists && !ec)

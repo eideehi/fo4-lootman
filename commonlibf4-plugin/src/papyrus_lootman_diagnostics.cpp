@@ -171,7 +171,9 @@ namespace papyrus_lootman
 		const auto text = ids.str();
 		if (!text.empty())
 		{
-			result.ids = text;
+			// Keyword source ids embed plugin filenames; sanitize so base_keywords matches its already
+			// sanitized sibling fields and cannot inject into the structured log.
+			result.ids = SanitizeDiagnosticText(text);
 		}
 		return result;
 	}
@@ -577,7 +579,7 @@ namespace papyrus_lootman
 		{
 			snapshot.baseFormID = baseForm->formID;
 			snapshot.formType = baseForm->GetFormType();
-			snapshot.baseSource = GetSourceIdentifier(baseForm);
+			snapshot.baseSource = SanitizeDiagnosticText(GetSourceIdentifier(baseForm));
 			snapshot.baseEditorID = SanitizeDiagnosticText(GetFormEditorIDOrEmpty(baseForm));
 			snapshot.baseName = SanitizeDiagnosticText(GetFormName(baseForm));
 			snapshot.keywords = GetKeywordDiagnostics(baseForm);
@@ -850,7 +852,7 @@ namespace papyrus_lootman
 			const auto distance = std::sqrt(entry.distanceSquared);
 
 			REX::DEBUG(
-				"source=native component=nearby_object_diagnostics event=reference context=\"{}\" index={} ref={:08X} base={:08X} base_source={} form_type={} supported_form_type={} enabled_by_mcm={} reason={} candidate={} row_probe_failed={} distance_units={:.3f} position_x={:.3f} position_y={:.3f} position_z={:.3f} cell={:08X} location={:08X} owner={:08X} precondition_ok={} deleted={} disabled={} destroyed={} got_valid_form={} valid_form={} got_lootable_form={} lootable_form={} got_valid_object={} valid_object={} got_lootable_object={} lootable_object={} inventory_status={} inventory_entries={} activation_blocked={} base_editor_id=\"{}\" base_name=\"{}\" ref_name=\"{}\" base_keywords=\"{}\" keyword_count={} keywords_truncated={}",
+				"source=native component=nearby_object_diagnostics event=reference context=\"{}\" index={} ref={:08X} base={:08X} base_source=\"{}\" form_type={} supported_form_type={} enabled_by_mcm={} reason={} candidate={} row_probe_failed={} distance_units={:.3f} position_x={:.3f} position_y={:.3f} position_z={:.3f} cell={:08X} location={:08X} owner={:08X} precondition_ok={} deleted={} disabled={} destroyed={} got_valid_form={} valid_form={} got_lootable_form={} lootable_form={} got_valid_object={} valid_object={} got_lootable_object={} lootable_object={} inventory_status={} inventory_entries={} activation_blocked={} base_editor_id=\"{}\" base_name=\"{}\" ref_name=\"{}\" base_keywords=\"{}\" keyword_count={} keywords_truncated={}",
 				contextText,
 				index + 1,
 				snapshot.refFormID,

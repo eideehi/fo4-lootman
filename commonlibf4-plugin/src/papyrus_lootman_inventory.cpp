@@ -15,7 +15,7 @@ namespace papyrus_lootman
 	using namespace std::literals;
 	using namespace RE;
 
-	ExtraDataList* FindExtraDataForInventoryItem(
+	BSTSmartPointer<ExtraDataList> FindExtraDataForInventoryItem(
 		TESObjectREFR* container, std::uint16_t uniqueID, TESForm*& outBaseForm)
 	{
 		outBaseForm = nullptr;
@@ -35,7 +35,10 @@ namespace papyrus_lootman
 				if (extraUID && extraUID->uniqueID == uniqueID)
 				{
 					outBaseForm = item.object;
-					return stack->extra.get();
+					// Return a refcount-pinned copy rather than a bare pointer: the caller uses the
+					// extra list after this read lock is released, and a concurrent inventory mutation
+					// could otherwise drop the last reference and free it (use-after-free).
+					return stack->extra;
 				}
 			}
 		}
@@ -50,6 +53,8 @@ namespace papyrus_lootman
 
 		TESForm* baseForm = nullptr;
 		ExtraDataList* extraDataList = nullptr;
+		// Keeps a container-sourced extra list alive past FindExtraDataForInventoryItem's read lock.
+		BSTSmartPointer<ExtraDataList> pinnedExtra;
 
 		if (inventoryItem.Reference())
 		{
@@ -59,8 +64,9 @@ namespace papyrus_lootman
 		}
 		else if (inventoryItem.Container() && inventoryItem.UniqueID())
 		{
-			extraDataList = FindExtraDataForInventoryItem(
+			pinnedExtra = FindExtraDataForInventoryItem(
 				inventoryItem.Container(), inventoryItem.UniqueID(), baseForm);
+			extraDataList = pinnedExtra.get();
 		}
 
 		if (!baseForm || !extraDataList)
@@ -129,7 +135,10 @@ namespace papyrus_lootman
 		for (const auto& [comp, count] : data)
 		{
 			MiscComponent component;
-			component.insert("object"sv, comp);
+			// Pack through the TESForm* specialization (PackFormSafe) — a bare BGSComponent* would fall
+			// to the default object PackVariable path, which dispatches the wrong CreateObject vtable
+			// slot and crashes on return (CommonLibF4 hazard #3).
+			component.insert("object"sv, static_cast<TESForm*>(comp));
 			component.insert("count"sv, static_cast<std::int32_t>(count / 2));
 			result.push_back(std::move(component));
 		}
@@ -174,7 +183,9 @@ namespace papyrus_lootman
 
 	void LogInventoryDiagnostics(std::monostate, TESObjectREFR* inventoryOwner, BSFixedString prefix)
 	{
-		const auto prefixText = prefix.c_str();
+		// Papyrus-supplied prefix and form display names are arbitrary text; sanitize before they are
+		// interpolated into the structured key="..." diagnostics so they cannot inject log records.
+		const auto prefixText = SanitizeDiagnosticText(prefix.c_str());
 		if (!inventoryOwner)
 		{
 			REX::DEBUG(
@@ -225,7 +236,7 @@ namespace papyrus_lootman
 				inventoryOwner->formID,
 				rawIndex,
 				form->formID,
-				GetFormName(form),
+				SanitizeDiagnosticText(GetFormName(form)),
 				GetFormTypeName(form->GetFormType()),
 				itemCount);
 
@@ -274,9 +285,9 @@ namespace papyrus_lootman
 					rawIndex,
 					componentIndex,
 					component->formID,
-					GetFormName(component),
+					SanitizeDiagnosticText(GetFormName(component)),
 					scrapItem ? scrapItem->formID : 0,
-					GetFormName(scrapItem),
+					SanitizeDiagnosticText(GetFormName(scrapItem)),
 					perItemCount,
 					totalComponentCount);
 				AddComponentTotal(componentTotals, scrapItem, totalComponentCount);
@@ -308,7 +319,7 @@ namespace papyrus_lootman
 				inventoryOwner->formID,
 				componentTotalIndex++,
 				scrapItem ? scrapItem->formID : 0,
-				GetFormName(scrapItem),
+				SanitizeDiagnosticText(GetFormName(scrapItem)),
 				count);
 		}
 	}

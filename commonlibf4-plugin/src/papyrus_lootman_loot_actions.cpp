@@ -26,11 +26,6 @@ namespace papyrus_lootman
 		{
 			return false;
 		}
-		const auto itemName = notifyMovedItems ? GetFormName(ref) : std::string{};
-		auto notificationInfo = notifyMovedItems
-			? BuildWorldReferenceNotificationInfo(ref, object, worldCount)
-			: InventoryItemInfo{};
-
 		float acceptedWeight = 0.0F;
 		float unitWeight = 0.0F;
 		if (capacity && capacity->enabled)
@@ -41,6 +36,13 @@ namespace papyrus_lootman
 				return false;
 			}
 		}
+
+		// Resolve the display name / notification payload only after the capacity gate passes, so a
+		// destination at capacity does not pay name resolution for every rejected item.
+		const auto itemName = notifyMovedItems ? GetFormName(ref) : std::string{};
+		auto notificationInfo = notifyMovedItems
+			? BuildWorldReferenceNotificationInfo(ref, object, worldCount)
+			: InventoryItemInfo{};
 
 		std::int32_t beforeCount = 0;
 		const bool gotBefore = TryGetReferenceItemCountSafe(dest, object, beforeCount);
@@ -242,7 +244,6 @@ namespace papyrus_lootman
 		const bool notifyMovedItems = expectedItem && ShouldNotifyLootDestination(actionRef);
 		InventoryItemInfo notificationInfo{};
 		notificationInfo.totalCount = 1;
-		const auto itemName = notifyMovedItems ? GetFormName(expectedItem) : std::string{};
 
 		float acceptedWeight = 0.0F;
 		if (capacity && capacity->enabled)
@@ -255,6 +256,9 @@ namespace papyrus_lootman
 				return false;
 			}
 		}
+
+		// Resolve the display name only after the capacity gate passes (mirrors TryLootWorldReference).
+		const auto itemName = notifyMovedItems ? GetFormName(expectedItem) : std::string{};
 
 		std::int32_t beforeCount = 0;
 		const bool gotBefore = expectedItem && TryGetReferenceItemCountSafe(actionRef, expectedItem, beforeCount);

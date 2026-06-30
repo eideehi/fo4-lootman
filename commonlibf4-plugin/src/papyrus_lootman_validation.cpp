@@ -193,11 +193,11 @@ namespace papyrus_lootman
 			return false;
 		}
 
-		const bool hasExcludeKeyword = HasKeyword(
-			ref,
-			injection_data::GetKeywordListRef(injection_data::exclude_keyword),
-			GetInstanceData(ref));
-		if (hasExcludeKeyword)
+		// Only walk the ref's extra data for instance data when there is actually an exclude-keyword
+		// list to test against (empty is the common default), avoiding a wasted GetInstanceData walk
+		// per ref on the per-frame nearby scan.
+		const auto& excludeKeywords = injection_data::GetKeywordListRef(injection_data::exclude_keyword);
+		if (!excludeKeywords.empty() && HasKeyword(ref, excludeKeywords, GetInstanceData(ref)))
 		{
 			return false;
 		}
@@ -219,12 +219,13 @@ namespace papyrus_lootman
 		}
 
 		auto formType = form->GetFormType();
-		const bool isDeferredActivationAmmoCandidate = IsDeferredActivationAmmoCandidate(ref, form);
 		if (!IsFormTypeMatch(formType, ENUM_FORM_ID::kCONT) &&
 		    !IsFormTypeMatch(formType, ENUM_FORM_ID::kNPC_))
 		{
+			// IsDeferredActivationAmmoCandidate walks the extra list; evaluate it lazily (short-circuit)
+			// after IsQuestItem, since it is only consulted for the rare quest-item case.
 			if (IsQuestItem(ref->extraList.get()) &&
-			    !isDeferredActivationAmmoCandidate &&
+			    !IsDeferredActivationAmmoCandidate(ref, form) &&
 			    !MatchesAnyCached(form, injection_data::include_quest_item, matchCache))
 			{
 				return false;
@@ -481,7 +482,8 @@ namespace papyrus_lootman
 	}
 
 	bool HasLootableItem(BGSInventoryList* inventoryList, const PropertiesSnapshot* props = nullptr,
-		MatchCache* matchCache = nullptr, bool sourceIsDead = false)
+		MatchCache* matchCache = nullptr, bool sourceIsDead = false,
+		std::vector<BGSMod::Attachment::Mod*>* modBuffer)
 	{
 		if (!inventoryList) return false;
 
@@ -493,7 +495,10 @@ namespace papyrus_lootman
 		}
 
 		bool result = false;
-		std::vector<BGSMod::Attachment::Mod*> modBuffer;
+		// Reuse the caller's scan buffer when provided (GetMods clears it before each fill), so a nearby
+		// scan does not heap-allocate a fresh vector for every container/corpse it inspects.
+		std::vector<BGSMod::Attachment::Mod*> localModBuffer;
+		std::vector<BGSMod::Attachment::Mod*>& modBufferRef = modBuffer ? *modBuffer : localModBuffer;
 		const auto lootableInventoryItemType = props->lootableInventoryItemType;
 		ReadLockGuard guard(inventoryList->rwLock);
 
@@ -523,7 +528,7 @@ namespace papyrus_lootman
 			for (auto stack = item.stackData.get(); stack; stack = stack->nextStack.get())
 			{
 				InventoryItemInfo stackInfo{};
-				if (!TryGetInventoryStackInfoSafe(*stack, modBuffer, inventory_info_full, stackInfo))
+				if (!TryGetInventoryStackInfoSafe(*stack, modBufferRef, inventory_info_full, stackInfo))
 				{
 					auto fallbackInfo = BuildFallbackStackInfo(*stack);
 					auto resolvedFallbackCount = fallbackInfo.totalCount;
@@ -613,7 +618,7 @@ namespace papyrus_lootman
 				return false;
 			}
 			EnsureContainerInventoryListForLootScan(ref, form);
-			const bool hasLootableItem = HasLootableItem(ref->inventoryList, props, matchCache);
+			const bool hasLootableItem = HasLootableItem(ref->inventoryList, props, matchCache, false, modBuffer);
 			if (!hasLootableItem)
 			{
 				return false;
@@ -633,7 +638,7 @@ namespace papyrus_lootman
 			{
 				return false;
 			}
-			if (!HasLootableItem(ref->inventoryList, props, matchCache, true))
+			if (!HasLootableItem(ref->inventoryList, props, matchCache, true, modBuffer))
 			{
 				return false;
 			}

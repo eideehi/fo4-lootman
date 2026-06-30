@@ -49,11 +49,8 @@ namespace papyrus_lootman
 			return false;
 		}
 
-		if (MatchesAnyCached(form, injection_data::notify_item, matchCache))
-		{
-			return true;
-		}
-
+		// Evaluate the O(1) checks before the notify_item pattern scan (MatchesAnyCached scans the
+		// user-supplied list on first encounter of each form); the OR result is unchanged.
 		const auto formType = form->GetFormType();
 		const auto categoryMask = injection_data::GetNotifyCategoryMask();
 		if ((categoryMask & GetNotifyCategoryBit(formType)) != 0)
@@ -61,9 +58,14 @@ namespace papyrus_lootman
 			return true;
 		}
 
-		return injection_data::GetNotifyLegendaryEquipment() &&
-		       IsEquipmentFormType(formType) &&
-		       info.legendary;
+		if (injection_data::GetNotifyLegendaryEquipment() &&
+		    IsEquipmentFormType(formType) &&
+		    info.legendary)
+		{
+			return true;
+		}
+
+		return MatchesAnyCached(form, injection_data::notify_item, matchCache);
 	}
 
 	void QueueLootItemNotification(

@@ -36,8 +36,8 @@ namespace papyrus_lootman
 			return;
 		}
 
-		const auto current = data[component];
-		data[component] = SaturatingInventoryCount(static_cast<std::uint64_t>(current) + count);
+		auto& slot = data[component];
+		slot = SaturatingInventoryCount(static_cast<std::uint64_t>(slot) + count);
 	}
 
 	void MergeComponentData(

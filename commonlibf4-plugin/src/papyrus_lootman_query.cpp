@@ -41,7 +41,17 @@ namespace papyrus_lootman
 				if (IsFavorite(form)) continue;
 			}
 
-			auto info = GetInventoryItemInfo(item, modBuffer, inventory_info_quest);
+			// GetInventoryItemInfo walks ExtraDataList / attachment-mod blocks that can fault on malformed
+			// extra data; use the SEH-guarded variant (as every other inventory-info read site does) so a
+			// bad item is skipped instead of crashing the VM thread.
+			InventoryItemInfo info;
+			if (!TryGetInventoryItemInfoSafe(item, modBuffer, inventory_info_quest, info))
+			{
+				REX::WARN(
+					"source=native component=loot_query event=item_skipped reason=item_info_exception item={:08X}",
+					form->formID);
+				continue;
+			}
 			if ((info.questItem && !IsIncludedQuestItem(form, &matchCache)) ||
 			    info.dropped ||
 			    (info.equipped && !isDead))
@@ -109,7 +119,16 @@ namespace papyrus_lootman
 			}
 			if (!lootableForm) continue;
 
-			auto info = GetInventoryItemInfo(item, modBuffer, inventory_info_full);
+			// inventory_info_full enters the equipment branch (GetEquipmentData -> ExtraDataList -> kPMOD
+			// attachment-mod walk), the access-violation-prone path; guard it like the sibling read sites.
+			InventoryItemInfo info;
+			if (!TryGetInventoryItemInfoSafe(item, modBuffer, inventory_info_full, info))
+			{
+				REX::WARN(
+					"source=native component=loot_query event=item_skipped reason=item_info_exception item={:08X}",
+					form->formID);
+				continue;
+			}
 			if (!IsValidInventoryItem(form, info, &matchCache) ||
 			    !IsLootableInventoryItem(form, info, &propsSnapshot))
 			{
