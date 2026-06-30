@@ -196,8 +196,8 @@ namespace papyrus_lootman
 		// Only walk the ref's extra data for instance data when there is actually an exclude-keyword
 		// list to test against (empty is the common default), avoiding a wasted GetInstanceData walk
 		// per ref on the per-frame nearby scan.
-		const auto& excludeKeywords = injection_data::GetKeywordListRef(injection_data::exclude_keyword);
-		if (!excludeKeywords.empty() && HasKeyword(ref, excludeKeywords, GetInstanceData(ref)))
+		const auto excludeKeywords = injection_data::GetKeywordListRef(injection_data::exclude_keyword);
+		if (!excludeKeywords->empty() && HasKeyword(ref, *excludeKeywords, GetInstanceData(ref)))
 		{
 			return false;
 		}
@@ -297,14 +297,14 @@ namespace papyrus_lootman
 		if (!form) return false;
 		if (!IsPlayable(form)) return false;
 
-		const auto& excludedForms = injection_data::GetFormIDSet(injection_data::exclude_form);
-		if (excludedForms.find(form->formID) != excludedForms.end())
+		const auto excludedForms = injection_data::GetFormIDSet(injection_data::exclude_form);
+		if (excludedForms->find(form->formID) != excludedForms->end())
 		{
 			return false;
 		}
 
-		const auto& excludedKeywords = injection_data::GetKeywordListRef(injection_data::exclude_keyword);
-		if (!excludedKeywords.empty() && HasKeyword(form, excludedKeywords))
+		const auto excludedKeywords = injection_data::GetKeywordListRef(injection_data::exclude_keyword);
+		if (!excludedKeywords->empty() && HasKeyword(form, *excludedKeywords))
 		{
 			return false;
 		}

@@ -63,19 +63,19 @@ namespace papyrus_lootman
 	{
 		if (!form) return false;
 
-		const auto& formIDs = injection_data::GetFormIDSet(key);
-		if (formIDs.find(form->formID) != formIDs.end())
+		const auto formIDs = injection_data::GetFormIDSet(key);
+		if (formIDs->find(form->formID) != formIDs->end())
 		{
 			return true;
 		}
 
-		const auto& keywords = injection_data::GetKeywordListRef(key);
-		if (keywords.empty())
+		const auto keywords = injection_data::GetKeywordListRef(key);
+		if (keywords->empty())
 		{
 			return false;
 		}
 
-		for (auto* keyword : keywords)
+		for (auto* keyword : *keywords)
 		{
 			if (HasKeyword(form, keyword))
 			{

@@ -1,5 +1,7 @@
 #pragma once
 
+#include <memory>
+
 namespace injection_data
 {
 	// Keys map 1:1 to JSON pointer paths defined in injection_data.cpp.
@@ -87,11 +89,13 @@ namespace injection_data
 	std::vector<RE::BGSKeyword*> GetAsKeywordList(Key key);
 	std::vector<RE::BGSLocationRefType*> GetAsLocationRefTypeList(Key key);
 	// Ref-returning helpers avoid repeated allocations in hot paths.
-	const std::vector<RE::TESForm*>& GetAsFormListRef(Key key);
-	const std::vector<RE::BGSKeyword*>& GetAsKeywordListRef(Key key);
-	const std::vector<RE::BGSLocationRefType*>& GetAsLocationRefTypeListRef(Key key);
-	const std::unordered_set<RE::TESFormID>& GetFormIDSet(Key key);
-	const std::vector<RE::BGSKeyword*>& GetKeywordListRef(Key key);
+	// Ref-returning helpers hand out a snapshot-co-owning shared_ptr (not a bare reference) so a
+	// kGameLoaded rebuild cannot free the container a worker thread is still reading.
+	std::shared_ptr<const std::vector<RE::TESForm*>> GetAsFormListRef(Key key);
+	std::shared_ptr<const std::vector<RE::BGSKeyword*>> GetAsKeywordListRef(Key key);
+	std::shared_ptr<const std::vector<RE::BGSLocationRefType*>> GetAsLocationRefTypeListRef(Key key);
+	std::shared_ptr<const std::unordered_set<RE::TESFormID>> GetFormIDSet(Key key);
+	std::shared_ptr<const std::vector<RE::BGSKeyword*>> GetKeywordListRef(Key key);
 	std::uint32_t GetNotifyCategoryMask();
 	bool GetNotifyLegendaryEquipment();
 	bool HasNotifyFilters();

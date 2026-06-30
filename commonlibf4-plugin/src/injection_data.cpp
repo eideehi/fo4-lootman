@@ -2,6 +2,8 @@
 #include "utility.h"
 
 #include <cctype>
+#include <memory>
+#include <shared_mutex>
 #include <string_view>
 
 namespace injection_data
@@ -39,11 +41,31 @@ namespace injection_data
 
 	// Temporary "ModName|FormID" strings loaded from JSON files before runtime resolution.
 	std::unordered_map<std::string, std::unordered_set<std::string>> tmp;
-	std::unordered_map<Key, std::unordered_set<Value>> data;
-	std::unordered_map<Key, std::vector<RE::TESForm*>> formListByKey;
-	std::unordered_map<Key, std::vector<RE::BGSKeyword*>> keywordListByKey;
-	std::unordered_map<Key, std::vector<RE::BGSLocationRefType*>> locationRefTypeListByKey;
-	std::unordered_map<Key, std::unordered_set<RE::TESFormID>> formIDSetByKey;
+
+	// Runtime-resolved injection data. LoadInjectionData rebuilds it on every kGameLoaded (including
+	// mid-session save loads), but the loot/validation hot path reads it from VM worker threads. Because the
+	// list/set accessors hand out a reference that outlives any internal lock, a shared_mutex find() cannot
+	// make them safe; instead the resolved maps live in one immutable snapshot published behind a shared_ptr.
+	// A reader copies the current snapshot pointer under a shared_lock, and a Ref accessor returns a
+	// snapshot-co-owning shared_ptr, so a rebuild swap can never clear()/rehash a container a worker is still
+	// iterating (data race / use-after-free / CTD).
+	struct ResolvedData
+	{
+		std::unordered_map<Key, std::unordered_set<Value>> data;
+		std::unordered_map<Key, std::vector<RE::TESForm*>> formListByKey;
+		std::unordered_map<Key, std::vector<RE::BGSKeyword*>> keywordListByKey;
+		std::unordered_map<Key, std::vector<RE::BGSLocationRefType*>> locationRefTypeListByKey;
+		std::unordered_map<Key, std::unordered_set<RE::TESFormID>> formIDSetByKey;
+	};
+
+	std::shared_mutex resolvedDataMutex;
+	std::shared_ptr<const ResolvedData> resolvedData = std::make_shared<const ResolvedData>();
+
+	std::shared_ptr<const ResolvedData> CurrentResolvedData()
+	{
+		std::shared_lock<std::shared_mutex> guard(resolvedDataMutex);
+		return resolvedData;
+	}
 	std::uint32_t notifyCategoryMask = 0;
 	bool notifyLegendaryEquipment = false;
 	// True when some sources fail to load/parse, while still allowing best-effort operation.
@@ -168,8 +190,9 @@ namespace injection_data
 
 	Value Get(const Key key)
 	{
-		const auto it = data.find(key);
-		if (it == data.end()) return Value();
+		const auto snapshot = CurrentResolvedData();
+		const auto it = snapshot->data.find(key);
+		if (it == snapshot->data.end()) return Value();
 		const auto& values = it->second;
 		auto vit = values.begin();
 		return vit == values.end() ? Value() : *vit;
@@ -178,8 +201,9 @@ namespace injection_data
 	std::vector<Value> GetList(const Key key)
 	{
 		std::vector<Value> result;
-		auto it = data.find(key);
-		if (it != data.end())
+		const auto snapshot = CurrentResolvedData();
+		auto it = snapshot->data.find(key);
+		if (it != snapshot->data.end())
 		{
 			result.insert(result.end(), it->second.begin(), it->second.end());
 		}
@@ -192,46 +216,54 @@ namespace injection_data
 
 	std::vector<RE::TESForm*> GetAsFormList(const Key key)
 	{
-		return GetAsFormListRef(key);
+		return *GetAsFormListRef(key);
 	}
 
 	std::vector<RE::BGSKeyword*> GetAsKeywordList(const Key key)
 	{
-		return GetAsKeywordListRef(key);
+		return *GetAsKeywordListRef(key);
 	}
 
 	std::vector<RE::BGSLocationRefType*> GetAsLocationRefTypeList(const Key key)
 	{
-		return GetAsLocationRefTypeListRef(key);
+		return *GetAsLocationRefTypeListRef(key);
 	}
 
-	const std::vector<RE::TESForm*>& GetAsFormListRef(const Key key)
+	std::shared_ptr<const std::vector<RE::TESForm*>> GetAsFormListRef(const Key key)
 	{
-		const auto it = formListByKey.find(key);
-		return it == formListByKey.end() ? emptyFormList : it->second;
+		const auto snapshot = CurrentResolvedData();
+		const auto it = snapshot->formListByKey.find(key);
+		const auto& list = it == snapshot->formListByKey.end() ? emptyFormList : it->second;
+		return std::shared_ptr<const std::vector<RE::TESForm*>>(snapshot, &list);
 	}
 
-	const std::vector<RE::BGSKeyword*>& GetAsKeywordListRef(const Key key)
+	std::shared_ptr<const std::vector<RE::BGSKeyword*>> GetAsKeywordListRef(const Key key)
 	{
 		return GetKeywordListRef(key);
 	}
 
-	const std::vector<RE::BGSLocationRefType*>& GetAsLocationRefTypeListRef(const Key key)
+	std::shared_ptr<const std::vector<RE::BGSLocationRefType*>> GetAsLocationRefTypeListRef(const Key key)
 	{
-		const auto it = locationRefTypeListByKey.find(key);
-		return it == locationRefTypeListByKey.end() ? emptyLocationRefTypeList : it->second;
+		const auto snapshot = CurrentResolvedData();
+		const auto it = snapshot->locationRefTypeListByKey.find(key);
+		const auto& list = it == snapshot->locationRefTypeListByKey.end() ? emptyLocationRefTypeList : it->second;
+		return std::shared_ptr<const std::vector<RE::BGSLocationRefType*>>(snapshot, &list);
 	}
 
-	const std::unordered_set<RE::TESFormID>& GetFormIDSet(const Key key)
+	std::shared_ptr<const std::unordered_set<RE::TESFormID>> GetFormIDSet(const Key key)
 	{
-		const auto it = formIDSetByKey.find(key);
-		return it == formIDSetByKey.end() ? emptyFormIDSet : it->second;
+		const auto snapshot = CurrentResolvedData();
+		const auto it = snapshot->formIDSetByKey.find(key);
+		const auto& set = it == snapshot->formIDSetByKey.end() ? emptyFormIDSet : it->second;
+		return std::shared_ptr<const std::unordered_set<RE::TESFormID>>(snapshot, &set);
 	}
 
-	const std::vector<RE::BGSKeyword*>& GetKeywordListRef(const Key key)
+	std::shared_ptr<const std::vector<RE::BGSKeyword*>> GetKeywordListRef(const Key key)
 	{
-		const auto it = keywordListByKey.find(key);
-		return it == keywordListByKey.end() ? emptyKeywordList : it->second;
+		const auto snapshot = CurrentResolvedData();
+		const auto it = snapshot->keywordListByKey.find(key);
+		const auto& list = it == snapshot->keywordListByKey.end() ? emptyKeywordList : it->second;
+		return std::shared_ptr<const std::vector<RE::BGSKeyword*>>(snapshot, &list);
 	}
 
 	std::uint32_t GetNotifyCategoryMask()
@@ -248,8 +280,8 @@ namespace injection_data
 	{
 		return notifyCategoryMask != 0 ||
 		       notifyLegendaryEquipment ||
-		       !GetFormIDSet(notify_item).empty() ||
-		       !GetKeywordListRef(notify_item).empty();
+		       !GetFormIDSet(notify_item)->empty() ||
+		       !GetKeywordListRef(notify_item)->empty();
 	}
 
 	bool Initialize()
@@ -415,19 +447,15 @@ namespace injection_data
 	void LoadInjectionData()
 	{
 		REX::DEBUG("source=native component=injection_data event=load_started");
-		data.clear();
-		formListByKey.clear();
-		keywordListByKey.clear();
-		locationRefTypeListByKey.clear();
-		formIDSetByKey.clear();
+		auto next = std::make_shared<ResolvedData>();
 
 		for (const auto& info : info_list)
 		{
 			auto key = info.key;
 
-			if (data.find(key) == data.end())
+			if (next->data.find(key) == next->data.end())
 			{
-				data.emplace(key, std::unordered_set<Value>());
+				next->data.emplace(key, std::unordered_set<Value>());
 			}
 
 			auto it = tmp.find(info.path);
@@ -455,9 +483,9 @@ namespace injection_data
 						Value value;
 						value.type = Type::kLocationRefType;
 						value.data.location_ref_type = locationRefType;
-						if (data[key].emplace(value).second)
+						if (next->data[key].emplace(value).second)
 						{
-							locationRefTypeListByKey[key].push_back(locationRefType);
+							next->locationRefTypeListByKey[key].push_back(locationRefType);
 						}
 						continue;
 					}
@@ -471,9 +499,9 @@ namespace injection_data
 						Value value;
 						value.type = Type::kKeyword;
 						value.data.keyword = kw;
-						if (data[key].emplace(value).second)
+						if (next->data[key].emplace(value).second)
 						{
-							keywordListByKey[key].push_back(kw);
+							next->keywordListByKey[key].push_back(kw);
 						}
 						continue;
 					}
@@ -490,12 +518,17 @@ namespace injection_data
 				Value value;
 				value.type = Type::kForm;
 				value.data.form = form;
-				if (data[key].emplace(value).second)
+				if (next->data[key].emplace(value).second)
 				{
-					formListByKey[key].push_back(form);
-					formIDSetByKey[key].emplace(form->formID);
+					next->formListByKey[key].push_back(form);
+					next->formIDSetByKey[key].emplace(form->formID);
 				}
 			}
+		}
+
+		{
+			std::unique_lock<std::shared_mutex> guard(resolvedDataMutex);
+			resolvedData = std::move(next);
 		}
 
 		REX::DEBUG("source=native component=injection_data event=load_completed");

@@ -330,8 +330,8 @@ namespace papyrus_lootman
 		{
 			return "non_playable_form";
 		}
-		if (injection_data::GetFormIDSet(injection_data::exclude_form).contains(baseForm->formID) ||
-			HasKeyword(baseForm, injection_data::GetKeywordListRef(injection_data::exclude_keyword), GetInstanceData(ref)))
+		if (injection_data::GetFormIDSet(injection_data::exclude_form)->contains(baseForm->formID) ||
+			HasKeyword(baseForm, *injection_data::GetKeywordListRef(injection_data::exclude_keyword), GetInstanceData(ref)))
 		{
 			return "excluded_by_injection_data";
 		}
