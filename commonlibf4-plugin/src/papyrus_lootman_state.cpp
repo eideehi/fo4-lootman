@@ -20,8 +20,9 @@ namespace papyrus_lootman
 	};
 
 	std::unordered_map<std::uint32_t, LockedObjectEntry> lockedObjects;
-	std::unordered_set<std::uint64_t> recentlyLootedWorldRefs;
+	std::unordered_map<std::uint64_t, Clock::time_point> recentlyLootedWorldRefs;
 	Clock::time_point lastLockedObjectCleanupAt{};
+	Clock::time_point lastRecentLootCleanupAt{};
 
 	// Created refs are keyed by their 32-bit handle value, persistent refs by
 	// their formID. Those two 32-bit ranges overlap, so tag handle-derived keys
@@ -31,6 +32,13 @@ namespace papyrus_lootman
 	inline constexpr auto kLockedObjectStaleTimeout = std::chrono::minutes(5);
 	inline constexpr auto kLockedObjectCleanupInterval = std::chrono::seconds(1);
 	inline constexpr std::size_t kLockedObjectCleanupMaxPerPass = 32;
+
+	// Mirror the locked-object eviction cadence so recentlyLootedWorldRefs is bounded the same way instead of
+	// growing for the whole session. TTL eviction also drops a stale created-ref handle key before the engine
+	// can recycle that handle onto an unrelated ref and produce a false "recently looted" hit.
+	inline constexpr auto kRecentLootStaleTimeout = std::chrono::minutes(5);
+	inline constexpr auto kRecentLootCleanupInterval = std::chrono::seconds(1);
+	inline constexpr std::size_t kRecentLootCleanupMaxPerPass = 32;
 
 	std::uint64_t GetRecentlyLootedWorldRefKey(const TESObjectREFR* ref)
 	{
@@ -60,10 +68,38 @@ namespace papyrus_lootman
 		return recentlyLootedWorldRefs.find(key) != recentlyLootedWorldRefs.end();
 	}
 
+	// Caller must hold recentWorldLootLock. Evicts entries older than the TTL, capped per pass and rate-limited
+	// by an interval, mirroring CleanupStaleLockedObjects.
+	void CleanupStaleRecentlyLootedWorldRefsLocked(const Clock::time_point& now)
+	{
+		if (lastRecentLootCleanupAt.time_since_epoch().count() != 0 &&
+			(now - lastRecentLootCleanupAt) < kRecentLootCleanupInterval)
+		{
+			return;
+		}
+		lastRecentLootCleanupAt = now;
+
+		std::size_t removedCount = 0;
+		for (auto it = recentlyLootedWorldRefs.begin();
+			 it != recentlyLootedWorldRefs.end() && removedCount < kRecentLootCleanupMaxPerPass;)
+		{
+			if ((now - it->second) < kRecentLootStaleTimeout)
+			{
+				++it;
+				continue;
+			}
+
+			it = recentlyLootedWorldRefs.erase(it);
+			++removedCount;
+		}
+	}
+
 	bool TryMarkRecentlyLootedWorldRef(std::uint64_t key)
 	{
+		const auto now = Clock::now();
 		std::lock_guard<std::mutex> guard(recentWorldLootLock);
-		return recentlyLootedWorldRefs.insert(key).second;
+		CleanupStaleRecentlyLootedWorldRefsLocked(now);
+		return recentlyLootedWorldRefs.emplace(key, now).second;
 	}
 
 	bool IsRecentlyLootedWorldRef(const TESObjectREFR* ref)
@@ -111,33 +147,41 @@ namespace papyrus_lootman
 		return true;
 	}
 
+	// Caller must hold objectsLock. Returns the number of stale locks evicted (0 when the interval gate skips
+	// this pass) so the caller can emit the diagnostic outside the lock.
+	std::size_t CleanupStaleLockedObjectsLocked(const Clock::time_point& now)
+	{
+		if (lastLockedObjectCleanupAt.time_since_epoch().count() != 0 &&
+			(now - lastLockedObjectCleanupAt) < kLockedObjectCleanupInterval)
+		{
+			return 0;
+		}
+		lastLockedObjectCleanupAt = now;
+
+		std::size_t removedCount = 0;
+		for (auto it = lockedObjects.begin();
+			 it != lockedObjects.end() && removedCount < kLockedObjectCleanupMaxPerPass;)
+		{
+			const auto& entry = it->second;
+			if ((now - entry.lockedAt) < kLockedObjectStaleTimeout)
+			{
+				++it;
+				continue;
+			}
+
+			it = lockedObjects.erase(it);
+			++removedCount;
+		}
+		return removedCount;
+	}
+
 	void CleanupStaleLockedObjects()
 	{
 		const auto now = Clock::now();
 		std::size_t removedCount = 0;
-
 		{
 			std::lock_guard<std::mutex> guard(objectsLock);
-			if (lastLockedObjectCleanupAt.time_since_epoch().count() != 0 &&
-				(now - lastLockedObjectCleanupAt) < kLockedObjectCleanupInterval)
-			{
-				return;
-			}
-			lastLockedObjectCleanupAt = now;
-
-			for (auto it = lockedObjects.begin();
-				 it != lockedObjects.end() && removedCount < kLockedObjectCleanupMaxPerPass;)
-			{
-				const auto& entry = it->second;
-				if ((now - entry.lockedAt) < kLockedObjectStaleTimeout)
-				{
-					++it;
-					continue;
-				}
-
-				it = lockedObjects.erase(it);
-				++removedCount;
-			}
+			removedCount = CleanupStaleLockedObjectsLocked(now);
 		}
 
 		if (removedCount > 0)
@@ -153,10 +197,21 @@ namespace papyrus_lootman
 			return false;
 		}
 
-		CleanupStaleLockedObjects();
-		auto formId = obj->formID;
-		std::lock_guard<std::mutex> guard(objectsLock);
-		return lockedObjects.emplace(formId, LockedObjectEntry{ obj, Clock::now() }).second;
+		const auto now = Clock::now();
+		const auto formId = obj->formID;
+		std::size_t removedCount = 0;
+		bool locked = false;
+		{
+			std::lock_guard<std::mutex> guard(objectsLock);
+			removedCount = CleanupStaleLockedObjectsLocked(now);
+			locked = lockedObjects.emplace(formId, LockedObjectEntry{ obj, now }).second;
+		}
+
+		if (removedCount > 0)
+		{
+			REX::DEBUG("source=native component=loot_state event=stale_locks_released count={}", removedCount);
+		}
+		return locked;
 	}
 
 	void UnlockObject(std::uint32_t formId)
