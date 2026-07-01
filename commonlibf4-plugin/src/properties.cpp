@@ -304,6 +304,12 @@ namespace properties
 			updates[always_looting_explosives] = GetBoolProperty(propertyName);
 		}
 
+		propertyName = "AlwaysLootingClothing";
+		if (updateAll || propertyName == updateProperty)
+		{
+			updates[always_looting_clothing] = GetBoolProperty(propertyName);
+		}
+
 		propertyName = "CarryWeight";
 		if (updateAll || propertyName == updateProperty)
 		{

@@ -244,6 +244,8 @@ bool Function ReadBool(LTMN2:Properties properties, string id) global
         Return properties.LootingLegendaryOnly
     ElseIf (id == "AlwaysLootingExplosives")
         Return properties.AlwaysLootingExplosives
+    ElseIf (id == "AlwaysLootingClothing")
+        Return properties.AlwaysLootingClothing
 
     ; Object-type filters (12 bools native rebuilds into a mask)
     ElseIf (id == "EnableObjectLootingOfACTI")
@@ -362,6 +364,8 @@ bool Function WriteSettableBool(LTMN2:Properties properties, string id, bool val
         properties.LootingLegendaryOnly = value
     ElseIf (id == "AlwaysLootingExplosives")
         properties.AlwaysLootingExplosives = value
+    ElseIf (id == "AlwaysLootingClothing")
+        properties.AlwaysLootingClothing = value
 
     ; Object-type filters
     ElseIf (id == "EnableObjectLootingOfACTI")

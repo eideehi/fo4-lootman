@@ -104,6 +104,7 @@ namespace papyrus_lootman
 		bool notLootingFromSettlement = false;
 		bool lootingLegendaryOnly = false;
 		bool alwaysLootingExplosives = false;
+		bool alwaysLootingClothing = false;
 		int lootableAlchItemType = 0;
 		int lootableBookItemType = 0;
 		int lootableMiscItemType = 0;
@@ -514,7 +515,8 @@ namespace papyrus_lootman
 	bool IsLootableInventoryItem(
 		const RE::TESForm* form,
 		const InventoryItemInfo& info,
-		const PropertiesSnapshot* props);
+		const PropertiesSnapshot* props,
+		MatchCache* matchCache = nullptr);
 	bool HasLootableItem(
 		RE::BGSInventoryList* inventoryList,
 		const PropertiesSnapshot* props,

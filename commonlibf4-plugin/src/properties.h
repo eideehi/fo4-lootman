@@ -27,6 +27,7 @@ namespace properties
 		lootable_inventory_item_type,
 		looting_legendary_only,
 		always_looting_explosives,
+		always_looting_clothing,
 		carry_weight,
 		ignore_overweight,
 		loot_is_deliver_to_player,

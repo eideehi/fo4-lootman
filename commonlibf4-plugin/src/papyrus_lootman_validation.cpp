@@ -371,8 +371,20 @@ namespace papyrus_lootman
 		return true;
 	}
 
+	// When the AlwaysLootingClothing option is on, configured clothing-like ARMO is allowed through the
+	// Legendary Only equipment gate. Applies to ARMO only; weapons keep the AlwaysLootingExplosives
+	// exception. With the option off, Legendary Only rejects non-legendary ARMO as it did before this feature.
+	bool IsLegendaryOnlyExceptionArmor(const TESForm* form, const PropertiesSnapshot* props, MatchCache* matchCache)
+	{
+		const bool alwaysClothing = props
+			? props->alwaysLootingClothing
+			: properties::GetBool(properties::always_looting_clothing);
+		return alwaysClothing && form && form->GetFormType() == ENUM_FORM_ID::kARMO &&
+		       MatchesAnyCached(form, injection_data::include_legendary_only_exception, matchCache);
+	}
+
 	bool IsLootableInventoryItem(const TESForm* form, const InventoryItemInfo& info,
-		const PropertiesSnapshot* props)
+		const PropertiesSnapshot* props, MatchCache* matchCache)
 	{
 		auto formType = form->GetFormType();
 		if (formType == ENUM_FORM_ID::kWEAP || formType == ENUM_FORM_ID::kARMO)
@@ -382,6 +394,10 @@ namespace papyrus_lootman
 				: properties::GetBool(properties::looting_legendary_only);
 			if (legendaryOnly && !info.legendary)
 			{
+				if (IsLegendaryOnlyExceptionArmor(form, props, matchCache))
+				{
+					return true;
+				}
 				const bool alwaysExplosives = props
 					? props->alwaysLootingExplosives
 					: properties::GetBool(properties::always_looting_explosives);
@@ -587,7 +603,7 @@ namespace papyrus_lootman
 		__try
 		{
 			outResult = IsValidInventoryItem(form, info, matchCache) &&
-			            IsLootableInventoryItem(form, info, props);
+			            IsLootableInventoryItem(form, info, props, matchCache);
 			return true;
 		}
 		__except (SehFilterRecoverable(GetExceptionCode()))
@@ -804,6 +820,10 @@ namespace papyrus_lootman
 					: properties::GetBool(properties::looting_legendary_only);
 				if (legendaryOnly)
 				{
+					if (IsLegendaryOnlyExceptionArmor(form, props, matchCache))
+					{
+						return true;
+					}
 					const bool alwaysExplosives = props
 						? props->alwaysLootingExplosives
 						: properties::GetBool(properties::always_looting_explosives);
@@ -822,6 +842,10 @@ namespace papyrus_lootman
 				: properties::GetBool(properties::looting_legendary_only);
 			if (legendaryOnly && !data.isLegendary)
 			{
+				if (IsLegendaryOnlyExceptionArmor(form, props, matchCache))
+				{
+					return true;
+				}
 				const bool alwaysExplosives = props
 					? props->alwaysLootingExplosives
 					: properties::GetBool(properties::always_looting_explosives);

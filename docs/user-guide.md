@@ -240,6 +240,8 @@ Item-level toggles applied on top of the inventory and object filters.
   - `Legendary Only` — when on, only legendary armor and weapons are looted.
   - `Always Looting Explosives` — when on, explosives are looted even while
     `Legendary Only` is on.
+  - `Always Looting Clothing` — when on, configured clothing is looted even
+    while `Legendary Only` is on. Off by default.
 - Chemistry / Food: `Alcohol`, `Chemistry`, `Food`, `Nuka-Cola`, `Stimpak`,
   `Syringer Ammo`, `Water`, `Other`.
 - Book: `Perk Magazine`, `Other`.
@@ -611,6 +613,7 @@ Supported paths:
 | `/include/featured-item` | Forms or keywords | Allows listed featured items through the featured-item protection. |
 | `/include/quest-item` | Forms or keywords | Allows listed quest items or quest-flagged world objects through the quest-item protection. |
 | `/include/unique-item` | Forms or keywords | Allows listed unique items through the unique-item protection. |
+| `/include/legendary-only-exception` | Forms or keywords | When the `Always Looting Clothing` option is on and `Legendary Only` is on, allows matching `ARMO` (clothing-like apparel) to be looted even though it is not legendary. Applies to `ARMO` only; weapons keep the `Always Looting Explosives` exception. Every other filter still applies. Accepts `"$list:<name>"` references. |
 | `/exclude/form` | Forms | Prevents listed forms from being looted. |
 | `/exclude/keyword` | Keywords | Prevents forms or objects with listed keywords from being looted. |
 | `/notify/item` | Forms or keywords | Shows native pickup item notifications when a looted item matches one of these entries. |
@@ -632,6 +635,52 @@ Supported paths:
 The `notify` paths control native pickup item notifications only. They do not
 change the system HUD message table or the `Display System Message` behavior
 described later in this guide.
+
+#### Reusable Lists and the Legendary Only Exception
+
+Define reusable named lists in a top-level `"lists"` object, then reference them
+from any include or exclude array with a `"$list:<name>"` token. List names may
+contain letters, digits, `_`, and `-`. References are expanded after all sorted
+files load and before form resolution, so a list can be defined in one file and
+referenced from another.
+
+```json
+{
+    "lists": {
+        "my-clothing": [
+            "Fallout4.esm|0010E9"
+        ]
+    },
+    "include": {
+        "legendary-only-exception": [
+            "$list:my-clothing",
+            "Fallout4.esm|0010E9"
+        ]
+    }
+}
+```
+
+Like other paths, list arrays merge across sorted files and a scalar string
+replaces that list. Lists may reference other lists. A missing reference, a
+cyclic reference, a malformed list name, or a non-string entry is logged and
+skipped (degraded mode) without stopping the rest of the load.
+
+`/include/legendary-only-exception` is the path this is wired to by default. It
+takes effect only when the `Always Looting Clothing` MCM option (Equipment) is
+enabled; that option is off by default, so upgrading LootMan does not start
+looting clothing until you turn it on. When it is on and `Legendary Only` is
+enabled, any `ARMO` record matching this path is looted even though LootMan
+otherwise skips non-legendary armor and weapons (grenades and mines still follow
+`Always Looting Explosives`), so configured clothing comes through while ordinary
+armor stays excluded. This is a Legendary Only exception only: it does not bypass
+exclusions, protections, disabled MCM categories, settlement exclusion,
+locked-container checks, or carry-weight checks, and it never affects weapons.
+
+The shipped default file defines two lists for this path, `vanilla-clothing` and
+`vanilla-dog-apparel`, covering base-game and DLC apparel. To adjust coverage,
+define your own list (or extend one) and reference it. There is no single
+reliable clothing keyword in Fallout 4 — `ApparelTypeClothing` is not applied to
+all clothing — so identify apparel by form ID or by a keyword you have verified.
 
 Malformed JSON can prevent LootMan's native plugin from loading. Invalid item
 types inside a valid JSON file are logged and skipped or degraded where

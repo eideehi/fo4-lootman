@@ -12,6 +12,7 @@ namespace injection_data
 		include_featured_item,
 		include_quest_item,
 		include_unique_item,
+		include_legendary_only_exception,
 		exclude_form,
 		exclude_keyword,
 		notify_item,

@@ -105,6 +105,7 @@ Group Config
 
     bool property LootingLegendaryOnly = false auto hidden
     bool property AlwaysLootingExplosives = false auto hidden
+    bool property AlwaysLootingClothing = false auto hidden
 
     bool property EnableALCHItemAlcohol = true auto hidden
     bool property EnableALCHItemChemistry = true auto hidden

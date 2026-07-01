@@ -24,6 +24,7 @@ namespace papyrus_lootman
 		s.notLootingFromSettlement = properties::GetBool(properties::not_looting_from_settlement);
 		s.lootingLegendaryOnly = properties::GetBool(properties::looting_legendary_only);
 		s.alwaysLootingExplosives = properties::GetBool(properties::always_looting_explosives);
+		s.alwaysLootingClothing = properties::GetBool(properties::always_looting_clothing);
 		s.lootableAlchItemType = properties::GetInt(properties::lootable_alch_item_type);
 		s.lootableBookItemType = properties::GetInt(properties::lootable_book_item_type);
 		s.lootableMiscItemType = properties::GetInt(properties::lootable_misc_item_type);

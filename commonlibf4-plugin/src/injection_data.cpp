@@ -22,6 +22,7 @@ namespace injection_data
 		{"/include/featured-item", include_featured_item, Type::kForm | Type::kKeyword},
 		{"/include/quest-item", include_quest_item, Type::kForm | Type::kKeyword},
 		{"/include/unique-item", include_unique_item, Type::kForm | Type::kKeyword},
+		{"/include/legendary-only-exception", include_legendary_only_exception, Type::kForm | Type::kKeyword},
 		{"/exclude/form", exclude_form, Type::kForm},
 		{"/exclude/keyword", exclude_keyword, Type::kKeyword},
 		{"/notify/item", notify_item, Type::kForm | Type::kKeyword},
@@ -41,6 +42,11 @@ namespace injection_data
 
 	// Temporary "ModName|FormID" strings loaded from JSON files before runtime resolution.
 	std::unordered_map<std::string, std::unordered_set<std::string>> tmp;
+
+	// Reusable named lists from the top-level "lists" object. Entries may be "ModName|FormID"
+	// strings or "$list:<name>" references; they are expanded into tmp after all files load and
+	// before form/keyword resolution, so LoadInjectionData only ever sees concrete identifiers.
+	std::unordered_map<std::string, std::unordered_set<std::string>> lists;
 
 	// Runtime-resolved injection data. LoadInjectionData rebuilds it on every kGameLoaded (including
 	// mid-session save loads), but the loot/validation hot path reads it from VM worker threads. Because the
@@ -77,6 +83,179 @@ namespace injection_data
 	const std::unordered_set<RE::TESFormID> emptyFormIDSet;
 	constexpr std::string_view kNotifyCategoryPath = "/notify/category"sv;
 	constexpr std::string_view kNotifyLegendaryEquipmentPath = "/notify/legendary-equipment"sv;
+	constexpr std::string_view kListsKey = "lists"sv;
+	constexpr std::string_view kListRefPrefix = "$list:"sv;
+
+	// Named lists accept identifier characters only, matching the documented grammar.
+	bool IsValidListName(std::string_view name)
+	{
+		if (name.empty()) return false;
+		for (const unsigned char c : name)
+		{
+			if (!(std::isalnum(c) || c == '_' || c == '-')) return false;
+		}
+		return true;
+	}
+
+	bool IsListRef(const std::string& value)
+	{
+		return value.compare(0, kListRefPrefix.size(), kListRefPrefix) == 0;
+	}
+
+	std::string ListRefName(const std::string& value)
+	{
+		return value.substr(kListRefPrefix.size());
+	}
+
+	// Resolve one named list into concrete (non-reference) identifiers, following nested
+	// "$list:<name>" references. Missing, malformed, or cyclic references degrade and are skipped
+	// like other invalid injection-data entries, without recursing forever.
+	void ExpandListInto(const std::string& name, std::unordered_set<std::string>& out,
+		std::unordered_set<std::string>& active)
+	{
+		if (!IsValidListName(name))
+		{
+			degradedMode = true;
+			REX::WARN(
+				"source=native component=injection_data event=list_reference_invalid reason=malformed_name name=\"{}\"",
+				utility::SanitizeLogText(name));
+			return;
+		}
+
+		if (!active.emplace(name).second)
+		{
+			degradedMode = true;
+			REX::WARN(
+				"source=native component=injection_data event=list_reference_invalid reason=cycle name=\"{}\"",
+				utility::SanitizeLogText(name));
+			return;
+		}
+
+		const auto it = lists.find(name);
+		if (it == lists.end())
+		{
+			degradedMode = true;
+			REX::WARN(
+				"source=native component=injection_data event=list_reference_invalid reason=not_found name=\"{}\"",
+				utility::SanitizeLogText(name));
+			active.erase(name);
+			return;
+		}
+
+		for (const auto& entry : it->second)
+		{
+			if (IsListRef(entry))
+			{
+				ExpandListInto(ListRefName(entry), out, active);
+			}
+			else
+			{
+				out.emplace(entry);
+			}
+		}
+
+		active.erase(name);
+	}
+
+	// Replace every "$list:<name>" reference in tmp with the referenced list's concrete entries.
+	// Runs after all sorted files are loaded and before form/keyword resolution.
+	void ExpandListReferences()
+	{
+		for (auto& [path, entries] : tmp)
+		{
+			bool hasRef = false;
+			for (const auto& entry : entries)
+			{
+				if (IsListRef(entry))
+				{
+					hasRef = true;
+					break;
+				}
+			}
+			if (!hasRef) continue;
+
+			std::unordered_set<std::string> expanded;
+			for (const auto& entry : entries)
+			{
+				if (IsListRef(entry))
+				{
+					std::unordered_set<std::string> active;
+					ExpandListInto(ListRefName(entry), expanded, active);
+				}
+				else
+				{
+					expanded.emplace(entry);
+				}
+			}
+			entries = std::move(expanded);
+		}
+	}
+
+	// Merge a file's top-level "lists" object into the reusable named lists. Array members merge
+	// across sorted files; a scalar string member replaces that list, matching path semantics.
+	void LoadNamedLists(const nlohmann::json& value, const std::filesystem::path& file)
+	{
+		if (!value.is_object())
+		{
+			degradedMode = true;
+			REX::WARN(
+				"source=native component=injection_data event=config_entry_invalid path=/{} file=\"{}\" reason=invalid_type",
+				kListsKey,
+				file.string());
+			return;
+		}
+
+		for (const auto& item : value.items())
+		{
+			const auto& name = item.key();
+			const auto& entries = item.value();
+
+			if (!IsValidListName(name))
+			{
+				degradedMode = true;
+				REX::WARN(
+					"source=native component=injection_data event=list_definition_invalid reason=malformed_name file=\"{}\" name=\"{}\"",
+					file.string(),
+					utility::SanitizeLogText(name));
+				continue;
+			}
+
+			auto [listIt, inserted] = lists.try_emplace(name);
+			(void)inserted;
+			auto& values = listIt->second;
+
+			if (entries.is_array())
+			{
+				for (const auto& element : entries)
+				{
+					if (!element.is_string())
+					{
+						degradedMode = true;
+						REX::WARN(
+							"source=native component=injection_data event=list_definition_invalid reason=non_string file=\"{}\" name=\"{}\"",
+							file.string(),
+							utility::SanitizeLogText(name));
+						continue;
+					}
+					values.emplace(element.get<std::string>());
+				}
+			}
+			else if (entries.is_string())
+			{
+				// Scalar values are explicit overrides for this list.
+				values.clear();
+				values.emplace(entries.get<std::string>());
+			}
+			else
+			{
+				degradedMode = true;
+				REX::WARN(
+					"source=native component=injection_data event=list_definition_invalid reason=invalid_type file=\"{}\" name=\"{}\"",
+					file.string(),
+					utility::SanitizeLogText(name));
+			}
+		}
+	}
 
 	std::string NormalizeNotifyCategoryName(std::string value)
 	{
@@ -289,6 +468,7 @@ namespace injection_data
 		REX::DEBUG("source=native component=injection_data event=initialize_started");
 		degradedMode = false;
 		tmp.clear();
+		lists.clear();
 		notifyCategoryMask = 0;
 		notifyLegendaryEquipment = false;
 
@@ -438,7 +618,14 @@ namespace injection_data
 						file.string());
 				}
 			}
+
+			if (src.contains(std::string(kListsKey)))
+			{
+				LoadNamedLists(src[std::string(kListsKey)], file);
+			}
 		}
+
+		ExpandListReferences();
 
 		REX::DEBUG("source=native component=injection_data event=initialize_completed degraded_mode={}", degradedMode);
 		return true;

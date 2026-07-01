@@ -581,7 +581,7 @@ namespace papyrus_lootman
 						continue;
 					}
 					if (!IsValidInventoryItem(form, stackInfo, &matchCache) ||
-					    !IsLootableInventoryItem(form, stackInfo, props))
+					    !IsLootableInventoryItem(form, stackInfo, props, &matchCache))
 					{
 						continue;
 					}
