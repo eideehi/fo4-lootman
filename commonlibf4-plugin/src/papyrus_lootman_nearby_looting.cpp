@@ -380,6 +380,9 @@ namespace papyrus_lootman
 		auto capacity = BuildLootCapacityContext(player, dest, workshop);
 		std::int32_t successfulObjects = 0;
 		std::int32_t movedStacks = 0;
+		// Capture the pass-invariant properties snapshot once and thread it into each per-container transfer so
+		// a nearby-loot pass does not re-capture it (8 locked reads) for every ref it loots.
+		const auto propsSnapshot = PropertiesSnapshot::Capture();
 
 		for (auto* ref : refs)
 		{
@@ -429,6 +432,7 @@ namespace papyrus_lootman
 					ref,
 					dest,
 					itemType,
+					&propsSnapshot,
 					&capacity);
 				if (moved > 0)
 				{
@@ -448,6 +452,7 @@ namespace papyrus_lootman
 					ref,
 					dest,
 					itemType,
+					&propsSnapshot,
 					&capacity);
 				if (moved > 0)
 				{
@@ -703,6 +708,7 @@ namespace papyrus_lootman
 					ref,
 					dest,
 					itemType,
+					&propsSnapshot,
 					&capacity,
 					&budget);
 				successful = movedStacks > 0;
@@ -717,6 +723,7 @@ namespace papyrus_lootman
 					ref,
 					dest,
 					itemType,
+					&propsSnapshot,
 					&capacity,
 					&budget);
 				successful = movedStacks > 0;

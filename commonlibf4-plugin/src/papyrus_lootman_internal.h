@@ -494,6 +494,7 @@ namespace papyrus_lootman
 		RE::TESObjectREFR* src,
 		RE::TESObjectREFR* dest,
 		std::uint32_t itemType,
+		const PropertiesSnapshot* props = nullptr,
 		LootCapacityContext* capacity = nullptr,
 		LootPassBudget* passBudget = nullptr);
 	bool TryLockObject(RE::TESObjectREFR* obj);

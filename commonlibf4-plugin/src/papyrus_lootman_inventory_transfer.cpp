@@ -461,6 +461,7 @@ namespace papyrus_lootman
 		TESObjectREFR* src,
 		TESObjectREFR* dest,
 		std::uint32_t itemType,
+		const PropertiesSnapshot* props,
 		LootCapacityContext* capacity,
 		LootPassBudget* passBudget)
 	{
@@ -479,7 +480,14 @@ namespace papyrus_lootman
 		{
 			return 0;
 		}
-		auto propsSnapshot = PropertiesSnapshot::Capture();
+		// Reuse the caller's pass-invariant snapshot when provided (mirrors HasLootableItem) so a nearby-loot
+		// pass does not re-capture the properties snapshot for every container/corpse it transfers from.
+		PropertiesSnapshot localProps;
+		if (!props)
+		{
+			localProps = PropertiesSnapshot::Capture();
+			props = &localProps;
+		}
 		auto* sourceBase = src->GetObjectReference();
 		const bool sourceIsNpc = sourceBase && sourceBase->GetFormType() == ENUM_FORM_ID::kNPC_;
 		const bool sourceIsDead = IsDeadForLooting(src);
@@ -520,7 +528,7 @@ namespace papyrus_lootman
 				bool validForm = false;
 				const bool gotValidForm = TryIsValidFormSafe(
 					form,
-					&propsSnapshot,
+					props,
 					&matchCache,
 					validForm);
 				if (!gotValidForm || !validForm)
@@ -531,7 +539,7 @@ namespace papyrus_lootman
 				bool lootableForm = false;
 				const bool gotLootableForm = TryIsLootableFormSafe(
 					form,
-					&propsSnapshot,
+					props,
 					&matchCache,
 					lootableForm);
 				if (!gotLootableForm || !lootableForm)
@@ -573,7 +581,7 @@ namespace papyrus_lootman
 						continue;
 					}
 					if (!IsValidInventoryItem(form, stackInfo, &matchCache) ||
-					    !IsLootableInventoryItem(form, stackInfo, &propsSnapshot))
+					    !IsLootableInventoryItem(form, stackInfo, props))
 					{
 						continue;
 					}
@@ -606,7 +614,7 @@ namespace papyrus_lootman
 
 				for (auto it = itemRequests.rbegin(); it != itemRequests.rend(); ++it)
 				{
-					requests.push_back(*it);
+					requests.push_back(std::move(*it));
 				}
 			}
 		}
