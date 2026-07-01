@@ -121,6 +121,14 @@ function readPreviousEntries(config: Config, mode: DeployMode): Map<string, stri
 	return previous;
 }
 
+function isInPapyrusDeployScope(relativePath: string): boolean {
+	return relativePath === "Scripts" || relativePath.startsWith("Scripts/");
+}
+
+function isInCurrentDeployScope(relativePath: string, withPapyrus: boolean): boolean {
+	return withPapyrus || !isInPapyrusDeployScope(relativePath);
+}
+
 function buildTargets(config: Config, mode: DeployMode, lang: DeployLang, withPapyrus: boolean): DeployTarget[] {
 	const filesRoot = path.join(config.buildTempDir, "files");
 	const targets: DeployTarget[] = [
@@ -245,7 +253,9 @@ export function syncDeploy(config: Config, opts: SyncDeployOpts): SyncDeployResu
 	let copied = 0;
 	let removed = 0;
 	let unchanged = 0;
-	const staleEntries = [...previous.keys()].filter((relativePath) => !current.has(relativePath));
+	const staleEntries = [...previous.keys()].filter((relativePath) =>
+		isInCurrentDeployScope(relativePath, withPapyrus) && !current.has(relativePath)
+	);
 	const progress = createFileProgress(entries.length + staleEntries.length, "Deploying files");
 
 	try {

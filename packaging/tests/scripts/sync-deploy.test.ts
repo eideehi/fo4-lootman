@@ -111,6 +111,33 @@ describe("sync-deploy", () => {
 		expect(fs.existsSync(path.join(dataDir, "Old", "stale.txt"))).toBe(false);
 	});
 
+	it("does not remove previously deployed Papyrus scripts when deploying resources only", () => {
+		const root = createTempDir();
+		dirs.push(root);
+		const config = createTestConfig(root);
+		const dataDir = path.join(config.fallout4Dir, "Data");
+		seedBaseDeployArtifacts(config, "en");
+
+		const manifestPath = resolveDeployManifestPath(config, "product", "en");
+		fs.outputJsonSync(manifestPath, {
+			version: 1,
+			mode: "product",
+			lang: "en",
+			generatedAt: "old",
+			files: [
+				{ destRelative: "Old/stale.txt", srcHash: "abc" },
+				{ destRelative: "Scripts/ltmn2/mcm.pex", srcHash: "def" },
+			],
+		});
+		fs.outputFileSync(path.join(dataDir, "Old", "stale.txt"), "stale");
+		fs.outputFileSync(path.join(dataDir, "Scripts", "ltmn2", "mcm.pex"), "papyrus");
+
+		const result = syncDeploy(config, { mode: "product", lang: "en" });
+		expect(result.removed).toBe(1);
+		expect(fs.existsSync(path.join(dataDir, "Old", "stale.txt"))).toBe(false);
+		expect(fs.readFileSync(path.join(dataDir, "Scripts", "ltmn2", "mcm.pex"), "utf8")).toBe("papyrus");
+	});
+
 	it("removes stale locale files left by a previous deploy in another language", () => {
 		const root = createTempDir();
 		dirs.push(root);
