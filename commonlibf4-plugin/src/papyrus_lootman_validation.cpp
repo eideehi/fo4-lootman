@@ -612,7 +612,7 @@ namespace papyrus_lootman
 		}
 #else
 		outResult = IsValidInventoryItem(form, info, matchCache) &&
-		            IsLootableInventoryItem(form, info, props);
+		            IsLootableInventoryItem(form, info, props, matchCache);
 		return true;
 #endif
 	}
