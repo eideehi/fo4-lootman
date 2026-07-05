@@ -148,8 +148,9 @@ describe("system message policy", () => {
 
 		expect(messageQueueHeader).toContain("struct TextReplacement");
 		expect(messageQueue).toContain("std::vector<TextReplacement> replacements");
-		expect(messageQueue).toContain("for (const auto& replacement : msg.replacements)");
-		expect(messageQueue).toContain("text = ReplaceAll(std::move(text), replacement.token, replacement.value);");
+		expect(messageQueue).toContain("std::string SubstituteTokens(std::string_view templateText, const std::vector<TextReplacement>& replacements)");
+		expect(messageQueue).toContain("for (const auto& replacement : replacements)");
+		expect(messageQueue).toContain("return SubstituteTokens(text, msg.replacements);");
 
 		expect(englishTranslations).toContain("$LTMN_SYSTEM_MESSAGE_LINKED_TO_WORKSHOP_NAMED\t[LootMan] Workshop linked: {workshopName}.");
 		expect(englishTranslations).toContain("$LTMN_SYSTEM_MESSAGE_UNLINKED_TO_WORKSHOP_NAMED\t[LootMan] Workshop unlinked: {workshopName}.");
