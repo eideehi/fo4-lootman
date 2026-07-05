@@ -133,9 +133,12 @@ describe("sync-deploy", () => {
 		fs.outputFileSync(path.join(dataDir, "Scripts", "ltmn2", "mcm.pex"), "papyrus");
 
 		const result = syncDeploy(config, { mode: "product", lang: "en" });
+		const manifest = fs.readJsonSync(manifestPath) as { files: Array<{ destRelative: string; srcHash: string }> };
 		expect(result.removed).toBe(1);
 		expect(fs.existsSync(path.join(dataDir, "Old", "stale.txt"))).toBe(false);
 		expect(fs.readFileSync(path.join(dataDir, "Scripts", "ltmn2", "mcm.pex"), "utf8")).toBe("papyrus");
+		expect(manifest.files).toContainEqual({ destRelative: "Scripts/ltmn2/mcm.pex", srcHash: "def" });
+		expect(manifest.files).not.toContainEqual({ destRelative: "Old/stale.txt", srcHash: "abc" });
 	});
 
 	it("removes stale locale files left by a previous deploy in another language", () => {

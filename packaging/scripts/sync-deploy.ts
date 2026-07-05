@@ -292,10 +292,15 @@ export function syncDeploy(config: Config, opts: SyncDeployOpts): SyncDeployResu
 		mode: opts.mode,
 		lang: opts.lang,
 		generatedAt: new Date().toISOString(),
-		files: entries.map((entry) => ({
-			destRelative: entry.destRelative,
-			srcHash: entry.hash,
-		})),
+		files: [
+			...entries.map((entry) => ({
+				destRelative: entry.destRelative,
+				srcHash: entry.hash,
+			})),
+			...[...previous.entries()]
+				.filter(([relativePath]) => !isInCurrentDeployScope(relativePath, withPapyrus) && !current.has(relativePath))
+				.map(([destRelative, srcHash]) => ({ destRelative, srcHash })),
+		],
 	};
 
 	fs.mkdirsSync(path.dirname(manifestPath));
