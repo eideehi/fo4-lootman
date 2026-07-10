@@ -74,6 +74,9 @@ describe("legendary-only clothing exception policy", () => {
 		expect(injectionSource).toContain("reason=cycle");
 		expect(injectionSource).toContain("reason=not_found");
 		expect(injectionSource).toContain("reason=malformed_name");
+		expect(injectionSource).toContain("kMaxListExpansionDepth");
+		expect(injectionSource).toContain("kMaxListExpansionVisits");
+		expect(injectionSource).toContain("reason=expansion_limit");
 	});
 
 	it("routes both inventory and world legendary-only branches through one ARMO exception helper", () => {

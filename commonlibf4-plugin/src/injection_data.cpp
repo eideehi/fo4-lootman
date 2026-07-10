@@ -85,6 +85,8 @@ namespace injection_data
 	constexpr std::string_view kNotifyLegendaryEquipmentPath = "/notify/legendary-equipment"sv;
 	constexpr std::string_view kListsKey = "lists"sv;
 	constexpr std::string_view kListRefPrefix = "$list:"sv;
+	constexpr std::size_t kMaxListExpansionDepth = 64;
+	constexpr std::size_t kMaxListExpansionVisits = 10000;
 
 	// Named lists accept identifier characters only, matching the documented grammar.
 	bool IsValidListName(std::string_view name)
@@ -110,16 +112,27 @@ namespace injection_data
 	// Resolve one named list into concrete (non-reference) identifiers, following nested
 	// "$list:<name>" references. Missing, malformed, or cyclic references degrade and are skipped
 	// like other invalid injection-data entries, without recursing forever.
-	void ExpandListInto(const std::string& name, std::unordered_set<std::string>& out,
-		std::unordered_set<std::string>& active)
+	bool ExpandListInto(const std::string& name, std::unordered_set<std::string>& out,
+		std::unordered_set<std::string>& active, std::size_t depth, std::size_t& visits)
 	{
+		if (depth > kMaxListExpansionDepth || ++visits > kMaxListExpansionVisits)
+		{
+			degradedMode = true;
+			REX::WARN(
+				"source=native component=injection_data event=list_reference_invalid reason=expansion_limit name=\"{}\" depth={} visits={}",
+				utility::SanitizeLogText(name),
+				depth,
+				visits);
+			return false;
+		}
+
 		if (!IsValidListName(name))
 		{
 			degradedMode = true;
 			REX::WARN(
 				"source=native component=injection_data event=list_reference_invalid reason=malformed_name name=\"{}\"",
 				utility::SanitizeLogText(name));
-			return;
+			return true;
 		}
 
 		if (!active.emplace(name).second)
@@ -128,7 +141,7 @@ namespace injection_data
 			REX::WARN(
 				"source=native component=injection_data event=list_reference_invalid reason=cycle name=\"{}\"",
 				utility::SanitizeLogText(name));
-			return;
+			return true;
 		}
 
 		const auto it = lists.find(name);
@@ -139,14 +152,18 @@ namespace injection_data
 				"source=native component=injection_data event=list_reference_invalid reason=not_found name=\"{}\"",
 				utility::SanitizeLogText(name));
 			active.erase(name);
-			return;
+			return true;
 		}
 
 		for (const auto& entry : it->second)
 		{
 			if (IsListRef(entry))
 			{
-				ExpandListInto(ListRefName(entry), out, active);
+				if (!ExpandListInto(ListRefName(entry), out, active, depth + 1, visits))
+				{
+					active.erase(name);
+					return false;
+				}
 			}
 			else
 			{
@@ -155,6 +172,7 @@ namespace injection_data
 		}
 
 		active.erase(name);
+		return true;
 	}
 
 	// Replace every "$list:<name>" reference in tmp with the referenced list's concrete entries.
@@ -163,6 +181,7 @@ namespace injection_data
 	{
 		for (auto& [path, entries] : tmp)
 		{
+			std::size_t visits = 0;
 			bool hasRef = false;
 			for (const auto& entry : entries)
 			{
@@ -180,7 +199,10 @@ namespace injection_data
 				if (IsListRef(entry))
 				{
 					std::unordered_set<std::string> active;
-					ExpandListInto(ListRefName(entry), expanded, active);
+					if (!ExpandListInto(ListRefName(entry), expanded, active, 1, visits))
+					{
+						break;
+					}
 				}
 				else
 				{
