@@ -350,29 +350,16 @@ namespace papyrus_lootman
 
 		if (!TryAddInventoryItemSafe(dest, object, static_cast<std::uint32_t>(count), extra))
 		{
-			// The destination add failed after the source removal already
-			// succeeded. Restore the stack to the source so the item is not lost;
-			// the preserved extra data keeps the instance intact.
-			if (!TryAddInventoryItemSafe(src, object, static_cast<std::uint32_t>(count), std::move(extra)))
-			{
-				REX::WARN(
-					"source=native component=inventory_transfer event=instance_preserving_move_unrecoverable reason=dest_add_and_source_restore_failed src={:08X} dest={:08X} item={:08X} count={} stack={}",
-					src->formID,
-					dest->formID,
-					object->formID,
-					count,
-					stackIndex ? static_cast<std::int32_t>(*stackIndex) : -1);
-			}
-			else
-			{
-				REX::WARN(
-					"source=native component=inventory_transfer event=instance_preserving_move_rolled_back reason=dest_add_failed src={:08X} dest={:08X} item={:08X} count={} stack={}",
-					src->formID,
-					dest->formID,
-					object->formID,
-					count,
-					stackIndex ? static_cast<std::int32_t>(*stackIndex) : -1);
-			}
+			// An SEH return does not prove whether AddInventoryItem committed its side
+			// effect. Never reuse the same instance extra in the source after an
+			// indeterminate destination call; that can create two owners for one extra.
+			REX::WARN(
+				"source=native component=inventory_transfer event=instance_preserving_move_unrecoverable reason=dest_add_outcome_unknown src={:08X} dest={:08X} item={:08X} count={} stack={}",
+				src->formID,
+				dest->formID,
+				object->formID,
+				count,
+				stackIndex ? static_cast<std::int32_t>(*stackIndex) : -1);
 			return false;
 		}
 

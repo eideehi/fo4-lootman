@@ -18,11 +18,15 @@ namespace papyrus_lootman
 		NiPointer<TESObjectREFR> ref;
 		Clock::time_point lockedAt;
 	};
+	struct RecentlyLootedWorldRefEntry
+	{
+		const TESObjectREFR* ref = nullptr;
+		TESFormID formID = 0;
+	};
 
 	std::unordered_map<std::uint32_t, LockedObjectEntry> lockedObjects;
-	std::unordered_map<std::uint64_t, Clock::time_point> recentlyLootedWorldRefs;
+	std::unordered_map<std::uint64_t, RecentlyLootedWorldRefEntry> recentlyLootedWorldRefs;
 	Clock::time_point lastLockedObjectCleanupAt{};
-	Clock::time_point lastRecentLootCleanupAt{};
 
 	// Created refs are keyed by their 32-bit handle value, persistent refs by
 	// their formID. Those two 32-bit ranges overlap, so tag handle-derived keys
@@ -32,13 +36,6 @@ namespace papyrus_lootman
 	inline constexpr auto kLockedObjectStaleTimeout = std::chrono::minutes(5);
 	inline constexpr auto kLockedObjectCleanupInterval = std::chrono::seconds(1);
 	inline constexpr std::size_t kLockedObjectCleanupMaxPerPass = 32;
-
-	// Mirror the locked-object eviction cadence so recentlyLootedWorldRefs is bounded the same way instead of
-	// growing for the whole session. TTL eviction also drops a stale created-ref handle key before the engine
-	// can recycle that handle onto an unrelated ref and produce a false "recently looted" hit.
-	inline constexpr auto kRecentLootStaleTimeout = std::chrono::minutes(5);
-	inline constexpr auto kRecentLootCleanupInterval = std::chrono::seconds(1);
-	inline constexpr std::size_t kRecentLootCleanupMaxPerPass = 32;
 
 	std::uint64_t GetRecentlyLootedWorldRefKey(const TESObjectREFR* ref)
 	{
@@ -62,44 +59,35 @@ namespace papyrus_lootman
 		return static_cast<std::uint64_t>(ref->formID);
 	}
 
-	bool IsRecentlyLootedWorldRef(std::uint64_t key)
+	bool IsRecentlyLootedWorldRef(std::uint64_t key, const TESObjectREFR* ref)
 	{
 		std::lock_guard<std::mutex> guard(recentWorldLootLock);
-		return recentlyLootedWorldRefs.find(key) != recentlyLootedWorldRefs.end();
+		auto it = recentlyLootedWorldRefs.find(key);
+		if (it == recentlyLootedWorldRefs.end())
+		{
+			return false;
+		}
+		if (it->second.ref == ref && it->second.formID == ref->formID)
+		{
+			return true;
+		}
+
+		// Created-ref handles can be recycled. A key hit for a different pointer is
+		// stale identity, not evidence that the new reference was already looted.
+		recentlyLootedWorldRefs.erase(it);
+		return false;
 	}
 
-	// Caller must hold recentWorldLootLock. Evicts entries older than the TTL, capped per pass and rate-limited
-	// by an interval, mirroring CleanupStaleLockedObjects.
-	void CleanupStaleRecentlyLootedWorldRefsLocked(const Clock::time_point& now)
+	bool TryMarkRecentlyLootedWorldRef(std::uint64_t key, const TESObjectREFR* ref)
 	{
-		if (lastRecentLootCleanupAt.time_since_epoch().count() != 0 &&
-			(now - lastRecentLootCleanupAt) < kRecentLootCleanupInterval)
-		{
-			return;
-		}
-		lastRecentLootCleanupAt = now;
-
-		std::size_t removedCount = 0;
-		for (auto it = recentlyLootedWorldRefs.begin();
-			 it != recentlyLootedWorldRefs.end() && removedCount < kRecentLootCleanupMaxPerPass;)
-		{
-			if ((now - it->second) < kRecentLootStaleTimeout)
-			{
-				++it;
-				continue;
-			}
-
-			it = recentlyLootedWorldRefs.erase(it);
-			++removedCount;
-		}
-	}
-
-	bool TryMarkRecentlyLootedWorldRef(std::uint64_t key)
-	{
-		const auto now = Clock::now();
 		std::lock_guard<std::mutex> guard(recentWorldLootLock);
-		CleanupStaleRecentlyLootedWorldRefsLocked(now);
-		return recentlyLootedWorldRefs.emplace(key, now).second;
+		// Finalization can fail after the item has already moved. Keep the suppression
+		// marker until the next save load so a still-enabled reference cannot be looted
+		// again merely because an elapsed-time TTL expired.
+		auto [it, inserted] = recentlyLootedWorldRefs.insert_or_assign(
+			key, RecentlyLootedWorldRefEntry{ ref, ref->formID });
+		(void)it;
+		return inserted;
 	}
 
 	bool IsRecentlyLootedWorldRef(const TESObjectREFR* ref)
@@ -109,7 +97,7 @@ namespace papyrus_lootman
 		{
 			return false;
 		}
-		return IsRecentlyLootedWorldRef(key);
+		return IsRecentlyLootedWorldRef(key, ref);
 	}
 
 	bool TryMarkRecentlyLootedWorldRef(TESObjectREFR* ref)
@@ -119,7 +107,7 @@ namespace papyrus_lootman
 		{
 			return false;
 		}
-		return TryMarkRecentlyLootedWorldRef(key);
+		return TryMarkRecentlyLootedWorldRef(key, ref);
 	}
 
 	bool IsPapyrusObjectHandleAvailable(TESObjectREFR* ref)
