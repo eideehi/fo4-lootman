@@ -542,7 +542,7 @@ namespace injection_data
 			REX::ERROR(
 				"source=native component=injection_data event=directory_scan_failed path=\"{}\" reason=\"{}\"",
 				dir.string(),
-				e.what());
+				utility::SanitizeLogText(e.what()));
 		}
 
 		// Stable ordering keeps override behavior deterministic across runs.
@@ -574,7 +574,7 @@ namespace injection_data
 				REX::ERROR(
 					"source=native component=injection_data event=json_parse_failed path=\"{}\" reason=\"{}\"",
 					file.string(),
-					e.what());
+					utility::SanitizeLogText(e.what()));
 				continue;
 			}
 

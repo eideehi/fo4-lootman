@@ -114,7 +114,7 @@ namespace log_settings
 			REX::WARN(
 				"source=native component=log_settings event=config_parse_failed path=\"{}\" reason=\"{}\"",
 				path.string(),
-				e.what());
+				utility::SanitizeLogText(e.what()));
 			return false;
 		}
 
@@ -224,7 +224,7 @@ namespace log_settings
 				REX::WARN(
 					"source=native component=log_settings event=config_write_skipped reason=parse_failed path=\"{}\" details=\"{}\"",
 					path.string(),
-					e.what());
+					utility::SanitizeLogText(e.what()));
 				return false;
 			}
 		}
