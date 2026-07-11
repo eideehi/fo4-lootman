@@ -305,7 +305,7 @@ namespace papyrus_lootman
 
 	bool ShouldPreserveStackExtraForTransfer(
 		TESBoundObject* object,
-		const BGSInventoryItem::Stack& stack,
+		ExtraDataList* extra,
 		std::int32_t movingCount,
 		std::int32_t stackCount)
 	{
@@ -321,7 +321,7 @@ namespace papyrus_lootman
 		}
 
 		bool hasRelevantExtra = false;
-		return TryHasTransferRelevantExtraSafe(stack.extra.get(), hasRelevantExtra) && hasRelevantExtra;
+		return TryHasTransferRelevantExtraSafe(extra, hasRelevantExtra) && hasRelevantExtra;
 	}
 
 	bool TryMoveInventoryItemPreservingStackExtraSafe(

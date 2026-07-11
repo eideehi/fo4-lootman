@@ -211,10 +211,18 @@ namespace papyrus_lootman
 					itemRequests.reserve(4);
 
 					std::uint32_t stackIndex = 0;
-					for (auto stack = item.stackData.get(); stack; stack = stack->nextStack.get(), ++stackIndex)
+					for (auto stack = item.stackData.get(); stack;)
 					{
+						auto* currentStack = stack;
+						const auto currentStackIndex = stackIndex;
+						// Advance eagerly through the SEH guard so the skip paths below never re-read
+						// a suspect link raw; a faulting link ends the chain after the current stack.
+						BGSInventoryItem::Stack* nextStack = nullptr;
+						stack = TryGetNextStackSafe(currentStack, nextStack) ? nextStack : nullptr;
+						++stackIndex;
+
 						InventoryItemInfo stackInfo{};
-						if (!TryGetInventoryStackInfoSafe(*stack, modBuffer, requestInfoFlags, stackInfo))
+						if (!TryGetInventoryStackInfoSafe(*currentStack, modBuffer, requestInfoFlags, stackInfo))
 						{
 							REX::WARN(
 								"source=native component=inventory_transfer event=stack_skipped reason=stack_info_exception operation=transfer_inventory_items item={:08X}",
@@ -231,7 +239,7 @@ namespace papyrus_lootman
 
 						const auto protectedCount = GetPlayerTransferProtectedStackCount(
 							form,
-							*stack,
+							*currentStack,
 							stackInfo,
 							sourceIsPlayer,
 							sourceIsDead,
@@ -246,7 +254,7 @@ namespace papyrus_lootman
 
 						float unitWeight = 0.0F;
 						if (capacity && capacity->enabled &&
-							!TryGetItemUnitWeightSafe(form, GetInstanceData(stack->extra.get()), unitWeight))
+							!TryGetItemUnitWeightSafe(form, GetInstanceData(currentStack->extra.get()), unitWeight))
 						{
 							continue;
 						}
@@ -255,15 +263,15 @@ namespace papyrus_lootman
 							form,
 							movableCount,
 							unitWeight,
-							stackIndex,
-							stack->extra,
+							currentStackIndex,
+							currentStack->extra,
 							ShouldPreserveStackExtraForTransfer(
 								form,
-								*stack,
+								currentStack->extra.get(),
 								movableCount,
 								stackInfo.totalCount),
 							stackInfo,
-							notifyMovedItems ? GetInventoryItemDisplayNameSafe(item, form, stackIndex) : std::string{}
+							notifyMovedItems ? GetInventoryItemDisplayNameSafe(item, form, currentStackIndex) : std::string{}
 						});
 					}
 
@@ -277,10 +285,18 @@ namespace papyrus_lootman
 				std::vector<InventoryFormTransferRequest> itemRequests;
 				itemRequests.reserve(4);
 				std::uint32_t stackIndex = 0;
-				for (auto stack = item.stackData.get(); stack; stack = stack->nextStack.get(), ++stackIndex)
+				for (auto stack = item.stackData.get(); stack;)
 				{
+					auto* currentStack = stack;
+					const auto currentStackIndex = stackIndex;
+					// Advance eagerly through the SEH guard so the skip paths below never re-read
+					// a suspect link raw; a faulting link ends the chain after the current stack.
+					BGSInventoryItem::Stack* nextStack = nullptr;
+					stack = TryGetNextStackSafe(currentStack, nextStack) ? nextStack : nullptr;
+					++stackIndex;
+
 					InventoryItemInfo stackInfo{};
-					if (!TryGetInventoryStackInfoSafe(*stack, modBuffer, requestInfoFlags, stackInfo))
+					if (!TryGetInventoryStackInfoSafe(*currentStack, modBuffer, requestInfoFlags, stackInfo))
 					{
 						REX::WARN(
 							"source=native component=inventory_transfer event=stack_skipped reason=stack_info_exception operation=transfer_inventory_items item={:08X}",
@@ -297,7 +313,7 @@ namespace papyrus_lootman
 
 					float unitWeight = 0.0F;
 					if (capacity && capacity->enabled &&
-						!TryGetItemUnitWeightSafe(form, GetInstanceData(stack->extra.get()), unitWeight))
+						!TryGetItemUnitWeightSafe(form, GetInstanceData(currentStack->extra.get()), unitWeight))
 					{
 						continue;
 					}
@@ -306,15 +322,15 @@ namespace papyrus_lootman
 						form,
 						stackInfo.totalCount,
 						unitWeight,
-						stackIndex,
-						stack->extra,
+						currentStackIndex,
+						currentStack->extra,
 						ShouldPreserveStackExtraForTransfer(
 							form,
-							*stack,
+							currentStack->extra.get(),
 							stackInfo.totalCount,
 							stackInfo.totalCount),
 						stackInfo,
-						notifyMovedItems ? GetInventoryItemDisplayNameSafe(item, form, stackIndex) : std::string{}
+						notifyMovedItems ? GetInventoryItemDisplayNameSafe(item, form, currentStackIndex) : std::string{}
 					});
 				}
 
@@ -505,25 +521,43 @@ namespace papyrus_lootman
 		const bool notifyMovedItems = ShouldNotifyLootDestination(dest);
 
 		{
+			// Hold the inventory read lock for the whole scan, mirroring HasLootableItem: every engine-memory
+			// access below is routed through an SEH-guarded Try...Safe helper so a corrupt entry becomes a
+			// skipped stack instead of an unwind past this frame. Under /EHsc an SEH unwind skips C++
+			// destructors, so an unguarded fault here would leak the read lock and deadlock the next writer.
 			ReadLockGuard guard(inventoryList->rwLock);
-			for (auto& item : inventoryList->data)
+
+			std::uint32_t inventoryItemCount = 0;
+			if (!TryGetInventoryItemCountSafe(inventoryList, inventoryItemCount))
+			{
+				inventoryItemCount = 0;
+			}
+			for (std::uint32_t itemIndex = 0; itemIndex < inventoryItemCount; ++itemIndex)
 			{
 				if (passBudget && passBudget->ShouldStop())
 				{
 					break;
 				}
 
-				auto* form = item.object;
-				if (!form)
+				TESForm* entryForm = nullptr;
+				BGSInventoryItem::Stack* firstStack = nullptr;
+				if (!TryGetInventoryEntrySafe(inventoryList, itemIndex, entryForm, firstStack) || !entryForm)
 				{
 					continue;
 				}
+				// BGSInventoryItem::object is declared TESBoundObject*, so this static downcast
+				// only restores the pointer's original type.
+				auto* form = static_cast<TESBoundObject*>(entryForm);
 
-				if (!IsFormTypeMatchesItemType(form->GetFormType(), itemType))
+				ENUM_FORM_ID formType{};
+				if (!TryGetFormTypeSafe(form, formType))
 				{
 					continue;
 				}
-				const auto formType = form->GetFormType();
+				if (!IsFormTypeMatchesItemType(formType, itemType))
+				{
+					continue;
+				}
 
 				bool validForm = false;
 				const bool gotValidForm = TryIsValidFormSafe(
@@ -549,22 +583,43 @@ namespace papyrus_lootman
 
 				std::vector<InventoryTransferRequest> itemRequests;
 				std::uint32_t stackIndex = 0;
-				for (auto stack = item.stackData.get(); stack; stack = stack->nextStack.get(), ++stackIndex)
+				for (auto stack = firstStack; stack;)
 				{
 					if (passBudget && passBudget->ShouldStop())
 					{
 						break;
 					}
 
+					auto* currentStack = stack;
+					const auto currentStackIndex = stackIndex;
+					// Advance eagerly through the SEH guard so the skip paths below never re-read a
+					// suspect link raw; a faulting link ends the chain after the current stack.
+					BGSInventoryItem::Stack* nextStack = nullptr;
+					stack = TryGetNextStackSafe(currentStack, nextStack) ? nextStack : nullptr;
+					++stackIndex;
+
 					InventoryItemInfo stackInfo{};
-					bool gotStackInfo = TryGetInventoryStackInfoSafe(
-						*stack,
-						modBuffer,
-						inventory_info_full,
-						stackInfo);
-					if (!gotStackInfo)
+					BSTSmartPointer<ExtraDataList> stackExtra;
+					if (TryGetInventoryStackInfoSafe(
+							*currentStack,
+							modBuffer,
+							inventory_info_full,
+							stackInfo))
 					{
-						stackInfo = BuildFallbackStackInfo(*stack);
+						// The guarded full-info read already walked this stack, so copying its
+						// extra pointer raw cannot fault.
+						stackExtra = currentStack->extra;
+					}
+					// The stack-info read above already faulted on this stack; every further read of
+					// the same memory must stay behind an SEH guard too (BuildFallbackStackInfo and
+					// the extra copy dereference the same suspect stack).
+					else if (!TryBuildFallbackStackInfoSafe(*currentStack, stackInfo) ||
+					         !TryGetStackExtraSafe(*currentStack, stackExtra))
+					{
+						REX::WARN(
+							"source=native component=inventory_transfer event=stack_skipped reason=stack_info_exception operation=transfer_lootable_inventory_items item={:08X}",
+							form->formID);
+						continue;
 					}
 
 					auto resolvedCount = stackInfo.totalCount;
@@ -580,17 +635,22 @@ namespace papyrus_lootman
 					{
 						continue;
 					}
-					if (!IsValidInventoryItem(form, stackInfo, &matchCache) ||
-					    !IsLootableInventoryItem(form, stackInfo, props, &matchCache))
+					bool lootableStack = false;
+					if (!TryIsLootableInventoryItemSafe(form, stackInfo, props, &matchCache, lootableStack) ||
+					    !lootableStack)
 					{
 						continue;
 					}
 
 					float unitWeight = 0.0F;
-					if (capacity && capacity->enabled &&
-						!TryGetItemUnitWeightSafe(form, GetInstanceData(stack->extra.get()), unitWeight))
+					if (capacity && capacity->enabled)
 					{
-						continue;
+						TBO_InstanceData* instanceData = nullptr;
+						if (!TryGetInstanceDataSafe(stackExtra.get(), instanceData) ||
+						    !TryGetItemUnitWeightSafe(form, instanceData, unitWeight))
+						{
+							continue;
+						}
 					}
 
 					const auto preservationStackCount = stackInfo.totalCount > 0 ?
@@ -598,17 +658,19 @@ namespace papyrus_lootman
 						resolvedCount;
 					itemRequests.push_back(InventoryTransferRequest{
 						form,
-						stackIndex,
+						currentStackIndex,
 						resolvedCount,
 						unitWeight,
-						stack->extra,
+						stackExtra,
 						ShouldPreserveStackExtraForTransfer(
 							form,
-							*stack,
+							stackExtra.get(),
 							resolvedCount,
 							preservationStackCount),
 						stackInfo,
-						notifyMovedItems ? GetInventoryItemDisplayNameSafe(item, form, stackIndex) : std::string{}
+						notifyMovedItems ?
+							GetInventoryItemDisplayNameSafe(inventoryList->data[itemIndex], form, currentStackIndex) :
+							std::string{}
 					});
 				}
 
@@ -893,12 +955,18 @@ namespace papyrus_lootman
 					itemRequests.reserve(4);
 
 					std::uint32_t stackIndex = 0;
-					for (auto stack = inventoryItem.stackData.get();
-					     stack && remainingRequested > 0;
-					     stack = stack->nextStack.get(), ++stackIndex)
+					for (auto stack = inventoryItem.stackData.get(); stack && remainingRequested > 0;)
 					{
+						auto* currentStack = stack;
+						const auto currentStackIndex = stackIndex;
+						// Advance eagerly through the SEH guard so the skip paths below never re-read
+						// a suspect link raw; a faulting link ends the chain after the current stack.
+						BGSInventoryItem::Stack* nextStack = nullptr;
+						stack = TryGetNextStackSafe(currentStack, nextStack) ? nextStack : nullptr;
+						++stackIndex;
+
 						InventoryItemInfo stackInfo{};
-						if (!TryGetInventoryStackInfoSafe(*stack, modBuffer, inventory_info_basic, stackInfo))
+						if (!TryGetInventoryStackInfoSafe(*currentStack, modBuffer, inventory_info_basic, stackInfo))
 						{
 							REX::WARN(
 								"source=native component=inventory_transfer event=stack_skipped reason=stack_info_exception operation=move_inventory_item item={:08X}",
@@ -912,7 +980,7 @@ namespace papyrus_lootman
 
 						const auto protectedCount = GetPlayerTransferProtectedStackCount(
 							object,
-							*stack,
+							*currentStack,
 							stackInfo,
 							true,
 							false,
@@ -930,11 +998,11 @@ namespace papyrus_lootman
 							object,
 							requestCount,
 							0.0F,
-							stackIndex,
-							stack->extra,
+							currentStackIndex,
+							currentStack->extra,
 							ShouldPreserveStackExtraForTransfer(
 								object,
-								*stack,
+								currentStack->extra.get(),
 								requestCount,
 								stackInfo.totalCount)
 						});
@@ -971,21 +1039,40 @@ namespace papyrus_lootman
 					std::vector<InventoryFormTransferRequest> itemRequests;
 					itemRequests.reserve(4);
 					std::uint32_t stackIndex = 0;
-					for (auto stack = inventoryItem.stackData.get();
-					     stack && remainingRequested > 0;
-					     stack = stack->nextStack.get(), ++stackIndex)
+					for (auto stack = inventoryItem.stackData.get(); stack && remainingRequested > 0;)
 					{
+						auto* currentStack = stack;
+						const auto currentStackIndex = stackIndex;
+						// Advance eagerly through the SEH guard so the skip paths below never re-read
+						// a suspect link raw; a faulting link ends the chain after the current stack.
+						BGSInventoryItem::Stack* nextStack = nullptr;
+						stack = TryGetNextStackSafe(currentStack, nextStack) ? nextStack : nullptr;
+						++stackIndex;
+
 						InventoryItemInfo stackInfo{};
 						std::int32_t stackCount = 0;
-						if (TryGetInventoryStackInfoSafe(*stack, modBuffer, inventory_info_basic, stackInfo))
+						BSTSmartPointer<ExtraDataList> stackExtra;
+						if (TryGetInventoryStackInfoSafe(*currentStack, modBuffer, inventory_info_basic, stackInfo))
 						{
 							stackCount = stackInfo.totalCount;
+							// The guarded info read already walked this stack, so copying its extra
+							// pointer raw cannot fault.
+							stackExtra = currentStack->extra;
 						}
 						else
 						{
-							stackCount = static_cast<std::int32_t>(std::min<std::uint32_t>(
-								stack->count,
-								static_cast<std::uint32_t>(std::numeric_limits<std::int32_t>::max())));
+							// The info read above already faulted on this stack; the count and extra
+							// reads touch the same suspect memory, so keep them behind SEH guards too.
+							InventoryItemInfo fallbackInfo{};
+							if (!TryBuildFallbackStackInfoSafe(*currentStack, fallbackInfo) ||
+							    !TryGetStackExtraSafe(*currentStack, stackExtra))
+							{
+								REX::WARN(
+									"source=native component=inventory_transfer event=stack_skipped reason=stack_info_exception operation=move_inventory_item item={:08X}",
+									object->formID);
+								continue;
+							}
+							stackCount = fallbackInfo.totalCount;
 						}
 						if (stackCount <= 0)
 						{
@@ -997,11 +1084,11 @@ namespace papyrus_lootman
 							object,
 							requestCount,
 							0.0F,
-							stackIndex,
-							stack->extra,
+							currentStackIndex,
+							stackExtra,
 							ShouldPreserveStackExtraForTransfer(
 								object,
-								*stack,
+								stackExtra.get(),
 								requestCount,
 								stackCount)
 						});

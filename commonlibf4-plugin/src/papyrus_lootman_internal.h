@@ -382,6 +382,27 @@ namespace papyrus_lootman
 		std::vector<RE::BGSMod::Attachment::Mod*>& buffer,
 		std::uint32_t infoFlags,
 		InventoryItemInfo& outInfo);
+	// SEH-guarded single-read helpers for scanning a possibly corrupt inventory while its read lock is
+	// held; each converts an access violation into a false return instead of unwinding past the caller.
+	bool TryGetInventoryItemCountSafe(RE::BGSInventoryList* inventoryList, std::uint32_t& outCount);
+	bool TryGetInventoryEntrySafe(
+		RE::BGSInventoryList* inventoryList,
+		std::uint32_t index,
+		RE::TESForm*& outForm,
+		RE::BGSInventoryItem::Stack*& outFirstStack);
+	bool TryGetFormTypeSafe(const RE::TESForm* form, RE::ENUM_FORM_ID& outFormType);
+	bool TryGetNextStackSafe(RE::BGSInventoryItem::Stack* stack, RE::BGSInventoryItem::Stack*& outNext);
+	bool TryBuildFallbackStackInfoSafe(const RE::BGSInventoryItem::Stack& stack, InventoryItemInfo& outInfo);
+	bool TryIsLootableInventoryItemSafe(
+		const RE::TESForm* form,
+		const InventoryItemInfo& info,
+		const PropertiesSnapshot* props,
+		MatchCache* matchCache,
+		bool& outResult);
+	bool TryGetStackExtraSafe(
+		const RE::BGSInventoryItem::Stack& stack,
+		RE::BSTSmartPointer<RE::ExtraDataList>& outExtra);
+	bool TryGetInstanceDataSafe(const RE::ExtraDataList* extra, RE::TBO_InstanceData*& outInstanceData);
 	bool EnsureContainerInventoryListForLootScan(RE::TESObjectREFR* ref, RE::TESForm* baseForm);
 	bool TryGetReferenceItemCountSafe(
 		RE::TESObjectREFR* ref,
@@ -443,7 +464,7 @@ namespace papyrus_lootman
 		std::optional<std::uint32_t> stackIndex);
 	bool ShouldPreserveStackExtraForTransfer(
 		RE::TESBoundObject* object,
-		const RE::BGSInventoryItem::Stack& stack,
+		RE::ExtraDataList* extra,
 		std::int32_t movingCount,
 		std::int32_t stackCount);
 	bool TryMoveInventoryItemPreservingStackExtraSafe(

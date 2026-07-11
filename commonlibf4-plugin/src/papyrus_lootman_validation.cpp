@@ -617,6 +617,42 @@ namespace papyrus_lootman
 #endif
 	}
 
+	bool TryGetStackExtraSafe(const BGSInventoryItem::Stack& stack, BSTSmartPointer<ExtraDataList>& outExtra)
+	{
+#if defined(_MSC_VER)
+		__try
+		{
+			outExtra = stack.extra;
+			return true;
+		}
+		__except (SehFilterRecoverable(GetExceptionCode()))
+		{
+			return false;
+		}
+#else
+		outExtra = stack.extra;
+		return true;
+#endif
+	}
+
+	bool TryGetInstanceDataSafe(const ExtraDataList* extra, TBO_InstanceData*& outInstanceData)
+	{
+#if defined(_MSC_VER)
+		__try
+		{
+			outInstanceData = GetInstanceData(extra);
+			return true;
+		}
+		__except (SehFilterRecoverable(GetExceptionCode()))
+		{
+			return false;
+		}
+#else
+		outInstanceData = GetInstanceData(extra);
+		return true;
+#endif
+	}
+
 	bool HasLootableItem(BGSInventoryList* inventoryList, const PropertiesSnapshot* props = nullptr,
 		MatchCache* matchCache = nullptr, bool sourceIsDead = false,
 		std::vector<BGSMod::Attachment::Mod*>* modBuffer)
