@@ -194,14 +194,23 @@ namespace injection_data
 			if (!hasRef) continue;
 
 			std::unordered_set<std::string> expanded;
+			bool limitTripped = false;
 			for (const auto& entry : entries)
 			{
 				if (IsListRef(entry))
 				{
+					// Once the shared per-path visits budget is exhausted, every further
+					// ExpandListInto call would fail (and warn) immediately, so stop expanding
+					// references. Keep iterating so concrete sibling identifiers still land in
+					// the rebuilt set: only the offending references degrade, not the path.
+					if (limitTripped)
+					{
+						continue;
+					}
 					std::unordered_set<std::string> active;
 					if (!ExpandListInto(ListRefName(entry), expanded, active, 1, visits))
 					{
-						break;
+						limitTripped = true;
 					}
 				}
 				else

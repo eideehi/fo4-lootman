@@ -77,6 +77,12 @@ describe("legendary-only clothing exception policy", () => {
 		expect(injectionSource).toContain("kMaxListExpansionDepth");
 		expect(injectionSource).toContain("kMaxListExpansionVisits");
 		expect(injectionSource).toContain("reason=expansion_limit");
+		// a tripped expansion limit degrades only the offending "$list:" references; concrete
+		// sibling identifiers on the same path must survive the rebuild instead of being
+		// dropped by breaking out of the rebuild loop.
+		const expand = sliceBetween(injectionSource, "void ExpandListReferences()", "void LoadNamedLists(");
+		expect(expand).toContain("if (limitTripped)");
+		expect(expand).toContain("limitTripped = true;");
 	});
 
 	it("routes both inventory and world legendary-only branches through one ARMO exception helper", () => {
