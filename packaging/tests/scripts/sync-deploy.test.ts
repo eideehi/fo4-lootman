@@ -141,6 +141,40 @@ describe("sync-deploy", () => {
 		expect(manifest.files).not.toContainEqual({ destRelative: "Old/stale.txt", srcHash: "abc" });
 	});
 
+	it("retains scripts across a resource-only deploy and still removes them as stale on the next Papyrus deploy", () => {
+		const root = createTempDir();
+		dirs.push(root);
+		const config = createTestConfig(root);
+		const dataDir = path.join(config.fallout4Dir, "Data");
+		const papyrusBinaryDir = path.join(config.buildTempDir, "files", "papyrus", "product", "binary");
+		seedBaseDeployArtifacts(config, "en");
+		fs.outputFileSync(path.join(papyrusBinaryDir, "ltmn2", "mcm.pex"), "papyrus");
+
+		const first = syncDeploy(config, { mode: "product", lang: "en", withPapyrus: true });
+		const manifestPath = resolveDeployManifestPath(config, "product", "en");
+		let manifest = fs.readJsonSync(manifestPath) as { files: Array<{ destRelative: string; srcHash: string }> };
+		expect(first.copied).toBe(4);
+		expect(fs.readFileSync(path.join(dataDir, "Scripts", "ltmn2", "mcm.pex"), "utf8")).toBe("papyrus");
+		expect(manifest.files.map((file) => file.destRelative)).toContain("Scripts/ltmn2/mcm.pex");
+
+		const second = syncDeploy(config, { mode: "product", lang: "en" });
+		manifest = fs.readJsonSync(manifestPath) as { files: Array<{ destRelative: string; srcHash: string }> };
+		expect(second.removed).toBe(0);
+		expect(fs.readFileSync(path.join(dataDir, "Scripts", "ltmn2", "mcm.pex"), "utf8")).toBe("papyrus");
+		expect(manifest.files.map((file) => file.destRelative)).toContain("Scripts/ltmn2/mcm.pex");
+
+		fs.removeSync(path.join(papyrusBinaryDir, "ltmn2", "mcm.pex"));
+		fs.outputFileSync(path.join(papyrusBinaryDir, "ltmn2", "other.pex"), "papyrus-other");
+
+		const third = syncDeploy(config, { mode: "product", lang: "en", withPapyrus: true });
+		manifest = fs.readJsonSync(manifestPath) as { files: Array<{ destRelative: string; srcHash: string }> };
+		expect(third.removed).toBe(1);
+		expect(fs.existsSync(path.join(dataDir, "Scripts", "ltmn2", "mcm.pex"))).toBe(false);
+		expect(fs.readFileSync(path.join(dataDir, "Scripts", "ltmn2", "other.pex"), "utf8")).toBe("papyrus-other");
+		expect(manifest.files.map((file) => file.destRelative)).not.toContain("Scripts/ltmn2/mcm.pex");
+		expect(manifest.files.map((file) => file.destRelative)).toContain("Scripts/ltmn2/other.pex");
+	});
+
 	it("removes stale locale files left by a previous deploy in another language", () => {
 		const root = createTempDir();
 		dirs.push(root);
