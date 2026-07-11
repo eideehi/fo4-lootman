@@ -1,6 +1,7 @@
 #include "constructible_object.h"
 
 #include <shared_mutex>
+#include <unordered_set>
 
 namespace constructible_object
 {
@@ -15,6 +16,7 @@ namespace constructible_object
 		std::unordered_map<std::uint32_t, RE::BGSConstructibleObject*>& out,
 		RE::TESForm* form,
 		RE::BGSConstructibleObject* cobj,
+		std::unordered_set<std::uint32_t>& visitedLists,
 		std::uint32_t depth = 0)
 	{
 		if (!form || !cobj)
@@ -37,11 +39,20 @@ namespace constructible_object
 				return;
 			}
 
+			// Skip a FormList already expanded during this cobj's traversal. The emplace below is
+			// idempotent for a fixed cobj, so the skip drops nothing, and it is what keeps a cyclic
+			// graph with fan-out from exploding into exponentially many depth-capped paths (the
+			// depth cap alone bounds only path length, not total visits).
+			if (!visitedLists.insert(form->formID).second)
+			{
+				return;
+			}
+
 			auto formList = form->As<RE::BGSListForm>();
 			if (!formList) return;
 			for (auto* item : formList->arrayOfForms)
 			{
-				CacheCObj(out, item, cobj, depth + 1);
+				CacheCObj(out, item, cobj, visitedLists, depth + 1);
 			}
 		}
 		else if (form->Is(RE::ENUM_FORM_ID::kARMO) ||
@@ -68,13 +79,17 @@ namespace constructible_object
 		std::unordered_map<std::uint32_t, RE::BGSConstructibleObject*> rebuilt;
 		auto& allCObj = dh->GetFormArray<RE::BGSConstructibleObject>();
 		rebuilt.reserve(allCObj.size());
+		std::unordered_set<std::uint32_t> visitedLists;
 		for (auto* cobj : allCObj)
 		{
 			if (!cobj || !cobj->createdItem || !cobj->requiredItems)
 			{
 				continue;
 			}
-			CacheCObj(rebuilt, cobj->createdItem, cobj);
+			// Visited-list tracking is per cobj: the same FormList must still expand for the
+			// next cobj because the cached value is that cobj pointer.
+			visitedLists.clear();
+			CacheCObj(rebuilt, cobj->createdItem, cobj, visitedLists);
 		}
 
 		const auto count = rebuilt.size();
