@@ -337,6 +337,9 @@ namespace papyrus_lootman
 			return false;
 		}
 
+		std::int32_t destBefore = 0;
+		const bool gotDestBefore = TryGetReferenceItemCountSafe(dest, object, destBefore);
+
 		// Remove from the source first. The destination add and the source removal
 		// cannot be made atomic, so order them for the safe failure mode: if the
 		// removal faults (TryRemoveScrapSourceSafe returns false under SEH), the
@@ -351,8 +354,35 @@ namespace papyrus_lootman
 		if (!TryAddInventoryItemSafe(dest, object, static_cast<std::uint32_t>(count), extra))
 		{
 			// An SEH return does not prove whether AddInventoryItem committed its side
-			// effect. Never reuse the same instance extra in the source after an
-			// indeterminate destination call; that can create two owners for one extra.
+			// effect. Only when the destination count verifiably did not change is the
+			// add known to be uncommitted; then re-adding the same instance extra to
+			// the source cannot create two owners for one extra. In every other case
+			// (count increased, or either count query failed) the extra may already
+			// be owned by the destination, so never reuse it.
+			std::int32_t destAfter = 0;
+			const bool gotDestAfter = TryGetReferenceItemCountSafe(dest, object, destAfter);
+			if (gotDestBefore && gotDestAfter && destAfter == destBefore)
+			{
+				if (TryAddInventoryItemSafe(src, object, static_cast<std::uint32_t>(count), std::move(extra)))
+				{
+					REX::WARN(
+						"source=native component=inventory_transfer event=instance_preserving_move_rolled_back reason=dest_add_failed src={:08X} dest={:08X} item={:08X} count={} stack={}",
+						src->formID,
+						dest->formID,
+						object->formID,
+						count,
+						stackIndex ? static_cast<std::int32_t>(*stackIndex) : -1);
+					return false;
+				}
+				REX::WARN(
+					"source=native component=inventory_transfer event=instance_preserving_move_unrecoverable reason=dest_add_and_source_restore_failed src={:08X} dest={:08X} item={:08X} count={} stack={}",
+					src->formID,
+					dest->formID,
+					object->formID,
+					count,
+					stackIndex ? static_cast<std::int32_t>(*stackIndex) : -1);
+				return false;
+			}
 			REX::WARN(
 				"source=native component=inventory_transfer event=instance_preserving_move_unrecoverable reason=dest_add_outcome_unknown src={:08X} dest={:08X} item={:08X} count={} stack={}",
 				src->formID,

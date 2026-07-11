@@ -67,13 +67,28 @@ namespace papyrus_lootman
 		{
 			return false;
 		}
-		if (it->second.ref == ref && it->second.formID == ref->formID)
+		if (it->second.formID != ref->formID)
+		{
+			recentlyLootedWorldRefs.erase(it);
+			return false;
+		}
+		if (!ref->IsCreated())
+		{
+			// A persistent placed ref keeps its formID for the whole session even
+			// when the engine destroys and recreates the TESObjectREFR on cell
+			// reload, so the formID hit is authoritative regardless of the stored
+			// pointer. Refresh the pointer so diagnostics stay current.
+			it->second.ref = ref;
+			return true;
+		}
+		if (it->second.ref == ref)
 		{
 			return true;
 		}
 
-		// Created-ref handles can be recycled. A key hit for a different pointer is
-		// stale identity, not evidence that the new reference was already looted.
+		// Created-ref handles (and 0xFF formIDs, for the handle==0 fallback key)
+		// can be recycled. A key hit for a different pointer is stale identity,
+		// not evidence that the new reference was already looted.
 		recentlyLootedWorldRefs.erase(it);
 		return false;
 	}
