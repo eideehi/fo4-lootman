@@ -43,6 +43,9 @@ export interface NativeHookCallSite {
 	rva: string;
 	sourceId: string;
 	label: string;
+	expectedTargetRva?: string;
+	contextSignatureVersion?: 1;
+	contextBytes?: string;
 }
 
 export interface NativeHookAddressLibraryMetadata {
@@ -66,7 +69,7 @@ export interface NativeHookAddressEntry {
 }
 
 export interface NativeHookAddressManifest {
-	schemaVersion: 1;
+	schemaVersion: 1 | 2;
 	targetRuntime: string;
 	sourceFile: string;
 	generatedHeader: string;
@@ -451,8 +454,8 @@ export function validateNativeHookManifest(
 		return { valid: false, errors: ["Manifest root must be an object."] };
 	}
 
-	if (manifest.schemaVersion !== 1) {
-		errors.push("schemaVersion must be 1.");
+	if (manifest.schemaVersion !== 1 && manifest.schemaVersion !== 2) {
+		errors.push("schemaVersion must be 1 or 2.");
 	}
 	if (typeof manifest.targetRuntime !== "string" || manifest.targetRuntime.trim() === "") {
 		errors.push("targetRuntime must be a non-empty string.");
@@ -560,6 +563,15 @@ export function validateNativeHookManifest(
 				} else if (/0x[0-9A-F]+/i.test(rawSite.label)) {
 					errors.push(`${siteLabel}.label must be semantic and must not contain an address literal.`);
 				}
+				if (manifest.schemaVersion === 2 && rawEntry.discoveryStrategy && isRecord(rawEntry.discoveryStrategy) && rawEntry.discoveryStrategy.status === "proven") {
+					validateNumericLiteral(rawSite.expectedTargetRva, `${siteLabel}.expectedTargetRva`, errors);
+					if (rawSite.contextSignatureVersion !== 1) {
+						errors.push(`${siteLabel}.contextSignatureVersion must be 1.`);
+					}
+					if (typeof rawSite.contextBytes !== "string" || !/^[0-9A-F]{2}(?: [0-9A-F]{2})*$/.test(rawSite.contextBytes)) {
+						errors.push(`${siteLabel}.contextBytes must be uppercase space-separated bytes.`);
+					}
+				}
 			}
 			validateCallSiteProofMapping(rawEntry, label, errors, expectedCountValue);
 		} else {
@@ -597,7 +609,7 @@ export function validateNativeHookManifest(
 		}
 	}
 
-	if (options.checkGeneratedHeader && manifest.schemaVersion === 1 && typeof manifest.generatedHeader === "string") {
+	if (options.checkGeneratedHeader && (manifest.schemaVersion === 1 || manifest.schemaVersion === 2) && typeof manifest.generatedHeader === "string") {
 		const typedManifest = manifest as unknown as NativeHookAddressManifest;
 		const expected = generateNativeHookHeader(typedManifest);
 		const headerPath = getGeneratedHeaderPath(typedManifest, root);
@@ -642,6 +654,7 @@ export function generateNativeHookHeader(manifest: NativeHookAddressManifest): s
 		"",
 		"#include <array>",
 		"#include <cstdint>",
+		"#include <span>",
 		"#include <REL/ID.h>",
 		"",
 		"namespace papyrus_lootman",
@@ -652,13 +665,22 @@ export function generateNativeHookHeader(manifest: NativeHookAddressManifest): s
 		"\t\tstd::uintptr_t rva;",
 		"\t\tstd::uint32_t sourceId;",
 		"\t\tconst char* label;",
+		"\t\tstd::uintptr_t expectedTargetRva;",
+		"\t\tstd::span<const std::uint8_t> contextBytes;",
 		"\t};",
+		"",
+		"\tinline constexpr std::uint32_t kNativeHookContextSignatureVersion = 1;",
 		"",
 	];
 
 	for (const entry of manifest.entries) {
 		if (entry.category === "call_site_rva") {
 			const sites = entry.sites ?? [];
+			for (const [index, site] of sites.entries()) {
+				const bytes = (site.contextBytes ?? "").split(" ").filter(Boolean);
+				lines.push(`\tinline constexpr std::array<std::uint8_t, ${bytes.length}> ${entry.cppName}Context${index}{ ${bytes.map((byte) => `0x${byte}`).join(", ")} };`);
+			}
+			lines.push("");
 			if (sites.length === 1) {
 				const site = sites[0];
 				lines.push(
@@ -667,18 +689,22 @@ export function generateNativeHookHeader(manifest: NativeHookAddressManifest): s
 					`\t\t${formatHex(site.rva)},`,
 					`\t\t${formatHex(site.sourceId)},`,
 					`\t\t${quoteCppString(formatSiteLabel(site))},`,
+					`\t\t${formatHex(site.expectedTargetRva ?? "0x0")},`,
+					`\t\t${entry.cppName}Context0,`,
 					"\t};",
 					"",
 				);
 			} else {
 				lines.push(`\tinline constexpr std::array<NativeHookCallSite, ${sites.length}> ${entry.cppName}{{`);
-				for (const site of sites) {
+				for (const [index, site] of sites.entries()) {
 					lines.push(
 						"\t\t{",
 						`\t\t\t${quoteCppString(site.id)},`,
 						`\t\t\t${formatHex(site.rva)},`,
 						`\t\t\t${formatHex(site.sourceId)},`,
 						`\t\t\t${quoteCppString(formatSiteLabel(site))},`,
+						`\t\t\t${formatHex(site.expectedTargetRva ?? "0x0")},`,
+						`\t\t\t${entry.cppName}Context${index},`,
 						"\t\t},",
 					);
 				}

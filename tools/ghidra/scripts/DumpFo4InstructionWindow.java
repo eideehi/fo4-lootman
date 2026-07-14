@@ -4,6 +4,7 @@
 import ghidra.app.script.GhidraScript;
 import ghidra.program.model.address.Address;
 import ghidra.program.model.listing.Instruction;
+import ghidra.program.model.mem.MemoryAccessException;
 
 import java.io.File;
 import java.io.PrintWriter;
@@ -30,7 +31,7 @@ public class DumpFo4InstructionWindow extends GhidraScript {
 
             for (int i = 2; i < args.length; i++) {
                 Address address = parseTargetAddress(args[i]);
-                dumpWindow(out, address, instructionCount);
+                dumpWindow(out, address, instructionCount, i + 1 < args.length);
             }
         }
 
@@ -45,7 +46,7 @@ public class DumpFo4InstructionWindow extends GhidraScript {
         return toAddr(Long.parseUnsignedLong(text, 16));
     }
 
-    private void dumpWindow(PrintWriter out, Address address, int instructionCount) {
+    private void dumpWindow(PrintWriter out, Address address, int instructionCount, boolean addTrailingBlankLine) {
         out.printf("================================================================================%n");
         out.printf("Target %s%n", address);
 
@@ -55,14 +56,36 @@ public class DumpFo4InstructionWindow extends GhidraScript {
         }
         if (instruction == null) {
             out.println("No instruction found.");
-            out.println();
+            if (addTrailingBlankLine) {
+                out.println();
+            }
             return;
         }
 
         for (int i = 0; i < instructionCount && instruction != null; i++) {
-            out.printf("  %s: %s%n", instruction.getAddress(), instruction);
+            out.printf("  %s: [%s] %s%n", instruction.getAddress(), formatBytes(instruction), instruction);
             instruction = instruction.getNext();
         }
-        out.println();
+        if (addTrailingBlankLine) {
+            out.println();
+        }
+    }
+
+    private String formatBytes(Instruction instruction) {
+        byte[] bytes;
+        try {
+            bytes = instruction.getBytes();
+        } catch (MemoryAccessException e) {
+            throw new IllegalStateException("Unable to read instruction bytes at " + instruction.getAddress(), e);
+        }
+
+        StringBuilder result = new StringBuilder();
+        for (int i = 0; i < bytes.length; i++) {
+            if (i > 0) {
+                result.append(' ');
+            }
+            result.append(String.format("%02X", bytes[i] & 0xFF));
+        }
+        return result.toString();
     }
 }

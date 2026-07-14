@@ -8,6 +8,7 @@
 
 #include <array>
 #include <cstdint>
+#include <span>
 #include <REL/ID.h>
 
 namespace papyrus_lootman
@@ -18,13 +19,21 @@ namespace papyrus_lootman
 		std::uintptr_t rva;
 		std::uint32_t sourceId;
 		const char* label;
+		std::uintptr_t expectedTargetRva;
+		std::span<const std::uint8_t> contextBytes;
 	};
+
+	inline constexpr std::uint32_t kNativeHookContextSignatureVersion = 1;
+
+	inline constexpr std::array<std::uint8_t, 3> kLoadChangeCellBeforeZoneResetCallSiteContext0{ 0x88, 0x45, 0x67 };
 
 	inline constexpr NativeHookCallSite kLoadChangeCellBeforeZoneResetCallSite{
 		"encounter-zone.reset-suppression.cell-before-reset",
 		0x4D23D4,
 		0x0,
 		"encounter-zone.reset-suppression.cell-before-reset@0x4D23D4",
+		0x494B40,
+		kLoadChangeCellBeforeZoneResetCallSiteContext0,
 	};
 
 	// Address Library offset: 0x4D2E30
@@ -36,26 +45,41 @@ namespace papyrus_lootman
 	// Address Library offset: 0x30EC618
 	inline constexpr REL::ID kCurrentWorkshopHandleGlobalId{ 4797241 };
 
+	inline constexpr std::array<std::uint8_t, 2> kPopulateLinkedWorkshopContainerCallSitesContext0{ 0xEB, 0x27 };
+	inline constexpr std::array<std::uint8_t, 4> kPopulateLinkedWorkshopContainerCallSitesContext1{ 0x44, 0x8B, 0x4F, 0x10 };
+	inline constexpr std::array<std::uint8_t, 4> kPopulateLinkedWorkshopContainerCallSitesContext2{ 0x48, 0x8B, 0x45, 0x7F };
+
 	inline constexpr std::array<NativeHookCallSite, 3> kPopulateLinkedWorkshopContainerCallSites{{
 		{
 			"workshop-shared-container.populate-linked.primary",
 			0x391F88,
 			0x0,
 			"workshop-shared-container.populate-linked.primary@0x391F88",
+			0x389E20,
+			kPopulateLinkedWorkshopContainerCallSitesContext0,
 		},
 		{
 			"workshop-shared-container.populate-linked.workbench",
 			0xB289E6,
 			0x0,
 			"workshop-shared-container.populate-linked.workbench@0xB289E6",
+			0x389E20,
+			kPopulateLinkedWorkshopContainerCallSitesContext1,
 		},
 		{
 			"workshop-shared-container.populate-linked.menu",
 			0x1089296,
 			0x0,
 			"workshop-shared-container.populate-linked.menu@0x1089296",
+			0x389E20,
+			kPopulateLinkedWorkshopContainerCallSitesContext2,
 		},
 	}};
+
+	inline constexpr std::array<std::uint8_t, 6> kRebuildWorkshopSupplyCallSitesContext0{ 0x48, 0x83, 0x7C, 0x24, 0x28, 0x00 };
+	inline constexpr std::array<std::uint8_t, 3> kRebuildWorkshopSupplyCallSitesContext1{ 0x48, 0x8B, 0x07 };
+	inline constexpr std::array<std::uint8_t, 5> kRebuildWorkshopSupplyCallSitesContext2{ 0x48, 0x83, 0x7D, 0xA0, 0x00 };
+	inline constexpr std::array<std::uint8_t, 3> kRebuildWorkshopSupplyCallSitesContext3{ 0x48, 0x8B, 0x1F };
 
 	inline constexpr std::array<NativeHookCallSite, 4> kRebuildWorkshopSupplyCallSites{{
 		{
@@ -63,26 +87,37 @@ namespace papyrus_lootman
 			0xA65436,
 			0xA1,
 			"workshop-material.rebuild-supply.source-a1@0xA65436",
+			0xB29500,
+			kRebuildWorkshopSupplyCallSitesContext0,
 		},
 		{
 			"workshop-material.rebuild-supply.source-a2",
 			0xA5F149,
 			0xA2,
 			"workshop-material.rebuild-supply.source-a2@0xA5F149",
+			0xB29500,
+			kRebuildWorkshopSupplyCallSitesContext1,
 		},
 		{
 			"workshop-material.rebuild-supply.source-a3",
 			0xA6056C,
 			0xA3,
 			"workshop-material.rebuild-supply.source-a3@0xA6056C",
+			0xB29500,
+			kRebuildWorkshopSupplyCallSitesContext2,
 		},
 		{
 			"workshop-material.rebuild-supply.source-a4",
 			0xAEFBF9,
 			0xA4,
 			"workshop-material.rebuild-supply.source-a4@0xAEFBF9",
+			0xB29500,
+			kRebuildWorkshopSupplyCallSitesContext3,
 		},
 	}};
+
+	inline constexpr std::array<std::uint8_t, 4> kComponentCountHelperCallSitesContext0{ 0x8B, 0x44, 0x24, 0x30 };
+	inline constexpr std::array<std::uint8_t, 2> kComponentCountHelperCallSitesContext1{ 0x84, 0xC0 };
 
 	inline constexpr std::array<NativeHookCallSite, 2> kComponentCountHelperCallSites{{
 		{
@@ -90,14 +125,24 @@ namespace papyrus_lootman
 			0x59BC3A,
 			0xB1,
 			"workshop-material.component-count.papyrus@0x59BC3A",
+			0x507670,
+			kComponentCountHelperCallSitesContext0,
 		},
 		{
 			"workshop-material.component-count.workbench-ui",
 			0x11751BB,
 			0xB2,
 			"workshop-material.component-count.workbench-ui@0x11751BB",
+			0x507670,
+			kComponentCountHelperCallSitesContext1,
 		},
 	}};
+
+	inline constexpr std::array<std::uint8_t, 2> kDirectComponentCountCallSitesContext0{ 0x03, 0xF0 };
+	inline constexpr std::array<std::uint8_t, 5> kDirectComponentCountCallSitesContext1{ 0x03, 0xE8, 0x49, 0x8B, 0xCE };
+	inline constexpr std::array<std::uint8_t, 9> kDirectComponentCountCallSitesContext2{ 0x03, 0xE8, 0x48, 0x8B, 0x0D, 0xAF, 0x5B, 0x73, 0x02 };
+	inline constexpr std::array<std::uint8_t, 2> kDirectComponentCountCallSitesContext3{ 0x03, 0xF8 };
+	inline constexpr std::array<std::uint8_t, 6> kDirectComponentCountCallSitesContext4{ 0x01, 0x85, 0xF0, 0x00, 0x00, 0x00 };
 
 	inline constexpr std::array<NativeHookCallSite, 5> kDirectComponentCountCallSites{{
 		{
@@ -105,32 +150,45 @@ namespace papyrus_lootman
 			0x3BC3FD,
 			0xE1,
 			"workshop-material.direct-component-count.source-e1@0x3BC3FD",
+			0x507A10,
+			kDirectComponentCountCallSitesContext0,
 		},
 		{
 			"workshop-material.direct-component-count.source-e2",
 			0x39F28F,
 			0xE2,
 			"workshop-material.direct-component-count.source-e2@0x39F28F",
+			0x507A10,
+			kDirectComponentCountCallSitesContext1,
 		},
 		{
 			"workshop-material.direct-component-count.source-e3",
 			0xB32EFB,
 			0xE3,
 			"workshop-material.direct-component-count.source-e3@0xB32EFB",
+			0x507A10,
+			kDirectComponentCountCallSitesContext2,
 		},
 		{
 			"workshop-material.direct-component-count.source-e4",
 			0xB378A8,
 			0xE4,
 			"workshop-material.direct-component-count.source-e4@0xB378A8",
+			0x507A10,
+			kDirectComponentCountCallSitesContext3,
 		},
 		{
 			"workshop-material.direct-component-count.source-e5",
 			0xB2D1BE,
 			0xE5,
 			"workshop-material.direct-component-count.source-e5@0xB2D1BE",
+			0x507A10,
+			kDirectComponentCountCallSitesContext4,
 		},
 	}};
+
+	inline constexpr std::array<std::uint8_t, 4> kWorkshopResourceStatusCallSitesContext0{ 0x48, 0x8B, 0x4B, 0x20 };
+	inline constexpr std::array<std::uint8_t, 4> kWorkshopResourceStatusCallSitesContext1{ 0x48, 0x8D, 0x4D, 0xF8 };
 
 	inline constexpr std::array<NativeHookCallSite, 2> kWorkshopResourceStatusCallSites{{
 		{
@@ -138,14 +196,21 @@ namespace papyrus_lootman
 			0xB2F130,
 			0xF1,
 			"workshop-material.resource-status.source-f1@0xB2F130",
+			0xB32E20,
+			kWorkshopResourceStatusCallSitesContext0,
 		},
 		{
 			"workshop-material.resource-status.source-f2",
 			0xB2D0D6,
 			0xF2,
 			"workshop-material.resource-status.source-f2@0xB2D0D6",
+			0xB32E20,
+			kWorkshopResourceStatusCallSitesContext1,
 		},
 	}};
+
+	inline constexpr std::array<std::uint8_t, 7> kWorkshopMenuSelectCallSitesContext0{ 0x0F, 0xB7, 0x0D, 0x72, 0xF7, 0x5B, 0x02 };
+	inline constexpr std::array<std::uint8_t, 7> kWorkshopMenuSelectCallSitesContext1{ 0x0F, 0xB7, 0x0D, 0xB5, 0xF4, 0x5B, 0x02 };
 
 	inline constexpr std::array<NativeHookCallSite, 2> kWorkshopMenuSelectCallSites{{
 		{
@@ -153,14 +218,38 @@ namespace papyrus_lootman
 			0xB2C71A,
 			0xA1,
 			"workshop-menu.select.source-a1@0xB2C71A",
+			0x396DC0,
+			kWorkshopMenuSelectCallSitesContext0,
 		},
 		{
 			"workshop-menu.select.source-a2",
 			0xB2C9D7,
 			0xA2,
 			"workshop-menu.select.source-a2@0xB2C9D7",
+			0x396DC0,
+			kWorkshopMenuSelectCallSitesContext1,
 		},
 	}};
+
+	inline constexpr std::array<std::uint8_t, 6> kWorkshopMenuAvailabilityCallSitesContext0{ 0x8B, 0x8D, 0xF8, 0x00, 0x00, 0x00 };
+	inline constexpr std::array<std::uint8_t, 3> kWorkshopMenuAvailabilityCallSitesContext1{ 0x8B, 0x4D, 0xA0 };
+	inline constexpr std::array<std::uint8_t, 3> kWorkshopMenuAvailabilityCallSitesContext2{ 0x8B, 0x4D, 0xA4 };
+	inline constexpr std::array<std::uint8_t, 3> kWorkshopMenuAvailabilityCallSitesContext3{ 0x8B, 0x4D, 0xA8 };
+	inline constexpr std::array<std::uint8_t, 4> kWorkshopMenuAvailabilityCallSitesContext4{ 0x8B, 0x4C, 0x24, 0x70 };
+	inline constexpr std::array<std::uint8_t, 4> kWorkshopMenuAvailabilityCallSitesContext5{ 0x84, 0xC0, 0x74, 0x0C };
+	inline constexpr std::array<std::uint8_t, 12> kWorkshopMenuAvailabilityCallSitesContext6{ 0x84, 0xC0, 0x74, 0x3C, 0x83, 0xBC, 0x24, 0xA0, 0x00, 0x00, 0x00, 0x00 };
+	inline constexpr std::array<std::uint8_t, 12> kWorkshopMenuAvailabilityCallSitesContext7{ 0x84, 0xC0, 0x74, 0x3C, 0x83, 0xBC, 0x24, 0x98, 0x00, 0x00, 0x00, 0x00 };
+	inline constexpr std::array<std::uint8_t, 4> kWorkshopMenuAvailabilityCallSitesContext8{ 0x8B, 0x4C, 0x24, 0x24 };
+	inline constexpr std::array<std::uint8_t, 3> kWorkshopMenuAvailabilityCallSitesContext9{ 0x8B, 0x4D, 0xC4 };
+	inline constexpr std::array<std::uint8_t, 3> kWorkshopMenuAvailabilityCallSitesContext10{ 0x8B, 0x4D, 0xC8 };
+	inline constexpr std::array<std::uint8_t, 4> kWorkshopMenuAvailabilityCallSitesContext11{ 0x8B, 0x4C, 0x24, 0x4C };
+	inline constexpr std::array<std::uint8_t, 9> kWorkshopMenuAvailabilityCallSitesContext12{ 0x84, 0xC0, 0x74, 0x11, 0x83, 0x7C, 0x24, 0x48, 0x00 };
+	inline constexpr std::array<std::uint8_t, 11> kWorkshopMenuAvailabilityCallSitesContext13{ 0x84, 0xC0, 0x74, 0x11, 0x44, 0x39, 0xB5, 0xB0, 0x01, 0x00, 0x00 };
+	inline constexpr std::array<std::uint8_t, 4> kWorkshopMenuAvailabilityCallSitesContext14{ 0x8B, 0x4C, 0x24, 0x38 };
+	inline constexpr std::array<std::uint8_t, 3> kWorkshopMenuAvailabilityCallSitesContext15{ 0x8B, 0x4D, 0x87 };
+	inline constexpr std::array<std::uint8_t, 4> kWorkshopMenuAvailabilityCallSitesContext16{ 0x44, 0x8B, 0x45, 0xAF };
+	inline constexpr std::array<std::uint8_t, 7> kWorkshopMenuAvailabilityCallSitesContext17{ 0x8B, 0x8C, 0x24, 0x88, 0x00, 0x00, 0x00 };
+	inline constexpr std::array<std::uint8_t, 5> kWorkshopMenuAvailabilityCallSitesContext18{ 0x44, 0x8B, 0x4C, 0x24, 0x70 };
 
 	inline constexpr std::array<NativeHookCallSite, 19> kWorkshopMenuAvailabilityCallSites{{
 		{
@@ -168,116 +257,159 @@ namespace papyrus_lootman
 			0xB2C6DE,
 			0x91,
 			"workshop-menu.availability.source-91@0xB2C6DE",
+			0x3997B0,
+			kWorkshopMenuAvailabilityCallSitesContext0,
 		},
 		{
 			"workshop-menu.availability.source-92",
 			0xB2C747,
 			0x92,
 			"workshop-menu.availability.source-92@0xB2C747",
+			0x3997B0,
+			kWorkshopMenuAvailabilityCallSitesContext1,
 		},
 		{
 			"workshop-menu.availability.source-93",
 			0xB2C99E,
 			0x93,
 			"workshop-menu.availability.source-93@0xB2C99E",
+			0x3997B0,
+			kWorkshopMenuAvailabilityCallSitesContext2,
 		},
 		{
 			"workshop-menu.availability.source-94",
 			0xB2CA04,
 			0x94,
 			"workshop-menu.availability.source-94@0xB2CA04",
+			0x3997B0,
+			kWorkshopMenuAvailabilityCallSitesContext3,
 		},
 		{
 			"workshop-menu.availability.source-95",
 			0xB2EA54,
 			0x95,
 			"workshop-menu.availability.source-95@0xB2EA54",
+			0x3997B0,
+			kWorkshopMenuAvailabilityCallSitesContext4,
 		},
 		{
 			"workshop-menu.availability.source-96",
 			0x396E65,
 			0x96,
 			"workshop-menu.availability.source-96@0x396E65",
+			0x3997B0,
+			kWorkshopMenuAvailabilityCallSitesContext5,
 		},
 		{
 			"workshop-menu.availability.source-97",
 			0x3B7FB2,
 			0x97,
 			"workshop-menu.availability.source-97@0x3B7FB2",
+			0x3997B0,
+			kWorkshopMenuAvailabilityCallSitesContext6,
 		},
 		{
 			"workshop-menu.availability.source-98",
 			0x3C18AF,
 			0x98,
 			"workshop-menu.availability.source-98@0x3C18AF",
+			0x3997B0,
+			kWorkshopMenuAvailabilityCallSitesContext7,
 		},
 		{
 			"workshop-menu.availability.source-99",
 			0xB2B914,
 			0x99,
 			"workshop-menu.availability.source-99@0xB2B914",
+			0x3997B0,
+			kWorkshopMenuAvailabilityCallSitesContext8,
 		},
 		{
 			"workshop-menu.availability.source-9a",
 			0xB2D7DF,
 			0x9A,
 			"workshop-menu.availability.source-9a@0xB2D7DF",
+			0x3997B0,
+			kWorkshopMenuAvailabilityCallSitesContext9,
 		},
 		{
 			"workshop-menu.availability.source-9b",
 			0xB2D911,
 			0x9B,
 			"workshop-menu.availability.source-9b@0xB2D911",
+			0x3997B0,
+			kWorkshopMenuAvailabilityCallSitesContext10,
 		},
 		{
 			"workshop-menu.availability.source-9c",
 			0xB2ED7F,
 			0x9C,
 			"workshop-menu.availability.source-9c@0xB2ED7F",
+			0x3997B0,
+			kWorkshopMenuAvailabilityCallSitesContext11,
 		},
 		{
 			"workshop-menu.availability.source-9d",
 			0xB303DB,
 			0x9D,
 			"workshop-menu.availability.source-9d@0xB303DB",
+			0x3997B0,
+			kWorkshopMenuAvailabilityCallSitesContext12,
 		},
 		{
 			"workshop-menu.availability.source-9e",
 			0xB32425,
 			0x9E,
 			"workshop-menu.availability.source-9e@0xB32425",
+			0x3997B0,
+			kWorkshopMenuAvailabilityCallSitesContext13,
 		},
 		{
 			"workshop-menu.availability.source-9f",
 			0xB3316C,
 			0x9F,
 			"workshop-menu.availability.source-9f@0xB3316C",
+			0x3997B0,
+			kWorkshopMenuAvailabilityCallSitesContext14,
 		},
 		{
 			"workshop-menu.availability.source-a0",
 			0xB361C8,
 			0xA0,
 			"workshop-menu.availability.source-a0@0xB361C8",
+			0x3997B0,
+			kWorkshopMenuAvailabilityCallSitesContext15,
 		},
 		{
 			"workshop-menu.availability.source-a1",
 			0xB366D1,
 			0xA1,
 			"workshop-menu.availability.source-a1@0xB366D1",
+			0x3997B0,
+			kWorkshopMenuAvailabilityCallSitesContext16,
 		},
 		{
 			"workshop-menu.availability.source-a2",
 			0xB376B0,
 			0xA2,
 			"workshop-menu.availability.source-a2@0xB376B0",
+			0x3997B0,
+			kWorkshopMenuAvailabilityCallSitesContext17,
 		},
 		{
 			"workshop-menu.availability.source-a3",
 			0xB3775B,
 			0xA3,
 			"workshop-menu.availability.source-a3@0xB3775B",
+			0x3997B0,
+			kWorkshopMenuAvailabilityCallSitesContext18,
 		},
 	}};
+
+	inline constexpr std::array<std::uint8_t, 5> kWorkshopCheckAndSetPlacementCallSitesContext0{ 0xE8, 0x6F, 0x30, 0xEB, 0xFF };
+	inline constexpr std::array<std::uint8_t, 9> kWorkshopCheckAndSetPlacementCallSitesContext1{ 0x40, 0x84, 0xF6, 0x0F, 0x84, 0xC5, 0x03, 0x00, 0x00 };
+	inline constexpr std::array<std::uint8_t, 9> kWorkshopCheckAndSetPlacementCallSitesContext2{ 0x40, 0x84, 0xF6, 0x0F, 0x84, 0x08, 0x01, 0x00, 0x00 };
+	inline constexpr std::array<std::uint8_t, 4> kWorkshopCheckAndSetPlacementCallSitesContext3{ 0x44, 0x39, 0x65, 0x20 };
 
 	inline constexpr std::array<NativeHookCallSite, 4> kWorkshopCheckAndSetPlacementCallSites{{
 		{
@@ -285,26 +417,42 @@ namespace papyrus_lootman
 			0xB2B177,
 			0xA5,
 			"workshop-menu.check-placement.source-a5@0xB2B177",
+			0xB2E9C0,
+			kWorkshopCheckAndSetPlacementCallSitesContext0,
 		},
 		{
 			"workshop-menu.check-placement.source-a6",
 			0xB2C762,
 			0xA6,
 			"workshop-menu.check-placement.source-a6@0xB2C762",
+			0xB2E9C0,
+			kWorkshopCheckAndSetPlacementCallSitesContext1,
 		},
 		{
 			"workshop-menu.check-placement.source-a7",
 			0xB2CA1F,
 			0xA7,
 			"workshop-menu.check-placement.source-a7@0xB2CA1F",
+			0xB2E9C0,
+			kWorkshopCheckAndSetPlacementCallSitesContext2,
 		},
 		{
 			"workshop-menu.check-placement.source-a8",
 			0xB2E6FE,
 			0xA8,
 			"workshop-menu.check-placement.source-a8@0xB2E6FE",
+			0xB2E9C0,
+			kWorkshopCheckAndSetPlacementCallSitesContext3,
 		},
 	}};
+
+	inline constexpr std::array<std::uint8_t, 3> kWorkshopStartPlacementCallSitesContext0{ 0x8B, 0x45, 0x30 };
+	inline constexpr std::array<std::uint8_t, 3> kWorkshopStartPlacementCallSitesContext1{ 0x8B, 0x45, 0x50 };
+	inline constexpr std::array<std::uint8_t, 3> kWorkshopStartPlacementCallSitesContext2{ 0x48, 0x8B, 0xCE };
+	inline constexpr std::array<std::uint8_t, 10> kWorkshopStartPlacementCallSitesContext3{ 0x33, 0xD2, 0x48, 0x8B, 0xCE, 0xE8, 0x7D, 0x50, 0x00, 0x00 };
+	inline constexpr std::array<std::uint8_t, 5> kWorkshopStartPlacementCallSitesContext4{ 0xE9, 0xB3, 0x00, 0x00, 0x00 };
+	inline constexpr std::array<std::uint8_t, 3> kWorkshopStartPlacementCallSitesContext5{ 0x48, 0x8B, 0xCF };
+	inline constexpr std::array<std::uint8_t, 10> kWorkshopStartPlacementCallSitesContext6{ 0x33, 0xD2, 0x48, 0x8B, 0xCE, 0xE8, 0xD2, 0x20, 0x00, 0x00 };
 
 	inline constexpr std::array<NativeHookCallSite, 7> kWorkshopStartPlacementCallSites{{
 		{
@@ -312,44 +460,62 @@ namespace papyrus_lootman
 			0xB2C85A,
 			0xA3,
 			"workshop-menu.start-placement.source-a3@0xB2C85A",
+			0xB2FFB0,
+			kWorkshopStartPlacementCallSitesContext0,
 		},
 		{
 			"workshop-menu.start-placement.source-a4",
 			0xB2CB15,
 			0xA4,
 			"workshop-menu.start-placement.source-a4@0xB2CB15",
+			0xB2FFB0,
+			kWorkshopStartPlacementCallSitesContext1,
 		},
 		{
 			"workshop-menu.start-placement.source-a9",
 			0xB2B16F,
 			0xA9,
 			"workshop-menu.start-placement.source-a9@0xB2B16F",
+			0xB2FFB0,
+			kWorkshopStartPlacementCallSitesContext2,
 		},
 		{
 			"workshop-menu.start-placement.source-aa",
 			0xB2B9D4,
 			0xAA,
 			"workshop-menu.start-placement.source-aa@0xB2B9D4",
+			0xB2FFB0,
+			kWorkshopStartPlacementCallSitesContext3,
 		},
 		{
 			"workshop-menu.start-placement.source-ab",
 			0xB2D980,
 			0xAB,
 			"workshop-menu.start-placement.source-ab@0xB2D980",
+			0xB2FFB0,
+			kWorkshopStartPlacementCallSitesContext4,
 		},
 		{
 			"workshop-menu.start-placement.source-ac",
 			0xB2E6F6,
 			0xAC,
 			"workshop-menu.start-placement.source-ac@0xB2E6F6",
+			0xB2FFB0,
+			kWorkshopStartPlacementCallSitesContext5,
 		},
 		{
 			"workshop-menu.start-placement.source-ad",
 			0xB2E97F,
 			0xAD,
 			"workshop-menu.start-placement.source-ad@0xB2E97F",
+			0xB2FFB0,
+			kWorkshopStartPlacementCallSitesContext6,
 		},
 	}};
+
+	inline constexpr std::array<std::uint8_t, 8> kWorkshopBuildResourceCheckCallSitesContext0{ 0x84, 0xC0, 0x0F, 0x84, 0x50, 0x04, 0x00, 0x00 };
+	inline constexpr std::array<std::uint8_t, 8> kWorkshopBuildResourceCheckCallSitesContext1{ 0x84, 0xC0, 0x0F, 0x84, 0x2A, 0x08, 0x00, 0x00 };
+	inline constexpr std::array<std::uint8_t, 4> kWorkshopBuildResourceCheckCallSitesContext2{ 0x48, 0x8B, 0x4B, 0x18 };
 
 	inline constexpr std::array<NativeHookCallSite, 3> kWorkshopBuildResourceCheckCallSites{{
 		{
@@ -357,20 +523,29 @@ namespace papyrus_lootman
 			0x392524,
 			0xB1,
 			"workshop-material.build-resource-check.placement@0x392524",
+			0x42BCD0,
+			kWorkshopBuildResourceCheckCallSitesContext0,
 		},
 		{
 			"workshop-material.build-resource-check.confirm",
 			0x398E16,
 			0xB2,
 			"workshop-material.build-resource-check.confirm@0x398E16",
+			0x42BCD0,
+			kWorkshopBuildResourceCheckCallSitesContext1,
 		},
 		{
 			"workshop-material.build-resource-check.consume-precheck",
 			0x3B7C5E,
 			0xB3,
 			"workshop-material.build-resource-check.consume-precheck@0x3B7C5E",
+			0x42BCD0,
+			kWorkshopBuildResourceCheckCallSitesContext2,
 		},
 	}};
+
+	inline constexpr std::array<std::uint8_t, 4> kWorkshopConsumeComponentCallSitesContext0{ 0x48, 0x83, 0xC7, 0x10 };
+	inline constexpr std::array<std::uint8_t, 4> kWorkshopConsumeComponentCallSitesContext1{ 0x48, 0x83, 0xC3, 0x10 };
 
 	inline constexpr std::array<NativeHookCallSite, 2> kWorkshopConsumeComponentCallSites{{
 		{
@@ -378,12 +553,16 @@ namespace papyrus_lootman
 			0x399006,
 			0xF3,
 			"workshop-material.consume-component.source-f3@0x399006",
+			0x392020,
+			kWorkshopConsumeComponentCallSitesContext0,
 		},
 		{
 			"workshop-material.consume-component.source-f4",
 			0x3B7D3A,
 			0xF4,
 			"workshop-material.consume-component.source-f4@0x3B7D3A",
+			0x392020,
+			kWorkshopConsumeComponentCallSitesContext1,
 		},
 	}};
 
@@ -395,33 +574,48 @@ namespace papyrus_lootman
 
 	inline constexpr std::uint32_t kWorkshopResourceStatusMissingResources = 0x2;
 
+	inline constexpr std::array<std::uint8_t, 4> kRemoveComponentsCallSitesContext0{ 0x48, 0x83, 0xC3, 0x10 };
+	inline constexpr std::array<std::uint8_t, 5> kRemoveComponentsCallSitesContext1{ 0xE9, 0xB7, 0x00, 0x00, 0x00 };
+
 	inline constexpr std::array<NativeHookCallSite, 2> kRemoveComponentsCallSites{{
 		{
 			"workshop-material.remove-components.source-f1",
 			0x114ECB9,
 			0xF1,
 			"workshop-material.remove-components.source-f1@0x114ECB9",
+			0x1182740,
+			kRemoveComponentsCallSitesContext0,
 		},
 		{
 			"workshop-material.remove-components.source-f2",
 			0x114E6E3,
 			0xF2,
 			"workshop-material.remove-components.source-f2@0x114E6E3",
+			0x1182740,
+			kRemoveComponentsCallSitesContext1,
 		},
 	}};
+
+	inline constexpr std::array<std::uint8_t, 7> kWorkshopObjectCountPapyrusCallSiteContext0{ 0x48, 0x81, 0xC4, 0xC0, 0x00, 0x00, 0x00 };
 
 	inline constexpr NativeHookCallSite kWorkshopObjectCountPapyrusCallSite{
 		"workshop-material.object-count.papyrus",
 		0x5DD494,
 		0xC1,
 		"workshop-material.object-count.papyrus@0x5DD494",
+		0x59D370,
+		kWorkshopObjectCountPapyrusCallSiteContext0,
 	};
+
+	inline constexpr std::array<std::uint8_t, 2> kCurrentWorkshopObjectCountCallSiteContext0{ 0x8B, 0xC0 };
 
 	inline constexpr NativeHookCallSite kCurrentWorkshopObjectCountCallSite{
 		"workshop-material.object-count.current-workshop",
 		0x59D388,
 		0xC2,
 		"workshop-material.object-count.current-workshop@0x59D388",
+		0x37DE70,
+		kCurrentWorkshopObjectCountCallSiteContext0,
 	};
 
 	inline constexpr std::uintptr_t kWorkshopSupplyOwnerFieldE0Offset = 0xE0;

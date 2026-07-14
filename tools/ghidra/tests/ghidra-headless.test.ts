@@ -126,11 +126,40 @@ describe("ghidra headless", () => {
 		expect(command.reportPath).toBe(path.join(root, "tools", "ghidra", "reports", "custom-probe.txt"));
 	});
 
+	it("builds one read-only instruction command for every proven manifest site", () => {
+		const root = createTempDir();
+		dirs.push(root);
+		writeConfig(root, "headless.example.json");
+		fs.outputJsonSync(path.join(root, "tools/native-hooks/papyrus_lootman_hooks.addresses.json"), {
+			entries: [{
+				id: "fixture.family",
+				discoveryStrategy: { status: "proven", proof: { sites: [
+					{ siteId: "fixture.a", absoluteAddress: "0x140001000" },
+					{ siteId: "fixture.b", absoluteAddress: "0x140002000" },
+				] } },
+			}],
+		});
+		const config = readGhidraHeadlessConfig({ projectRoot: root });
+
+		const command = buildGhidraInstructionWindowProbeCommand(config, {
+			projectRoot: root,
+			provenNativeHooks: true,
+			reportPath: "tools/ghidra/reports/fallout4-1.11.221/proven-call-site-evidence.txt",
+			instructionCount: 12,
+		});
+
+		expect(command.args.slice(-2)).toEqual(["0x140001000", "0x140002000"]);
+		expect(command.args).toEqual(expect.arrayContaining(["-readOnly", "-noanalysis", "12"]));
+	});
+
 	it("runs the probe command with injected process execution", async () => {
 		const root = createTempDir();
 		dirs.push(root);
 		writeConfig(root, "headless.example.json");
-		const execaFn = vi.fn().mockResolvedValue({ exitCode: 0, stdout: "ok", stderr: "" });
+		const execaFn = vi.fn().mockImplementation(async (_command, args: string[]) => {
+			fs.outputFileSync(args.at(-3) as string, "fixture report");
+			return { exitCode: 0, stdout: "ok", stderr: "" };
+		});
 
 		const result = await runGhidraHeadlessProbe({ projectRoot: root, execaFn });
 
@@ -141,6 +170,17 @@ describe("ghidra headless", () => {
 			reject: false,
 			stdio: "pipe",
 		});
+	});
+
+	it("rejects a successful process that produces no report", async () => {
+		const root = createTempDir();
+		dirs.push(root);
+		writeConfig(root, "headless.example.json");
+		const execaFn = vi.fn().mockResolvedValue({ exitCode: 0, stdout: "script failed", stderr: "" });
+
+		await expect(runGhidraHeadlessProbe({ projectRoot: root, execaFn })).rejects.toThrow(
+			/Ghidra headless probe exited successfully without creating.*script failed/s,
+		);
 	});
 
 	it("parses CLI overrides", () => {

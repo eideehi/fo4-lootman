@@ -248,6 +248,21 @@ describe("native hook address manifest", () => {
 		expect(result.errors.join("\n")).toContain("expectedOriginalTargetGroup");
 	});
 
+	it("requires versioned target and context evidence on every proven schema v2 call site", () => {
+		for (const field of ["expectedTargetRva", "contextSignatureVersion", "contextBytes"] as const) {
+			const manifest = cloneManifest(readNativeHookManifest(defaultManifestPath));
+			manifest.schemaVersion = 2;
+			const entry = manifest.entries.find((candidate) => candidate.category === "call_site_rva");
+			if (!entry?.sites) throw new Error("Fixture manifest has no call sites.");
+			delete entry.sites[0][field];
+
+			const result = validateNativeHookManifest(manifest, { projectRoot, checkEvidencePaths: true });
+
+			expect(result.valid).toBe(false);
+			expect(result.errors.join("\n")).toContain(field);
+		}
+	});
+
 	it("generates deterministic C++ and matches the checked-in header", () => {
 		const manifest = readNativeHookManifest(defaultManifestPath);
 		const first = generateNativeHookHeader(manifest);

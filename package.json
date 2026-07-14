@@ -18,6 +18,7 @@
     "native-hooks:resolve": "node tools/scripts/preflight.js native-hooks:resolve && tsx tools/native-hooks/scripts/resolve-native-hook-addresses.ts",
     "native-hooks:verify": "node tools/scripts/preflight.js native-hooks:verify && tsx tools/native-hooks/scripts/verify-native-hooks.ts",
     "ghidra:probe": "node tools/scripts/preflight.js ghidra:probe && tsx tools/ghidra/scripts/run-ghidra-headless-probe.ts",
+    "ghidra:hook-evidence": "node tools/scripts/preflight.js ghidra:hook-evidence && tsx tools/ghidra/scripts/run-ghidra-headless-probe.ts --proven-native-hooks --instruction-count=12",
     "test": "node tools/scripts/preflight.js test && vitest run",
     "test:packaging": "node tools/scripts/preflight.js test:packaging && vitest run packaging/tests",
     "test:tools": "node tools/scripts/preflight.js test:tools && vitest run tools",

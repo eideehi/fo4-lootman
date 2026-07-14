@@ -16,6 +16,7 @@ export interface ResolveNativeHookAddressOptions {
 	projectRoot?: string;
 	manifestPath?: string;
 	write?: boolean;
+	evidenceReportPath?: string;
 }
 
 export interface ResolvedNativeHookAddressEntry {
@@ -38,6 +39,9 @@ export interface ResolvedNativeHookAddressSite {
 	siteId: string;
 	rva: string;
 	changed: boolean;
+	expectedTargetRva: string;
+	contextBytes: string;
+	contextInstructionCount: number;
 }
 
 interface CallReference {
@@ -45,6 +49,14 @@ interface CallReference {
 	to: number;
 	type: string;
 }
+
+interface EvidenceInstruction {
+	address: number;
+	bytes: number[];
+	disassembly: string;
+}
+
+const DEFAULT_EVIDENCE_REPORT = "tools/ghidra/reports/fallout4-1.11.221/proven-call-site-evidence.txt";
 
 const HEX_LITERAL_PATTERN = /^0x[0-9A-F]+$/i;
 const PLAIN_HEX_PATTERN = /^[0-9A-F]+$/i;
@@ -67,6 +79,94 @@ function formatRva(value: number): string {
 
 function formatAbsoluteAddress(value: number): string {
 	return `0x${value.toString(16).toUpperCase()}`;
+}
+
+function parseEvidenceReport(root: string, reportPath: string): Map<number, EvidenceInstruction[]> {
+	const absolutePath = path.isAbsolute(reportPath) ? reportPath : path.join(root, reportPath);
+	const reportText = fs.readFileSync(absolutePath, "utf8");
+	const windows = new Map<number, EvidenceInstruction[]>();
+	let currentAddress: number | undefined;
+	for (const [lineIndex, line] of reportText.split(/\r?\n/).entries()) {
+		const targetMatch = line.trim().match(/^Target\s+([0-9A-F]+)$/i);
+		if (targetMatch) {
+			currentAddress = parseHex(targetMatch[1], `${reportPath}:${lineIndex + 1} target`);
+			if (windows.has(currentAddress)) throw new Error(`${reportPath}: duplicate Target ${formatAbsoluteAddress(currentAddress)}.`);
+			windows.set(currentAddress, []);
+			continue;
+		}
+		if (currentAddress === undefined || line.trim() === "") continue;
+		const instructionMatch = line.match(/^\s*([0-9A-F]+):\s*\[([^\]]+)\]\s+(.+)$/i);
+		if (!instructionMatch) continue;
+		const rawBytes = instructionMatch[2].trim().split(/\s+/);
+		if (rawBytes.length === 0 || rawBytes.some((byte) => !/^[0-9A-F]{2}$/i.test(byte))) {
+			throw new Error(`${reportPath}:${lineIndex + 1}: malformed raw instruction bytes.`);
+		}
+		windows.get(currentAddress)?.push({
+			address: parseHex(instructionMatch[1], `${reportPath}:${lineIndex + 1} instruction address`),
+			bytes: rawBytes.map((byte) => Number.parseInt(byte, 16)),
+			disassembly: instructionMatch[3],
+		});
+	}
+	return windows;
+}
+
+function signedInt32(bytes: number[]): number {
+	const value = (bytes[0] | (bytes[1] << 8) | (bytes[2] << 16) | (bytes[3] << 24));
+	return value;
+}
+
+function deriveSiteEvidence(
+	entry: NativeHookAddressEntry,
+	siteId: string,
+	callAddress: number,
+	expectedTarget: number,
+	imageBase: number,
+	windows: Map<number, EvidenceInstruction[]>,
+): { expectedTargetRva: string; candidates: { bytes: string; instructionCount: number }[] } {
+	const instructions = windows.get(callAddress);
+	if (!instructions || instructions.length < 2) {
+		throw new Error(`${entry.id}: missing raw-byte instruction window for ${siteId} at ${formatAbsoluteAddress(callAddress)}.`);
+	}
+	const call = instructions[0];
+	if (call.address !== callAddress || call.bytes.length !== 5 || call.bytes[0] !== 0xE8) {
+		throw new Error(`${entry.id}: ${siteId} must begin with a five-byte E8 CALL rel32 instruction.`);
+	}
+	const decodedTarget = callAddress + 5 + signedInt32(call.bytes.slice(1));
+	if (decodedTarget !== expectedTarget) {
+		throw new Error(`${entry.id}: ${siteId} raw CALL target ${formatAbsoluteAddress(decodedTarget)} does not match ${formatAbsoluteAddress(expectedTarget)}.`);
+	}
+	let bytes: number[] = [];
+	const candidates = instructions.slice(1).map((instruction, index) => {
+		bytes = bytes.concat(instruction.bytes);
+		return {
+			bytes: bytes.map((byte) => byte.toString(16).padStart(2, "0").toUpperCase()).join(" "),
+			instructionCount: index + 1,
+		};
+	});
+	return { expectedTargetRva: formatRva(expectedTarget - imageBase), candidates };
+}
+
+function selectUniqueSiteContexts(
+	entry: NativeHookAddressEntry,
+	siteEvidence: Map<string, { expectedTargetRva: string; candidates: { bytes: string; instructionCount: number }[] }>,
+): Map<string, { expectedTargetRva: string; contextBytes: string; contextInstructionCount: number }> {
+	const selected = new Map<string, { expectedTargetRva: string; contextBytes: string; contextInstructionCount: number }>();
+	for (const [siteId, evidence] of siteEvidence) {
+		const candidate = evidence.candidates.find((value) => {
+			for (const [otherSiteId, otherEvidence] of siteEvidence) {
+				if (otherSiteId === siteId) continue;
+				if (otherEvidence.candidates.some((other) => other.bytes === value.bytes)) return false;
+			}
+			return true;
+		});
+		if (!candidate) throw new Error(`${entry.id}: no non-empty whole-instruction context uniquely identifies ${siteId} within its family.`);
+		selected.set(siteId, {
+			expectedTargetRva: evidence.expectedTargetRva,
+			contextBytes: candidate.bytes,
+			contextInstructionCount: candidate.instructionCount,
+		});
+	}
+	return selected;
 }
 
 function stripHexPrefix(value: string): string {
@@ -134,7 +234,7 @@ function parseEntryReferences(sectionText: string, targetAddress: number): CallR
 function hasDirectCallInstruction(reportText: string, from: number, to: number): boolean {
 	const source = from.toString(16);
 	const target = to.toString(16);
-	const pattern = new RegExp(`^\\s*${source}:\\s+CALL\\s+0x${target}\\b`, "im");
+	const pattern = new RegExp(`^\\s*${source}:\\s+(?:\\[[^\\]]+\\]\\s+)?CALL\\s+0x${target}\\b`, "im");
 	return pattern.test(reportText);
 }
 
@@ -206,6 +306,7 @@ function resolveSingleCallSiteEntry(
 	root: string,
 	entry: NativeHookAddressEntry,
 	proof: NativeHookDiscoveryProof,
+	evidenceWindows: Map<number, EvidenceInstruction[]>,
 ): ResolvedNativeHookAddressEntry {
 	if (!entry.sites || entry.sites.length !== 1) {
 		throw new Error(`${entry.id}: expected exactly one manifest site.`);
@@ -226,10 +327,21 @@ function resolveSingleCallSiteEntry(
 	const candidateRvas = references
 		.map((reference) => referenceToRva(entry, reference, imageBase))
 		.sort((a, b) => parseHex(a, "candidate RVA") - parseHex(b, "candidate RVA"));
-	const changed = entry.sites[0].rva.toUpperCase() !== candidateRvas[0].toUpperCase();
+	let changed = entry.sites[0].rva.toUpperCase() !== candidateRvas[0].toUpperCase();
+	const siteId = entry.sites[0].id;
+	const siteEvidence = new Map([[siteId, deriveSiteEvidence(
+		entry, siteId, references[0].from, targetAddress, imageBase, evidenceWindows,
+	)]]);
+	const selected = selectUniqueSiteContexts(entry, siteEvidence).get(siteId);
+	if (!selected) throw new Error(`${entry.id}: failed to select context for ${siteId}.`);
+	changed ||= entry.sites[0].expectedTargetRva?.toUpperCase() !== selected.expectedTargetRva.toUpperCase() ||
+		entry.sites[0].contextSignatureVersion !== 1 || entry.sites[0].contextBytes !== selected.contextBytes;
 	entry.sites[0] = {
 		...entry.sites[0],
 		rva: candidateRvas[0],
+		expectedTargetRva: selected.expectedTargetRva,
+		contextSignatureVersion: 1,
+		contextBytes: selected.contextBytes,
 	};
 
 	return {
@@ -237,6 +349,7 @@ function resolveSingleCallSiteEntry(
 		targetAbsoluteAddress: formatAbsoluteAddress(targetAddress),
 		candidateRvas,
 		changed,
+		sites: [{ siteId, rva: candidateRvas[0], changed, ...selected }],
 	};
 }
 
@@ -244,6 +357,7 @@ function resolveExplicitCallSiteEntry(
 	root: string,
 	entry: NativeHookAddressEntry,
 	proof: NativeHookDiscoveryProof,
+	evidenceWindows: Map<number, EvidenceInstruction[]>,
 ): ResolvedNativeHookAddressEntry {
 	if (!entry.sites || entry.sites.length !== entry.expectedCount) {
 		throw new Error(`${entry.id}: expected exactly ${entry.expectedCount} manifest sites.`);
@@ -293,22 +407,37 @@ function resolveExplicitCallSiteEntry(
 		);
 	}
 
+	const derivedEvidence = new Map(entry.sites.map((site) => {
+		const reference = selectedReferencesBySiteId.get(site.id);
+		if (!reference) throw new Error(`${entry.id}: proof.sites must include manifest site ${site.id}.`);
+		return [site.id, deriveSiteEvidence(entry, site.id, reference.from, targetAddress, imageBase, evidenceWindows)] as const;
+	}));
+	const selectedContexts = selectUniqueSiteContexts(entry, derivedEvidence);
 	const resolvedSites: ResolvedNativeHookAddressSite[] = entry.sites.map((site) => {
 		const reference = selectedReferencesBySiteId.get(site.id);
 		if (!reference) {
 			throw new Error(`${entry.id}: proof.sites must include manifest site ${site.id}.`);
 		}
 		const rva = referenceToRva(entry, reference, imageBase);
+		const context = selectedContexts.get(site.id);
+		if (!context) throw new Error(`${entry.id}: failed to select context for ${site.id}.`);
+		const changed = site.rva.toUpperCase() !== rva.toUpperCase() ||
+			site.expectedTargetRva?.toUpperCase() !== context.expectedTargetRva.toUpperCase() ||
+			site.contextSignatureVersion !== 1 || site.contextBytes !== context.contextBytes;
 		return {
 			siteId: site.id,
 			rva,
-			changed: site.rva.toUpperCase() !== rva.toUpperCase(),
+			changed,
+			...context,
 		};
 	});
 	const resolvedBySiteId = new Map(resolvedSites.map((site) => [site.siteId, site]));
 	entry.sites = entry.sites.map((site) => ({
 		...site,
 		rva: resolvedBySiteId.get(site.id)?.rva ?? site.rva,
+		expectedTargetRva: resolvedBySiteId.get(site.id)?.expectedTargetRva,
+		contextSignatureVersion: 1,
+		contextBytes: resolvedBySiteId.get(site.id)?.contextBytes,
 	}));
 
 	return {
@@ -320,7 +449,11 @@ function resolveExplicitCallSiteEntry(
 	};
 }
 
-function resolveCallSiteEntry(root: string, entry: NativeHookAddressEntry): ResolvedNativeHookAddressEntry {
+function resolveCallSiteEntry(
+	root: string,
+	entry: NativeHookAddressEntry,
+	evidenceWindows: Map<number, EvidenceInstruction[]>,
+): ResolvedNativeHookAddressEntry {
 	const proof = entry.discoveryStrategy.proof;
 	if (!proof) {
 		throw new Error(`${entry.id}: proven entries require discoveryStrategy.proof.`);
@@ -336,13 +469,13 @@ function resolveCallSiteEntry(root: string, entry: NativeHookAddressEntry): Reso
 	}
 
 	if (proof.sites !== undefined) {
-		return resolveExplicitCallSiteEntry(root, entry, proof);
+		return resolveExplicitCallSiteEntry(root, entry, proof, evidenceWindows);
 	}
 
 	if (entry.expectedCount !== 1) {
 		throw new Error(`${entry.id}: proof.sites is required for multi-site proven call-site entries.`);
 	}
-	return resolveSingleCallSiteEntry(root, entry, proof);
+	return resolveSingleCallSiteEntry(root, entry, proof, evidenceWindows);
 }
 
 function writeManifest(manifestPath: string, manifest: NativeHookAddressManifest): void {
@@ -353,11 +486,13 @@ export function resolveNativeHookAddresses(options: ResolveNativeHookAddressOpti
 	const root = options.projectRoot ?? projectRoot;
 	const manifestPath = options.manifestPath ?? defaultManifestPath;
 	const manifest = readNativeHookManifest(manifestPath);
+	const evidenceReportPath = options.evidenceReportPath ?? DEFAULT_EVIDENCE_REPORT;
+	const evidenceWindows = parseEvidenceReport(root, evidenceReportPath);
 
 	assertValidNativeHookManifest(manifest, {
 		projectRoot: root,
 		checkEvidencePaths: true,
-		checkGeneratedHeader: true,
+		checkGeneratedHeader: manifest.schemaVersion === 2,
 		checkSource: false,
 	});
 
@@ -369,7 +504,7 @@ export function resolveNativeHookAddresses(options: ResolveNativeHookAddressOpti
 			skippedEntries.push(entry.id);
 			continue;
 		}
-		resolvedEntries.push(resolveCallSiteEntry(root, entry));
+		resolvedEntries.push(resolveCallSiteEntry(root, entry, evidenceWindows));
 	}
 
 	if (resolvedEntries.length === 0) {
@@ -378,6 +513,7 @@ export function resolveNativeHookAddresses(options: ResolveNativeHookAddressOpti
 
 	let generatedHeader: string | undefined;
 	if (options.write) {
+		manifest.schemaVersion = 2;
 		assertValidNativeHookManifest(manifest, {
 			projectRoot: root,
 			checkEvidencePaths: true,
@@ -409,6 +545,8 @@ export function parseResolveNativeHookAddressArgs(args: string[]): ResolveNative
 			options.write = true;
 		} else if (arg.startsWith("--manifest=")) {
 			options.manifestPath = path.resolve(arg.slice("--manifest=".length));
+		} else if (arg.startsWith("--evidence-report=")) {
+			options.evidenceReportPath = path.resolve(arg.slice("--evidence-report=".length));
 		} else {
 			throw new Error(`Unknown argument: ${arg}`);
 		}

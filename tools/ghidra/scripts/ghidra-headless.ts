@@ -2,6 +2,7 @@ import { execa, type Options as ExecaOptions } from "execa";
 import fs from "fs-extra";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+import { readNativeHookManifest } from "../../native-hooks/scripts/native-hook-addresses.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 export const ghidraRoot = path.resolve(__dirname, "..");
@@ -30,6 +31,8 @@ export interface GhidraProbeOptions extends ReadGhidraHeadlessConfigOptions {
 	reportPath?: string;
 	address?: string;
 	instructionCount?: number;
+	provenNativeHooks?: boolean;
+	manifestPath?: string;
 	execaFn?: typeof execa;
 	stdio?: ExecaOptions["stdio"];
 }
@@ -38,6 +41,31 @@ export interface GhidraProbeCommand {
 	command: string;
 	args: string[];
 	reportPath: string;
+}
+
+export const defaultProvenHookEvidencePath = "tools/ghidra/reports/fallout4-1.11.221/proven-call-site-evidence.txt";
+
+function getProvenHookAddresses(root: string, manifestPath?: string): string[] {
+	const resolvedManifestPath = manifestPath
+		? resolveWorkspacePath(root, manifestPath)
+		: path.join(root, "tools", "native-hooks", "papyrus_lootman_hooks.addresses.json");
+	const manifest = readNativeHookManifest(resolvedManifestPath);
+	const addresses: string[] = [];
+	for (const entry of manifest.entries) {
+		if (entry.discoveryStrategy.status !== "proven") continue;
+		const proof = entry.discoveryStrategy.proof;
+		if (!proof) throw new Error(`${entry.id}: proven entry has no proof.`);
+		if (proof.sites) {
+			addresses.push(...proof.sites.map((site) => site.absoluteAddress));
+			continue;
+		}
+		if (!entry.sites || entry.sites.length !== 1) {
+			throw new Error(`${entry.id}: proven entry needs one manifest site or explicit proof sites.`);
+		}
+		addresses.push(`0x${(0x140000000 + Number.parseInt(entry.sites[0].rva.slice(2), 16)).toString(16).toUpperCase()}`);
+	}
+	if (addresses.length === 0) throw new Error("No proven native hook call sites were found.");
+	return [...new Set(addresses)];
 }
 
 export interface GhidraProbeResult extends GhidraProbeCommand {
@@ -132,7 +160,7 @@ export function readGhidraHeadlessConfig(options: ReadGhidraHeadlessConfigOption
 
 export function buildGhidraInstructionWindowProbeCommand(
 	config: GhidraHeadlessConfig,
-	options: Pick<GhidraProbeOptions, "projectRoot" | "reportPath" | "address" | "instructionCount"> = {},
+	options: Pick<GhidraProbeOptions, "projectRoot" | "reportPath" | "address" | "instructionCount" | "provenNativeHooks" | "manifestPath"> = {},
 ): GhidraProbeCommand {
 	const root = options.projectRoot ?? projectRoot;
 	const reportPath = options.reportPath ? resolveWorkspacePath(root, options.reportPath) : config.probeReportPath;
@@ -142,6 +170,7 @@ export function buildGhidraInstructionWindowProbeCommand(
 		throw new Error("instructionCount must be a positive integer.");
 	}
 
+	const addresses = options.provenNativeHooks ? getProvenHookAddresses(root, options.manifestPath) : [address];
 	return {
 		command: config.analyzeHeadless,
 		args: [
@@ -157,7 +186,7 @@ export function buildGhidraInstructionWindowProbeCommand(
 			"DumpFo4InstructionWindow",
 			reportPath,
 			String(instructionCount),
-			address,
+			...addresses,
 		],
 		reportPath,
 	};
@@ -185,6 +214,13 @@ export async function runGhidraHeadlessProbe(options: GhidraProbeOptions = {}): 
 			probeResult.stderr,
 		].filter((line) => line !== "").join("\n"));
 	}
+	if (!fs.existsSync(command.reportPath)) {
+		throw new Error([
+			`Ghidra headless probe exited successfully without creating ${command.reportPath}.`,
+			probeResult.stdout,
+			probeResult.stderr,
+		].filter((line) => line !== "").join("\n"));
+	}
 	return probeResult;
 }
 
@@ -202,6 +238,11 @@ export function parseGhidraHeadlessProbeArgs(args: string[]): GhidraProbeOptions
 			options.address = arg.slice("--address=".length);
 		} else if (arg.startsWith("--instruction-count=")) {
 			options.instructionCount = Number.parseInt(arg.slice("--instruction-count=".length), 10);
+		} else if (arg === "--proven-native-hooks") {
+			options.provenNativeHooks = true;
+			options.reportPath ??= defaultProvenHookEvidencePath;
+		} else if (arg.startsWith("--manifest=")) {
+			options.manifestPath = arg.slice("--manifest=".length);
 		} else {
 			throw new Error(`Unknown argument: ${arg}`);
 		}

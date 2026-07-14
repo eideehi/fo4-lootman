@@ -12,6 +12,7 @@
 #include <span>
 #include <unordered_map>
 #include <unordered_set>
+#include <vector>
 
 #include <REL/Relocation.h>
 
@@ -264,6 +265,13 @@ namespace papyrus_lootman
 		std::array<std::uint8_t, 5> bytes{};
 	};
 
+	struct DirectCallContextReadContext
+	{
+		std::uintptr_t address = 0;
+		std::uint8_t* destination = nullptr;
+		std::size_t size = 0;
+	};
+
 	void ReadDirectCallInstructionBytes(void* opaque)
 	{
 		auto* context = static_cast<DirectCallInstructionReadContext*>(opaque);
@@ -271,6 +279,15 @@ namespace papyrus_lootman
 			context->bytes.data(),
 			reinterpret_cast<const void*>(context->address),
 			context->bytes.size());
+	}
+
+	void ReadDirectCallContextBytes(void* opaque)
+	{
+		auto* context = static_cast<DirectCallContextReadContext*>(opaque);
+		std::memcpy(
+			context->destination,
+			reinterpret_cast<const void*>(context->address),
+			context->size);
 	}
 
 	std::optional<DirectCallSiteDecode> DecodeDirectCallSite(
@@ -310,11 +327,54 @@ namespace papyrus_lootman
 			static_cast<std::intptr_t>(address + 5) +
 			static_cast<std::intptr_t>(displacement));
 		const auto moduleBase = address - site.rva;
+		const auto targetRva = targetAddress - moduleBase;
+		if (targetRva != site.expectedTargetRva)
+		{
+			REX::ERROR(
+				"source=native component=native_hook event=direct_call_hook_skipped reason=unexpected_original_target family={} site={} rva={:X} original_target_rva={:X} expected_original_target_rva={:X} failure_policy_action={}",
+				family,
+				site.id,
+				site.rva,
+				targetRva,
+				site.expectedTargetRva,
+				failurePolicyAction);
+			return std::nullopt;
+		}
+
+		std::vector<std::uint8_t> actualContext(site.contextBytes.size());
+		DirectCallContextReadContext contextRead{
+			address + 5,
+			actualContext.data(),
+			actualContext.size(),
+		};
+		if (actualContext.empty() ||
+			!ExecuteSehCallSafe(&ReadDirectCallContextBytes, &contextRead))
+		{
+			REX::ERROR(
+				"source=native component=native_hook event=direct_call_hook_skipped reason=context_read_failed family={} site={} rva={:X} context_signature_version={} failure_policy_action={}",
+				family,
+				site.id,
+				site.rva,
+				kNativeHookContextSignatureVersion,
+				failurePolicyAction);
+			return std::nullopt;
+		}
+		if (!std::equal(actualContext.begin(), actualContext.end(), site.contextBytes.begin()))
+		{
+			REX::ERROR(
+				"source=native component=native_hook event=direct_call_hook_skipped reason=context_mismatch family={} site={} rva={:X} context_signature_version={} failure_policy_action={}",
+				family,
+				site.id,
+				site.rva,
+				kNativeHookContextSignatureVersion,
+				failurePolicyAction);
+			return std::nullopt;
+		}
 		return DirectCallSiteDecode{
 			&site,
 			address,
 			targetAddress,
-			targetAddress - moduleBase,
+			targetRva,
 		};
 	}
 

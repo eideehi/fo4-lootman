@@ -87,6 +87,8 @@ function writeFixtureProjectWithReports(
 	for (const [reportPath, text] of Object.entries(reports)) {
 		fs.outputFileSync(path.join(root, reportPath), text);
 	}
+	const evidenceText = Object.values(reports).join("\n");
+	fs.outputFileSync(path.join(root, "tools/ghidra/reports/fallout4-1.11.221/proven-call-site-evidence.txt"), evidenceText);
 	return manifestPath;
 }
 
@@ -107,9 +109,10 @@ function exactReport(): string {
 		"  140123000: RET",
 		"",
 		"================================================================================",
-		"Target 140456000",
+		"Target 140456789",
 		"Instructions:",
-		"  140456789: CALL 0x140123000",
+		"  140456789: [E8 72 C8 CC FF] CALL 0x140123000",
+		"  14045678e: [48 8B C1] MOV RAX,RCX",
 		"",
 	].join("\n");
 }
@@ -186,17 +189,22 @@ function multiSiteReport(): string {
 		"================================================================================",
 		"Target 140456010",
 		"Instructions:",
-		"  140456010: CALL 0x140123000",
+		"  140456010: [E8 EB CF CC FF] CALL 0x140123000",
+		"  140456015: [48 8B C1] MOV RAX,RCX",
+		"  140456018: [90] NOP",
 		"",
 		"================================================================================",
 		"Target 140456020",
 		"Instructions:",
-		"  140456020: CALL 0x140123000",
+		"  140456020: [E8 DB CF CC FF] CALL 0x140123000",
+		"  140456025: [48 8B C2] MOV RAX,RDX",
+		"  140456028: [90] NOP",
 		"",
 		"================================================================================",
 		"Target 140456030",
 		"Instructions:",
-		"  140456030: CALL 0x140123000",
+		"  140456030: [E8 CB CF CC FF] CALL 0x140123000",
+		"  140456035: [48 8B C3] MOV RAX,RBX",
 		"",
 	].join("\n");
 }
@@ -220,12 +228,18 @@ describe("native hook address resolution", () => {
 
 		expect(result.wroteManifest).toBe(false);
 		expect(result.resolvedEntries).toEqual([
-			{
+			expect.objectContaining({
 				id: "fixture.proven_call",
 				targetAbsoluteAddress: "0x140123000",
 				candidateRvas: ["0x456789"],
 				changed: true,
-			},
+				sites: [expect.objectContaining({
+					siteId: "fixture.proven-call.primary",
+					expectedTargetRva: "0x123000",
+					contextBytes: "48 8B C1",
+					contextInstructionCount: 1,
+				})],
+			}),
 		]);
 		expect(result.skippedEntries).toEqual(["fixture.unproven_call"]);
 		expect(manifestAfter.entries[0].sites?.[0].rva).toBe("0x1111");
@@ -269,11 +283,48 @@ describe("native hook address resolution", () => {
 		const manifestPath = writeFixtureProject(
 			root,
 			createFixtureManifest(),
-			exactReport().replace("  140456789: CALL 0x140123000", "  140456789: JMP 0x140123000"),
+			exactReport().replace("[E8 72 C8 CC FF] CALL 0x140123000", "[E8 72 C8 CC FF] JMP 0x140123000"),
 		);
 
 		expect(() => resolveNativeHookAddresses({ projectRoot: root, manifestPath }))
 			.toThrow("no CALL 0x140123000 instruction line was found");
+	});
+
+	it("refuses missing or malformed raw instruction bytes", () => {
+		const root = createTempDir();
+		dirs.push(root);
+		const missingPath = writeFixtureProject(root, createFixtureManifest(), exactReport()
+			.replace("[E8 72 C8 CC FF] ", "")
+			.replace("  14045678e: [48 8B C1] MOV RAX,RCX", ""));
+		expect(() => resolveNativeHookAddresses({ projectRoot: root, manifestPath: missingPath }))
+			.toThrow("missing raw-byte instruction window");
+
+		const malformedPath = writeFixtureProject(root, createFixtureManifest(), exactReport().replace(
+			"[E8 72 C8 CC FF]", "[E8 72 C8 XX FF]",
+		));
+		expect(() => resolveNativeHookAddresses({ projectRoot: root, manifestPath: malformedPath }))
+			.toThrow("malformed raw instruction bytes");
+	});
+
+	it("independently rejects a raw CALL target mismatch", () => {
+		const root = createTempDir();
+		dirs.push(root);
+		const manifestPath = writeFixtureProject(root, createFixtureManifest(), exactReport().replace(
+			"[E8 72 C8 CC FF]", "[E8 73 C8 CC FF]",
+		));
+		expect(() => resolveNativeHookAddresses({ projectRoot: root, manifestPath }))
+			.toThrow("raw CALL target 0x140123001 does not match 0x140123000");
+	});
+
+	it("rejects a family whose post-call instruction contexts never become unique", () => {
+		const root = createTempDir();
+		dirs.push(root);
+		const report = multiSiteReport().replace("[48 8B C2] MOV RAX,RDX", "[48 8B C1] MOV RAX,RCX");
+		const manifestPath = writeFixtureProjectWithReports(root, createMultiSiteManifest(), {
+			"tools/ghidra/reports/multi-site.txt": report,
+		});
+		expect(() => resolveNativeHookAddresses({ projectRoot: root, manifestPath }))
+			.toThrow("no non-empty whole-instruction context uniquely identifies");
 	});
 
 	it("resolves explicit multi-site proof without writing by default", () => {
@@ -287,16 +338,16 @@ describe("native hook address resolution", () => {
 		const manifestAfter = fs.readJsonSync(manifestPath) as NativeHookAddressManifest;
 
 		expect(result.wroteManifest).toBe(false);
-		expect(result.resolvedEntries[0]).toEqual({
+		expect(result.resolvedEntries[0]).toEqual(expect.objectContaining({
 			id: "fixture.multi_site",
 			targetAbsoluteAddress: "0x140123000",
 			candidateRvas: ["0x456010", "0x456020"],
 			changed: true,
 			sites: [
-				{ siteId: "fixture.multi.site-a", rva: "0x456010", changed: true },
-				{ siteId: "fixture.multi.site-b", rva: "0x456020", changed: true },
+				expect.objectContaining({ siteId: "fixture.multi.site-a", rva: "0x456010", changed: true, contextBytes: "48 8B C1" }),
+				expect.objectContaining({ siteId: "fixture.multi.site-b", rva: "0x456020", changed: true, contextBytes: "48 8B C2" }),
 			],
-		});
+		}));
 		expect(manifestAfter.entries[0].sites?.map((site) => site.rva)).toEqual(["0x1111", "0x2222"]);
 	});
 
@@ -317,12 +368,18 @@ describe("native hook address resolution", () => {
 				rva: "0x456010",
 				sourceId: "0xA1",
 				label: "fixture.multi.site-a",
+				expectedTargetRva: "0x123000",
+				contextSignatureVersion: 1,
+				contextBytes: "48 8B C1",
 			},
 			{
 				id: "fixture.multi.site-b",
 				rva: "0x456020",
 				sourceId: "0xA2",
 				label: "fixture.multi.site-b",
+				expectedTargetRva: "0x123000",
+				contextSignatureVersion: 1,
+				contextBytes: "48 8B C2",
 			},
 		]);
 	});
@@ -388,8 +445,8 @@ describe("native hook address resolution", () => {
 		dirs.push(root);
 		const manifestPath = writeFixtureProjectWithReports(root, createMultiSiteManifest(), {
 			"tools/ghidra/reports/multi-site.txt": multiSiteReport().replace(
-				"  140456020: CALL 0x140123000",
-				"  140456020: CALL 0x140999000",
+				"[E8 DB CF CC FF] CALL 0x140123000",
+				"[E8 DB CF CC FF] CALL 0x140999000",
 			),
 		});
 
