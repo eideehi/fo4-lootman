@@ -255,6 +255,11 @@ namespace papyrus_lootman
 		std::uint32_t itemType)
 	{
 		std::vector<ScrapInventoryItem> scrappableItems;
+		auto advanceStackSafe = [](BGSInventoryItem::Stack* stack)
+		{
+			BGSInventoryItem::Stack* nextStack = nullptr;
+			return TryGetNextStackSafe(stack, nextStack) ? nextStack : nullptr;
+		};
 		if (!inventoryOwner || itemType > all_item)
 		{
 			return scrappableItems;
@@ -320,7 +325,7 @@ namespace papyrus_lootman
 				itemEntries.reserve(4);
 
 				std::uint32_t stackIndex = 0;
-				for (auto stack = item.stackData.get(); stack; stack = stack->nextStack.get(), ++stackIndex)
+				for (auto stack = item.stackData.get(); stack; stack = advanceStackSafe(stack), ++stackIndex)
 				{
 					InventoryItemInfo stackInfo{};
 					if (!TryGetInventoryStackInfoSafe(*stack, modBuffer, inventory_info_full, stackInfo))
@@ -403,7 +408,7 @@ namespace papyrus_lootman
 			std::vector<ScrapInventoryItem> itemEntries;
 			itemEntries.reserve(4);
 			std::uint32_t stackIndex = 0;
-			for (auto stack = item.stackData.get(); stack; stack = stack->nextStack.get(), ++stackIndex)
+			for (auto stack = item.stackData.get(); stack; stack = advanceStackSafe(stack), ++stackIndex)
 			{
 				InventoryItemInfo stackInfo{};
 				if (!TryGetInventoryStackInfoSafe(*stack, modBuffer, inventory_info_full, stackInfo))

@@ -57,13 +57,15 @@ namespace papyrus_lootman
 
 	bool HasInventoryFavoriteStack(const BGSInventoryItem& item)
 	{
-		for (auto stack = item.stackData.get(); stack; stack = stack->nextStack.get())
+		for (auto stack = item.stackData.get(); stack;)
 		{
 			bool stackFavorite = false;
 			if (TryIsInventoryStackFavoriteSafe(*stack, stackFavorite) && stackFavorite)
 			{
 				return true;
 			}
+			BGSInventoryItem::Stack* nextStack = nullptr;
+			stack = TryGetNextStackSafe(stack, nextStack) ? nextStack : nullptr;
 		}
 		return false;
 	}
