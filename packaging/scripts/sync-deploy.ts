@@ -29,6 +29,7 @@ interface DeployEntry {
 	src: string;
 	destRelative: string;
 	hash: string;
+	localeOverride: boolean;
 }
 
 interface DeployManifestFile {
@@ -162,7 +163,7 @@ function buildTargets(config: Config, mode: DeployMode, lang: DeployLang, withPa
 	return targets;
 }
 
-function collectEntries(targets: DeployTarget[]): {
+function collectEntries(targets: DeployTarget[], lang: DeployLang): {
 	entries: DeployEntry[];
 	skippedTargets: number;
 	requiredMissing: string[];
@@ -171,7 +172,7 @@ function collectEntries(targets: DeployTarget[]): {
 	let skippedTargets = 0;
 	const requiredMissing: string[] = [];
 
-	for (const target of targets) {
+	for (const [targetIndex, target] of targets.entries()) {
 		if (target.type === "file") {
 			if (!fs.existsSync(target.src) || !fs.statSync(target.src).isFile()) {
 				if (target.required) {
@@ -185,6 +186,7 @@ function collectEntries(targets: DeployTarget[]): {
 				src: target.src,
 				destRelative: target.destRelative,
 				hash: computeHash(target.src),
+				localeOverride: false,
 			});
 			continue;
 		}
@@ -206,11 +208,26 @@ function collectEntries(targets: DeployTarget[]): {
 				src: srcPath,
 				destRelative,
 				hash: computeHash(srcPath),
+				localeOverride: lang === "ja" && targetIndex === 1,
 			});
 		}
 	}
 
-	return { entries, skippedTargets, requiredMissing };
+	const authoritative = new Map<string, DeployEntry>();
+	for (const entry of entries) {
+		const existing = authoritative.get(entry.destRelative);
+		if (existing === undefined || existing.hash === entry.hash) {
+			authoritative.set(entry.destRelative, existing ?? entry);
+			continue;
+		}
+		if (entry.localeOverride && !existing.localeOverride) {
+			authoritative.set(entry.destRelative, entry);
+			continue;
+		}
+		throw new Error(`Conflicting deploy output path: ${entry.destRelative}`);
+	}
+
+	return { entries: [...authoritative.values()], skippedTargets, requiredMissing };
 }
 
 export function resolveDeployManifestPath(config: Config, mode: DeployMode, lang: DeployLang): string {
@@ -222,7 +239,7 @@ export function syncDeploy(config: Config, opts: SyncDeployOpts): SyncDeployResu
 	const withPapyrus = opts.withPapyrus ?? false;
 	const fullSync = opts.fullSync ?? false;
 	const targets = buildTargets(config, opts.mode, opts.lang, withPapyrus);
-	const { entries, skippedTargets, requiredMissing } = collectEntries(targets);
+	const { entries, skippedTargets, requiredMissing } = collectEntries(targets, opts.lang);
 
 	if (entries.length === 0) {
 		const filesRoot = path.join(config.buildTempDir, "files");

@@ -72,6 +72,8 @@ function seedCompileLayout(root: string) {
 	const importsUser = config.papyrusImportDirs[1];
 
 	fs.outputFileSync(path.join(config.templatesRoot, "papyrus.ppj"), "FLAGS=__FLAGS__\n__OUTPUT_DIR__\n__IS_PRODUCT__\n__IMPORTS__\n__SCRIPTS__");
+	fs.outputFileSync(config.papyrusCompilerPath, "compiler");
+	fs.outputFileSync(config.papyrusFlagsPath, "flags");
 	fs.outputFileSync(path.join(sourceDir, "LTMN", "Test.psc"), "ScriptName LTMN:Test");
 	fs.outputFileSync(path.join(f4seSourceDir, "OverlayOnly.psc"), "ScriptName OverlayOnly");
 	seedRequiredPapyrusSymbols(importsUser);
@@ -270,18 +272,47 @@ describe("compilePapyrus", () => {
 		const root = createTempDir();
 		dirs.push(root);
 		const { config, sourceDir, modeCacheDir, hashesPath } = seedCompileLayout(root);
-		const sourceScriptPath = path.join(sourceDir, "LTMN", "Test.psc");
-		const scriptHash = hashFile(sourceScriptPath);
 		const execaFn = vi.fn().mockResolvedValue({ exitCode: 0, stdout: "compiled", stderr: "" });
 
 		fs.outputFileSync(path.join(modeCacheDir, "LTMN", "Test.pex"), "cached-binary");
 		fs.outputFileSync(path.join(modeCacheDir, "LTMN", "Debug.pex"), "stale-binary");
-		fs.outputJsonSync(hashesPath, { "ltmn:test": scriptHash });
+		await compilePapyrus(config, { mode: "product", execaFn });
+		execaFn.mockClear();
 		await compilePapyrus(config, { mode: "product", execaFn });
 
 		expect(execaFn).not.toHaveBeenCalled();
-		expect(fs.readJsonSync(hashesPath)).toEqual({ "ltmn:test": scriptHash });
+		expect(fs.readJsonSync(hashesPath)).toEqual({ "ltmn:test": hashFile(path.join(sourceDir, "LTMN", "Test.psc")) });
 		expect(fs.existsSync(path.join(modeCacheDir, "LTMN", "Debug.pex"))).toBe(false);
+	});
+
+	it.each(["project source", "F4SE source", "import source", "flags", "template", "compiler", "import order"])(
+		"rebuilds the complete project when %s changes",
+		async (input) => {
+			const root = createTempDir(); dirs.push(root);
+			const { config, sourceDir, modeCacheDir } = seedCompileLayout(root);
+			fs.outputFileSync(path.join(modeCacheDir, "LTMN", "Test.pex"), "cached-binary");
+			const execaFn = vi.fn().mockResolvedValue({ exitCode: 0, stdout: "compiled", stderr: "" });
+			await compilePapyrus(config, { mode: "product", execaFn });
+			execaFn.mockClear();
+			if (input === "project source") fs.appendFileSync(path.join(sourceDir, "LTMN", "Test.psc"), "\n; changed");
+			if (input === "F4SE source") fs.appendFileSync(path.join(config.papyrusSourceDir, "F4SE", "OverlayOnly.psc"), "\n; changed");
+			if (input === "import source") fs.appendFileSync(path.join(config.papyrusImportDirs[1], "Math.psc"), "\n; changed");
+			if (input === "flags") fs.appendFileSync(config.papyrusFlagsPath, "\nchanged");
+			if (input === "template") fs.appendFileSync(path.join(config.templatesRoot, "papyrus.ppj"), "\nchanged");
+			if (input === "compiler") fs.appendFileSync(config.papyrusCompilerPath, "\nchanged");
+			if (input === "import order") config.papyrusImportDirs.reverse();
+			await compilePapyrus(config, { mode: "product", execaFn });
+			expect(execaFn).toHaveBeenCalledTimes(1);
+		},
+	);
+
+	it("does not publish a successful fingerprint after compiler failure", async () => {
+		const root = createTempDir(); dirs.push(root);
+		const { config } = seedCompileLayout(root);
+		const fingerprintPath = path.join(config.buildDirRoot, "cache", "papyrus", "project-fingerprint-product.json");
+		const execaFn = vi.fn().mockResolvedValue({ exitCode: 1, stdout: "1 failed", stderr: "" });
+		await expect(compilePapyrus(config, { mode: "product", execaFn })).rejects.toThrow(/compilation failed/);
+		expect(fs.existsSync(fingerprintPath)).toBe(false);
 	});
 
 	it("throws when compiler output reports failed scripts", async () => {

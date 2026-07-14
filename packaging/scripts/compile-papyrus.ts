@@ -2,6 +2,7 @@ import fs from "fs-extra";
 import path from "node:path";
 import { glob } from "glob";
 import { execa } from "execa";
+import { createHash } from "node:crypto";
 import { DEFAULT_BUILD_MODE, parseBuildModeArg, type BuildMode } from "./build-mode.js";
 import { hashFile } from "./content-hash.js";
 import { type Config, createConfig, isCliEntry } from "./config.js";
@@ -63,6 +64,33 @@ export interface CompilePapyrusOpts {
 	mode?: BuildMode;
 	runWindowsExeFn?: typeof runWindowsExe;
 	toWindowsPathFn?: typeof toWindowsPath;
+}
+
+const PAPYRUS_FINGERPRINT_VERSION = 1;
+
+async function hashInputTree(root: string): Promise<Array<[string, string]>> {
+	if (!fs.existsSync(root) || !fs.statSync(root).isDirectory()) return [];
+	const files = (await glob("**/*", { cwd: root, nodir: true, dot: true })).sort();
+	return files.map((file) => [file.replace(/\\/g, "/"), hashFile(path.join(root, file))]);
+}
+
+async function computePapyrusFingerprint(config: Config, mode: BuildMode, sourceDir: string): Promise<string> {
+	const compiler = fs.existsSync(config.papyrusCompilerPath) && fs.statSync(config.papyrusCompilerPath).isFile()
+		? hashFile(config.papyrusCompilerPath)
+		: `missing:${config.papyrusCompilerPath}`;
+	const value = {
+		version: PAPYRUS_FINGERPRINT_VERSION,
+		mode,
+		isWsl: config.isWsl,
+		compiler,
+		flags: fs.existsSync(config.papyrusFlagsPath) ? hashFile(config.papyrusFlagsPath) : `missing:${config.papyrusFlagsPath}`,
+		template: hashFile(path.join(config.templatesRoot, "papyrus.ppj")),
+		importOrder: config.papyrusImportDirs,
+		sources: await hashInputTree(sourceDir),
+		f4se: await hashInputTree(getPapyrusF4SESourceDir(config.papyrusSourceDir)),
+		imports: await Promise.all(config.papyrusImportDirs.map(async (dir) => ({ dir, files: await hashInputTree(dir) }))),
+	};
+	return createHash("sha256").update(JSON.stringify(value)).digest("hex");
 }
 
 interface RequiredPapyrusSymbol {
@@ -231,13 +259,10 @@ export async function compilePapyrus(config: Config, opts?: CompilePapyrusOpts):
 	const papyrusCacheDir = path.join(config.buildDirRoot, "cache", "papyrus");
 	const modeCacheDir = path.join(papyrusCacheDir, "binary", mode);
 	const scriptHashesPath = path.join(papyrusCacheDir, `script-hashes-${mode}.json`);
+	const fingerprintPath = path.join(papyrusCacheDir, `project-fingerprint-${mode}.json`);
 
 	// Ensure cache exists
-	if (!fs.existsSync(scriptHashesPath)) {
-		fs.mkdirsSync(path.dirname(scriptHashesPath));
-		fs.writeJsonSync(scriptHashesPath, {});
-	}
-	const scriptHashes: Record<string, string> = fs.readJsonSync(scriptHashesPath);
+	const scriptHashes: Record<string, string> = fs.existsSync(scriptHashesPath) ? fs.readJsonSync(scriptHashesPath) : {};
 
 	// Build output directories
 	const papyrusDirRoot = path.join(config.buildTempDir, "files", "papyrus");
@@ -265,6 +290,9 @@ export async function compilePapyrus(config: Config, opts?: CompilePapyrusOpts):
 	const importSearchDirs = buildPapyrusImportSearchDirs(sourceDir, overlayDir, config.papyrusImportDirs);
 	const resolvedImports = getResolvedRequiredPapyrusImports(importSearchDirs);
 	verifyPapyrusImportSymbols(importSearchDirs);
+	const fingerprint = await computePapyrusFingerprint(config, mode, sourceDir);
+	const previousFingerprint = fs.existsSync(fingerprintPath) ? (fs.readJsonSync(fingerprintPath) as { version?: number; fingerprint?: string }) : null;
+	const fullRebuild = previousFingerprint?.version !== PAPYRUS_FINGERPRINT_VERSION || previousFingerprint.fingerprint !== fingerprint;
 
 	// Scan sources and compute hashes
 	const newHashes: Record<string, string> = {};
@@ -281,6 +309,9 @@ export async function compilePapyrus(config: Config, opts?: CompilePapyrusOpts):
 		if (!Object.hasOwn(scriptHashes, scriptName) || scriptHashes[scriptName] !== hash) {
 			scriptsToCompile.add(scriptName);
 		}
+	}
+	if (fullRebuild) {
+		for (const scriptName of Object.keys(newHashes)) scriptsToCompile.add(scriptName);
 	}
 
 	await pruneStaleCachedPex(modeCacheDir, newHashes);
@@ -370,10 +401,11 @@ export async function compilePapyrus(config: Config, opts?: CompilePapyrusOpts):
 	} else {
 		console.log("No Papyrus scripts changed, skipping compilation.");
 	}
-	fs.writeJsonSync(scriptHashesPath, newHashes);
-
 	// Deploy from cache
 	await deployPex(modeCacheDir, modeOutDir, newHashes);
+	fs.mkdirsSync(path.dirname(scriptHashesPath));
+	fs.writeJsonSync(scriptHashesPath, newHashes);
+	fs.writeJsonSync(fingerprintPath, { version: PAPYRUS_FINGERPRINT_VERSION, fingerprint });
 	console.log("Papyrus binaries deployed.");
 }
 

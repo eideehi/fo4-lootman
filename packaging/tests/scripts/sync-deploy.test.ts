@@ -245,6 +245,24 @@ describe("sync-deploy", () => {
 		);
 	});
 
+	it("keeps the Japanese locale override authoritative across consecutive deploys", () => {
+		const root = createTempDir(); dirs.push(root);
+		const config = createTestConfig(root);
+		const filesRoot = path.join(config.buildTempDir, "files", "resources");
+		const relative = path.join("Interface", "Translations", "LootMan_en.txt");
+		fs.outputFileSync(path.join(filesRoot, "common", relative), "common");
+		fs.outputFileSync(path.join(filesRoot, "ja", relative), "japanese");
+		fs.outputFileSync(path.join(config.buildTempDir, "files", "dll", "product", "lootman.dll"), "dll");
+
+		syncDeploy(config, { mode: "product", lang: "ja" });
+		const second = syncDeploy(config, { mode: "product", lang: "ja" });
+		const deployed = path.join(config.fallout4Dir, "Data", relative);
+		const manifest = fs.readJsonSync(resolveDeployManifestPath(config, "product", "ja")) as { files: Array<{ destRelative: string }> };
+		expect(fs.readFileSync(deployed, "utf8")).toBe("japanese");
+		expect(second.copied).toBe(0);
+		expect(manifest.files.filter((file) => file.destRelative === relative.replaceAll("\\", "/"))).toHaveLength(1);
+	});
+
 	it("throws when no deployable artifacts exist", () => {
 		const root = createTempDir();
 		dirs.push(root);
