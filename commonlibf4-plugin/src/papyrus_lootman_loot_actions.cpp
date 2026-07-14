@@ -69,7 +69,9 @@ namespace papyrus_lootman
 
 		std::int32_t afterCount = 0;
 		const bool gotAfter = TryGetReferenceItemCountSafe(dest, object, afterCount);
-		if (gotBefore && gotAfter && afterCount > beforeCount)
+		const bool observedDestIncrease = gotBefore && gotAfter && afterCount > beforeCount;
+		const bool countUnavailable = !gotBefore && !gotAfter;
+		if (observedDestIncrease || countUnavailable)
 		{
 			// Play the pickup cue only now that the transfer is confirmed, so the
 			// player never hears a pickup sound for an item that failed to move.

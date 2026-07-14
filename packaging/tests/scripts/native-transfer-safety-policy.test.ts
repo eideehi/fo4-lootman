@@ -33,4 +33,15 @@ describe("native transfer safety policy", () => {
 		const restoreAt = body.indexOf("TryAddInventoryItemSafe(src");
 		expect(restoreAt).toBeGreaterThan(body.indexOf("destAfter == destBefore"));
 	});
+
+	it("finalizes world-reference pickup when the add succeeds but both count probes are unavailable", () => {
+		const source = readWorkspaceFile("commonlibf4-plugin/src/papyrus_lootman_loot_actions.cpp");
+		const start = source.indexOf("bool TryLootWorldReference(");
+		expect(start).toBeGreaterThanOrEqual(0);
+		const body = source.slice(start, source.indexOf("bool TryLootDeferredActivationAmmoReference(", start));
+		expect(body).toContain("const bool observedDestIncrease = gotBefore && gotAfter && afterCount > beforeCount;");
+		expect(body).toContain("const bool countUnavailable = !gotBefore && !gotAfter;");
+		expect(body).toContain("if (observedDestIncrease || countUnavailable)");
+		expect(body.indexOf("FinalizeWorldPickup")).toBeGreaterThan(body.indexOf("observedDestIncrease || countUnavailable"));
+	});
 });
