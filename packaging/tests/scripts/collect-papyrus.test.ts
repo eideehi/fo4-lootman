@@ -14,7 +14,7 @@ describe("collect-papyrus", () => {
 		}
 	});
 
-	it("copies all .psc files recursively", async () => {
+	it("copies all .psc files recursively without deleting an unowned output", async () => {
 		const root = createTempDir();
 		dirs.push(root);
 		const config = createTestConfig(root);
@@ -28,12 +28,12 @@ describe("collect-papyrus", () => {
 
 		expect(await collectPapyrus(config)).toEqual({
 			copied: 2,
-			removed: 1,
+			removed: 0,
 			skipped: 0,
 			total: 2,
 		});
 
-		expect(fs.existsSync(path.join(outDir, "stale.psc"))).toBe(false);
+		expect(fs.readFileSync(path.join(outDir, "stale.psc"), "utf8")).toBe("stale");
 		expect(fs.readFileSync(path.join(outDir, "Main.psc"), "utf8")).toContain("ScriptName Main");
 		expect(fs.readFileSync(path.join(outDir, "Nested", "Other.psc"), "utf8")).toContain("Nested:Other");
 		expect(fs.existsSync(path.join(outDir, "ignore.txt"))).toBe(false);

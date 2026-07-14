@@ -4,6 +4,7 @@ import { afterEach, describe, expect, it } from "vitest";
 import { clean } from "../../scripts/clean.js";
 import { createTestConfig } from "../helpers/config-fixture.js";
 import { createTempDir, removeTempDir } from "../helpers/temp-dir.js";
+import { ensureOwnedBuildRoot } from "../../scripts/owned-path.js";
 
 describe("clean", () => {
 	const dirs: string[] = [];
@@ -23,6 +24,7 @@ describe("clean", () => {
 		fs.writeFileSync(path.join(config.buildTempDir, "artifact.txt"), "x");
 		fs.mkdirsSync(config.buildDirRoot);
 		fs.writeFileSync(path.join(config.buildDirRoot, "cache.txt"), "y");
+		ensureOwnedBuildRoot(config.buildDirRoot);
 
 		clean(config);
 
@@ -54,10 +56,19 @@ describe("clean", () => {
 
 		fs.mkdirsSync(config.buildDirRoot);
 		fs.writeFileSync(path.join(config.buildDirRoot, "cache.txt"), "y");
+		ensureOwnedBuildRoot(config.buildDirRoot);
 
 		clean(config, { all: true });
 
 		expect(fs.existsSync(config.buildDirRoot)).toBe(false);
+	});
+
+	it("refuses clean:all without an intact ownership marker", () => {
+		const root = createTempDir(); dirs.push(root);
+		const config = createTestConfig(root);
+		fs.outputFileSync(path.join(config.buildDirRoot, "keep.txt"), "user-data");
+		expect(() => clean(config, { all: true })).toThrow(/ownership marker/);
+		expect(fs.readFileSync(path.join(config.buildDirRoot, "keep.txt"), "utf8")).toBe("user-data");
 	});
 
 	it("removes WSL stage directory during clean:all", () => {
@@ -67,6 +78,8 @@ describe("clean", () => {
 
 		fs.mkdirsSync(config.wslStageDir);
 		fs.writeFileSync(path.join(config.wslStageDir, "staged.txt"), "z");
+		ensureOwnedBuildRoot(config.buildDirRoot);
+		ensureOwnedBuildRoot(config.wslStageDir);
 
 		clean(config, { all: true });
 
@@ -116,6 +129,8 @@ describe("clean", () => {
 		fs.writeFileSync(path.join(config.buildDirRoot, "cache.txt"), "y");
 		fs.mkdirsSync(config.wslStageDir);
 		fs.writeFileSync(path.join(config.wslStageDir, "staged.txt"), "z");
+		ensureOwnedBuildRoot(config.buildDirRoot);
+		ensureOwnedBuildRoot(config.wslStageDir);
 
 		clean(config, { all: true, wslBuild: true });
 

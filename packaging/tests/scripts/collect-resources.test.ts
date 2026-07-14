@@ -14,7 +14,7 @@ describe("collect-resources", () => {
 		}
 	});
 
-	it("replaces destination with copied resources", () => {
+	it("copies resources without deleting an unowned destination file", () => {
 		const root = createTempDir();
 		dirs.push(root);
 		const config = createTestConfig(root);
@@ -27,12 +27,12 @@ describe("collect-resources", () => {
 
 		expect(collectResources(config)).toEqual({
 			copied: 2,
-			removed: 1,
+			removed: 0,
 			skipped: 0,
 			total: 2,
 		});
 
-		expect(fs.existsSync(path.join(dest, "old.txt"))).toBe(false);
+		expect(fs.readFileSync(path.join(dest, "old.txt"), "utf8")).toBe("old");
 		expect(fs.readFileSync(path.join(dest, "common", "a.txt"), "utf8")).toBe("from-source");
 		expect(fs.readFileSync(path.join(dest, "common", "b.txt"), "utf8")).toBe("other-source");
 	});

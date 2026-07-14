@@ -1,6 +1,7 @@
 import fs from "fs-extra";
 import { type Config, createConfig, isCliEntry } from "./config.js";
 import { resolveWslBuildStagePath } from "./wsl-stage.js";
+import { assertOwnedBuildRoot } from "./owned-path.js";
 
 export interface CleanOpts {
 	all?: boolean;
@@ -10,9 +11,13 @@ export interface CleanOpts {
 export function clean(config: Config, opts?: CleanOpts): void {
 	if (opts?.all) {
 		console.log(`Cleaning ${config.buildDirRoot} (including cache)`);
-		fs.removeSync(config.buildDirRoot);
+		assertOwnedBuildRoot(config.buildDirRoot);
 		if (config.isWsl) {
 			console.log(`Cleaning ${config.wslStageDir}`);
+			assertOwnedBuildRoot(config.wslStageDir);
+		}
+		fs.removeSync(config.buildDirRoot);
+		if (config.isWsl) {
 			fs.removeSync(config.wslStageDir);
 		}
 		return;

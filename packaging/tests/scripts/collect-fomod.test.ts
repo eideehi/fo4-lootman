@@ -14,7 +14,7 @@ describe("collect-fomod", () => {
 		}
 	});
 
-	it("copies fomod files and replaces version token", () => {
+	it("copies fomod files without deleting an unowned output and replaces version token", () => {
 		const root = createTempDir();
 		dirs.push(root);
 		const config = createTestConfig(root, { version: "1.2.3" });
@@ -27,12 +27,12 @@ describe("collect-fomod", () => {
 
 		expect(collectFomod(config)).toEqual({
 			copied: 2,
-			removed: 1,
+			removed: 0,
 			skipped: 0,
 			total: 2,
 		});
 
-		expect(fs.existsSync(path.join(outDir, "old.txt"))).toBe(false);
+		expect(fs.readFileSync(path.join(outDir, "old.txt"), "utf8")).toBe("stale");
 		expect(fs.readFileSync(path.join(outDir, "info.xml"), "utf8")).toContain("<Version>1.2.3</Version>");
 		expect(fs.readFileSync(path.join(outDir, "module.xml"), "utf8")).toContain("<Module />");
 	});

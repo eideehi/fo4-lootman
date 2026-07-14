@@ -6,6 +6,7 @@ import { execa } from "execa";
 import { DEFAULT_BUILD_MODE, parseBuildModeArg, type BuildMode } from "./build-mode.js";
 import { type Config, createConfig, isCliEntry } from "./config.js";
 import { hashContent, hashFile } from "./content-hash.js";
+import { ensureOwnedBuildRoot } from "./owned-path.js";
 import { runWhile } from "./progress.js";
 import { runWindowsExe } from "./windows-exec.js";
 import { normalizeRelativePath, resolveWslBuildStagePath, syncStageDir, syncTree } from "./wsl-stage.js";
@@ -163,6 +164,7 @@ function stageDllProject(
 	config: Config,
 	readSubmoduleCommitFn?: (submoduleDir: string) => string | null,
 ): { stageDir: string; reused: boolean; copied: number; skipped: number; removed: number } {
+	ensureOwnedBuildRoot(config.wslStageDir);
 	const sourceDir = getBuildCwd(config);
 	const stageDir = resolveWslBuildStagePath(config, "dll", "commonlibf4-plugin");
 	const stageSubmoduleDir = path.join(stageDir, DLL_SUBMODULE_RELATIVE_PATH);

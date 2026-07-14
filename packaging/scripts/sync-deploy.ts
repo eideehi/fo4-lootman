@@ -5,6 +5,7 @@ import type { BuildMode } from "./build-mode.js";
 import { hashFile } from "./content-hash.js";
 import type { Config } from "./config.js";
 import { createFileProgress } from "./progress.js";
+import { ensureOwnedBuildRoot, resolveOwnedPath } from "./owned-path.js";
 
 export type DeployMode = BuildMode;
 export type DeployLang = "en" | "ja";
@@ -217,6 +218,7 @@ export function resolveDeployManifestPath(config: Config, mode: DeployMode, lang
 }
 
 export function syncDeploy(config: Config, opts: SyncDeployOpts): SyncDeployResult {
+	ensureOwnedBuildRoot(config.buildDirRoot);
 	const withPapyrus = opts.withPapyrus ?? false;
 	const fullSync = opts.fullSync ?? false;
 	const targets = buildTargets(config, opts.mode, opts.lang, withPapyrus);
@@ -256,14 +258,16 @@ export function syncDeploy(config: Config, opts: SyncDeployOpts): SyncDeployResu
 	const staleEntries = [...previous.keys()].filter((relativePath) =>
 		isInCurrentDeployScope(relativePath, withPapyrus) && !current.has(relativePath)
 	);
+	const destinationPaths = new Map(entries.map((entry) => [entry.destRelative, resolveOwnedPath(dataDir, entry.destRelative)]));
+	const staleDestinationPaths = new Map(staleEntries.map((relativePath) => [relativePath, resolveOwnedPath(dataDir, relativePath)]));
 	const progress = createFileProgress(entries.length + staleEntries.length, "Deploying files");
 
 	try {
 		for (const entry of entries) {
-			const destPath = path.join(dataDir, entry.destRelative);
+			const destPath = destinationPaths.get(entry.destRelative)!;
 			if (!fullSync) {
 				const previousHash = previous.get(entry.destRelative);
-				if (previousHash === entry.hash && fs.existsSync(destPath)) {
+				if (previousHash === entry.hash && fs.existsSync(destPath) && fs.lstatSync(destPath).isFile() && computeHash(destPath) === entry.hash) {
 					unchanged++;
 					progress.advance();
 					continue;
@@ -276,8 +280,14 @@ export function syncDeploy(config: Config, opts: SyncDeployOpts): SyncDeployResu
 		}
 
 		for (const relativePath of staleEntries) {
-			const destPath = path.join(dataDir, relativePath);
+			const destPath = staleDestinationPaths.get(relativePath)!;
 			if (fs.existsSync(destPath)) {
+				const expectedHash = previous.get(relativePath);
+				if (!fs.lstatSync(destPath).isFile() || fs.lstatSync(destPath).isSymbolicLink() || expectedHash === undefined || computeHash(destPath) !== expectedHash) {
+					console.warn(`Retaining modified or unsafe deployed path: ${relativePath}`);
+					progress.advance();
+					continue;
+				}
 				fs.removeSync(destPath);
 				removed++;
 			}

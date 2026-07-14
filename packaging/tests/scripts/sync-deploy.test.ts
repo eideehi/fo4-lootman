@@ -4,6 +4,7 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 import { resolveDeployManifestPath, syncDeploy } from "../../scripts/sync-deploy.js";
 import { createTestConfig } from "../helpers/config-fixture.js";
 import { createTempDir, removeTempDir } from "../helpers/temp-dir.js";
+import { hashFile } from "../../scripts/content-hash.js";
 
 function seedBaseDeployArtifacts(config: ReturnType<typeof createTestConfig>, lang: "en" | "ja"): void {
 	const filesRoot = path.join(config.buildTempDir, "files");
@@ -93,6 +94,7 @@ describe("sync-deploy", () => {
 		const config = createTestConfig(root);
 		const dataDir = path.join(config.fallout4Dir, "Data");
 		seedBaseDeployArtifacts(config, "en");
+		fs.outputFileSync(path.join(dataDir, "Old", "stale.txt"), "stale");
 
 		const manifestPath = resolveDeployManifestPath(config, "product", "en");
 		fs.outputJsonSync(manifestPath, {
@@ -101,14 +103,43 @@ describe("sync-deploy", () => {
 			lang: "en",
 			generatedAt: "old",
 			files: [
-				{ destRelative: "Old/stale.txt", srcHash: "abc" },
+				{ destRelative: "Old/stale.txt", srcHash: hashFile(path.join(dataDir, "Old", "stale.txt")) },
 			],
 		});
-		fs.outputFileSync(path.join(dataDir, "Old", "stale.txt"), "stale");
-
 		const result = syncDeploy(config, { mode: "product", lang: "en" });
 		expect(result.removed).toBe(1);
 		expect(fs.existsSync(path.join(dataDir, "Old", "stale.txt"))).toBe(false);
+	});
+
+	it("retains a stale deployed file whose bytes no longer match its manifest", () => {
+		const root = createTempDir(); dirs.push(root);
+		const config = createTestConfig(root);
+		const dataDir = path.join(config.fallout4Dir, "Data");
+		seedBaseDeployArtifacts(config, "en");
+		const stalePath = path.join(dataDir, "Old", "stale.txt");
+		fs.outputFileSync(stalePath, "owned");
+		fs.outputJsonSync(resolveDeployManifestPath(config, "product", "en"), {
+			version: 1, mode: "product", lang: "en", generatedAt: "old",
+			files: [{ destRelative: "Old/stale.txt", srcHash: hashFile(stalePath) }],
+		});
+		fs.writeFileSync(stalePath, "user-modified");
+
+		const result = syncDeploy(config, { mode: "product", lang: "en" });
+		expect(result.removed).toBe(0);
+		expect(fs.readFileSync(stalePath, "utf8")).toBe("user-modified");
+	});
+
+	it("rejects an escaping manifest path before copying deploy artifacts", () => {
+		const root = createTempDir(); dirs.push(root);
+		const config = createTestConfig(root);
+		seedBaseDeployArtifacts(config, "en");
+		fs.outputJsonSync(resolveDeployManifestPath(config, "product", "en"), {
+			version: 1, mode: "product", lang: "en", generatedAt: "old",
+			files: [{ destRelative: "../outside.txt", srcHash: "unsafe" }],
+		});
+
+		expect(() => syncDeploy(config, { mode: "product", lang: "en" })).toThrow(/Unsafe packaging path/);
+		expect(fs.existsSync(path.join(config.fallout4Dir, "Data", "F4SE", "Plugins", "lootman.dll"))).toBe(false);
 	});
 
 	it("does not remove previously deployed Papyrus scripts when deploying resources only", () => {
@@ -117,6 +148,7 @@ describe("sync-deploy", () => {
 		const config = createTestConfig(root);
 		const dataDir = path.join(config.fallout4Dir, "Data");
 		seedBaseDeployArtifacts(config, "en");
+		fs.outputFileSync(path.join(dataDir, "Old", "stale.txt"), "stale");
 
 		const manifestPath = resolveDeployManifestPath(config, "product", "en");
 		fs.outputJsonSync(manifestPath, {
@@ -125,11 +157,10 @@ describe("sync-deploy", () => {
 			lang: "en",
 			generatedAt: "old",
 			files: [
-				{ destRelative: "Old/stale.txt", srcHash: "abc" },
+				{ destRelative: "Old/stale.txt", srcHash: hashFile(path.join(dataDir, "Old", "stale.txt")) },
 				{ destRelative: "Scripts/ltmn2/mcm.pex", srcHash: "def" },
 			],
 		});
-		fs.outputFileSync(path.join(dataDir, "Old", "stale.txt"), "stale");
 		fs.outputFileSync(path.join(dataDir, "Scripts", "ltmn2", "mcm.pex"), "papyrus");
 
 		const result = syncDeploy(config, { mode: "product", lang: "en" });

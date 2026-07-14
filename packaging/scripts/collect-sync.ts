@@ -4,6 +4,7 @@ import path from "node:path";
 import { hashContent as computeContentHash } from "./content-hash.js";
 import type { Config } from "./config.js";
 import { createFileProgress } from "./progress.js";
+import { ensureOwnedBuildRoot, resolveOwnedPath } from "./owned-path.js";
 
 export interface CollectSyncEntry {
 	relativePath: string;
@@ -73,7 +74,7 @@ function removeEmptyDirectories(startDir: string, stopDir: string): void {
 	const root = path.resolve(stopDir);
 	let current = path.resolve(startDir);
 
-	while (current.startsWith(root) && current !== root) {
+	while (current !== root && current.startsWith(`${root}${path.sep}`)) {
 		if (!fs.existsSync(current) || !fs.statSync(current).isDirectory()) {
 			current = path.dirname(current);
 			continue;
@@ -106,6 +107,7 @@ export function syncCollectedFiles(
 		progressLabel?: string;
 	},
 ): CollectSyncResult {
+	ensureOwnedBuildRoot(config.buildDirRoot);
 	const manifestPath = resolveCollectManifestPath(config, opts.manifestName);
 	const previousManifest = readManifest(manifestPath);
 	const previous = new Map<string, string>();
@@ -140,11 +142,13 @@ export function syncCollectedFiles(
 	}
 
 	const staleCandidates = [...stalePaths].filter((relativePath) => !currentEntries.has(relativePath)).sort();
+	const destinationPaths = new Map(sortedEntries.map(([relativePath]) => [relativePath, resolveOwnedPath(opts.destRoot, relativePath)]));
+	const staleDestinationPaths = new Map(staleCandidates.map((relativePath) => [relativePath, resolveOwnedPath(opts.destRoot, relativePath)]));
 	const progress = createFileProgress(sortedEntries.length + staleCandidates.length, opts.progressLabel ?? "Syncing files");
 
 	try {
 		for (const [relativePath, entry] of sortedEntries) {
-			const destPath = path.join(opts.destRoot, relativePath);
+			const destPath = destinationPaths.get(relativePath)!;
 			const previousHash = previous.get(relativePath);
 			if (previousHash === entry.contentHash && isFile(destPath)) {
 				skipped++;
@@ -162,8 +166,14 @@ export function syncCollectedFiles(
 		}
 
 		for (const relativePath of staleCandidates) {
-			const destPath = path.join(opts.destRoot, relativePath);
+			const destPath = staleDestinationPaths.get(relativePath)!;
 			if (fs.existsSync(destPath)) {
+				const expectedHash = previous.get(relativePath);
+				if (!fs.lstatSync(destPath).isFile() || fs.lstatSync(destPath).isSymbolicLink() || expectedHash === undefined || computeContentHash(fs.readFileSync(destPath)) !== expectedHash) {
+					console.warn(`Retaining modified or unsafe collected path: ${relativePath}`);
+					progress.advance();
+					continue;
+				}
 				fs.removeSync(destPath);
 				removeEmptyDirectories(path.dirname(destPath), opts.destRoot);
 				removed++;

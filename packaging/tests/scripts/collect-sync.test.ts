@@ -106,4 +106,27 @@ describe("collect-sync", () => {
 
 		expect(fs.existsSync(destRoot)).toBe(false);
 	});
+
+	it("retains modified stale files", () => {
+		const root = createTempDir(); dirs.push(root);
+		const config = createTestConfig(root);
+		const destRoot = path.join(config.buildTempDir, "files", "custom");
+		syncCollectedFiles(config, { manifestName: "collect-sync-test", destRoot, entries: [{ relativePath: "file.txt", readContent: () => "owned" }] });
+		fs.writeFileSync(path.join(destRoot, "file.txt"), "user-modified");
+
+		const result = syncCollectedFiles(config, { manifestName: "collect-sync-test", destRoot, entries: [] });
+		expect(result.removed).toBe(0);
+		expect(fs.readFileSync(path.join(destRoot, "file.txt"), "utf8")).toBe("user-modified");
+	});
+
+	it("rejects traversal before writing any collected output", () => {
+		const root = createTempDir(); dirs.push(root);
+		const config = createTestConfig(root);
+		const destRoot = path.join(config.buildTempDir, "files", "custom");
+		expect(() => syncCollectedFiles(config, {
+			manifestName: "collect-sync-test", destRoot,
+			entries: [{ relativePath: "../escape.txt", readContent: () => "unsafe" }],
+		})).toThrow(/Unsafe packaging path/);
+		expect(fs.existsSync(path.join(config.buildTempDir, "files", "escape.txt"))).toBe(false);
+	});
 });
