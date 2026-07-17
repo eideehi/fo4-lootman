@@ -85,74 +85,80 @@ namespace papyrus_lootman
 
 	CheckCellBeforeEncounterZoneResetFn originalCheckCellBeforeEncounterZoneReset = nullptr;
 	CheckResetElapsedFromDetachTimeFn checkResetElapsedFromDetachTime = nullptr;
-	std::mutex encounterZoneSuppressionLogLock;
-	Clock::time_point lastEncounterZoneSuppressionLogAt{};
 
-	inline constexpr auto kEncounterZoneSuppressionLogInterval = std::chrono::seconds(5);
+	struct EncounterZoneResetSuppressionEvaluation
+	{
+		bool suppress = false;
+		bool locationCleared = false;
+		bool cellDetachResetElapsed = false;
+		std::optional<std::uint32_t> cellDetachTime;
+	};
 
-	bool ShouldSuppressCellBeforeEncounterZoneReset(
+	EncounterZoneResetSuppressionEvaluation EvaluateCellBeforeEncounterZoneReset(
 		BGSEncounterZone* zone,
 		TESObjectCELL* cell,
 		bool originalResult)
 	{
+		EncounterZoneResetSuppressionEvaluation evaluation{};
 		if (!originalResult || !zone || !cell || !checkResetElapsedFromDetachTime)
 		{
-			return false;
+			return evaluation;
 		}
 
-		const auto cellDetachTime = GetCellDetachTime(cell);
-		if (!cellDetachTime)
+		evaluation.cellDetachTime = GetCellDetachTime(cell);
+		if (!evaluation.cellDetachTime)
 		{
-			return false;
+			return evaluation;
 		}
 
 		const auto currentDay = zone->gameData.attachTime;
 		if (currentDay == 0)
 		{
-			return false;
+			return evaluation;
 		}
 
-		const bool locationCleared =
+		evaluation.locationCleared =
 			zone->data.location ? zone->data.location->cleared : false;
-		const bool cellDetachResetElapsed = checkResetElapsedFromDetachTime(
+		evaluation.cellDetachResetElapsed = checkResetElapsedFromDetachTime(
 			currentDay,
-			*cellDetachTime,
-			locationCleared);
+			*evaluation.cellDetachTime,
+			evaluation.locationCleared);
 
-		return zone->gameData.detachTime == 0 &&
+		evaluation.suppress = zone->gameData.detachTime == 0 &&
 			zone->gameData.resetTime != 0 &&
 			zone->gameData.resetTime == currentDay &&
-			!cellDetachResetElapsed;
+			!evaluation.cellDetachResetElapsed;
+		return evaluation;
 	}
 
 	bool HookedCheckCellBeforeEncounterZoneReset(BGSEncounterZone* zone, TESObjectCELL* cell)
 	{
 		const bool result = originalCheckCellBeforeEncounterZoneReset(zone, cell);
-		if (!ShouldSuppressCellBeforeEncounterZoneReset(zone, cell, result))
+		if (!result)
 		{
 			return result;
 		}
 
-		const auto now = Clock::now();
-		{
-			std::lock_guard<std::mutex> guard(encounterZoneSuppressionLogLock);
-			if (lastEncounterZoneSuppressionLogAt.time_since_epoch().count() == 0 ||
-				(now - lastEncounterZoneSuppressionLogAt) >= kEncounterZoneSuppressionLogInterval)
-			{
-				lastEncounterZoneSuppressionLogAt = now;
-				const auto cellDetachTime = GetCellDetachTime(cell).value_or(0);
-				REX::DEBUG(
-					"source=native component=encounter_zone event=reset_suppressed zone={:08X} cell={:08X} zone_detach_time={} zone_attach_time={} zone_reset_time={} cell_detach_time={}",
-					zone ? zone->formID : 0,
-					cell ? cell->formID : 0,
-					zone ? zone->gameData.detachTime : 0,
-					zone ? zone->gameData.attachTime : 0,
-					zone ? zone->gameData.resetTime : 0,
-					cellDetachTime);
-			}
-		}
+		const auto evaluation = EvaluateCellBeforeEncounterZoneReset(zone, cell, result);
+		// A positive check means the engine is about to reset this cell, which can
+		// re-enable already-looted world references. Positives are rare (one per
+		// resettable cell), so log every one with the full decision inputs; a
+		// save-load respawn repro either shows its cell here or proves the reset
+		// took an unhooked path.
+		REX::DEBUG(
+			"source=native component=encounter_zone event=reset_check result=reset suppressed={} zone={:08X} cell={:08X} zone_detach_time={} zone_attach_time={} zone_reset_time={} cell_detach_time={} cell_detach_time_present={} location_cleared={} cell_detach_reset_elapsed={}",
+			evaluation.suppress,
+			zone ? zone->formID : 0,
+			cell ? cell->formID : 0,
+			zone ? zone->gameData.detachTime : 0,
+			zone ? zone->gameData.attachTime : 0,
+			zone ? zone->gameData.resetTime : 0,
+			evaluation.cellDetachTime.value_or(0),
+			evaluation.cellDetachTime.has_value(),
+			evaluation.locationCleared,
+			evaluation.cellDetachResetElapsed);
 
-		return false;
+		return !evaluation.suppress;
 	}
 
 	void InstallEncounterZoneResetSuppressionHooks()
