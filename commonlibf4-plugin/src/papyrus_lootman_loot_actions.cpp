@@ -250,11 +250,33 @@ namespace papyrus_lootman
 		float acceptedWeight = 0.0F;
 		if (capacity && capacity->enabled)
 		{
+			// Log each capacity rejection separately: activation refs (ACTI/FLOR)
+			// have no other per-reference diagnostics, so a silently failing gate
+			// here is indistinguishable from a scan-level skip in field reports.
 			float unitWeight = 0.0F;
-			if (!expectedItem ||
-				!TryGetItemUnitWeightSafe(expectedItem, nullptr, unitWeight) ||
-				!capacity->CanAccept(unitWeight, 1, acceptedWeight))
+			if (!expectedItem)
 			{
+				REX::DEBUG(
+					"source=native component=loot_nearby event=activation_skipped reason=no_produce_item ref={:08X} base={:08X}",
+					ref ? ref->formID : 0,
+					baseObject ? baseObject->formID : 0);
+				return false;
+			}
+			if (!TryGetItemUnitWeightSafe(expectedItem, nullptr, unitWeight))
+			{
+				REX::DEBUG(
+					"source=native component=loot_nearby event=activation_skipped reason=unit_weight_unavailable ref={:08X} produce={:08X}",
+					ref ? ref->formID : 0,
+					expectedItem->formID);
+				return false;
+			}
+			if (!capacity->CanAccept(unitWeight, 1, acceptedWeight))
+			{
+				REX::DEBUG(
+					"source=native component=loot_nearby event=activation_skipped reason=capacity_rejected ref={:08X} produce={:08X} unit_weight={:.3f}",
+					ref ? ref->formID : 0,
+					expectedItem->formID,
+					unitWeight);
 				return false;
 			}
 		}
@@ -275,6 +297,10 @@ namespace papyrus_lootman
 		}();
 		if (!activated)
 		{
+			REX::DEBUG(
+				"source=native component=loot_nearby event=activation_skipped reason=activation_failed ref={:08X} base={:08X}",
+				ref ? ref->formID : 0,
+				baseObject ? baseObject->formID : 0);
 			return false;
 		}
 
