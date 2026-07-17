@@ -29,9 +29,21 @@ namespace papyrus_lootman
 	void InvokeWorldReferenceAddCall(void* opaque)
 	{
 		auto* context = static_cast<WorldReferenceAddCallContext*>(opaque);
+		// Hand the destination a deep copy of the world reference's extra data
+		// instead of the reference's own list. AddObjectToContainer stores the
+		// passed list in the new inventory stack while the world reference still
+		// points at it, and the pickup finalization (MarkAsDeleted) then tears
+		// the reference down; with a shared list that teardown can cost the
+		// looted item its object-instance (weapon/armor mod) data.
+		BSTSmartPointer<ExtraDataList> extraCopy;
+		if (context->extra)
+		{
+			extraCopy = BSTSmartPointer<ExtraDataList>(new ExtraDataList());
+			extraCopy->CopyList(context->extra.get());
+		}
 		context->dest->AddObjectToContainer(
 			context->object,
-			context->extra,
+			extraCopy,
 			context->count,
 			context->oldContainer,
 			ITEM_REMOVE_REASON::kStoreContainer);
