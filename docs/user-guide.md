@@ -40,7 +40,7 @@ dependency's own release page when setting up F4SE or MCM.
 
 The current FOMOD installer presents the following groups in order:
 
-1. **About Compatibility** — a required acknowledgement of the 3.1.0 update
+1. **About Compatibility** — a required acknowledgement of the 3.2.0 update
    compatibility notice. You cannot deselect it.
 2. **Select plugin language.** — choose exactly one of English or Japanese for
    `LootMan.esp`.
@@ -54,14 +54,14 @@ The current FOMOD installer presents the following groups in order:
 
 ### Updating From Older Versions
 
-LootMan 3.1.0 supports overwrite updates from LootMan 2.x and 3.0.x
+LootMan 3.2.0 supports overwrite updates from LootMan 2.x and earlier 3.x
 releases.
 
-LootMan 3.1.0 does not support overwrite updates from LootMan 1.x. If you are
+LootMan 3.2.0 does not support overwrite updates from LootMan 1.x. If you are
 upgrading from 1.x, uninstall 1.x and make a clean save before installing
-3.1.0.
+3.2.0.
 
-When a save from 2.x is loaded under 3.1.0, the v3.0.0 save migration can
+When a save from 2.x is loaded under 3.2.0, the v3.0.0 save migration can
 change two MCM settings:
 
 - If your 2.x save was using manual-only looting (`Looting Interval` set to
@@ -167,7 +167,7 @@ limits enforced by the MCM sliders.
 | `Native Log Level` | dropdown | Trace, Debug, Info, Warn, Error, Critical, Off | Controls the native DLL log level. Changes are saved to `Data/F4SE/Plugins/LootMan/config.json`. |
 | `Play Pickup Sound` | switch | on / off | Plays sound effects when items are looted. |
 | `Play Container Animation` | switch | on / off | Plays the open animation on containers LootMan loots from. |
-| `Looting Range` | slider | 1.0 – 256, step 0.5 (meters) | Distance from the player searched on each looting pass. The native plugin clamps the effective range at 200 meters, so slider values above 200 do not enlarge the search beyond 200 meters in 3.1.0. |
+| `Looting Range` | slider | 1.0 – 256, step 0.5 (meters) | Distance from the player searched on each looting pass. The native plugin clamps the effective range at 200 meters, so slider values above 200 do not enlarge the search beyond 200 meters in 3.2.0. |
 | `Carry Weight` | slider | 100 – 10000, step 100 (pounds) | LootMan's maximum carry weight. |
 | `Ignore Overweight` | switch | on / off | When on, LootMan continues looting past the carry-weight limit and suppresses the overweight HUD message. |
 | `Loot Is Deliver To Player` | switch | on / off | When on, looted items are added to the player inventory instead of LootMan's inventory. |
@@ -315,7 +315,8 @@ surface is reflected on the other and the two cannot drift apart.
 You can obtain the holotape two ways:
 
 - It is added to your inventory automatically when LootMan installs. Saves that
-  already have LootMan installed also receive it once when you update to 3.1.0,
+  already have LootMan installed also receive it once when you update to 3.1.0
+  or later,
   so existing 3.0.x saves are covered. You do not get a duplicate: the grant is
   skipped when you already hold one.
 - You can craft it for free at any Chemistry Station, under the Utility recipe
@@ -749,8 +750,8 @@ removing files. If you hard-remove `LootMan.esp` or its assets from a save that
 still references those static records, another workshop-menu mod may still warn
 about the missing LootMan Trunk entry.
 
-For LootMan 1.x to 3.1.0 upgrades, uninstall 1.x and make a clean save before
-installing 3.1.0. For LootMan 2.x or 3.0.x releases to 3.1.0,
+For LootMan 1.x to 3.2.0 upgrades, uninstall 1.x and make a clean save before
+installing 3.2.0. For LootMan 2.x or earlier 3.x releases to 3.2.0,
 overwrite updates are supported.
 
 ## Source, Credits, and Licensing
@@ -792,7 +793,7 @@ install / uninstall completion messages, which are routed directly through the
 native plugin and always display.
 
 One additional localized string ships with LootMan but is not displayed by
-the current 3.1.0 code paths:
+the current 3.2.0 code paths:
 
 - `[LootMan] Locked container ignored because there is no Bobby pin.`
 

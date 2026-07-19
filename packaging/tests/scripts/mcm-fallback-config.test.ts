@@ -43,10 +43,10 @@ describe("mcm fallback config delivery", () => {
 		// unrelated CurrentModVersion check elsewhere in Patch().
 		const gate = /If\s*\(CurrentModVersion\s*<\s*(\d+)\)\s*\r?\n\s*LTMN2:Patch\.v3_1_0\(\)/.exec(patch);
 		expect(gate, "Patch() does not wire a gated LTMN2:Patch.v3_1_0 call").not.toBeNull();
-		// The gate must equal MOD_VERSION (so the step is live) and exceed 30000 (so
-		// saves stored at 30000 still run it).
-		expect(Number(gate![1])).toBe(modVersion);
-		expect(Number(gate![1]), "migration gate must be passable by saves at 30000").toBeGreaterThan(30000);
+		// The holotape migration belongs to 3.1.0. Later releases advance
+		// MOD_VERSION without rerunning or renaming this historical migration.
+		expect(Number(gate![1])).toBe(30100);
+		expect(modVersion).toBeGreaterThanOrEqual(Number(gate![1]));
 
 		const migration = extractPapyrusFunction(patchScript, "v3_1_0");
 		expect(migration).toContain("IsInstalled");

@@ -11,7 +11,7 @@ string Function GetVersionString(int version) global
 EndFunction
 
 ; Version encoding: Major{1}.Minor{2}.Patch{2}; 10234 is 1.2.34.
-int MOD_VERSION = 30100 const
+int MOD_VERSION = 30200 const
 
 ; Timer IDs consumed by OnTimer.
 int TIMER_INSTALL = 1 const

@@ -48,11 +48,11 @@ pnpm run ghidra:probe
 
 The short `pnpm run build` alias maps to `pnpm run package:build`.
 
-## 3.1.0 Update Policy
+## 3.2.0 Update Policy
 
-- Supported: overwrite updates from LootMan 2.x and 3.0.x releases to 3.1.0.
-- Not supported: overwrite updates from LootMan 1.x to 3.1.0.
-- If you are upgrading from 1.x, uninstall 1.x and make a clean save before installing 3.1.0.
+- Supported: overwrite updates from LootMan 2.x and earlier 3.x releases to 3.2.0.
+- Not supported: overwrite updates from LootMan 1.x to 3.2.0.
+- If you are upgrading from 1.x, uninstall 1.x and make a clean save before installing 3.2.0.
 - If you want to remove LootMan entirely or troubleshoot a broken install, use the in-game uninstall flow before reinstalling.
 
 ## Build And Packaging
