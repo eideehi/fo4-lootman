@@ -723,29 +723,4 @@ namespace papyrus_lootman
 			itemType);
 	}
 
-	std::vector<TESForm*> GetScrappableItems(
-		std::monostate, TESObjectREFR* inventoryOwner, std::uint32_t itemType)
-	{
-		std::vector<TESForm*> result;
-
-		if (!inventoryOwner || itemType > all_item)
-		{
-			return result;
-		}
-
-		auto scrappableItems = CollectScrapInventoryItems(inventoryOwner, itemType);
-		result.reserve(scrappableItems.size());
-
-		std::unordered_set<std::uint32_t> seenForms;
-		seenForms.reserve(scrappableItems.size());
-		for (const auto& item : scrappableItems)
-		{
-			if (!item.form || !seenForms.insert(item.form->formID).second)
-			{
-				continue;
-			}
-			result.push_back(item.form);
-		}
-		return result;
-	}
 }

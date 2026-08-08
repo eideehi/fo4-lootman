@@ -335,8 +335,40 @@ namespace papyrus_lootman
 		{
 			return "non_playable_form";
 		}
-		if (injection_data::GetFormIDSet(injection_data::exclude_form)->contains(baseForm->formID) ||
-			HasKeyword(baseForm, *injection_data::GetKeywordListRef(injection_data::exclude_keyword), GetInstanceData(ref)))
+
+		TESFormID baseFormID = 0;
+		unsigned long exceptionCode = 0;
+		if (!TryReadFormIDSafe(baseForm, baseFormID, exceptionCode))
+		{
+			RaiseMatchProbeException(exceptionCode);
+		}
+		{
+			const auto excludedForms = injection_data::GetFormIDSet(injection_data::exclude_form);
+			if (excludedForms->contains(baseFormID))
+			{
+				return "excluded_by_injection_data";
+			}
+		}
+
+		bool excludedByKeyword = false;
+		bool excludeKeywordProbeFailed = false;
+		{
+			const auto excludedKeywords = injection_data::GetKeywordListRef(injection_data::exclude_keyword);
+			if (!excludedKeywords->empty() &&
+				!TryHasReferenceKeywordSafe(
+					ref,
+					*excludedKeywords,
+					excludedByKeyword,
+					exceptionCode))
+			{
+				excludeKeywordProbeFailed = true;
+			}
+		}
+		if (excludeKeywordProbeFailed)
+		{
+			RaiseMatchProbeException(exceptionCode);
+		}
+		if (excludedByKeyword)
 		{
 			return "excluded_by_injection_data";
 		}

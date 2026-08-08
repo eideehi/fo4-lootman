@@ -187,96 +187,6 @@ namespace papyrus_lootman
 			static_cast<std::uint32_t>(RE::TESObjectREFR::FORM_ID));
 	}
 
-	struct MiscComponent
-	{
-		static constexpr const char* name = "MiscObject#MiscComponent";
-
-		MiscComponent()
-		{
-			if (_proxy)
-			{
-				return;
-			}
-
-			auto* game = RE::GameVM::GetSingleton();
-			auto vm = game ? game->GetVM() : nullptr;
-			RE::BSFixedString typeName(name);
-			if (!vm || !vm->CreateStruct(typeName, _proxy) || !_proxy)
-			{
-				assert(false);
-				REX::ERROR("source=native component=papyrus_struct event=create_failed type=\"{}\"", name);
-			}
-		}
-
-		template <class T>
-		std::optional<T> find(std::string_view a_name, bool a_quiet = false) const
-		{
-			if (_proxy && _proxy->type)
-			{
-				const auto& mappings = _proxy->type->varNameIndexMap;
-				const auto it = mappings.find(a_name);
-				if (it != mappings.end())
-				{
-					const auto& var = _proxy->variables[it->second];
-					return RE::BSScript::detail::UnpackVariable<T>(var);
-				}
-			}
-
-			if (!a_quiet)
-			{
-				REX::ERROR(
-					"source=native component=papyrus_struct event=field_lookup_failed field=\"{}\" type=\"{}\"",
-					a_name,
-					name);
-			}
-
-			return std::nullopt;
-		}
-
-		template <class T>
-		bool insert(std::string_view a_name, T&& a_val)
-		{
-			if (_proxy && _proxy->type)
-			{
-				auto& mappings = _proxy->type->varNameIndexMap;
-				const auto it = mappings.find(a_name);
-				if (it != mappings.end())
-				{
-					auto& var = _proxy->variables[it->second];
-					RE::BSScript::detail::PackVariable(var, std::forward<T>(a_val));
-					return true;
-				}
-			}
-
-			REX::ERROR(
-				"source=native component=papyrus_struct event=field_pack_failed field=\"{}\" type=\"{}\"",
-				a_name,
-				name);
-			return false;
-		}
-
-	private:
-		friend struct RE::BSScript::detail::wrapper_accessor;
-
-		explicit MiscComponent(RE::BSTSmartPointer<RE::BSScript::Struct> a_proxy) noexcept :
-			_proxy(std::move(a_proxy))
-		{
-			assert(_proxy != nullptr);
-		}
-
-		[[nodiscard]] RE::BSTSmartPointer<RE::BSScript::Struct> get_proxy() const&
-		{
-			return _proxy;
-		}
-
-		[[nodiscard]] RE::BSTSmartPointer<RE::BSScript::Struct> get_proxy() &&
-		{
-			return std::move(_proxy);
-		}
-
-		RE::BSTSmartPointer<RE::BSScript::Struct> _proxy;
-	};
-
 	void InstallEncounterZoneResetSuppressionHooks();
 	void InstallWorkbenchSharedContainerHooks();
 	void InstallWorkshopMaterialProbeHooks();
@@ -353,6 +263,28 @@ namespace papyrus_lootman
 		const RE::TESForm* form,
 		const std::vector<RE::BGSKeyword*>& keywords,
 		RE::TBO_InstanceData* data = nullptr);
+	bool TryReadFormIDSafe(
+		const RE::TESForm* form,
+		RE::TESFormID& outFormID,
+		unsigned long& outExceptionCode);
+	bool TryHasKeywordSafe(
+		const RE::TESForm* form,
+		RE::BGSKeyword* keyword,
+		RE::TBO_InstanceData* data,
+		bool& outMatched,
+		unsigned long& outExceptionCode);
+	bool TryHasKeywordSafe(
+		const RE::TESForm* form,
+		const std::vector<RE::BGSKeyword*>& keywords,
+		RE::TBO_InstanceData* data,
+		bool& outMatched,
+		unsigned long& outExceptionCode);
+	bool TryHasReferenceKeywordSafe(
+		const RE::TESObjectREFR* ref,
+		const std::vector<RE::BGSKeyword*>& keywords,
+		bool& outMatched,
+		unsigned long& outExceptionCode);
+	[[noreturn]] void RaiseMatchProbeException(unsigned long exceptionCode);
 	bool MatchesAny(const RE::TESForm* form, const injection_data::Key& key);
 	bool MatchesAnyCached(
 		const RE::TESForm* form,
@@ -569,15 +501,7 @@ namespace papyrus_lootman
 		MatchCache* matchCache,
 		bool& outResult);
 
-	std::vector<RE::TESObjectREFR*> FindNearbyReferencesWithFormType(
-		std::monostate, RE::TESObjectREFR* ref, std::uint32_t formType);
-	std::vector<std::int32_t> FindNearbyReferenceIdsWithFormType(
-		std::monostate, RE::TESObjectREFR* ref, std::uint32_t formType);
 	std::int32_t FindNearestValidWorkshopId(std::monostate, RE::TESObjectREFR* ref);
-	std::vector<MiscComponent> GetEquipmentComponents(
-		std::monostate, RE::GameScript::RefrOrInventoryObj inventoryItem);
-	std::uint32_t GetFormType(std::monostate, RE::TESForm* form);
-	void Log(std::monostate, RE::BSFixedString message);
 	void LogEvent(
 		std::monostate,
 		RE::BSFixedString component,
@@ -595,18 +519,9 @@ namespace papyrus_lootman
 	void ShowConfigText(std::monostate, RE::BSFixedString labelKey, RE::BSFixedString valueKey);
 	std::int32_t GetLogLevel(std::monostate);
 	void SetLogLevel(std::monostate, std::int32_t logLevel);
-	std::string GetFormTypeIdentifier(std::monostate, RE::TESForm* form);
 	std::string GetHexID(std::monostate, RE::TESForm* form);
-	std::string GetName(std::monostate, RE::TESForm* form);
 	std::int32_t DumpNearbyObjectDiagnostics(
 		std::monostate, RE::TESObjectREFR* player, RE::BSFixedString context);
-	void LogInventoryDiagnostics(
-		std::monostate, RE::TESObjectREFR* inventoryOwner, RE::BSFixedString prefix);
-	void LogWorkshopSupplyDiagnostics(
-		std::monostate,
-		RE::TESObjectREFR* targetWorkshop,
-		RE::TESObjectREFR* lootManWorkshop,
-		RE::BSFixedString prefix);
 	void RememberWorkshopSupplyLink(
 		std::monostate,
 		RE::TESForm* targetLocationForm,
@@ -616,10 +531,6 @@ namespace papyrus_lootman
 		std::monostate, RE::TESForm* targetLocationForm, RE::BSFixedString prefix);
 	void ResetWorkshopRuntimeState(std::monostate, RE::BSFixedString context);
 	void ClearWorkshopRuntimeState(const char* context);
-	std::vector<RE::TESForm*> GetInventoryItemsWithItemType(
-		std::monostate, RE::TESObjectREFR* inventoryOwner, std::uint32_t itemType);
-	std::vector<RE::TESForm*> GetLootableItems(
-		std::monostate, RE::TESObjectREFR* inventoryOwner, std::uint32_t itemType);
 	std::int32_t TransferLootableInventoryItems(
 		std::monostate, RE::TESObjectREFR* src, RE::TESObjectREFR* dest, std::uint32_t itemType);
 	std::int32_t TransferInventoryItems(
@@ -677,8 +588,6 @@ namespace papyrus_lootman
 		RE::BGSPerk* locksmith02,
 		RE::BGSPerk* locksmith03,
 		RE::BGSPerk* locksmith04);
-	std::vector<RE::TESForm*> GetScrappableItems(
-		std::monostate, RE::TESObjectREFR* inventoryOwner, std::uint32_t itemType);
 	void ScrapInventoryItems(
 		std::monostate,
 		RE::TESObjectREFR* inventoryOwner,
@@ -689,12 +598,10 @@ namespace papyrus_lootman
 		RE::TESObjectREFR* inventoryOwner,
 		RE::TESObjectREFR* componentReceiver,
 		std::uint32_t itemType);
-	bool IsFormTypeEquals(std::monostate, RE::TESForm* form, std::uint32_t formType);
 	void PlayPickUpSound(
 		std::monostate, RE::TESObjectREFR* player, RE::TESObjectREFR* obj);
 	void FinalizeWorldPickup(std::monostate, RE::TESObjectREFR* ref);
 	void OnUpdateLootManProperty(std::monostate, RE::BSFixedString propertyName);
-	void ReleaseObject(std::monostate, std::uint32_t objId);
 }
 
 namespace RE::BSScript::detail
@@ -712,11 +619,6 @@ namespace RE::BSScript::detail
 	//
 	// Keep these specializations visible to the Register() translation unit so they are in scope before
 	// BindNativeMethod instantiates the return-packing path there.
-	template <>
-	struct _is_structure_wrapper<papyrus_lootman::MiscComponent> :
-		std::true_type
-	{};
-
 	template <>
 	inline void PackVariable<TESObjectREFR*>(Variable& a_var, TESObjectREFR*&& a_val)
 	{

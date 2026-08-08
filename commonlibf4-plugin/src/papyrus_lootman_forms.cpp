@@ -225,16 +225,6 @@ namespace papyrus_lootman
 		return editorID ? editorID : "";
 	}
 
-	std::uint32_t GetFormType(std::monostate, TESForm* form)
-	{
-		return !form ? static_cast<std::uint32_t>(ENUM_FORM_ID::kNONE) : static_cast<std::uint32_t>(form->GetFormType());
-	}
-
-	void Log(std::monostate, BSFixedString message)
-	{
-		LogPapyrusEvent("raw", "message", message.c_str(), kDefaultPapyrusLogLevel);
-	}
-
 	void LogEvent(
 		std::monostate,
 		BSFixedString component,
@@ -255,29 +245,9 @@ namespace papyrus_lootman
 		log_settings::SetLogLevel(logLevel);
 	}
 
-	std::string GetFormTypeIdentifier(std::monostate, TESForm* form)
-	{
-		if (!form)
-		{
-			return GetFormTypeName(ENUM_FORM_ID::kNONE);
-		}
-
-		return GetFormTypeName(form->GetFormType());
-	}
-
 	std::string GetHexID(std::monostate, TESForm* form)
 	{
 		return FormatFormId(form);
-	}
-
-	std::string GetName(std::monostate, TESForm* form)
-	{
-		return GetFormName(form);
-	}
-
-	bool IsFormTypeEquals(std::monostate, TESForm* form, std::uint32_t formType)
-	{
-		return form && static_cast<std::uint32_t>(form->GetFormType()) == formType;
 	}
 
 	void OnUpdateLootManProperty(std::monostate, BSFixedString propertyName)

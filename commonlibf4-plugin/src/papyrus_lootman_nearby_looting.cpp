@@ -308,31 +308,6 @@ namespace papyrus_lootman
 		return result;
 	}
 
-	// 1. FindNearbyReferencesWithFormType
-	std::vector<TESObjectREFR*> FindNearbyReferencesWithFormType(
-		std::monostate, TESObjectREFR* ref, std::uint32_t formType)
-	{
-		return FindNearbyReferencesWithFormTypeImpl(ref, formType, true);
-	}
-
-	std::vector<std::int32_t> FindNearbyReferenceIdsWithFormType(
-		std::monostate, TESObjectREFR* ref, std::uint32_t formType)
-	{
-		auto refs = FindNearbyReferencesWithFormTypeImpl(ref, formType, false);
-		std::vector<std::int32_t> ids;
-		ids.reserve(refs.size());
-		for (auto* obj : refs)
-		{
-			if (!obj)
-			{
-				continue;
-			}
-
-			ids.push_back(static_cast<std::int32_t>(obj->formID));
-		}
-		return ids;
-	}
-
 	std::int32_t FindNearestValidWorkshopId(std::monostate, TESObjectREFR* ref)
 	{
 		auto* workshop = TryFindNearestValidWorkshop(ref);

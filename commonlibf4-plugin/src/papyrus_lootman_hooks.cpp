@@ -4001,27 +4001,6 @@ namespace papyrus_lootman
 		ClearWorkshopRuntimeState(context.c_str());
 	}
 
-	void LogWorkshopSupplyDiagnostics(
-		std::monostate,
-		TESObjectREFR* targetWorkshop,
-		TESObjectREFR* lootManWorkshop,
-		BSFixedString prefix)
-	{
-		const auto prefixText = SanitizeDiagnosticText(prefix.c_str());
-		auto* targetLocation = targetWorkshop ? targetWorkshop->GetCurrentLocation() : nullptr;
-		auto* lootManLocation = lootManWorkshop ? lootManWorkshop->GetCurrentLocation() : nullptr;
-		auto* workshopCaravanKeyword = GetNativeWorkshopCaravanKeyword();
-
-		REX::DEBUG(
-			"source=native component=workshop_supply_link event=diagnostics context=\"{}\" target_workshop={:08X} target_location={:08X} lootman_workshop={:08X} lootman_location={:08X} workshop_caravan_keyword={:08X} native_linked_location_scan=disabled_after_ctd",
-			prefixText,
-			targetWorkshop ? targetWorkshop->formID : 0,
-			targetLocation ? targetLocation->formID : 0,
-			lootManWorkshop ? lootManWorkshop->formID : 0,
-			lootManLocation ? lootManLocation->formID : 0,
-			workshopCaravanKeyword ? workshopCaravanKeyword->formID : 0);
-	}
-
 	void InstallWorkbenchSharedContainerHooks()
 	{
 		static std::once_flag installOnce;

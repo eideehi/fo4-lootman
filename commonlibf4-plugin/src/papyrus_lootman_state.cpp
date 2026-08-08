@@ -229,11 +229,6 @@ namespace papyrus_lootman
 		return lockedObjects.find(formId) != lockedObjects.end();
 	}
 
-	void ReleaseObject(std::monostate, std::uint32_t objId)
-	{
-		UnlockObject(objId);
-	}
-
 	void ResetTransientState()
 	{
 		{
