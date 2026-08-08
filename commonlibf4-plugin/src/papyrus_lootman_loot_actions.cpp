@@ -74,8 +74,14 @@ namespace papyrus_lootman
 		// verification inconclusive, and treating "inconclusive" as failure would
 		// leave the world reference live and unsuppressed while the destination may
 		// keep the item, so the next pass would loot it again and duplicate it. Only a
-		// conclusive no-increase reading (both counts read, no delta) may reject.
-		const bool verificationInconclusive = !gotBefore || !gotAfter;
+		// conclusive no-increase reading or an available zero post-count may reject.
+		// A missing pre-add count is still inconclusive when the post-add probe sees
+		// at least one item: the item may have pre-existed, but finalizing avoids a
+		// possible duplicate after a void add. A successful zero post-count is
+		// different: it affirmatively proves the destination has none of the item,
+		// so keep the world reference instead of turning uncertainty into item loss.
+		const bool verificationInconclusive =
+			!gotAfter || (!gotBefore && afterCount > 0);
 		if (verificationInconclusive)
 		{
 			REX::WARN(
@@ -205,6 +211,10 @@ namespace papyrus_lootman
 				movedCount,
 				gotPlayerBefore,
 				gotPlayerAfter);
+			// The activation may have deposited the ammo into the player, but without
+			// an observed delta we cannot relay any amount safely. Do not charge or
+			// notify the configured non-player destination for items it did not receive.
+			movedCount = 0;
 		}
 
 		if (movedCount > 0 && dest != player && observedPlayerDelta)

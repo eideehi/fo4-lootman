@@ -34,13 +34,13 @@ describe("native transfer safety policy", () => {
 		expect(restoreAt).toBeGreaterThan(body.indexOf("destAfter == destBefore"));
 	});
 
-	it("finalizes world-reference pickup when either destination count probe is unavailable", () => {
+	it("keeps a world reference when the available post-add count proves the destination is empty", () => {
 		const source = readWorkspaceFile("commonlibf4-plugin/src/papyrus_lootman_loot_actions.cpp");
 		const start = source.indexOf("bool TryLootWorldReference(");
 		expect(start).toBeGreaterThanOrEqual(0);
 		const body = source.slice(start, source.indexOf("bool TryLootDeferredActivationAmmoReference(", start));
 		expect(body).toContain("const bool observedDestIncrease = gotBefore && gotAfter && afterCount > beforeCount;");
-		expect(body).toContain("const bool verificationInconclusive = !gotBefore || !gotAfter;");
+		expect(body).toContain("!gotAfter || (!gotBefore && afterCount > 0)");
 		const successBranch = body.slice(
 			body.indexOf("if (observedDestIncrease || verificationInconclusive)"),
 			body.indexOf('REX::WARN(\n\t\t\t"source=native component=loot_nearby event=world_transfer_verification_failed'),
@@ -50,5 +50,37 @@ describe("native transfer safety policy", () => {
 		expect(successBranch).toContain("return true;");
 		expect(body).toContain("got_before={}");
 		expect(body).toContain("got_after={}");
+	});
+
+	it("charges locked-container early exits to the object and category budgets", () => {
+		const source = readWorkspaceFile("commonlibf4-plugin/src/papyrus_lootman_nearby_looting.cpp");
+		const start = source.indexOf("std::vector<std::int32_t> LootNearbyEnabledReferences(");
+		expect(start).toBeGreaterThanOrEqual(0);
+		const body = source.slice(start);
+		const invalidCapacity = body.slice(
+			body.indexOf("if (capacity.enabled && !capacity.valid)"),
+			body.indexOf("if (!TryUnlockContainerForLooting("),
+		);
+		const unlockFailure = body.slice(
+			body.indexOf("if (!TryUnlockContainerForLooting("),
+			body.indexOf("movedStacks = TransferLootableInventoryItemsImpl("),
+		);
+		expect(invalidCapacity).toContain("markProcessed();");
+		expect(unlockFailure).toContain("markProcessed();");
+	});
+
+	it("does not account unverified deferred ammo as delivered to a non-player destination", () => {
+		const source = readWorkspaceFile("commonlibf4-plugin/src/papyrus_lootman_loot_actions.cpp");
+		const start = source.indexOf("bool TryLootDeferredActivationAmmoReference(");
+		expect(start).toBeGreaterThanOrEqual(0);
+		const body = source.slice(start, source.indexOf("bool TryLootActivationReference(", start));
+		const skippedRelay = body.slice(
+			body.indexOf("if (movedCount > 0 && dest != player && !observedPlayerDelta)"),
+			body.indexOf("if (movedCount > 0 && dest != player && observedPlayerDelta)"),
+		);
+		expect(skippedRelay).toContain("movedCount = 0;");
+		expect(body.indexOf("movedCount = 0;", body.indexOf("deferred_activation_relay_skipped"))).toBeLessThan(
+			body.indexOf("if (movedCount > 0 && capacity)"),
+		);
 	});
 });

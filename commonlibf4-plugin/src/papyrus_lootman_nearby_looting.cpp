@@ -675,6 +675,20 @@ namespace papyrus_lootman
 				}
 			} releaseGuard{ ref->formID };
 
+			auto markProcessed = [&]()
+			{
+				budget.MarkProcessed(actualFormType);
+				result[kLootPassResultProcessedObjects] = static_cast<std::int32_t>(
+					std::min<std::size_t>(
+						budget.processedObjects,
+						static_cast<std::size_t>(std::numeric_limits<std::int32_t>::max())));
+				const auto bucketIndex = FormTypeToBucketIndex(actualFormType);
+				if (bucketIndex >= 0)
+				{
+					++result[kLootPassResultBucketOffset + static_cast<std::size_t>(bucketIndex)];
+				}
+			};
+
 			bool successful = false;
 			std::int32_t movedStacks = 0;
 			if (actualFormType == ENUM_FORM_ID::kCONT)
@@ -687,6 +701,7 @@ namespace papyrus_lootman
 					// whose loot could never be accepted.
 					if (capacity.enabled && !capacity.valid)
 					{
+						markProcessed();
 						continue;
 					}
 					if (!TryUnlockContainerForLooting(
@@ -700,6 +715,7 @@ namespace papyrus_lootman
 						locksmith04,
 						unlockLockedContainer))
 					{
+						markProcessed();
 						continue;
 					}
 				}
@@ -748,16 +764,7 @@ namespace papyrus_lootman
 			// just-admitted object as already spent and reject its own transfer:
 			// with max_lootable_objects_per_pass=1 no object could ever be looted,
 			// and in general the last admitted object of every pass was wasted.
-			budget.MarkProcessed(actualFormType);
-			result[kLootPassResultProcessedObjects] = static_cast<std::int32_t>(
-				std::min<std::size_t>(
-					budget.processedObjects,
-					static_cast<std::size_t>(std::numeric_limits<std::int32_t>::max())));
-			const auto bucketIndex = FormTypeToBucketIndex(actualFormType);
-			if (bucketIndex >= 0)
-			{
-				++result[kLootPassResultBucketOffset + static_cast<std::size_t>(bucketIndex)];
-			}
+			markProcessed();
 
 			if (successful)
 			{
