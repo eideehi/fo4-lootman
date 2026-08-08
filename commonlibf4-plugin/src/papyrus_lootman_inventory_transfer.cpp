@@ -849,12 +849,16 @@ namespace papyrus_lootman
 		BGSKeyword* looseModKeyword,
 		bool suppressPlayerMessages)
 	{
+		// Read ignore_overweight once so the lock decision and the capacity
+		// context's enabled state cannot disagree when the MCM flips the property
+		// between the two reads mid-transfer.
+		const bool trackCapacity = !properties::GetBool(properties::ignore_overweight, true);
 		std::unique_lock<std::mutex> capacityGuard;
-		if (!properties::GetBool(properties::ignore_overweight, true))
+		if (trackCapacity)
 		{
 			capacityGuard = std::unique_lock<std::mutex>(lootCapacityLock);
 		}
-		auto capacity = BuildDirectTransferCapacityContext(dest);
+		auto capacity = BuildDirectTransferCapacityContext(dest, trackCapacity);
 		const bool notifyMovedItems = dest && dest->IsPlayerRef() && !suppressPlayerMessages;
 		if (dest && dest->IsPlayerRef())
 		{

@@ -389,10 +389,15 @@ namespace papyrus_lootman
 	LootCapacityContext BuildLootCapacityContext(
 		TESObjectREFR* player,
 		TESObjectREFR* pendingContainer,
-		TESObjectREFR* workshop)
+		TESObjectREFR* workshop,
+		bool trackCapacity)
 	{
+		// The caller passes the same ignore_overweight reading it used for the
+		// lootCapacityLock decision. Re-reading the property here could disagree
+		// with that reading when the MCM flips it mid-pass, producing a capacity
+		// context that projects weight without holding the serializing lock.
 		LootCapacityContext context;
-		if (properties::GetBool(properties::ignore_overweight, true))
+		if (!trackCapacity)
 		{
 			return context;
 		}
@@ -415,10 +420,10 @@ namespace papyrus_lootman
 		return context;
 	}
 
-	LootCapacityContext BuildDirectTransferCapacityContext(TESObjectREFR* dest)
+	LootCapacityContext BuildDirectTransferCapacityContext(TESObjectREFR* dest, bool trackCapacity)
 	{
 		LootCapacityContext context;
-		if (properties::GetBool(properties::ignore_overweight, true))
+		if (!trackCapacity)
 		{
 			return context;
 		}

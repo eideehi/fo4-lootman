@@ -618,10 +618,14 @@ namespace injection_data
 				}
 				else
 				{
+					// Degrade only this file's entry: erasing the accumulated set here
+					// would silently discard every exclusion earlier files loaded for
+					// this path just because one later patch file used a wrong type.
 					degradedMode = true;
-					tmp.erase(tmpIt);
 					REX::WARN(
-						"source=native component=injection_data event=config_entry_invalid reason=invalid_type value=\"{}\"",
+						"source=native component=injection_data event=config_entry_invalid path={} file=\"{}\" reason=invalid_type value=\"{}\"",
+						path,
+						file.string(),
 						utility::SanitizeLogText(value.dump()));
 				}
 			}

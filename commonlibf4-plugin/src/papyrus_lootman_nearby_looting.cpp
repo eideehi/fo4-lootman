@@ -373,12 +373,16 @@ namespace papyrus_lootman
 		std::reverse(refs.begin(), refs.end());
 
 		const auto candidateCount = refs.size();
+		// Read ignore_overweight once so the lock decision and the capacity
+		// context's enabled state cannot disagree when the MCM flips the property
+		// between the two reads mid-pass.
+		const bool trackCapacity = !properties::GetBool(properties::ignore_overweight, true);
 		std::unique_lock<std::mutex> capacityGuard;
-		if (!properties::GetBool(properties::ignore_overweight, true))
+		if (trackCapacity)
 		{
 			capacityGuard = std::unique_lock<std::mutex>(lootCapacityLock);
 		}
-		auto capacity = BuildLootCapacityContext(player, dest, workshop);
+		auto capacity = BuildLootCapacityContext(player, dest, workshop, trackCapacity);
 		std::int32_t successfulObjects = 0;
 		std::int32_t movedStacks = 0;
 		// Capture the pass-invariant properties snapshot once and thread it into each per-container transfer so
@@ -414,8 +418,17 @@ namespace papyrus_lootman
 			const auto actualFormType = baseForm->GetFormType();
 			if (actualFormType == ENUM_FORM_ID::kCONT)
 			{
-				if (IsReferenceLockedForLooting(ref) &&
-					!TryUnlockContainerForLooting(
+				if (IsReferenceLockedForLooting(ref))
+				{
+					// When capacity tracking is enabled but the weight reads failed,
+					// CanAccept rejects every item and the transfer below cannot move
+					// anything: skip instead of spending bobby pins on an unlock
+					// whose loot could never be accepted.
+					if (capacity.enabled && !capacity.valid)
+					{
+						continue;
+					}
+					if (!TryUnlockContainerForLooting(
 						ref,
 						player,
 						workshop,
@@ -425,8 +438,9 @@ namespace papyrus_lootman
 						locksmith03,
 						locksmith04,
 						unlockLockedContainer))
-				{
-					continue;
+					{
+						continue;
+					}
 				}
 
 				const auto moved = TransferLootableInventoryItemsImpl(
@@ -481,7 +495,14 @@ namespace papyrus_lootman
 			// be looted on this legacy path.
 			if (UsesWorldReferenceTransfer(actualFormType))
 			{
-				if (TryLootWorldReference(ref, dest, player, playPickupSound, &capacity))
+				// Mirror LootNearbyEnabledReferences: activation-linked ammo (trap
+				// trigger ammo, generator fusion cores) must be looted through engine
+				// activation; the world-reference transfer would tombstone the ref and
+				// bypass the activation semantics the deferred path preserves.
+				const bool looted = IsDeferredActivationAmmoCandidate(ref, baseForm)
+					? TryLootDeferredActivationAmmoReference(ref, dest, player, playPickupSound, &capacity)
+					: TryLootWorldReference(ref, dest, player, playPickupSound, &capacity);
+				if (looted)
 				{
 					++successfulObjects;
 				}
@@ -566,12 +587,16 @@ namespace papyrus_lootman
 				buffer.size(),
 				static_cast<std::size_t>(std::numeric_limits<std::int32_t>::max())));
 
+		// Read ignore_overweight once so the lock decision and the capacity
+		// context's enabled state cannot disagree when the MCM flips the property
+		// between the two reads mid-pass.
+		const bool trackCapacity = !properties::GetBool(properties::ignore_overweight, true);
 		std::unique_lock<std::mutex> capacityGuard;
-		if (!properties::GetBool(properties::ignore_overweight, true))
+		if (trackCapacity)
 		{
 			capacityGuard = std::unique_lock<std::mutex>(lootCapacityLock);
 		}
-		auto capacity = BuildLootCapacityContext(player, dest, workshop);
+		auto capacity = BuildLootCapacityContext(player, dest, workshop, trackCapacity);
 		auto budget = LootPassBudget::Capture();
 		MatchCache matchCache;
 		matchCache.results.reserve(buffer.size() * 2);
@@ -675,23 +700,21 @@ namespace papyrus_lootman
 				}
 			} releaseGuard{ ref->formID };
 
-			budget.MarkProcessed(actualFormType);
-			result[kLootPassResultProcessedObjects] = static_cast<std::int32_t>(
-				std::min<std::size_t>(
-					budget.processedObjects,
-					static_cast<std::size_t>(std::numeric_limits<std::int32_t>::max())));
-			const auto bucketIndex = FormTypeToBucketIndex(actualFormType);
-			if (bucketIndex >= 0)
-			{
-				++result[kLootPassResultBucketOffset + static_cast<std::size_t>(bucketIndex)];
-			}
-
 			bool successful = false;
 			std::int32_t movedStacks = 0;
 			if (actualFormType == ENUM_FORM_ID::kCONT)
 			{
-				if (IsReferenceLockedForLooting(ref) &&
-					!TryUnlockContainerForLooting(
+				if (IsReferenceLockedForLooting(ref))
+				{
+					// When capacity tracking is enabled but the weight reads failed,
+					// CanAccept rejects every item and the transfer below cannot move
+					// anything: skip instead of spending bobby pins on an unlock
+					// whose loot could never be accepted.
+					if (capacity.enabled && !capacity.valid)
+					{
+						continue;
+					}
+					if (!TryUnlockContainerForLooting(
 						ref,
 						player,
 						workshop,
@@ -701,8 +724,9 @@ namespace papyrus_lootman
 						locksmith03,
 						locksmith04,
 						unlockLockedContainer))
-				{
-					continue;
+					{
+						continue;
+					}
 				}
 
 				movedStacks = TransferLootableInventoryItemsImpl(
@@ -742,6 +766,22 @@ namespace papyrus_lootman
 				successful = IsDeferredActivationAmmoCandidate(ref, baseForm)
 					? TryLootDeferredActivationAmmoReference(ref, dest, player, playPickupSound, &capacity)
 					: TryLootWorldReference(ref, dest, player, playPickupSound, &capacity);
+			}
+
+			// Charge the pass budget only after the transfer attempt. Marking before
+			// it would make the budget checks inside the transfer treat the
+			// just-admitted object as already spent and reject its own transfer:
+			// with max_lootable_objects_per_pass=1 no object could ever be looted,
+			// and in general the last admitted object of every pass was wasted.
+			budget.MarkProcessed(actualFormType);
+			result[kLootPassResultProcessedObjects] = static_cast<std::int32_t>(
+				std::min<std::size_t>(
+					budget.processedObjects,
+					static_cast<std::size_t>(std::numeric_limits<std::int32_t>::max())));
+			const auto bucketIndex = FormTypeToBucketIndex(actualFormType);
+			if (bucketIndex >= 0)
+			{
+				++result[kLootPassResultBucketOffset + static_cast<std::size_t>(bucketIndex)];
 			}
 
 			if (successful)

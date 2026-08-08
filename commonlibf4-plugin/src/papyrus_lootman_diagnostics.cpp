@@ -226,11 +226,16 @@ namespace papyrus_lootman
 		}
 
 		{
+			// This function only runs inside ExecuteSehCallSafe, and under /EHsc an
+			// SEH unwind skips ~ReadLockGuard, leaking the inventory read lock. Route
+			// the untrusted size read through the inner SEH-guarded helper (the same
+			// pattern HasLootableItem uses) so a fault cannot escape the lock scope.
 			ReadLockGuard guard(inventoryList->rwLock);
-			outEntries = static_cast<std::uint32_t>(
-				std::min<std::size_t>(
-					inventoryList->data.size(),
-					static_cast<std::size_t>(std::numeric_limits<std::uint32_t>::max())));
+			std::uint32_t itemCount = 0;
+			if (TryGetInventoryItemCountSafe(inventoryList, itemCount))
+			{
+				outEntries = itemCount;
+			}
 		}
 
 		const auto hasLootableItems = HasLootableItem(inventoryList, &props, &matchCache, inspectActor);

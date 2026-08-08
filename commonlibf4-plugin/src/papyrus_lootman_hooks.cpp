@@ -1155,10 +1155,16 @@ namespace papyrus_lootman
 			return nullptr;
 		}
 
+		// Read the untrusted engine pointer before taking the mutex: this path runs
+		// inside SEH-guarded hook frames, and under /EHsc an SEH unwind skips the
+		// lock_guard destructor, so a fault on this dereference while the mutex is
+		// held would leave it locked forever and freeze every later workshop probe.
+		const TESFormID currentLocationId = currentLocation->formID;
+
 		TESFormID lootManWorkshopId = 0;
 		{
 			std::lock_guard<std::mutex> guard(rememberedWorkshopSupplyLinkLock);
-			const auto it = rememberedWorkshopSupplyLinks.find(currentLocation->formID);
+			const auto it = rememberedWorkshopSupplyLinks.find(currentLocationId);
 			if (it == rememberedWorkshopSupplyLinks.end())
 			{
 				return nullptr;

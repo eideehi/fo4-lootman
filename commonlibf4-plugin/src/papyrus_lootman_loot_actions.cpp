@@ -70,8 +70,23 @@ namespace papyrus_lootman
 		std::int32_t afterCount = 0;
 		const bool gotAfter = TryGetReferenceItemCountSafe(dest, object, afterCount);
 		const bool observedDestIncrease = gotBefore && gotAfter && afterCount > beforeCount;
-		const bool countUnavailable = !gotBefore && !gotAfter;
-		if (observedDestIncrease || countUnavailable)
+		// The add already committed at this point. Any failed count read makes the
+		// verification inconclusive, and treating "inconclusive" as failure would
+		// leave the world reference live and unsuppressed while the destination may
+		// keep the item, so the next pass would loot it again and duplicate it. Only a
+		// conclusive no-increase reading (both counts read, no delta) may reject.
+		const bool verificationInconclusive = !gotBefore || !gotAfter;
+		if (verificationInconclusive)
+		{
+			REX::WARN(
+				"source=native component=loot_nearby event=world_transfer_verification_inconclusive ref={:08X} base={:08X} count={} got_before={} got_after={}",
+				ref->formID,
+				object->formID,
+				worldCount,
+				gotBefore,
+				gotAfter);
+		}
+		if (observedDestIncrease || verificationInconclusive)
 		{
 			// Play the pickup cue only now that the transfer is confirmed, so the
 			// player never hears a pickup sound for an item that failed to move.
@@ -165,16 +180,34 @@ namespace papyrus_lootman
 		std::int32_t playerAfter = 0;
 		const bool gotPlayerAfter = TryGetReferenceItemCountSafe(player, object, playerAfter);
 		std::int32_t movedCount = 0;
+		bool observedPlayerDelta = false;
 		if (gotPlayerBefore && gotPlayerAfter && playerAfter > playerBefore)
 		{
 			movedCount = playerAfter - playerBefore;
+			observedPlayerDelta = true;
 		}
 		else if (!gotPlayerBefore || !gotPlayerAfter)
 		{
+			// A count read failed under SEH. Assume the activation deposited the
+			// world count for capacity/notification purposes, but never relay an
+			// unverified amount out of the player inventory below: if the activation
+			// actually deposited less, the relay would siphon the player's own
+			// pre-existing ammo of this type into the loot destination.
 			movedCount = worldCount;
 		}
 
-		if (movedCount > 0 && dest != player)
+		if (movedCount > 0 && dest != player && !observedPlayerDelta)
+		{
+			REX::WARN(
+				"source=native component=loot_nearby event=deferred_activation_relay_skipped reason=unverified_player_delta ref={:08X} item={:08X} assumed_count={} got_before={} got_after={}",
+				ref->formID,
+				object->formID,
+				movedCount,
+				gotPlayerBefore,
+				gotPlayerAfter);
+		}
+
+		if (movedCount > 0 && dest != player && observedPlayerDelta)
 		{
 			auto remaining = movedCount;
 			auto moveActivatedAmmo = [&]()

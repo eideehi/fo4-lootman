@@ -431,8 +431,9 @@ namespace papyrus_lootman
 	LootCapacityContext BuildLootCapacityContext(
 		RE::TESObjectREFR* player,
 		RE::TESObjectREFR* pendingContainer,
-		RE::TESObjectREFR* workshop);
-	LootCapacityContext BuildDirectTransferCapacityContext(RE::TESObjectREFR* dest);
+		RE::TESObjectREFR* workshop,
+		bool trackCapacity);
+	LootCapacityContext BuildDirectTransferCapacityContext(RE::TESObjectREFR* dest, bool trackCapacity);
 	std::int32_t GetWorldReferenceItemCount(RE::TESObjectREFR* ref);
 	bool TryAddWorldReferenceToContainerSafe(
 		RE::TESObjectREFR* dest,

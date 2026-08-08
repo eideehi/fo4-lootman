@@ -28,16 +28,17 @@ namespace papyrus_lootman
 		bool isQuestItem = false;
 	};
 
-	QuestAliasFlags GetQuestAliasFlags(ExtraDataList* extraDataList)
+	struct QuestAliasWalkCallContext
 	{
+		ExtraAliasInstanceArray* extraData = nullptr;
 		QuestAliasFlags flags;
-		if (!extraDataList) return flags;
+	};
 
-		auto extraData = extraDataList->GetByType<ExtraAliasInstanceArray>();
-		if (!extraData) return flags;
-
-		ReadLockGuard guard(extraData->aliasArrayLock);
-		for (auto& data : extraData->aliasArray)
+	void WalkQuestAliasArrayCall(void* opaque)
+	{
+		auto* context = static_cast<QuestAliasWalkCallContext*>(opaque);
+		auto& flags = context->flags;
+		for (auto& data : context->extraData->aliasArray)
 		{
 			if (!data.quest || data.quest->GetDelete() || !data.alias) continue;
 			auto questFlags = data.quest->data.flags;
@@ -66,8 +67,25 @@ namespace papyrus_lootman
 
 			if (flags.isEssential && flags.isQuestItem) break;
 		}
+	}
 
-		return flags;
+	QuestAliasFlags GetQuestAliasFlags(ExtraDataList* extraDataList)
+	{
+		QuestAliasFlags flags;
+		if (!extraDataList) return flags;
+
+		auto extraData = extraDataList->GetByType<ExtraAliasInstanceArray>();
+		if (!extraData) return flags;
+
+		// Every caller reaches this walk through an SEH-guarded Try...Safe frame, and
+		// under /EHsc an SEH unwind skips ~ReadLockGuard, permanently leaking the
+		// engine alias-array read lock and deadlocking the next engine writer. Walk
+		// the untrusted alias data inside its own SEH guard so a fault is caught
+		// while this frame (and with it the lock scope) still exits normally.
+		ReadLockGuard guard(extraData->aliasArrayLock);
+		QuestAliasWalkCallContext context{ extraData };
+		ExecuteSehCallSafe(&WalkQuestAliasArrayCall, &context);
+		return context.flags;
 	}
 
 	bool IsEssential(const TESObjectREFR* ref)
