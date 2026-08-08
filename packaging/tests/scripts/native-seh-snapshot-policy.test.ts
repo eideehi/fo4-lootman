@@ -27,6 +27,8 @@ describe("native SEH snapshot ownership policy", () => {
 	const matching = readWorkspaceFile("commonlibf4-plugin/src/papyrus_lootman_matching.cpp");
 	const validation = readWorkspaceFile("commonlibf4-plugin/src/papyrus_lootman_validation.cpp");
 	const diagnostics = readWorkspaceFile("commonlibf4-plugin/src/papyrus_lootman_diagnostics.cpp");
+	const actorState = readWorkspaceFile("commonlibf4-plugin/src/papyrus_lootman_actor_state.cpp");
+	const inventoryTransfer = readWorkspaceFile("commonlibf4-plugin/src/papyrus_lootman_inventory_transfer.cpp");
 	const pluginBuild = readWorkspaceFile("commonlibf4-plugin/xmake.lua");
 	const commonlibBuild = readWorkspaceFile("commonlibf4-plugin/lib/commonlibf4/lib/commonlib-shared/xmake.lua");
 
@@ -95,5 +97,32 @@ describe("native SEH snapshot ownership policy", () => {
 		expectOwnerScopeEndsBeforeRaise(validObject, "const auto excludeKeywords =");
 		expectOwnerScopeEndsBeforeRaise(validForm, "const auto excludedKeywords =");
 		expectOwnerScopeEndsBeforeRaise(diagnosticReason, "const auto excludedKeywords =");
+	});
+
+	it("releases the quest-alias read lock before conservatively classifying a walk fault", () => {
+		const leafProbe = sliceBetween(actorState, "bool TryWalkQuestAliasArraySafe(", "QuestAliasFlags GetQuestAliasFlags(");
+		const getFlags = sliceBetween(actorState, "QuestAliasFlags GetQuestAliasFlags(", "bool IsEssential(");
+		const tryBody = leafProbe.match(/__try\s*\{([\s\S]*?)\}\s*__except/)?.[1] ?? "";
+
+		expect(leafProbe).toContain("__except (SehFilterRecoverable(GetExceptionCode()))");
+		expect(tryBody).not.toMatch(/\b(?:std::|auto\b|\w+(?:Lock)?Guard\b)/);
+		expect(getFlags).toContain("walkSucceeded = TryWalkQuestAliasArraySafe(context);");
+		const owner = getFlags.indexOf("ReadLockGuard guard(extraData->aliasArrayLock);");
+		const protectedResult = getFlags.indexOf("return QuestAliasFlags{ true, true };");
+		const ownerScopeEnd = getFlags.lastIndexOf("\n\t\t}", protectedResult);
+		expect(ownerScopeEnd).toBeGreaterThan(owner);
+		expect(protectedResult).toBeGreaterThan(ownerScopeEnd);
+		expect(getFlags).not.toContain("RaiseMatchProbeException");
+		expect(getFlags).not.toContain("ExecuteSehCallSafe(&WalkQuestAliasArrayCall");
+	});
+
+	it("does not propagate match-probe faults through an inventory read-lock owner", () => {
+		const safeMatch = sliceBetween(matching, "bool TryMatchesAnyCachedSafe(", "bool IsIncludedQuestItem(");
+		const directTransfer = sliceBetween(inventoryTransfer, "std::int32_t TransferInventoryItemsImpl(", "std::int32_t TransferLootableInventoryItemsImpl(");
+
+		expect(safeMatch).toContain("outMatched = MatchesAnyCached(form, key, cache);");
+		expect(safeMatch).toContain("__except (SehFilterRecoverable(GetExceptionCode()))");
+		expect(directTransfer.match(/TryMatchesAnyCachedSafe\(/g)).toHaveLength(2);
+		expect(directTransfer).not.toContain("!MatchesAnyCached(form, injection_data::include_quest_item");
 	});
 });

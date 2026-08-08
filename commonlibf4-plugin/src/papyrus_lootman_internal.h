@@ -290,6 +290,11 @@ namespace papyrus_lootman
 		const RE::TESForm* form,
 		const injection_data::Key& key,
 		MatchCache* cache);
+	bool TryMatchesAnyCachedSafe(
+		const RE::TESForm* form,
+		const injection_data::Key& key,
+		MatchCache* cache,
+		bool& outMatched);
 	const char* GetFormEditorIDOrEmpty(const RE::TESForm* form);
 	std::string GetFormName(RE::TESForm* form);
 	std::string GetFormTypeName(RE::ENUM_FORM_ID formType);

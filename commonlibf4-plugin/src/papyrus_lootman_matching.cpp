@@ -264,6 +264,28 @@ namespace papyrus_lootman
 		return matched;
 	}
 
+	bool TryMatchesAnyCachedSafe(
+		const TESForm* form,
+		const injection_data::Key& key,
+		MatchCache* cache,
+		bool& outMatched)
+	{
+#if defined(_MSC_VER)
+		__try
+		{
+			outMatched = MatchesAnyCached(form, key, cache);
+			return true;
+		}
+		__except (SehFilterRecoverable(GetExceptionCode()))
+		{
+			return false;
+		}
+#else
+		outMatched = MatchesAnyCached(form, key, cache);
+		return true;
+#endif
+	}
+
 	bool IsIncludedQuestItem(const TESForm* form, MatchCache* matchCache)
 	{
 		return MatchesAnyCached(form, injection_data::include_quest_item, matchCache);

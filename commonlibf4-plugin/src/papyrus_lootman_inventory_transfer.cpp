@@ -230,7 +230,14 @@ namespace papyrus_lootman
 							continue;
 						}
 
-						if ((stackInfo.questItem && !MatchesAnyCached(form, injection_data::include_quest_item, &matchCache)) ||
+						bool includedQuestItem = false;
+						if ((stackInfo.questItem &&
+							 (!TryMatchesAnyCachedSafe(
+								  form,
+								  injection_data::include_quest_item,
+								  &matchCache,
+								  includedQuestItem) ||
+							  !includedQuestItem)) ||
 							stackInfo.dropped ||
 							stackInfo.totalCount <= 0)
 						{
@@ -303,7 +310,14 @@ namespace papyrus_lootman
 							form->formID);
 						continue;
 					}
-					if ((stackInfo.questItem && !MatchesAnyCached(form, injection_data::include_quest_item, &matchCache)) ||
+					bool includedQuestItem = false;
+					if ((stackInfo.questItem &&
+						 (!TryMatchesAnyCachedSafe(
+							  form,
+							  injection_data::include_quest_item,
+							  &matchCache,
+							  includedQuestItem) ||
+						  !includedQuestItem)) ||
 						stackInfo.dropped ||
 						(stackInfo.equipped && !sourceIsDead) ||
 						stackInfo.totalCount <= 0)

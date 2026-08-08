@@ -1,6 +1,7 @@
 #include "papyrus_lootman_internal.h"
 
 #include <cstdint>
+#include <excpt.h>
 
 namespace papyrus_lootman
 {
@@ -69,6 +70,25 @@ namespace papyrus_lootman
 		}
 	}
 
+	bool TryWalkQuestAliasArraySafe(
+		QuestAliasWalkCallContext& context)
+	{
+#if defined(_MSC_VER)
+		__try
+		{
+			WalkQuestAliasArrayCall(&context);
+			return true;
+		}
+		__except (SehFilterRecoverable(GetExceptionCode()))
+		{
+			return false;
+		}
+#else
+		WalkQuestAliasArrayCall(&context);
+		return true;
+#endif
+	}
+
 	QuestAliasFlags GetQuestAliasFlags(ExtraDataList* extraDataList)
 	{
 		QuestAliasFlags flags;
@@ -82,9 +102,20 @@ namespace papyrus_lootman
 		// engine alias-array read lock and deadlocking the next engine writer. Walk
 		// the untrusted alias data inside its own SEH guard so a fault is caught
 		// while this frame (and with it the lock scope) still exits normally.
-		ReadLockGuard guard(extraData->aliasArrayLock);
 		QuestAliasWalkCallContext context{ extraData };
-		ExecuteSehCallSafe(&WalkQuestAliasArrayCall, &context);
+		bool walkSucceeded = false;
+		{
+			ReadLockGuard guard(extraData->aliasArrayLock);
+			walkSucceeded = TryWalkQuestAliasArraySafe(context);
+		}
+		if (!walkSucceeded)
+		{
+			// Some IsDeadForLooting callers do not have an outer SEH boundary. Keep a
+			// fault distinct from a normal non-match without leaking an exception past
+			// those callers: conservatively protect the suspect alias-backed object in
+			// both classifications after the read lock has left scope normally.
+			return QuestAliasFlags{ true, true };
+		}
 		return context.flags;
 	}
 
