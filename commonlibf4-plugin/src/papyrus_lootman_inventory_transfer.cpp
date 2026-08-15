@@ -260,10 +260,17 @@ namespace papyrus_lootman
 						}
 
 						float unitWeight = 0.0F;
-						if (capacity && capacity->enabled &&
-							!TryGetItemUnitWeightSafe(form, GetInstanceData(currentStack->extra.get()), unitWeight))
+						if (capacity && capacity->enabled)
 						{
-							continue;
+							// Mirror the lootable path: extra-list contents are
+							// runtime-mutated engine data, so resolve the instance
+							// data behind an SEH guard instead of walking it raw.
+							TBO_InstanceData* instanceData = nullptr;
+							if (!TryGetInstanceDataSafe(currentStack->extra.get(), instanceData) ||
+							    !TryGetItemUnitWeightSafe(form, instanceData, unitWeight))
+							{
+								continue;
+							}
 						}
 
 						itemRequests.push_back(InventoryFormTransferRequest{
@@ -326,10 +333,17 @@ namespace papyrus_lootman
 					}
 
 					float unitWeight = 0.0F;
-					if (capacity && capacity->enabled &&
-						!TryGetItemUnitWeightSafe(form, GetInstanceData(currentStack->extra.get()), unitWeight))
+					if (capacity && capacity->enabled)
 					{
-						continue;
+						// Mirror the lootable path: extra-list contents are
+						// runtime-mutated engine data, so resolve the instance
+						// data behind an SEH guard instead of walking it raw.
+						TBO_InstanceData* instanceData = nullptr;
+						if (!TryGetInstanceDataSafe(currentStack->extra.get(), instanceData) ||
+						    !TryGetItemUnitWeightSafe(form, instanceData, unitWeight))
+						{
+							continue;
+						}
 					}
 
 					itemRequests.push_back(InventoryFormTransferRequest{
