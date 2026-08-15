@@ -891,10 +891,17 @@ namespace papyrus_lootman
 		}
 		else if (formType == ENUM_FORM_ID::kWEAP || formType == ENUM_FORM_ID::kARMO)
 		{
-			std::vector<BGSMod::Attachment::Mod*> localBuffer;
-			auto* equipmentBuffer = modBuffer ? modBuffer : &localBuffer;
+			// The mod buffer must be caller-owned: this frame sits inside the
+			// TryIsLootableObjectSafe SEH guard and the matching calls below can
+			// re-raise a recoverable probe fault, whose unwind skips local
+			// destructors under /EHsc. A frame-local fallback vector here would
+			// leak its heap block on that path, so a missing buffer fails closed.
+			if (!modBuffer)
+			{
+				return false;
+			}
 			EquipmentData data{};
-			if (!TryGetEquipmentDataSafe(ref->extraList.get(), equipmentBuffer, data))
+			if (!TryGetEquipmentDataSafe(ref->extraList.get(), modBuffer, data))
 			{
 				const bool legendaryOnly = props
 					? props->lootingLegendaryOnly

@@ -874,6 +874,10 @@ namespace papyrus_lootman
 	struct CurrentWorkshopProbeContext
 	{
 		CurrentWorkshopProbeSnapshot snapshot;
+		// Owned by the caller's frame: an SEH fault inside the guarded call
+		// skips destructors under /EHsc, so a frame-local NiPointer would leak
+		// its reference count and pin the workshop reference forever.
+		NiPointer<TESObjectREFR> workshopPin;
 	};
 
 	void CaptureCurrentWorkshopProbeCall(void* opaque)
@@ -898,8 +902,8 @@ namespace papyrus_lootman
 		static_assert(sizeof(handle) == sizeof(context->snapshot.handle));
 		std::memcpy(&handle, &context->snapshot.handle, sizeof(context->snapshot.handle));
 
-		auto workshop = handle.get();
-		auto* workshopRef = workshop.get();
+		context->workshopPin = handle.get();
+		auto* workshopRef = context->workshopPin.get();
 		FillFormProbeSnapshot(context->snapshot.workshop, workshopRef);
 
 		auto* location = workshopRef ? workshopRef->GetCurrentLocation() : nullptr;
@@ -967,6 +971,7 @@ namespace papyrus_lootman
 
 	void FillPlacementHandleProbe(
 		ObjectRefHandle handle,
+		NiPointer<TESObjectREFR>& refPin,
 		std::uint32_t& rawHandle,
 		bool& resolved,
 		FormProbeSnapshot& refSnapshot,
@@ -978,8 +983,11 @@ namespace papyrus_lootman
 			return;
 		}
 
-		auto ref = handle.get();
-		auto* refPtr = ref.get();
+		// refPin is caller-frame storage: a fault below unwinds this frame
+		// without destructors, so the pinned refcount must be released by the
+		// caller's scope, not by a local of this guarded frame.
+		refPin = handle.get();
+		auto* refPtr = refPin.get();
 		resolved = refPtr != nullptr;
 		FillFormProbeSnapshot(refSnapshot, refPtr);
 		auto* baseForm = refPtr ? refPtr->GetObjectReference() : nullptr;
@@ -989,6 +997,10 @@ namespace papyrus_lootman
 	struct PlacementItemProbeContext
 	{
 		PlacementItemProbeSnapshot snapshot;
+		// Caller-frame pins for FillPlacementHandleProbe; see
+		// CurrentWorkshopProbeContext::workshopPin for the SEH rationale.
+		NiPointer<TESObjectREFR> placementRefPin;
+		NiPointer<TESObjectREFR> dataPlacementRefPin;
 	};
 
 	void CapturePlacementItemProbeCall(void* opaque)
@@ -1001,6 +1013,7 @@ namespace papyrus_lootman
 		{
 			FillPlacementHandleProbe(
 				*placementHandle,
+				context->placementRefPin,
 				context->snapshot.placementHandle,
 				context->snapshot.placementHandleResolved,
 				context->snapshot.placementRef,
@@ -1025,6 +1038,7 @@ namespace papyrus_lootman
 			static_cast<std::uint32_t>(placementData->body.size());
 		FillPlacementHandleProbe(
 			placementData->placementItem,
+			context->dataPlacementRefPin,
 			context->snapshot.dataPlacementHandle,
 			context->snapshot.dataPlacementHandleResolved,
 			context->snapshot.dataPlacementRef,

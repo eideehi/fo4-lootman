@@ -24,6 +24,10 @@ namespace papyrus_lootman
 		BSTSmartPointer<ExtraDataList> extra;
 		TESObjectREFR* oldContainer = nullptr;
 		std::int32_t count = 1;
+		// Owned by the caller's frame: an SEH fault inside the guarded call
+		// skips destructors under /EHsc, so the copy target must not be a
+		// local of the guarded frame or its allocation leaks on every fault.
+		BSTSmartPointer<ExtraDataList> extraCopy;
 	};
 
 	void InvokeWorldReferenceAddCall(void* opaque)
@@ -35,15 +39,13 @@ namespace papyrus_lootman
 		// points at it, and the pickup finalization (MarkAsDeleted) then tears
 		// the reference down; with a shared list that teardown can cost the
 		// looted item its object-instance (weapon/armor mod) data.
-		BSTSmartPointer<ExtraDataList> extraCopy;
-		if (context->extra)
+		if (context->extra && context->extraCopy)
 		{
-			extraCopy = BSTSmartPointer<ExtraDataList>(new ExtraDataList());
-			extraCopy->CopyList(context->extra.get());
+			context->extraCopy->CopyList(context->extra.get());
 		}
 		context->dest->AddObjectToContainer(
 			context->object,
-			extraCopy,
+			context->extraCopy,
 			context->count,
 			context->oldContainer,
 			ITEM_REMOVE_REASON::kStoreContainer);
@@ -87,6 +89,10 @@ namespace papyrus_lootman
 			ref,
 			count
 		};
+		if (context.extra)
+		{
+			context.extraCopy = BSTSmartPointer<ExtraDataList>(new ExtraDataList());
+		}
 		return ExecuteSehCallSafe(&InvokeWorldReferenceAddCall, &context);
 	}
 
