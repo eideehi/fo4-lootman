@@ -93,6 +93,12 @@ namespace papyrus_lootman
 
 	void EnsureItemTypeCache()
 	{
+		// Never call this from inside an SEH-guarded frame: BuildItemTypeCache
+		// can re-raise a recoverable match-probe fault, and an SEH unwind that
+		// escapes through std::call_once leaves the once_flag permanently
+		// "in progress", deadlocking every later caller. All current call
+		// sites are unguarded native entry points, where a raise terminates
+		// the process instead of poisoning the flag.
 		std::call_once(itemTypeCacheInitFlag, &BuildItemTypeCache);
 	}
 
