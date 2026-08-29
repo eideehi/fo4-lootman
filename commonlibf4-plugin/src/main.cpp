@@ -5,18 +5,74 @@
 #include "message_queue.h"
 #include "papyrus_lootman.h"
 #include "properties.h"
+#include "runtime_probe.h"
 #include "vendor_chest.h"
+
+#include <atomic>
+
+namespace
+{
+	std::atomic<std::uint32_t> lifecycleProbeRecords{ 0 };
+	constexpr std::uint32_t kLifecycleProbeRecordLimit = 128;
+
+	const char* GetMessageName(std::uint32_t type)
+	{
+		switch (type)
+		{
+		case F4SE::MessagingInterface::kGameLoaded:
+			return "game_loaded";
+		case F4SE::MessagingInterface::kPreLoadGame:
+			return "pre_load_game";
+		case F4SE::MessagingInterface::kPostLoadGame:
+			return "post_load_game";
+		default:
+			return "other";
+		}
+	}
+
+	void TraceLifecycleMessage(std::uint32_t type, const char* phase)
+	{
+		if (type != F4SE::MessagingInterface::kGameLoaded &&
+			type != F4SE::MessagingInterface::kPreLoadGame &&
+			type != F4SE::MessagingInterface::kPostLoadGame)
+		{
+			return;
+		}
+		if (!runtime_probe::IsEnabled())
+		{
+			return;
+		}
+
+		if (!runtime_probe::TryReserve(lifecycleProbeRecords, kLifecycleProbeRecordLimit))
+		{
+			return;
+		}
+
+		const auto sequence = runtime_probe::NextSequence();
+		REX::TRACE(
+			"source=native component=runtime_probe event=f4se_message probe_schema=1 ordering=reservation_only seq={} thread_id={} message_type={} message_name={} phase={}",
+			sequence,
+			REX::W32::GetCurrentThreadId(),
+			type,
+			GetMessageName(type),
+			phase);
+	}
+}
 
 void OnMessage(F4SE::MessagingInterface::Message* a_msg)
 {
+	TraceLifecycleMessage(a_msg->type, "enter");
 	if (a_msg->type == F4SE::MessagingInterface::kGameLoaded)
 	{
 		// These systems depend on resolved game/plugin forms, so initialize them only after load.
 		form_cache::Initialize();
+		TraceLifecycleMessage(a_msg->type, "before_properties_initialize");
 		properties::Initialize();
+		TraceLifecycleMessage(a_msg->type, "after_properties_initialize");
 		injection_data::LoadInjectionData();
 		vendor_chest::Initialize();
 		constructible_object::Initialize();
+		TraceLifecycleMessage(a_msg->type, "game_loaded_initializers_complete");
 	}
 	else if (a_msg->type == F4SE::MessagingInterface::kPreLoadGame)
 	{
@@ -26,6 +82,7 @@ void OnMessage(F4SE::MessagingInterface::Message* a_msg)
 		// cannot surface in the newly loaded game.
 		message_queue::Reset();
 	}
+	TraceLifecycleMessage(a_msg->type, "exit");
 }
 
 bool RegisterPapyrus(RE::BSScript::IVirtualMachine* a_vm)

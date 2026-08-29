@@ -7,6 +7,55 @@ function readWorkspaceFile(file: string): string {
 }
 
 describe("native transfer safety policy", () => {
+	it("keeps retained runtime probes trace-only, bounded, and behavior-neutral", () => {
+		const mainSource = readWorkspaceFile("commonlibf4-plugin/src/main.cpp");
+		const propertiesSource = readWorkspaceFile("commonlibf4-plugin/src/properties.cpp");
+		const transferSource = readWorkspaceFile("commonlibf4-plugin/src/papyrus_lootman_transfer_ops.cpp");
+		const probeSource = readWorkspaceFile("commonlibf4-plugin/src/runtime_probe.cpp");
+		const logSettingsSource = readWorkspaceFile("commonlibf4-plugin/src/log_settings.cpp");
+		const inventorySource = readWorkspaceFile("commonlibf4-plugin/src/papyrus_lootman_inventory_transfer.cpp");
+		const scrapSource = readWorkspaceFile("commonlibf4-plugin/src/papyrus_lootman_scrap.cpp");
+
+		for (const source of [mainSource, propertiesSource, transferSource]) {
+			expect(source).toContain("probe_schema=1");
+			expect(source).toContain("runtime_probe::");
+			// Every probe-emitting file must root its gate in the shared
+			// IsEnabled() check, and no trace format may print a raw pointer.
+			expect(source).toContain("runtime_probe::IsEnabled()");
+			expect(source).not.toContain("{:p}");
+		}
+		// The gate is a conjunction: the config flag alone must not enable
+		// emission without the trace log level, and vice versa.
+		expect(probeSource).toContain("log_settings::IsRuntimeProbeEnabled() &&");
+		expect(probeSource).toContain("spdlog::level::trace");
+		expect(logSettingsSource).toContain('find("runtimeProbe")');
+		expect(logSettingsSource).toContain("std::atomic<bool> runtimeProbeEnabled = false");
+		// Initialize() must start from the false default and publish the parsed
+		// value through the atomic, not bypass it.
+		expect(logSettingsSource).toContain("bool enableRuntimeProbe = false");
+		expect(logSettingsSource).toContain("runtimeProbeEnabled.store(enableRuntimeProbe");
+		expect(mainSource).toContain("kLifecycleProbeRecordLimit = 128");
+		expect(mainSource).toContain("kPostLoadGame");
+		expect(propertiesSource).toContain("kPropertyProbeRecordLimit = 256");
+		expect(propertiesSource).toContain("activePropertyUpdates");
+		expect(propertiesSource).toContain("activePropertyCopies");
+		expect(transferSource).toContain("kInventoryProbeRecordLimit = 512");
+		expect(transferSource).toContain("event=stack_snapshot_recheck");
+		expect(transferSource).toContain("mode={}");
+		expect(transferSource).toContain('outcome = "entry_probe_failed"');
+		expect(transferSource).toContain('outcome = "stack_link_probe_failed"');
+		expect(transferSource).toContain('"count_changed"');
+		expect(transferSource).not.toContain("expected_stack_identity=");
+		for (const operation of [
+			"transfer_inventory_items",
+			"transfer_lootable_inventory_items",
+			"move_inventory_item",
+		]) {
+			expect(inventorySource).toContain(`\"${operation}\"`);
+		}
+		expect(scrapSource).toContain('"scrap_inventory_item"');
+	});
+
 	it("keeps world-reference suppression until transient state resets", () => {
 		const source = readWorkspaceFile("commonlibf4-plugin/src/papyrus_lootman_state.cpp");
 		expect(source).toContain("std::unordered_map<std::uint64_t, RecentlyLootedWorldRefEntry> recentlyLootedWorldRefs");

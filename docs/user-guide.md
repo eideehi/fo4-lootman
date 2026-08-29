@@ -516,12 +516,15 @@ executable at `Data/F4SE/Plugins/LootMan/config.json`. The file is created with
 default values the first time LootMan starts, and the MCM `Native Log Level`
 dropdown writes to it.
 
-Current schema (only `log.level` is read):
+Current schema:
 
 ```json
 {
     "log": {
         "level": "info"
+    },
+    "diagnostics": {
+        "runtimeProbe": false
     }
 }
 ```
@@ -537,6 +540,12 @@ unknown value, the native plugin logs a warning and starts the next session at
 `info`; the previous level is not preserved across a bad hand-edit. Use the
 MCM `Native Log Level` dropdown or fix the file value and restart Fallout 4 to
 restore the level you want.
+
+`diagnostics.runtimeProbe` is an investigation-only boolean and defaults to
+`false`. Runtime probes emit records only when it is explicitly `true` **and**
+`log.level` is `trace`. Leave it disabled during normal play; see
+`docs/investigations/2026-08-08-native-runtime-probe-protocol.md` for the
+bounded evidence-collection procedure.
 
 ### Injection Data (`Data/LootMan/*.json`)
 

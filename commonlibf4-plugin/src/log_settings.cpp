@@ -28,6 +28,7 @@ namespace log_settings
 	// 32-bit value with no invariant tying it to other state, so an atomic lets the gate stay lock-free
 	// instead of serializing every gate check on a global mutex.
 	std::atomic<std::int32_t> currentLogLevel = kDefaultLogLevel;
+	std::atomic<bool> runtimeProbeEnabled = false;
 
 	std::int32_t NormalizeLogLevel(const std::int32_t logLevel)
 	{
@@ -181,6 +182,39 @@ namespace log_settings
 		return false;
 	}
 
+	bool ReadRuntimeProbeEnabled(const std::filesystem::path& path, bool& enabled)
+	{
+		std::ifstream ifs(path);
+		if (!ifs.is_open())
+		{
+			return false;
+		}
+
+		nlohmann::json src;
+		try
+		{
+			src = nlohmann::json::parse(ifs);
+		}
+		catch (const nlohmann::json::parse_error&)
+		{
+			return false;
+		}
+
+		const auto diagnosticsIt = src.find("diagnostics");
+		if (diagnosticsIt == src.end() || !diagnosticsIt->is_object())
+		{
+			return false;
+		}
+		const auto probeIt = diagnosticsIt->find("runtimeProbe");
+		if (probeIt == diagnosticsIt->end() || !probeIt->is_boolean())
+		{
+			return false;
+		}
+
+		enabled = probeIt->get<bool>();
+		return true;
+	}
+
 	bool SaveLogLevel(const std::filesystem::path& path, const std::int32_t logLevel)
 	{
 		std::error_code ec;
@@ -241,6 +275,15 @@ namespace log_settings
 			src["log"] = nlohmann::json::object();
 		}
 		src["log"]["level"] = GetLogLevelName(logLevel);
+		if (!src.contains("diagnostics") || !src["diagnostics"].is_object())
+		{
+			src["diagnostics"] = nlohmann::json::object();
+		}
+		if (!src["diagnostics"].contains("runtimeProbe") ||
+			!src["diagnostics"]["runtimeProbe"].is_boolean())
+		{
+			src["diagnostics"]["runtimeProbe"] = false;
+		}
 
 		std::ofstream ofs(path, std::ios::trunc);
 		if (!ofs.is_open())
@@ -270,6 +313,11 @@ namespace log_settings
 			normalized >= current;
 	}
 
+	bool IsRuntimeProbeEnabled()
+	{
+		return runtimeProbeEnabled.load(std::memory_order_relaxed);
+	}
+
 	void SetLogLevel(const std::int32_t logLevel)
 	{
 		const auto normalized = NormalizeLogLevel(logLevel);
@@ -283,6 +331,7 @@ namespace log_settings
 	{
 		const auto path = GetConfigPath();
 		std::int32_t logLevel = kDefaultLogLevel;
+		bool enableRuntimeProbe = false;
 
 		std::error_code ec;
 		const auto exists = std::filesystem::exists(path, ec);
@@ -296,9 +345,11 @@ namespace log_settings
 		if (exists)
 		{
 			(void)ReadLogLevel(path, logLevel);
+			(void)ReadRuntimeProbeEnabled(path, enableRuntimeProbe);
 		}
 
 		currentLogLevel.store(logLevel, std::memory_order_relaxed);
+		runtimeProbeEnabled.store(enableRuntimeProbe, std::memory_order_relaxed);
 		ApplyLogLevel(logLevel);
 
 		if (!exists && !ec)
