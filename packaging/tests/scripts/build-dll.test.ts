@@ -15,8 +15,10 @@ function seedWslDllProject(config: ReturnType<typeof createTestConfig>): { proje
 }
 
 function createWslBuildRunner(config: ReturnType<typeof createTestConfig>) {
+	let configuredMode = "releasedbg";
 	return vi.fn().mockImplementation(async (...args) => {
 		if (args[1][0] === "f") {
+			configuredMode = args[1][2];
 			fs.outputFileSync(
 				path.join(config.wslStageDir, "build", "dll", "commonlibf4-plugin", ".xmake", "configured.txt"),
 				"configured",
@@ -24,7 +26,7 @@ function createWslBuildRunner(config: ReturnType<typeof createTestConfig>) {
 		}
 		if (args[1][0] === "build") {
 			fs.outputFileSync(
-				path.join(config.wslStageDir, "build", "dll", "commonlibf4-plugin", "build", "windows", "x64", "releasedbg", "lootman.dll"),
+				path.join(config.wslStageDir, "build", "dll", "commonlibf4-plugin", "build", "windows", "x64", configuredMode, "lootman.dll"),
 				"dll",
 			);
 		}
@@ -46,9 +48,9 @@ describe("build-dll", () => {
 		expect(parseArgs([])).toEqual({ mode: "product" });
 	});
 
-	it("parseArgs validates product-only mode", () => {
+	it("parseArgs accepts product and debug modes", () => {
 		expect(parseArgs(["--mode=product"])).toEqual({ mode: "product" });
-		expect(() => parseArgs(["--mode=debug"])).toThrow('Invalid mode: debug. Must be "product".');
+		expect(parseArgs(["--mode=debug"])).toEqual({ mode: "debug" });
 	});
 
 	it("resolveBuildSteps returns product commands", () => {
@@ -56,7 +58,11 @@ describe("build-dll", () => {
 			{ type: "argv", file: "xmake", args: ["f", "-m", "releasedbg", "-y"] },
 			{ type: "argv", file: "xmake", args: ["build", "-y"] },
 		]);
-		expect(resolveBuildSteps(false)).toEqual([
+		expect(resolveBuildSteps("product", false)).toEqual([
+			{ type: "argv", file: "xmake", args: ["build", "-y"] },
+		]);
+		expect(resolveBuildSteps("debug")).toEqual([
+			{ type: "argv", file: "xmake", args: ["f", "-m", "debug", "-y"] },
 			{ type: "argv", file: "xmake", args: ["build", "-y"] },
 		]);
 	});
@@ -166,6 +172,21 @@ describe("build-dll", () => {
 			["build", "-y"],
 			expect.any(Object),
 		);
+	});
+
+	it("reconfigures the staged WSL project when switching build mode", async () => {
+		const root = createTempDir();
+		dirs.push(root);
+		const config = createTestConfig(root, { isWsl: true });
+		seedWslDllProject(config);
+		const readSubmoduleCommitFn = vi.fn().mockReturnValue("commonlibf4-commit");
+		const runWindowsExeFn = createWslBuildRunner(config);
+
+		await buildDll(config, { mode: "product", readSubmoduleCommitFn, runWindowsExeFn });
+		await buildDll(config, { mode: "debug", readSubmoduleCommitFn, runWindowsExeFn });
+
+		expect(runWindowsExeFn).toHaveBeenNthCalledWith(3, "xmake", ["f", "-m", "debug", "-y"], expect.any(Object));
+		expect(fs.readFileSync(path.join(config.projectRoot, "commonlibf4-plugin", "build", "windows", "x64", "debug", "lootman.dll"), "utf8")).toBe("dll");
 	});
 
 	it("restores missing staged root files even when the stage state still matches", async () => {

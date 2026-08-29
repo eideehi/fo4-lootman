@@ -42,10 +42,14 @@ export function parseArgs(argv: string[]): { mode: BuildMode } {
 	return { mode: parseBuildModeArg(argv) };
 }
 
-export function resolveBuildSteps(needsConfigure = true): BuildStep[] {
+function resolveXmakeMode(mode: BuildMode): "releasedbg" | "debug" {
+	return mode === "product" ? "releasedbg" : "debug";
+}
+
+export function resolveBuildSteps(mode: BuildMode = DEFAULT_BUILD_MODE, needsConfigure = true): BuildStep[] {
 	return needsConfigure
 		? [
-				{ type: "argv", file: "xmake", args: ["f", "-m", "releasedbg", "-y"] },
+				{ type: "argv", file: "xmake", args: ["f", "-m", resolveXmakeMode(mode), "-y"] },
 				{ type: "argv", file: "xmake", args: ["build", "-y"] },
 		  ]
 		: [{ type: "argv", file: "xmake", args: ["build", "-y"] }];
@@ -269,8 +273,10 @@ export async function buildDll(config: Config, opts?: BuildDllOpts): Promise<voi
 	const stageStartedAt = Date.now();
 	const staged = config.isWsl ? stageDllProject(config, readSubmoduleCommitFn) : null;
 	const buildCwd = staged?.stageDir ?? cwd;
-	const needsConfigure = !staged || !staged.reused || !fs.existsSync(path.join(buildCwd, ".xmake"));
-	const steps = resolveBuildSteps(needsConfigure);
+	const configuredModePath = path.join(buildCwd, ".lootman-build-mode");
+	const configuredMode = staged !== null && fs.existsSync(configuredModePath) ? fs.readFileSync(configuredModePath, "utf8").trim() : null;
+	const needsConfigure = !staged || !staged.reused || !fs.existsSync(path.join(buildCwd, ".xmake")) || configuredMode !== mode;
+	const steps = resolveBuildSteps(mode, needsConfigure);
 
 	if (staged !== null) {
 		const stageElapsedMs = Date.now() - stageStartedAt;
@@ -295,8 +301,10 @@ export async function buildDll(config: Config, opts?: BuildDllOpts): Promise<voi
 		}
 	}
 	if (config.isWsl) {
-		const stageOutputDir = resolveStagedDllBuildOutputDir(buildCwd, config.dllBuildDir, "releasedbg");
-		const outputDir = resolveDllBuildOutputDir(config.projectRoot, config.dllBuildDir, "releasedbg");
+		fs.outputFileSync(configuredModePath, mode);
+		const xmakeMode = resolveXmakeMode(mode);
+		const stageOutputDir = resolveStagedDllBuildOutputDir(buildCwd, config.dllBuildDir, xmakeMode);
+		const outputDir = resolveDllBuildOutputDir(config.projectRoot, config.dllBuildDir, xmakeMode);
 		if (!fs.existsSync(stageOutputDir)) {
 			throw new Error([
 				"DLL build succeeded but staged output was not found.",

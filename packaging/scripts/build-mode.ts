@@ -1,11 +1,11 @@
 export const DEFAULT_BUILD_MODE = "product" as const;
 
-export type BuildMode = typeof DEFAULT_BUILD_MODE;
+export type BuildMode = typeof DEFAULT_BUILD_MODE | "debug";
 
 export function parseBuildModeValue(value: string | null | undefined): BuildMode {
 	const mode = value ?? DEFAULT_BUILD_MODE;
-	if (mode !== DEFAULT_BUILD_MODE) {
-		throw new Error(`Invalid mode: ${mode}. Must be "${DEFAULT_BUILD_MODE}".`);
+	if (mode !== DEFAULT_BUILD_MODE && mode !== "debug") {
+		throw new Error(`Invalid mode: ${mode}. Must be "product" or "debug".`);
 	}
 	return mode;
 }

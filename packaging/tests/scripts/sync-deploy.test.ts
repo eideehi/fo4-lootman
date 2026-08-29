@@ -6,11 +6,11 @@ import { createTestConfig } from "../helpers/config-fixture.js";
 import { createTempDir, removeTempDir } from "../helpers/temp-dir.js";
 import { hashFile } from "../../scripts/content-hash.js";
 
-function seedBaseDeployArtifacts(config: ReturnType<typeof createTestConfig>, lang: "en" | "ja"): void {
+function seedBaseDeployArtifacts(config: ReturnType<typeof createTestConfig>, lang: "en" | "ja", mode: "product" | "debug" = "product"): void {
 	const filesRoot = path.join(config.buildTempDir, "files");
 	fs.outputFileSync(path.join(filesRoot, "resources", "common", "LootMan", "messages.json"), "common");
 	fs.outputFileSync(path.join(filesRoot, "resources", lang, "Interface", "Translations", `LootMan_${lang}.txt`), "lang");
-	fs.outputFileSync(path.join(filesRoot, "dll", "product", "lootman.dll"), "dll");
+	fs.outputFileSync(path.join(filesRoot, "dll", mode, "lootman.dll"), "dll");
 }
 
 function seedSharedTranslationDeployArtifacts(config: ReturnType<typeof createTestConfig>, lang: "en" | "ja"): void {
@@ -172,23 +172,23 @@ describe("sync-deploy", () => {
 		expect(manifest.files).not.toContainEqual({ destRelative: "Old/stale.txt", srcHash: "abc" });
 	});
 
-	it("retains scripts across a resource-only deploy and still removes them as stale on the next Papyrus deploy", () => {
+	it("retains loose debug scripts across a resource-only deploy and removes stale scripts on the next Papyrus deploy", () => {
 		const root = createTempDir();
 		dirs.push(root);
 		const config = createTestConfig(root);
 		const dataDir = path.join(config.fallout4Dir, "Data");
-		const papyrusBinaryDir = path.join(config.buildTempDir, "files", "papyrus", "product", "binary");
-		seedBaseDeployArtifacts(config, "en");
+		const papyrusBinaryDir = path.join(config.buildTempDir, "files", "papyrus", "debug", "binary");
+		seedBaseDeployArtifacts(config, "en", "debug");
 		fs.outputFileSync(path.join(papyrusBinaryDir, "ltmn2", "mcm.pex"), "papyrus");
 
-		const first = syncDeploy(config, { mode: "product", lang: "en", withPapyrus: true });
-		const manifestPath = resolveDeployManifestPath(config, "product", "en");
+		const first = syncDeploy(config, { mode: "debug", lang: "en", withPapyrus: true });
+		const manifestPath = resolveDeployManifestPath(config, "debug", "en");
 		let manifest = fs.readJsonSync(manifestPath) as { files: Array<{ destRelative: string; srcHash: string }> };
 		expect(first.copied).toBe(4);
 		expect(fs.readFileSync(path.join(dataDir, "Scripts", "ltmn2", "mcm.pex"), "utf8")).toBe("papyrus");
 		expect(manifest.files.map((file) => file.destRelative)).toContain("Scripts/ltmn2/mcm.pex");
 
-		const second = syncDeploy(config, { mode: "product", lang: "en" });
+		const second = syncDeploy(config, { mode: "debug", lang: "en" });
 		manifest = fs.readJsonSync(manifestPath) as { files: Array<{ destRelative: string; srcHash: string }> };
 		expect(second.removed).toBe(0);
 		expect(fs.readFileSync(path.join(dataDir, "Scripts", "ltmn2", "mcm.pex"), "utf8")).toBe("papyrus");
@@ -197,7 +197,7 @@ describe("sync-deploy", () => {
 		fs.removeSync(path.join(papyrusBinaryDir, "ltmn2", "mcm.pex"));
 		fs.outputFileSync(path.join(papyrusBinaryDir, "ltmn2", "other.pex"), "papyrus-other");
 
-		const third = syncDeploy(config, { mode: "product", lang: "en", withPapyrus: true });
+		const third = syncDeploy(config, { mode: "debug", lang: "en", withPapyrus: true });
 		manifest = fs.readJsonSync(manifestPath) as { files: Array<{ destRelative: string; srcHash: string }> };
 		expect(third.removed).toBe(1);
 		expect(fs.existsSync(path.join(dataDir, "Scripts", "ltmn2", "mcm.pex"))).toBe(false);
@@ -278,18 +278,77 @@ describe("sync-deploy", () => {
 		const filesRoot = path.join(config.buildTempDir, "files");
 		fs.outputFileSync(path.join(filesRoot, "resources", "common", "LootMan", "messages.json"), "common");
 
-		expect(() => syncDeploy(config, { mode: "product", lang: "en" })).toThrow("Required DLL artifact not found:");
+		expect(() => syncDeploy(config, { mode: "product", lang: "en" })).toThrow("Required deploy artifact not found:");
 	});
 
-	it("throws when withPapyrus is true and no papyrus binaries are present", () => {
+	it("throws when product Papyrus deployment has no BA2", () => {
 		const root = createTempDir();
 		dirs.push(root);
 		const config = createTestConfig(root);
 		seedBaseDeployArtifacts(config, "en");
 
-		expect(() => syncDeploy(config, { mode: "product", lang: "en", withPapyrus: true })).toThrow(
-			"Papyrus artifacts not found under",
-		);
+		expect(() => syncDeploy(config, { mode: "product", lang: "en", withPapyrus: true })).toThrow("Required deploy artifact not found:");
+	});
+
+	it("deploys the product Papyrus BA2 instead of loose scripts", () => {
+		const root = createTempDir();
+		dirs.push(root);
+		const config = createTestConfig(root);
+		seedBaseDeployArtifacts(config, "en");
+		fs.outputFileSync(path.join(config.buildTempDir, "files", "ba2", "product", "LootMan - Main.ba2"), "ba2");
+
+		const result = syncDeploy(config, { mode: "product", lang: "en", withPapyrus: true });
+		const dataDir = path.join(config.fallout4Dir, "Data");
+		expect(result.copied).toBe(4);
+		expect(fs.readFileSync(path.join(dataDir, "LootMan - Main.ba2"), "utf8")).toBe("ba2");
+		expect(fs.existsSync(path.join(dataDir, "Scripts"))).toBe(false);
+	});
+
+	it("removes managed loose debug scripts when switching to a product deploy", () => {
+		const root = createTempDir();
+		dirs.push(root);
+		const config = createTestConfig(root);
+		const filesRoot = path.join(config.buildTempDir, "files");
+		const dataDir = path.join(config.fallout4Dir, "Data");
+		seedBaseDeployArtifacts(config, "en", "debug");
+		fs.outputFileSync(path.join(filesRoot, "papyrus", "debug", "binary", "LTMN2", "System.pex"), "debug-pex");
+		syncDeploy(config, { mode: "debug", lang: "en", withPapyrus: true });
+
+		seedBaseDeployArtifacts(config, "en", "product");
+		fs.outputFileSync(path.join(filesRoot, "ba2", "product", "LootMan - Main.ba2"), "product-ba2");
+		const result = syncDeploy(config, { mode: "product", lang: "en", withPapyrus: true });
+
+		expect(result.removed).toBe(1);
+		expect(fs.existsSync(path.join(dataDir, "Scripts", "LTMN2", "System.pex"))).toBe(false);
+		expect(fs.readFileSync(path.join(dataDir, "LootMan - Main.ba2"), "utf8")).toBe("product-ba2");
+	});
+
+	it("removes the managed product BA2 when switching to a debug deploy", () => {
+		const root = createTempDir();
+		dirs.push(root);
+		const config = createTestConfig(root);
+		const filesRoot = path.join(config.buildTempDir, "files");
+		const dataDir = path.join(config.fallout4Dir, "Data");
+		seedBaseDeployArtifacts(config, "en", "product");
+		fs.outputFileSync(path.join(filesRoot, "ba2", "product", "LootMan - Main.ba2"), "product-ba2");
+		syncDeploy(config, { mode: "product", lang: "en", withPapyrus: true });
+
+		seedBaseDeployArtifacts(config, "en", "debug");
+		fs.outputFileSync(path.join(filesRoot, "papyrus", "debug", "binary", "LTMN2", "System.pex"), "debug-pex");
+		const result = syncDeploy(config, { mode: "debug", lang: "en", withPapyrus: true });
+
+		expect(result.removed).toBe(1);
+		expect(fs.existsSync(path.join(dataDir, "LootMan - Main.ba2"))).toBe(false);
+		expect(fs.readFileSync(path.join(dataDir, "Scripts", "LTMN2", "System.pex"), "utf8")).toBe("debug-pex");
+	});
+
+	it("throws when debug Papyrus deployment has no loose binaries", () => {
+		const root = createTempDir();
+		dirs.push(root);
+		const config = createTestConfig(root);
+		seedBaseDeployArtifacts(config, "en", "debug");
+
+		expect(() => syncDeploy(config, { mode: "debug", lang: "en", withPapyrus: true })).toThrow("Papyrus artifacts not found under");
 	});
 
 	it("ignores invalid existing manifest and continues deployment", () => {

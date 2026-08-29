@@ -176,10 +176,10 @@ describe("compile-papyrus helpers", () => {
 		expect(() => verifyPapyrusImportSymbols([imports])).toThrow("Papyrus import verification failed.");
 	});
 
-	it("parseArgs defaults to product and validates mode", () => {
+	it("parseArgs defaults to product and accepts debug mode", () => {
 		expect(parseArgs([])).toEqual({ mode: "product" });
 		expect(parseArgs(["--mode=product"])).toEqual({ mode: "product" });
-		expect(() => parseArgs(["--mode=debug"])).toThrow('Invalid mode: debug. Must be "product".');
+		expect(parseArgs(["--mode=debug"])).toEqual({ mode: "debug" });
 	});
 
 	it("prepareF4SEOverlay recreates overlay and copies source files", async () => {

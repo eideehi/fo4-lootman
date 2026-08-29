@@ -1,20 +1,15 @@
 import fs from "fs-extra";
 import path from "node:path";
 import { syncCollectedFiles, type CollectSyncResult } from "./collect-sync.js";
+import { DEFAULT_BUILD_MODE, parseBuildModeArg, type BuildMode } from "./build-mode.js";
 import { type Config, createConfig, isCliEntry } from "./config.js";
 
 const dllName = "lootman.dll";
 
-export type DllMode = "product";
+export type DllMode = BuildMode;
 
 export function parseArgs(argv: string[]): DllMode {
-	const modeArg = argv.find((arg) => arg.startsWith("--mode="));
-	if (!modeArg) return "product";
-	const value = modeArg.split("=")[1];
-	if (value !== "product") {
-		throw new Error(`Invalid --mode value: "${value}" (expected "product")`);
-	}
-	return value;
+	return parseBuildModeArg(argv);
 }
 
 export function resolveDllPath(projectRoot: string, dllBuildDir: string, mode: string): string {
@@ -42,12 +37,13 @@ function collectSingleDll(config: Config, buildMode: string, outDir: string, man
 	});
 }
 
-export function collectDll(config: Config, mode: DllMode = "product"): CollectSyncResult {
+export function collectDll(config: Config, mode: DllMode = DEFAULT_BUILD_MODE): CollectSyncResult {
 	const dllDirRoot = path.join(config.buildTempDir, "files", "dll");
-	const productOutDir = path.join(dllDirRoot, "product");
+	const outDir = path.join(dllDirRoot, mode);
+	const buildMode = mode === "product" ? "releasedbg" : "debug";
 
 	console.log(`Collecting DLLs (mode: ${mode})...`);
-	const result = collectSingleDll(config, "releasedbg", productOutDir, `collect-dll-${mode}`);
+	const result = collectSingleDll(config, buildMode, outDir, `collect-dll-${mode}`);
 	console.log(`DLL collection complete. copied=${result.copied} removed=${result.removed} skipped=${result.skipped}`);
 	return result;
 }

@@ -84,6 +84,9 @@ function parseCleanArgs(argv: string[]): CleanCommandArgs {
 function parseBuildArgs(argv: string[]): BuildCommandArgs {
 	const modeRaw = readOption(argv, "--mode");
 	const mode = parseBuildModeValue(modeRaw);
+	if (mode !== "product") {
+		throw new Error('Standalone package build supports only mode "product". Use `pnpm run package:deploy:dev` for a debug deployment.');
+	}
 
 	return {
 		mode,
@@ -161,6 +164,9 @@ async function runDeploy(config: Config, argv: string[]): Promise<void> {
 
 		if (args.withPapyrus) {
 			await compilePapyrus(config, { mode: args.mode });
+			if (args.mode === "product") {
+				await createArchives(config, { mode: args.mode });
+			}
 		}
 	}
 
@@ -181,7 +187,8 @@ function printUsage(): void {
 		"Usage:",
 		"  pnpm run package:clean [-- --all|-- --wsl-build]",
 		`  pnpm run package:build -- [--mode=${DEFAULT_BUILD_MODE}] [--with-papyrus|--no-papyrus]`,
-		`  pnpm run package:deploy -- [--mode=${DEFAULT_BUILD_MODE}] [--lang=en|ja] [--with-papyrus] [--full-sync] [--build]`,
+		"  pnpm run package:deploy [-- --lang=en|ja] [--full-sync]",
+		"  pnpm run package:deploy:dev [-- --lang=en|ja] [--full-sync]",
 		"  pnpm run package:undeploy",
 	].join("\n"));
 }

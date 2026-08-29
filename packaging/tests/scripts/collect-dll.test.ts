@@ -18,9 +18,9 @@ describe("collect-dll", () => {
 		expect(parseArgs(["node", "script"])).toBe("product");
 	});
 
-	it("parseArgs validates product-only mode", () => {
+	it("parseArgs accepts product and debug modes", () => {
 		expect(parseArgs(["--mode=product"])).toBe("product");
-		expect(() => parseArgs(["--mode=debug"])).toThrow('Invalid --mode value: "debug" (expected "product")');
+		expect(parseArgs(["--mode=debug"])).toBe("debug");
 	});
 
 	it("resolveDllPath interpolates mode placeholder", () => {
@@ -44,6 +44,18 @@ describe("collect-dll", () => {
 		});
 
 		expect(fs.readFileSync(out, "utf8")).toBe("product-dll");
+	});
+
+	it("collects debug dll from debug build", () => {
+		const root = createTempDir();
+		dirs.push(root);
+		const config = createTestConfig(root);
+		const src = path.join(config.projectRoot, "commonlibf4-plugin", "build", "windows", "x64", "debug", "lootman.dll");
+		const out = path.join(config.buildTempDir, "files", "dll", "debug", "lootman.dll");
+
+		fs.outputFileSync(src, "debug-dll");
+		expect(collectDll(config, "debug").copied).toBe(1);
+		expect(fs.readFileSync(out, "utf8")).toBe("debug-dll");
 	});
 
 	it("skips unchanged dlls and recopies when the dll changes", () => {

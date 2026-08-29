@@ -10,6 +10,7 @@ import { ensureOwnedBuildRoot, resolveOwnedPath } from "./owned-path.js";
 export type DeployMode = BuildMode;
 export type DeployLang = "en" | "ja";
 const deployLangs: DeployLang[] = ["en", "ja"];
+const deployModes: DeployMode[] = ["product", "debug"];
 
 export interface SyncDeployOpts {
 	mode: DeployMode;
@@ -89,7 +90,7 @@ function readManifest(filePath: string): DeployManifest | null {
 			});
 		}
 
-		if (parsed.mode !== "product") {
+		if (parsed.mode !== "product" && parsed.mode !== "debug") {
 			return null;
 		}
 		if (parsed.lang !== "en" && parsed.lang !== "ja") {
@@ -108,15 +109,18 @@ function readManifest(filePath: string): DeployManifest | null {
 	}
 }
 
-function readPreviousEntries(config: Config, mode: DeployMode): Map<string, string> {
+function readPreviousEntries(config: Config): Map<string, string> {
 	const previous = new Map<string, string>();
 
-	// Switching locales should also retire files from the previous locale deploy,
-	// so stale cleanup needs to consider every manifest for the active mode.
-	for (const lang of deployLangs) {
-		const manifest = readManifest(resolveDeployManifestPath(config, mode, lang));
-		for (const item of manifest?.files ?? []) {
-			previous.set(item.destRelative, item.srcHash);
+	// Switching locale or product/debug mode must retire managed artifacts from
+	// the previous deployment. In particular, stale loose debug PEX files must
+	// not override the product BA2 after a product deploy.
+	for (const mode of deployModes) {
+		for (const lang of deployLangs) {
+			const manifest = readManifest(resolveDeployManifestPath(config, mode, lang));
+			for (const item of manifest?.files ?? []) {
+				previous.set(item.destRelative, item.srcHash);
+			}
 		}
 	}
 
@@ -124,7 +128,7 @@ function readPreviousEntries(config: Config, mode: DeployMode): Map<string, stri
 }
 
 function isInPapyrusDeployScope(relativePath: string): boolean {
-	return relativePath === "Scripts" || relativePath.startsWith("Scripts/");
+	return relativePath === "Scripts" || relativePath.startsWith("Scripts/") || relativePath === "LootMan - Main.ba2";
 }
 
 function isInCurrentDeployScope(relativePath: string, withPapyrus: boolean): boolean {
@@ -153,11 +157,20 @@ function buildTargets(config: Config, mode: DeployMode, lang: DeployLang, withPa
 	];
 
 	if (withPapyrus) {
-		targets.push({
-			type: "directory",
-			src: path.join(filesRoot, "papyrus", mode, "binary"),
-			destPrefix: "Scripts",
-		});
+		if (mode === "product") {
+			targets.push({
+				type: "file",
+				src: path.join(filesRoot, "ba2", mode, "LootMan - Main.ba2"),
+				destRelative: "LootMan - Main.ba2",
+				required: true,
+			});
+		} else {
+			targets.push({
+				type: "directory",
+				src: path.join(filesRoot, "papyrus", mode, "binary"),
+				destPrefix: "Scripts",
+			});
+		}
 	}
 
 	return targets;
@@ -250,9 +263,9 @@ export function syncDeploy(config: Config, opts: SyncDeployOpts): SyncDeployResu
 		].join(" "));
 	}
 	if (requiredMissing.length > 0) {
-		throw new Error(`Required DLL artifact not found: ${requiredMissing[0]}`);
+		throw new Error(`Required deploy artifact not found: ${requiredMissing[0]}`);
 	}
-	if (withPapyrus) {
+	if (withPapyrus && opts.mode === "debug") {
 		const papyrusEntries = entries.filter((entry) => entry.destRelative.startsWith("Scripts/"));
 		if (papyrusEntries.length === 0) {
 			const papyrusDir = path.join(config.buildTempDir, "files", "papyrus", opts.mode, "binary");
@@ -261,7 +274,7 @@ export function syncDeploy(config: Config, opts: SyncDeployOpts): SyncDeployResu
 	}
 
 	const manifestPath = resolveDeployManifestPath(config, opts.mode, opts.lang);
-	const previous = readPreviousEntries(config, opts.mode);
+	const previous = readPreviousEntries(config);
 
 	const current = new Map<string, string>();
 	for (const entry of entries) {

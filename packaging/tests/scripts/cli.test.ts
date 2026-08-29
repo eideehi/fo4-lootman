@@ -89,6 +89,7 @@ describe("runCli", () => {
 		expect(mocks.buildDll).toHaveBeenCalledWith(config, { mode: "product" });
 		expect(mocks.collectDll).toHaveBeenCalledWith(config, "product");
 		expect(mocks.compilePapyrus).toHaveBeenCalledWith(config, { mode: "product" });
+		expect(mocks.createArchives).toHaveBeenCalledWith(config, { mode: "product" });
 		expect(mocks.syncDeploy).toHaveBeenCalledWith(config, {
 			mode: "product",
 			lang: "ja",
@@ -126,10 +127,21 @@ describe("runCli", () => {
 	});
 
 	it("rejects unsupported build mode", async () => {
-		await expect(runCli(config, ["build", "--mode=debug"])).rejects.toThrow('Invalid mode: debug. Must be "product".');
+		await expect(runCli(config, ["build", "--mode=debug"])).rejects.toThrow("Standalone package build supports only");
 	});
 
-	it("rejects unsupported deploy mode", async () => {
-		await expect(runCli(config, ["deploy", "--mode=debug"])).rejects.toThrow('Invalid mode: debug. Must be "product".');
+	it("builds and deploys debug DLL with loose Papyrus scripts", async () => {
+		await runCli(config, ["deploy", "--mode=debug", "--build", "--with-papyrus"]);
+
+		expect(mocks.buildDll).toHaveBeenCalledWith(config, { mode: "debug" });
+		expect(mocks.collectDll).toHaveBeenCalledWith(config, "debug");
+		expect(mocks.compilePapyrus).toHaveBeenCalledWith(config, { mode: "debug" });
+		expect(mocks.createArchives).not.toHaveBeenCalled();
+		expect(mocks.syncDeploy).toHaveBeenCalledWith(config, {
+			mode: "debug",
+			lang: "en",
+			withPapyrus: true,
+			fullSync: false,
+		});
 	});
 });

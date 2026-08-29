@@ -16,7 +16,7 @@ export interface CreateArchivesOpts {
 }
 
 async function createBa2(
-	variant: "product",
+	variant: BuildMode,
 	opts: {
 		config: Config;
 		papyrusRoot: string;

@@ -19,8 +19,9 @@ describe("archive2", () => {
 		expect(parseArgs([])).toEqual({ mode: "product" });
 	});
 
-	it("parseArgs rejects invalid mode", () => {
-		expect(() => parseArgs(["--mode=debug"])).toThrow('Invalid mode: debug. Must be "product".');
+	it("parseArgs accepts product and debug modes", () => {
+		expect(parseArgs(["--mode=debug"])).toEqual({ mode: "debug" });
+		expect(() => parseArgs(["--mode=invalid"])).toThrow('Invalid mode: invalid. Must be "product" or "debug".');
 	});
 
 	it("creates BA2 using provided execa implementation", async () => {
