@@ -144,7 +144,7 @@ describe("ghidra headless", () => {
 		const command = buildGhidraInstructionWindowProbeCommand(config, {
 			projectRoot: root,
 			provenNativeHooks: true,
-			reportPath: "tools/ghidra/reports/fallout4-1.11.221/proven-call-site-evidence.txt",
+			reportPath: "tools/ghidra/reports/fallout4-1.11.240/proven-call-site-evidence.txt",
 			instructionCount: 12,
 		});
 

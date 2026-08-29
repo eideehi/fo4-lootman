@@ -43,7 +43,7 @@ export interface GhidraProbeCommand {
 	reportPath: string;
 }
 
-export const defaultProvenHookEvidencePath = "tools/ghidra/reports/fallout4-1.11.221/proven-call-site-evidence.txt";
+export const defaultProvenHookEvidencePath = "tools/ghidra/reports/fallout4-1.11.240/proven-call-site-evidence.txt";
 
 function getProvenHookAddresses(root: string, manifestPath?: string): string[] {
 	const resolvedManifestPath = manifestPath
