@@ -1,0 +1,47 @@
+Program: Fallout4-1.11.240.exe
+Image base: 140000000
+
+================================================================================
+Target 1403922a8
+  1403922a8: [E8 93 7E FF FF] CALL 0x14038a140
+  1403922ad: [EB 27] JMP 0x1403922d6
+  1403922af: [45 84 F6] TEST R14B,R14B
+  1403922b2: [75 22] JNZ 0x1403922d6
+  1403922b4: [48 8B 05 B5 B0 F4 02] MOV RAX,qword ptr [0x1432dd370]
+  1403922bb: [48 85 C0] TEST RAX,RAX
+  1403922be: [74 04] JZ 0x1403922c4
+  1403922c0: [F0 FF 40 28] INC.LOCK dword ptr [RAX + 0x28]
+  1403922c4: [48 8D 54 24 20] LEA RDX,[RSP + 0x20]
+  1403922c9: [48 89 44 24 20] MOV qword ptr [RSP + 0x20],RAX
+  1403922ce: [48 8B CD] MOV RCX,RBP
+  1403922d1: [E8 7A 20 01 00] CALL 0x1403a4350
+
+================================================================================
+Target 140b28966
+  140b28966: [E8 D5 17 86 FF] CALL 0x14038a140
+  140b2896b: [44 8B 4F 10] MOV R9D,dword ptr [RDI + 0x10]
+  140b2896f: [8B 4D 0F] MOV ECX,dword ptr [RBP + 0xf]
+  140b28972: [44 03 C9] ADD R9D,ECX
+  140b28975: [44 8B 47 08] MOV R8D,dword ptr [RDI + 0x8]
+  140b28979: [45 3B C1] CMP R8D,R9D
+  140b2897c: [73 24] JNC 0x140b289a2
+  140b2897e: [48 8D 55 E7] LEA RDX,[RBP + -0x19]
+  140b28982: [4C 89 65 E7] MOV qword ptr [RBP + -0x19],R12
+  140b28986: [48 8D 4F 10] LEA RCX,[RDI + 0x10]
+  140b2898a: [48 89 7D EF] MOV qword ptr [RBP + -0x11],RDI
+  140b2898e: [C7 44 24 20 08 00 00 00] MOV dword ptr [RSP + 0x20],0x8
+
+================================================================================
+Target 1410895e6
+  1410895e6: [E8 55 0B 30 FF] CALL 0x14038a140
+  1410895eb: [48 8B 45 7F] MOV RAX,qword ptr [RBP + 0x7f]
+  1410895ef: [48 85 C0] TEST RAX,RAX
+  1410895f2: [74 1D] JZ 0x141089611
+  1410895f4: [48 8D 48 20] LEA RCX,[RAX + 0x20]
+  1410895f8: [B8 FF FF FF FF] MOV EAX,0xffffffff
+  1410895fd: [F0 0F C1 41 08] XADD.LOCK dword ptr [RCX + 0x8],EAX
+  141089602: [FF C8] DEC EAX
+  141089604: [A9 FF 03 00 00] TEST EAX,0x3ff
+  141089609: [75 06] JNZ 0x141089611
+  14108960b: [48 8B 01] MOV RAX,qword ptr [RCX]
+  14108960e: [FF 50 08] CALL qword ptr [RAX + 0x8]

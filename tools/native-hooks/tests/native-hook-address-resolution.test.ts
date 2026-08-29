@@ -14,6 +14,7 @@ function createFixtureManifest(reportPath = "tools/ghidra/reports/proven-call.tx
 		targetRuntime: "Fallout4 Test 1.2.3",
 		sourceFile: "commonlibf4-plugin/src/papyrus_lootman_hooks.cpp",
 		generatedHeader: "commonlibf4-plugin/src/papyrus_lootman_hook_addresses.generated.h",
+		resolutionEvidenceReport: "tools/ghidra/reports/fallout4-1.11.240/proven-call-site-evidence.txt",
 		entries: [
 			{
 				id: "fixture.proven_call",
@@ -88,7 +89,7 @@ function writeFixtureProjectWithReports(
 		fs.outputFileSync(path.join(root, reportPath), text);
 	}
 	const evidenceText = Object.values(reports).join("\n");
-	fs.outputFileSync(path.join(root, "tools/ghidra/reports/fallout4-1.11.221/proven-call-site-evidence.txt"), evidenceText);
+	fs.outputFileSync(path.join(root, "tools/ghidra/reports/fallout4-1.11.240/proven-call-site-evidence.txt"), evidenceText);
 	return manifestPath;
 }
 
@@ -306,6 +307,40 @@ describe("native hook address resolution", () => {
 			.toThrow("malformed raw instruction bytes");
 	});
 
+	it("refuses unrecognized lines and non-contiguous instructions in evidence windows", () => {
+		const malformedRoot = createTempDir();
+		dirs.push(malformedRoot);
+		const malformedPath = writeFixtureProject(malformedRoot, createFixtureManifest(), exactReport().replace(
+			"  14045678e: [48 8B C1] MOV RAX,RCX",
+			"  unexpected evidence format",
+		));
+		expect(() => resolveNativeHookAddresses({ projectRoot: malformedRoot, manifestPath: malformedPath }))
+			.toThrow("unrecognized line inside Target 0x140456789");
+
+		const gapRoot = createTempDir();
+		dirs.push(gapRoot);
+		const gapPath = writeFixtureProject(gapRoot, createFixtureManifest(), exactReport().replace(
+			"14045678e: [48 8B C1]",
+			"14045678f: [48 8B C1]",
+		));
+		expect(() => resolveNativeHookAddresses({ projectRoot: gapRoot, manifestPath: gapPath }))
+			.toThrow("has no contiguous post-call instruction at 0x14045678E");
+	});
+
+	it("refuses an evidence report that is not declared by the manifest", () => {
+		const root = createTempDir();
+		dirs.push(root);
+		const manifestPath = writeFixtureProject(root, createFixtureManifest(), exactReport());
+		const alternatePath = path.join(root, "tools/ghidra/reports/alternate.txt");
+		fs.outputFileSync(alternatePath, exactReport());
+
+		expect(() => resolveNativeHookAddresses({
+			projectRoot: root,
+			manifestPath,
+			evidenceReportPath: alternatePath,
+		})).toThrow("Evidence report must match manifest resolutionEvidenceReport");
+	});
+
 	it("independently rejects a raw CALL target mismatch", () => {
 		const root = createTempDir();
 		dirs.push(root);
@@ -325,6 +360,20 @@ describe("native hook address resolution", () => {
 		});
 		expect(() => resolveNativeHookAddresses({ projectRoot: root, manifestPath }))
 			.toThrow("no non-empty whole-instruction context uniquely identifies");
+	});
+
+	it("does not use instructions after a mid-window address gap to make contexts unique", () => {
+		const root = createTempDir();
+		dirs.push(root);
+		const report = multiSiteReport()
+			.replace("[48 8B C2] MOV RAX,RDX", "[48 8B C1] MOV RAX,RCX")
+			.replace("  140456018: [90] NOP", "  140456019: [CC] INT3");
+		const manifestPath = writeFixtureProjectWithReports(root, createMultiSiteManifest(), {
+			"tools/ghidra/reports/multi-site.txt": report,
+		});
+
+		expect(() => resolveNativeHookAddresses({ projectRoot: root, manifestPath }))
+			.toThrow("no non-empty whole-instruction context uniquely identifies fixture.multi.site-a");
 	});
 
 	it("resolves explicit multi-site proof without writing by default", () => {

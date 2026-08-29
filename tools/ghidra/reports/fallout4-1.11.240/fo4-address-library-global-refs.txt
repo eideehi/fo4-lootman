@@ -1,0 +1,4 @@
+Program: Fallout4-1.11.240.exe
+Image base: 140000000
+Scalars: [5420055224, 5420054168, 5420052248]
+

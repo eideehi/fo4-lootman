@@ -10,6 +10,7 @@ import {
 	validateNativeHookManifest,
 	type NativeHookAddressManifest,
 } from "../scripts/native-hook-addresses.js";
+import { resolveNativeHookAddresses } from "../scripts/native-hook-address-resolution.js";
 
 function cloneManifest(manifest: NativeHookAddressManifest): NativeHookAddressManifest {
 	return JSON.parse(JSON.stringify(manifest)) as NativeHookAddressManifest;
@@ -27,6 +28,27 @@ describe("native hook address manifest", () => {
 
 		expect(result.errors).toEqual([]);
 		expect(result.valid).toBe(true);
+		expect(manifest.resolutionEvidenceReport).toBe(
+			"tools/ghidra/reports/fallout4-1.11.240/proven-call-site-evidence.txt",
+		);
+	});
+
+	it("keeps the checked-in 1.11.240 manifest resolved against its declared evidence", () => {
+		const result = resolveNativeHookAddresses();
+
+		expect(result.resolvedEntries).toHaveLength(15);
+		expect(result.resolvedEntries.every((entry) => !entry.changed)).toBe(true);
+		expect(result.resolvedEntries.flatMap((entry) => entry.sites ?? []).every((site) => !site.changed)).toBe(true);
+	});
+
+	it("keeps the durable 1.11.240 report manifest identical to production", () => {
+		const production = fs.readFileSync(defaultManifestPath, "utf8");
+		const report = fs.readFileSync(
+			path.join(projectRoot, "tools/native-hooks/reports/fallout4-1.11.240/manifest.json"),
+			"utf8",
+		);
+
+		expect(report).toBe(production);
 	});
 
 	it("fails when a call-site expected count is impossible", () => {
@@ -98,19 +120,19 @@ describe("native hook address manifest", () => {
 
 		expect(entry.discoveryStrategy.status).toBe("proven");
 		expect(entry.expectedCount).toBe(5);
-		expect(proof.targetAbsoluteAddress).toBe("0x140507A10");
+		expect(proof.targetAbsoluteAddress).toBe("0x140507D30");
 		expect(proof.sites?.map((site) => site.siteId)).toEqual(entry.sites?.map((site) => site.id));
 		expect(proof.sites?.map((site) => site.absoluteAddress)).toEqual([
-			"0x1403BC3FD",
-			"0x14039F28F",
-			"0x140B32EFB",
-			"0x140B378A8",
-			"0x140B2D1BE",
+			"0x1403BC71D",
+			"0x14039F5AF",
+			"0x140B32E7B",
+			"0x140B37828",
+			"0x140B2D13E",
 		]);
 		expect(proof.excludedReferences).toEqual([
 			{
-				absoluteAddress: "0x1405076E5",
-				reason: "Component helper internal fallback path, not one of the five direct component count hook sites; see tools/ghidra/reports/fallout4-1.11.221/fo4-direct-component-count-target-functions.txt.",
+				absoluteAddress: "0x140507A05",
+				reason: "Component helper internal fallback path, not one of the five direct component count hook sites; re-proven for Fallout4 1.11.240.",
 			},
 		]);
 	});
@@ -124,15 +146,15 @@ describe("native hook address manifest", () => {
 
 		expect(entry.discoveryStrategy.status).toBe("proven");
 		expect(entry.expectedCount).toBe(2);
-		expect(proof.report).toBe("tools/ghidra/reports/fallout4-1.11.221/fo4-component-count-helper-target-functions.txt");
+		expect(proof.report).toBe("tools/ghidra/reports/fallout4-1.11.240/fo4-component-count-helper-target-functions.txt");
 		expect(proof.instructionReports).toEqual([
-			"tools/ghidra/reports/fallout4-1.11.221/fo4-component-count-helper-call-windows.txt",
+			"tools/ghidra/reports/fallout4-1.11.240/fo4-component-count-helper-call-windows.txt",
 		]);
-		expect(proof.targetAbsoluteAddress).toBe("0x140507670");
+		expect(proof.targetAbsoluteAddress).toBe("0x140507990");
 		expect(proof.sites?.map((site) => site.siteId)).toEqual(entry.sites?.map((site) => site.id));
 		expect(proof.sites?.map((site) => site.absoluteAddress)).toEqual([
-			"0x14059BC3A",
-			"0x1411751BB",
+			"0x14059BF5A",
+			"0x14117550B",
 		]);
 		expect(proof.excludedReferences).toBeUndefined();
 	});
@@ -146,15 +168,15 @@ describe("native hook address manifest", () => {
 
 		expect(entry.discoveryStrategy.status).toBe("proven");
 		expect(entry.expectedCount).toBe(2);
-		expect(proof.report).toBe("tools/ghidra/reports/fallout4-1.11.221/fo4-menu-select-target-functions.txt");
+		expect(proof.report).toBe("tools/ghidra/reports/fallout4-1.11.240/fo4-menu-select-target-functions.txt");
 		expect(proof.instructionReports).toEqual([
-			"tools/ghidra/reports/fallout4-1.11.221/fo4-menu-select-call-windows.txt",
+			"tools/ghidra/reports/fallout4-1.11.240/fo4-menu-select-call-windows.txt",
 		]);
-		expect(proof.targetAbsoluteAddress).toBe("0x140396DC0");
+		expect(proof.targetAbsoluteAddress).toBe("0x1403970E0");
 		expect(proof.sites?.map((site) => site.siteId)).toEqual(entry.sites?.map((site) => site.id));
 		expect(proof.sites?.map((site) => site.absoluteAddress)).toEqual([
-			"0x140B2C71A",
-			"0x140B2C9D7",
+			"0x140B2C69A",
+			"0x140B2C957",
 		]);
 		expect(proof.excludedReferences).toBeUndefined();
 	});
@@ -274,7 +296,7 @@ describe("native hook address manifest", () => {
 		expect(first).toContain("#include <REL/ID.h>");
 		expect(first).toContain("inline constexpr REL::ID kEncounterZoneResetElapsedFromDetachId{ 2200355 };");
 		expect(first).toContain("inline constexpr REL::ID kWorkshopCaravanKeywordGlobalId{ 4797310 };");
-		expect(first).toContain("Address Library: RE::ID::Workshop::GetSelectedWorkshopMenuNode @ 0x389A90");
+		expect(first).toContain("Address Library: RE::ID::Workshop::GetSelectedWorkshopMenuNode @ 0x389DB0");
 		expect(path.relative(projectRoot, headerPath).replaceAll("\\", "/")).toBe(manifest.generatedHeader);
 	});
 });

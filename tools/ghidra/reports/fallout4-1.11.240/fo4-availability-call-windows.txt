@@ -1,0 +1,287 @@
+Program: Fallout4-1.11.240.exe
+Image base: 140000000
+
+================================================================================
+Target 140b2c65e
+  140b2c65e: [E8 6D D4 86 FF] CALL 0x140399ad0
+  140b2c663: [8B 8D F8 00 00 00] MOV ECX,dword ptr [RBP + 0xf8]
+  140b2c669: [49 8D 56 28] LEA RDX,[R14 + 0x28]
+  140b2c66d: [84 C0] TEST AL,AL
+  140b2c66f: [41 0F 44 CC] CMOVZ ECX,R12D
+  140b2c673: [85 C9] TEST ECX,ECX
+  140b2c675: [48 8B CE] MOV RCX,RSI
+  140b2c678: [0F 95 C3] SETNZ BL
+  140b2c67b: [E8 00 FD B4 00] CALL 0x14167c380
+  140b2c680: [48 8B 85 F0 00 00 00] MOV RAX,qword ptr [RBP + 0xf0]
+  140b2c687: [48 8D 54 24 70] LEA RDX,[RSP + 0x70]
+  140b2c68c: [B1 01] MOV CL,0x1
+
+================================================================================
+Target 140b2c6c7
+  140b2c6c7: [E8 04 D4 86 FF] CALL 0x140399ad0
+  140b2c6cc: [8B 4D A0] MOV ECX,dword ptr [RBP + -0x60]
+  140b2c6cf: [84 C0] TEST AL,AL
+  140b2c6d1: [41 0F 44 CC] CMOVZ ECX,R12D
+  140b2c6d5: [85 C9] TEST ECX,ECX
+  140b2c6d7: [0F 95 C0] SETNZ AL
+  140b2c6da: [3A D8] CMP BL,AL
+  140b2c6dc: [74 09] JZ 0x140b2c6e7
+  140b2c6de: [49 8D 4F F0] LEA RCX,[R15 + -0x10]
+  140b2c6e2: [E8 59 22 00 00] CALL 0x140b2e940
+  140b2c6e7: [40 84 F6] TEST SIL,SIL
+  140b2c6ea: [0F 84 C5 03 00 00] JZ 0x140b2cab5
+
+================================================================================
+Target 140b2c91e
+  140b2c91e: [E8 AD D1 86 FF] CALL 0x140399ad0
+  140b2c923: [8B 4D A4] MOV ECX,dword ptr [RBP + -0x5c]
+  140b2c926: [49 8D 56 28] LEA RDX,[R14 + 0x28]
+  140b2c92a: [84 C0] TEST AL,AL
+  140b2c92c: [41 0F 44 CC] CMOVZ ECX,R12D
+  140b2c930: [85 C9] TEST ECX,ECX
+  140b2c932: [48 8B CE] MOV RCX,RSI
+  140b2c935: [0F 95 C3] SETNZ BL
+  140b2c938: [E8 43 FA B4 00] CALL 0x14167c380
+  140b2c93d: [48 8B 85 F0 00 00 00] MOV RAX,qword ptr [RBP + 0xf0]
+  140b2c944: [48 8D 54 24 70] LEA RDX,[RSP + 0x70]
+  140b2c949: [33 C9] XOR ECX,ECX
+
+================================================================================
+Target 140b2c984
+  140b2c984: [E8 47 D1 86 FF] CALL 0x140399ad0
+  140b2c989: [8B 4D A8] MOV ECX,dword ptr [RBP + -0x58]
+  140b2c98c: [84 C0] TEST AL,AL
+  140b2c98e: [41 0F 44 CC] CMOVZ ECX,R12D
+  140b2c992: [85 C9] TEST ECX,ECX
+  140b2c994: [0F 95 C0] SETNZ AL
+  140b2c997: [3A D8] CMP BL,AL
+  140b2c999: [74 09] JZ 0x140b2c9a4
+  140b2c99b: [49 8D 4F F0] LEA RCX,[R15 + -0x10]
+  140b2c99f: [E8 9C 1F 00 00] CALL 0x140b2e940
+  140b2c9a4: [40 84 F6] TEST SIL,SIL
+  140b2c9a7: [0F 84 08 01 00 00] JZ 0x140b2cab5
+
+================================================================================
+Target 140b2e9d4
+  140b2e9d4: [E8 F7 B0 86 FF] CALL 0x140399ad0
+  140b2e9d9: [8B 4C 24 70] MOV ECX,dword ptr [RSP + 0x70]
+  140b2e9dd: [84 C0] TEST AL,AL
+  140b2e9df: [48 8B 5C 24 78] MOV RBX,qword ptr [RSP + 0x78]
+  140b2e9e4: [0F 44 CF] CMOVZ ECX,EDI
+  140b2e9e7: [85 C9] TEST ECX,ECX
+  140b2e9e9: [74 0E] JZ 0x140b2e9f9
+  140b2e9eb: [48 85 DB] TEST RBX,RBX
+  140b2e9ee: [74 12] JZ 0x140b2ea02
+  140b2e9f0: [E8 DB 89 86 FF] CALL 0x1403973d0
+  140b2e9f5: [84 C0] TEST AL,AL
+  140b2e9f7: [EB 07] JMP 0x140b2ea00
+
+================================================================================
+Target 140397185
+  140397185: [E8 46 29 00 00] CALL 0x140399ad0
+  14039718a: [84 C0] TEST AL,AL
+  14039718c: [74 0C] JZ 0x14039719a
+  14039718e: [39 7C 24 50] CMP dword ptr [RSP + 0x50],EDI
+  140397192: [76 06] JBE 0x14039719a
+  140397194: [41 0F B6 DE] MOVZX EBX,R14B
+  140397198: [EB 02] JMP 0x14039719c
+  14039719a: [32 DB] XOR BL,BL
+  14039719c: [40 38 3D 95 7D B4 02] CMP byte ptr [0x142edef38],DIL
+  1403971a3: [75 0E] JNZ 0x1403971b3
+  1403971a5: [84 DB] TEST BL,BL
+  1403971a7: [74 0A] JZ 0x1403971b3
+
+================================================================================
+Target 1403b82d2
+  1403b82d2: [E8 F9 17 FE FF] CALL 0x140399ad0
+  1403b82d7: [84 C0] TEST AL,AL
+  1403b82d9: [74 3C] JZ 0x1403b8317
+  1403b82db: [83 BC 24 A0 00 00 00 00] CMP dword ptr [RSP + 0xa0],0x0
+  1403b82e3: [74 32] JZ 0x1403b8317
+  1403b82e5: [8B 05 95 CF D2 02] MOV EAX,dword ptr [0x1430e5280]
+  1403b82eb: [39 05 8F F3 D3 02] CMP dword ptr [0x1430f7680],EAX
+  1403b82f1: [74 09] JZ 0x1403b82fc
+  1403b82f3: [80 3D EE EB D3 02 00] CMP byte ptr [0x1430f6ee8],0x0
+  1403b82fa: [75 1B] JNZ 0x1403b8317
+  1403b82fc: [48 8B 15 6D 50 F2 02] MOV RDX,qword ptr [0x1432dd370]
+  1403b8303: [48 8D 4C 24 40] LEA RCX,[RSP + 0x40]
+
+================================================================================
+Target 1403c1bcf
+  1403c1bcf: [E8 FC 7E FD FF] CALL 0x140399ad0
+  1403c1bd4: [84 C0] TEST AL,AL
+  1403c1bd6: [74 3C] JZ 0x1403c1c14
+  1403c1bd8: [83 BC 24 98 00 00 00 00] CMP dword ptr [RSP + 0x98],0x0
+  1403c1be0: [74 32] JZ 0x1403c1c14
+  1403c1be2: [8B 05 98 36 D2 02] MOV EAX,dword ptr [0x1430e5280]
+  1403c1be8: [39 05 92 5A D3 02] CMP dword ptr [0x1430f7680],EAX
+  1403c1bee: [74 09] JZ 0x1403c1bf9
+  1403c1bf0: [80 3D F1 52 D3 02 00] CMP byte ptr [0x1430f6ee8],0x0
+  1403c1bf7: [75 1B] JNZ 0x1403c1c14
+  1403c1bf9: [48 8B 15 70 B7 F1 02] MOV RDX,qword ptr [0x1432dd370]
+  1403c1c00: [48 8D 4C 24 28] LEA RCX,[RSP + 0x28]
+
+================================================================================
+Target 140b2b894
+  140b2b894: [E8 37 E2 86 FF] CALL 0x140399ad0
+  140b2b899: [8B 4C 24 24] MOV ECX,dword ptr [RSP + 0x24]
+  140b2b89d: [84 C0] TEST AL,AL
+  140b2b89f: [41 0F 44 CE] CMOVZ ECX,R14D
+  140b2b8a3: [85 C9] TEST ECX,ECX
+  140b2b8a5: [74 33] JZ 0x140b2b8da
+  140b2b8a7: [48 85 DB] TEST RBX,RBX
+  140b2b8aa: [74 59] JZ 0x140b2b905
+  140b2b8ac: [4C 39 73 28] CMP qword ptr [RBX + 0x28],R14
+  140b2b8b0: [74 53] JZ 0x140b2b905
+  140b2b8b2: [48 8B 4B 38] MOV RCX,qword ptr [RBX + 0x38]
+  140b2b8b6: [E8 65 B4 85 FF] CALL 0x140386d20
+
+================================================================================
+Target 140b2d75f
+  140b2d75f: [E8 6C C3 86 FF] CALL 0x140399ad0
+  140b2d764: [8B 4D C4] MOV ECX,dword ptr [RBP + -0x3c]
+  140b2d767: [84 C0] TEST AL,AL
+  140b2d769: [41 0F 44 CC] CMOVZ ECX,R12D
+  140b2d76d: [85 C9] TEST ECX,ECX
+  140b2d76f: [74 73] JZ 0x140b2d7e4
+  140b2d771: [E8 4A FF 84 FF] CALL 0x14037d6c0
+  140b2d776: [0F 2F C7] COMISS XMM0,XMM7
+  140b2d779: [72 1B] JC 0x140b2d796
+  140b2d77b: [48 8D 0D CE 60 A1 01] LEA RCX,[0x142543850]
+  140b2d782: [E8 E9 8D 55 00] CALL 0x141086570
+  140b2d787: [48 8D 4C 24 70] LEA RCX,[RSP + 0x70]
+
+================================================================================
+Target 140b2d891
+  140b2d891: [E8 3A C2 86 FF] CALL 0x140399ad0
+  140b2d896: [8B 4D C8] MOV ECX,dword ptr [RBP + -0x38]
+  140b2d899: [84 C0] TEST AL,AL
+  140b2d89b: [41 0F 44 CC] CMOVZ ECX,R12D
+  140b2d89f: [85 C9] TEST ECX,ECX
+  140b2d8a1: [74 0A] JZ 0x140b2d8ad
+  140b2d8a3: [E8 18 FE 84 FF] CALL 0x14037d6c0
+  140b2d8a8: [0F 2F C7] COMISS XMM0,XMM7
+  140b2d8ab: [72 09] JC 0x140b2d8b6
+  140b2d8ad: [49 8D 4F F0] LEA RCX,[R15 + -0x10]
+  140b2d8b1: [E8 5A 0B 00 00] CALL 0x140b2e410
+  140b2d8b6: [F3 41 0F 10 87 00 03 00 00] MOVSS XMM0,dword ptr [R15 + 0x300]
+
+================================================================================
+Target 140b2ecff
+  140b2ecff: [E8 CC AD 86 FF] CALL 0x140399ad0
+  140b2ed04: [8B 4C 24 4C] MOV ECX,dword ptr [RSP + 0x4c]
+  140b2ed08: [84 C0] TEST AL,AL
+  140b2ed0a: [41 0F 44 CF] CMOVZ ECX,R15D
+  140b2ed0e: [85 C9] TEST ECX,ECX
+  140b2ed10: [75 05] JNZ 0x140b2ed17
+  140b2ed12: [48 85 FF] TEST RDI,RDI
+  140b2ed15: [74 05] JZ 0x140b2ed1c
+  140b2ed17: [41 B5 01] MOV R13B,0x1
+  140b2ed1a: [EB 03] JMP 0x140b2ed1f
+  140b2ed1c: [45 32 ED] XOR R13B,R13B
+  140b2ed1f: [48 8B CB] MOV RCX,RBX
+
+================================================================================
+Target 140b3035b
+  140b3035b: [E8 70 97 86 FF] CALL 0x140399ad0
+  140b30360: [84 C0] TEST AL,AL
+  140b30362: [74 11] JZ 0x140b30375
+  140b30364: [83 7C 24 48 00] CMP dword ptr [RSP + 0x48],0x0
+  140b30369: [77 0A] JA 0x140b30375
+  140b3036b: [F3 0F 10 0D 25 E4 3F 02] MOVSS XMM1,dword ptr [0x142f2e798]
+  140b30373: [EB 04] JMP 0x140b30379
+  140b30375: [41 0F 28 C8] MOVAPS XMM1,XMM8
+  140b30379: [49 8B 8E 60 01 00 00] MOV RCX,qword ptr [R14 + 0x160]
+  140b30380: [48 8B 4C 0E 10] MOV RCX,qword ptr [RSI + RCX*0x1 + 0x10]
+  140b30385: [E8 A6 4C 00 00] CALL 0x140b35030
+  140b3038a: [41 FF C7] INC R15D
+
+================================================================================
+Target 140b323a5
+  140b323a5: [E8 26 77 86 FF] CALL 0x140399ad0
+  140b323aa: [84 C0] TEST AL,AL
+  140b323ac: [74 11] JZ 0x140b323bf
+  140b323ae: [44 39 B5 B0 01 00 00] CMP dword ptr [RBP + 0x1b0],R14D
+  140b323b5: [77 08] JA 0x140b323bf
+  140b323b7: [F3 0F 10 3D D9 C3 3F 02] MOVSS XMM7,dword ptr [0x142f2e798]
+  140b323bf: [48 8B 0F] MOV RCX,qword ptr [RDI]
+  140b323c2: [0F 28 CF] MOVAPS XMM1,XMM7
+  140b323c5: [48 8B 4C 0B 10] MOV RCX,qword ptr [RBX + RCX*0x1 + 0x10]
+  140b323ca: [E8 61 2C 00 00] CALL 0x140b35030
+  140b323cf: [49 8B 8D 80 03 00 00] MOV RCX,qword ptr [R13 + 0x380]
+  140b323d6: [48 8D 54 24 58] LEA RDX,[RSP + 0x58]
+
+================================================================================
+Target 140b330ec
+  140b330ec: [E8 DF 69 86 FF] CALL 0x140399ad0
+  140b330f1: [8B 4C 24 38] MOV ECX,dword ptr [RSP + 0x38]
+  140b330f5: [33 D2] XOR EDX,EDX
+  140b330f7: [84 C0] TEST AL,AL
+  140b330f9: [0F 44 CA] CMOVZ ECX,EDX
+  140b330fc: [85 C9] TEST ECX,ECX
+  140b330fe: [0F 95 C0] SETNZ AL
+  140b33101: [48 83 C4 28] ADD RSP,0x28
+  140b33105: [C3] RET
+  140b33110: [40 55] PUSH RBP
+  140b33112: [56] PUSH RSI
+  140b33113: [57] PUSH RDI
+
+================================================================================
+Target 140b36148
+  140b36148: [E8 83 39 86 FF] CALL 0x140399ad0
+  140b3614d: [8B 4D 87] MOV ECX,dword ptr [RBP + -0x79]
+  140b36150: [84 C0] TEST AL,AL
+  140b36152: [44 89 7C 24 38] MOV dword ptr [RSP + 0x38],R15D
+  140b36157: [B8 01 00 00 00] MOV EAX,0x1
+  140b3615c: [4C 8B 7D 67] MOV R15,qword ptr [RBP + 0x67]
+  140b36160: [0F 44 C8] CMOVZ ECX,EAX
+  140b36163: [89 5C 24 30] MOV dword ptr [RSP + 0x30],EBX
+  140b36167: [44 0F B7 CF] MOVZX R9D,DI
+  140b3616b: [89 4C 24 28] MOV dword ptr [RSP + 0x28],ECX
+  140b3616f: [4D 8B C5] MOV R8,R13
+  140b36172: [89 74 24 20] MOV dword ptr [RSP + 0x20],ESI
+
+================================================================================
+Target 140b36651
+  140b36651: [E8 7A 34 86 FF] CALL 0x140399ad0
+  140b36656: [44 8B 45 AF] MOV R8D,dword ptr [RBP + -0x51]
+  140b3665a: [48 8D 93 F0 02 00 00] LEA RDX,[RBX + 0x2f0]
+  140b36661: [84 C0] TEST AL,AL
+  140b36663: [44 89 7C 24 38] MOV dword ptr [RSP + 0x38],R15D
+  140b36668: [B8 01 00 00 00] MOV EAX,0x1
+  140b3666d: [89 74 24 30] MOV dword ptr [RSP + 0x30],ESI
+  140b36671: [44 0F 44 C0] CMOVZ R8D,EAX
+  140b36675: [48 8B CB] MOV RCX,RBX
+  140b36678: [44 89 44 24 28] MOV dword ptr [RSP + 0x28],R8D
+  140b3667d: [66 41 83 C6 02] ADD R14W,0x2
+  140b36682: [45 0F B7 CE] MOVZX R9D,R14W
+
+================================================================================
+Target 140b37630
+  140b37630: [E8 9B 24 86 FF] CALL 0x140399ad0
+  140b37635: [8B 8C 24 88 00 00 00] MOV ECX,dword ptr [RSP + 0x88]
+  140b3763c: [84 C0] TEST AL,AL
+  140b3763e: [8B 84 24 90 00 00 00] MOV EAX,dword ptr [RSP + 0x90]
+  140b37645: [44 0F B7 CE] MOVZX R9D,SI
+  140b37649: [49 8B 56 10] MOV RDX,qword ptr [R14 + 0x10]
+  140b3764d: [41 0F 44 CC] CMOVZ ECX,R12D
+  140b37651: [89 44 24 38] MOV dword ptr [RSP + 0x38],EAX
+  140b37655: [4D 8B C7] MOV R8,R15
+  140b37658: [89 5C 24 30] MOV dword ptr [RSP + 0x30],EBX
+  140b3765c: [89 4C 24 28] MOV dword ptr [RSP + 0x28],ECX
+  140b37660: [49 8B 0E] MOV RCX,qword ptr [R14]
+
+================================================================================
+Target 140b376db
+  140b376db: [E8 F0 23 86 FF] CALL 0x140399ad0
+  140b376e0: [44 8B 4C 24 70] MOV R9D,dword ptr [RSP + 0x70]
+  140b376e5: [48 8D 93 F0 02 00 00] LEA RDX,[RBX + 0x2f0]
+  140b376ec: [44 8B 84 24 80 00 00 00] MOV R8D,dword ptr [RSP + 0x80]
+  140b376f4: [84 C0] TEST AL,AL
+  140b376f6: [44 89 44 24 38] MOV dword ptr [RSP + 0x38],R8D
+  140b376fb: [41 BF 01 00 00 00] MOV R15D,0x1
+  140b37701: [45 0F 44 CF] CMOVZ R9D,R15D
+  140b37705: [89 7C 24 30] MOV dword ptr [RSP + 0x30],EDI
+  140b37709: [44 89 4C 24 28] MOV dword ptr [RSP + 0x28],R9D
+  140b3770e: [66 83 C5 02] ADD BP,0x2
+  140b37712: [44 0F B7 CD] MOVZX R9D,BP

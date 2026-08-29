@@ -19,6 +19,7 @@ interface CandidateBundleEntry {
 		status: string;
 		targetAbsoluteAddress?: string;
 		targetReport?: { selectedReferenceCount: number };
+		directCallInstructionCount?: number;
 		missingDirectCallSites?: string[];
 		extraSameTargetReferences?: string[];
 		targetCandidates?: { targetAbsoluteAddress: string }[];
@@ -63,7 +64,7 @@ function createCallEntry(
 function targetReport(
 	target: string,
 	references: string[],
-	directCalls: Array<{ source: string; target: string }>,
+	directCalls: Array<{ source: string; target: string; bytes?: string }>,
 ): string {
 	const targetBody = [
 		"Program: Fallout4.exe",
@@ -82,7 +83,7 @@ function targetReport(
 		"================================================================================",
 		`Target ${call.source}`,
 		"Instructions:",
-		`  ${call.source}: CALL 0x${call.target}`,
+		`  ${call.source}: ${call.bytes ? `[${call.bytes}] ` : ""}CALL 0x${call.target}`,
 	]);
 	return [...targetBody, ...directCallBodies, ""].join("\n");
 }
@@ -95,7 +96,7 @@ function instructionWindowReport(source: string, target: string): string {
 		"================================================================================",
 		`Target ${source}`,
 		"Instructions:",
-		`  ${source}: CALL 0x${target}`,
+		`  ${source}: [E8 00 00 00 00] CALL 0x${target}`,
 		"",
 	].join("\n");
 }
@@ -166,6 +167,13 @@ function createFixtureManifest(): NativeHookAddressManifest {
 				"tools/ghidra/reports/fixture-conflicting-targets.txt",
 				"0xA6",
 			),
+			createCallEntry(
+				"fixture.invalid_raw_opcode",
+				"kFixtureInvalidRawOpcodeCallSites",
+				"0x7234",
+				"tools/ghidra/reports/fixture-invalid-raw-opcode.txt",
+				"0xA7",
+			),
 			{
 				id: "fixture.layout",
 				cppName: "kFixtureLayoutOffset",
@@ -204,12 +212,17 @@ describe("native hook review bundle", () => {
 		const extraReferenceSource = absoluteFromRva("0x4234");
 		const rediscoverySource = absoluteFromRva("0x5234");
 		const conflictingTargetSource = absoluteFromRva("0x6234");
+		const invalidRawOpcodeSource = absoluteFromRva("0x7234");
 
 		fs.outputJsonSync(manifestPath, manifest, { spaces: 2 });
 		fs.outputFileSync(headerPath, generateNativeHookHeader(manifest));
 		fs.outputFileSync(
 			path.join(root, "tools", "ghidra", "reports", "fixture-ready.txt"),
-			targetReport("140005678", [readySource], [{ source: readySource, target: "140005678" }]),
+			targetReport(
+				"140005678",
+				[readySource],
+				[{ source: readySource, target: "140005678", bytes: "E8 00 00 00 00" }],
+			),
 		);
 		fs.outputFileSync(
 			path.join(root, "tools", "ghidra", "reports", "fixture-missing-window.txt"),
@@ -230,6 +243,14 @@ describe("native hook review bundle", () => {
 		fs.outputFileSync(
 			path.join(root, "tools", "ghidra", "reports", "fixture-conflicting-targets.txt"),
 			conflictingTargetReport(conflictingTargetSource),
+		);
+		fs.outputFileSync(
+			path.join(root, "tools", "ghidra", "reports", "fixture-invalid-raw-opcode.txt"),
+			targetReport(
+				"14000A000",
+				[invalidRawOpcodeSource],
+				[{ source: invalidRawOpcodeSource, target: "14000A000", bytes: "FF 00 00 00 00" }],
+			),
 		);
 		fs.outputFileSync(
 			sourcePath,
@@ -267,6 +288,8 @@ describe("native hook review bundle", () => {
 		expect(markdown).toContain("fixture.layout (layout_offset): value=0xE0");
 		expect(markdown).toContain("## Unresolved Items Checklist");
 		expect(markdown).not.toContain("fixture.layout: Discovery strategy is manual");
+		expect(markdown).toContain("fixture.layout: Diagnostic layout offset was retained without executable-address proof");
+		expect(markdown).toContain("Manual release gate: complete F4SE load and in-game smoke testing.");
 		expect(candidates.entries.every((entry: { proofReadiness?: unknown }) => entry.proofReadiness)).toBe(true);
 
 			const entries = new Map(candidates.entries.map((entry) => [entry.id, entry]));
@@ -282,6 +305,7 @@ describe("native hook review bundle", () => {
 			expect(entry("fixture.ready_call").proofReadiness.status).toBe("ready_for_proof_metadata");
 			expect(entry("fixture.ready_call").proofReadiness.targetAbsoluteAddress).toBe("0x140005678");
 			expect(entry("fixture.ready_call").proofReadiness.targetReport?.selectedReferenceCount).toBe(1);
+			expect(entry("fixture.ready_call").proofReadiness.directCallInstructionCount).toBe(1);
 			expect(entry("fixture.missing_window").proofReadiness.status).toBe("needs_instruction_window_refresh");
 			expect(entry("fixture.missing_window").proofReadiness.missingDirectCallSites).toEqual(["0x140002234"]);
 			expect(entry("fixture.missing_allrefs").proofReadiness.status).toBe("needs_target_allrefs_report");
@@ -292,8 +316,12 @@ describe("native hook review bundle", () => {
 			expect(entry("fixture.conflicting_targets").proofReadiness.targetCandidates?.map((
 				candidate: { targetAbsoluteAddress: string },
 			) => candidate.targetAbsoluteAddress)).toEqual(["0x140009000", "0x140009100"]);
+			expect(entry("fixture.invalid_raw_opcode").proofReadiness.status).toBe("needs_instruction_window_refresh");
+			expect(entry("fixture.invalid_raw_opcode").proofReadiness.missingDirectCallSites).toEqual(["0x140007234"]);
 			expect(entry("fixture.layout").proofReadiness.status).toBe("not_applicable");
-			expect(entry("fixture.layout").unresolvedItems).toEqual([]);
+			expect(entry("fixture.layout").unresolvedItems).toEqual([
+				"Diagnostic layout offset was retained without executable-address proof for this runtime; verify separately before changing it.",
+			]);
 		expect(sourceSlice).toContain("DecodeDirectCallSite");
 		expect(sourceSlice).toContain("InstallWorkshopMaterialProbeHooks");
 		expect(sourceSlice.split("\n").filter((line) => /[ \t]+$/u.test(line))).toEqual([]);

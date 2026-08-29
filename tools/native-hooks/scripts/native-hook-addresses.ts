@@ -73,6 +73,7 @@ export interface NativeHookAddressManifest {
 	targetRuntime: string;
 	sourceFile: string;
 	generatedHeader: string;
+	resolutionEvidenceReport?: string;
 	entries: NativeHookAddressEntry[];
 }
 
@@ -452,6 +453,19 @@ export function validateNativeHookManifest(
 
 	if (!isRecord(manifest)) {
 		return { valid: false, errors: ["Manifest root must be an object."] };
+	}
+	if (manifest.resolutionEvidenceReport !== undefined) {
+		if (typeof manifest.resolutionEvidenceReport !== "string") {
+			errors.push("resolutionEvidenceReport must be a workspace-relative path.");
+		} else {
+			validateEvidencePaths(
+				[manifest.resolutionEvidenceReport],
+				"resolutionEvidenceReport",
+				errors,
+				root,
+				checkEvidencePaths,
+			);
+		}
 	}
 
 	if (manifest.schemaVersion !== 1 && manifest.schemaVersion !== 2) {

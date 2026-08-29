@@ -1,0 +1,32 @@
+Program: Fallout4-1.11.240.exe
+Image base: 140000000
+
+================================================================================
+Target 14059bf5a
+  14059bf5a: [E8 31 BA F6 FF] CALL 0x140507990
+  14059bf5f: [8B 44 24 30] MOV EAX,dword ptr [RSP + 0x30]
+  14059bf63: [0F 57 C0] XORPS XMM0,XMM0
+  14059bf66: [8B 0D AC 70 8D 03] MOV ECX,dword ptr [0x143e73018]
+  14059bf6c: [F3 48 0F 2A C0] CVTSI2SS XMM0,RAX
+  14059bf71: [65 48 8B 04 25 58 00 00 00] MOV RAX,qword ptr GS:[0x58]
+  14059bf7a: [48 8B 0C C8] MOV RCX,qword ptr [RAX + RCX*0x8]
+  14059bf7e: [F3 0F 11 03] MOVSS dword ptr [RBX],XMM0
+  14059bf82: [80 3C 29 00] CMP byte ptr [RCX + RBP*0x1],0x0
+  14059bf86: [74 1B] JZ 0x14059bfa3
+  14059bf88: [48 8B 0D 29 C4 B5 02] MOV RCX,qword ptr [0x1430f83b8]
+  14059bf8f: [48 8D 15 2A 3F F1 01] LEA RDX,[0x1424afec0]
+
+================================================================================
+Target 14117550b
+  14117550b: [E8 80 24 39 FF] CALL 0x140507990
+  141175510: [84 C0] TEST AL,AL
+  141175512: [75 1F] JNZ 0x141175533
+  141175514: [48 8D 15 AD 7C 45 01] LEA RDX,[0x1425cd1c8]
+  14117551b: [48 8B CE] MOV RCX,RSI
+  14117551e: [44 8B 4C 24 70] MOV R9D,dword ptr [RSP + 0x70]
+  141175523: [4C 8B C7] MOV R8,RDI
+  141175526: [C7 44 24 20 02 00 00 00] MOV dword ptr [RSP + 0x20],0x2
+  14117552e: [E8 FD 88 F6 FF] CALL 0x1410dde30
+  141175533: [8B 44 24 30] MOV EAX,dword ptr [RSP + 0x30]
+  141175537: [48 8B 5C 24 50] MOV RBX,qword ptr [RSP + 0x50]
+  14117553c: [48 8B 6C 24 58] MOV RBP,qword ptr [RSP + 0x58]

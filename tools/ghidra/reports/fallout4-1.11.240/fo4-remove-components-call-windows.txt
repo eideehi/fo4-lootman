@@ -1,0 +1,32 @@
+Program: Fallout4-1.11.240.exe
+Image base: 140000000
+
+================================================================================
+Target 14114f009
+  14114f009: [E8 82 3A 03 00] CALL 0x141182a90
+  14114f00e: [48 83 C3 10] ADD RBX,0x10
+  14114f012: [49 3B DE] CMP RBX,R14
+  14114f015: [75 C9] JNZ 0x14114efe0
+  14114f017: [48 8D 55 6F] LEA RDX,[RBP + 0x6f]
+  14114f01b: [48 8B CF] MOV RCX,RDI
+  14114f01e: [E8 9D A4 3C FF] CALL 0x1405194c0
+  14114f023: [48 8B C8] MOV RCX,RAX
+  14114f026: [33 D2] XOR EDX,EDX
+  14114f028: [E8 93 42 F3 FF] CALL 0x1410832c0
+  14114f02d: [4C 39 65 0F] CMP qword ptr [RBP + 0xf],R12
+  14114f031: [74 0D] JZ 0x14114f040
+
+================================================================================
+Target 14114ea33
+  14114ea33: [E8 58 40 03 00] CALL 0x141182a90
+  14114ea38: [E9 B7 00 00 00] JMP 0x14114eaf4
+  14114ea3d: [44 0F B7 45 28] MOVZX R8D,word ptr [RBP + 0x28]
+  14114ea42: [66 45 85 C0] TEST R8W,R8W
+  14114ea46: [74 4B] JZ 0x14114ea93
+  14114ea48: [83 7D 24 01] CMP dword ptr [RBP + 0x24],0x1
+  14114ea4c: [74 1F] JZ 0x14114ea6d
+  14114ea4e: [44 8B 45 0C] MOV R8D,dword ptr [RBP + 0xc]
+  14114ea52: [48 8D 15 67 E9 47 01] LEA RDX,[0x1425cd3c0]
+  14114ea59: [48 8B 4D 10] MOV RCX,qword ptr [RBP + 0x10]
+  14114ea5d: [41 B9 01 00 00 00] MOV R9D,0x1
+  14114ea63: [E8 78 DA 01 00] CALL 0x14116c4e0

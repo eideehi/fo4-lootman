@@ -175,6 +175,7 @@ function buildUnresolvedItems(entry: NativeHookAddressEntry): string[] {
 		entry.discoveryStrategy.status === "manual" &&
 		(entry.category === "constant" || entry.category === "layout_offset");
 	if (manualNonExecutable) {
+		items.push(`${entry.category === "constant" ? "Semantic constant" : "Diagnostic layout offset"} was retained without executable-address proof for this runtime; verify separately before changing it.`);
 		return items;
 	}
 
@@ -353,7 +354,12 @@ function collectTargetCandidates(
 	for (const site of selectedSites) {
 		const source = stripHexPrefix(site.absoluteAddress);
 		for (const report of reports) {
-			const directCall = report.text.match(new RegExp(`^\\s*${source}:\\s+CALL\\s+0x([0-9A-F]+)\\b`, "im"));
+			const directCall = report.text.match(
+				new RegExp(
+					`^\\s*${source}:\\s+(?:\\[E8(?:\\s+[0-9A-F]{2}){4}\\]\\s+)?CALL\\s+0x([0-9A-F]+)\\b`,
+					"im",
+				),
+			);
 			if (directCall) {
 				addTargetCandidate(targets, site, `0x${directCall[1]}`, report.path);
 			}
@@ -378,7 +384,10 @@ function collectTargetCandidates(
 function hasDirectCallInstruction(reportText: string, sourceAbsoluteAddress: string, targetAbsoluteAddress: string): boolean {
 	const source = stripHexPrefix(sourceAbsoluteAddress);
 	const target = stripHexPrefix(targetAbsoluteAddress);
-	return new RegExp(`^\\s*${source}:\\s+CALL\\s+0x${target}\\b`, "im").test(reportText);
+	return new RegExp(
+		`^\\s*${source}:\\s+(?:\\[E8(?:\\s+[0-9A-F]{2}){4}\\]\\s+)?CALL\\s+0x${target}\\b`,
+		"im",
+	).test(reportText);
 }
 
 function buildTargetReport(
@@ -707,7 +716,7 @@ function formatProofReadinessList(entry: ReviewBundleCandidateEntry): string {
 		`target=${target}`,
 		`selectedRefs=${selectedReferences}`,
 		`directCalls=${directCalls}`,
-		`extras=${extras}`,
+		`untriagedExtras=${extras}`,
 		readiness.recommendedNextAction,
 	].join("; ");
 }
@@ -772,14 +781,12 @@ function generateMarkdown(
 
 	lines.push("", "## Unresolved Items Checklist");
 	const unresolvedEntries = candidates.entries.filter((entry) => entry.unresolvedItems.length > 0);
-	if (unresolvedEntries.length === 0) {
-		lines.push("- None");
-	}
 	for (const entry of unresolvedEntries) {
 		for (const item of entry.unresolvedItems) {
 			lines.push(`- [ ] ${entry.id}: ${item}`);
 		}
 	}
+	lines.push("- [ ] Manual release gate: complete F4SE load and in-game smoke testing.");
 
 	lines.push("");
 	return lines.join("\n");

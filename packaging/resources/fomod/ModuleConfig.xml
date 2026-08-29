@@ -77,10 +77,10 @@
 
                 <group name="Select your game version." type="SelectAny">
                     <plugins order="Explicit">
-                        <plugin name="1.11.221">
-                            <description>Fallout4.exe version.</description>
+                        <plugin name="1.11.240">
+                            <description>Required: LootMan 3.2.0 supports only Fallout4.exe 1.11.240 and also requires Address Library for F4SE Plugins with version-1-11-240-0.bin. The native plugin will not load on 1.11.221, 1.10.163, or other runtimes.</description>
                             <conditionFlags>
-                                <flag name="runtime_1_11_221">selected</flag>
+                                <flag name="runtime_1_11_240">selected</flag>
                             </conditionFlags>
                             <typeDescriptor>
                                 <type name="Required"/>

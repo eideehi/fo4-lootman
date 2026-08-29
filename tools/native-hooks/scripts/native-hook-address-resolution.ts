@@ -56,7 +56,7 @@ interface EvidenceInstruction {
 	disassembly: string;
 }
 
-const DEFAULT_EVIDENCE_REPORT = "tools/ghidra/reports/fallout4-1.11.221/proven-call-site-evidence.txt";
+const DEFAULT_EVIDENCE_REPORT = "tools/ghidra/reports/fallout4-1.11.240/proven-call-site-evidence.txt";
 
 const HEX_LITERAL_PATTERN = /^0x[0-9A-F]+$/i;
 const PLAIN_HEX_PATTERN = /^[0-9A-F]+$/i;
@@ -87,16 +87,26 @@ function parseEvidenceReport(root: string, reportPath: string): Map<number, Evid
 	const windows = new Map<number, EvidenceInstruction[]>();
 	let currentAddress: number | undefined;
 	for (const [lineIndex, line] of reportText.split(/\r?\n/).entries()) {
-		const targetMatch = line.trim().match(/^Target\s+([0-9A-F]+)$/i);
+		const trimmed = line.trim();
+		if (/^=+$/.test(trimmed)) {
+			currentAddress = undefined;
+			continue;
+		}
+		const targetMatch = trimmed.match(/^Target\s+([0-9A-F]+)$/i);
 		if (targetMatch) {
 			currentAddress = parseHex(targetMatch[1], `${reportPath}:${lineIndex + 1} target`);
 			if (windows.has(currentAddress)) throw new Error(`${reportPath}: duplicate Target ${formatAbsoluteAddress(currentAddress)}.`);
 			windows.set(currentAddress, []);
 			continue;
 		}
-		if (currentAddress === undefined || line.trim() === "") continue;
+		if (currentAddress === undefined || trimmed === "") continue;
 		const instructionMatch = line.match(/^\s*([0-9A-F]+):\s*\[([^\]]+)\]\s+(.+)$/i);
-		if (!instructionMatch) continue;
+		if (!instructionMatch) {
+			if ((windows.get(currentAddress)?.length ?? 0) > 0) {
+				throw new Error(`${reportPath}:${lineIndex + 1}: unrecognized line inside Target ${formatAbsoluteAddress(currentAddress)} raw-byte window.`);
+			}
+			continue;
+		}
 		const rawBytes = instructionMatch[2].trim().split(/\s+/);
 		if (rawBytes.length === 0 || rawBytes.some((byte) => !/^[0-9A-F]{2}$/i.test(byte))) {
 			throw new Error(`${reportPath}:${lineIndex + 1}: malformed raw instruction bytes.`);
@@ -135,8 +145,18 @@ function deriveSiteEvidence(
 	if (decodedTarget !== expectedTarget) {
 		throw new Error(`${entry.id}: ${siteId} raw CALL target ${formatAbsoluteAddress(decodedTarget)} does not match ${formatAbsoluteAddress(expectedTarget)}.`);
 	}
+	const contiguousInstructions: EvidenceInstruction[] = [];
+	let expectedInstructionAddress = callAddress + call.bytes.length;
+	for (const instruction of instructions.slice(1)) {
+		if (instruction.address !== expectedInstructionAddress) break;
+		contiguousInstructions.push(instruction);
+		expectedInstructionAddress += instruction.bytes.length;
+	}
+	if (contiguousInstructions.length === 0) {
+		throw new Error(`${entry.id}: ${siteId} has no contiguous post-call instruction at ${formatAbsoluteAddress(callAddress + call.bytes.length)}.`);
+	}
 	let bytes: number[] = [];
-	const candidates = instructions.slice(1).map((instruction, index) => {
+	const candidates = contiguousInstructions.map((instruction, index) => {
 		bytes = bytes.concat(instruction.bytes);
 		return {
 			bytes: bytes.map((byte) => byte.toString(16).padStart(2, "0").toUpperCase()).join(" "),
@@ -487,6 +507,14 @@ export function resolveNativeHookAddresses(options: ResolveNativeHookAddressOpti
 	const manifestPath = options.manifestPath ?? defaultManifestPath;
 	const manifest = readNativeHookManifest(manifestPath);
 	const evidenceReportPath = options.evidenceReportPath ?? DEFAULT_EVIDENCE_REPORT;
+	if (!manifest.resolutionEvidenceReport) {
+		throw new Error("Manifest must declare resolutionEvidenceReport for context-byte resolution.");
+	}
+	const declaredEvidencePath = path.resolve(root, manifest.resolutionEvidenceReport);
+	const selectedEvidencePath = path.resolve(root, evidenceReportPath);
+	if (declaredEvidencePath !== selectedEvidencePath) {
+		throw new Error(`Evidence report must match manifest resolutionEvidenceReport: ${manifest.resolutionEvidenceReport}`);
+	}
 	const evidenceWindows = parseEvidenceReport(root, evidenceReportPath);
 
 	assertValidNativeHookManifest(manifest, {

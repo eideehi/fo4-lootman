@@ -1,0 +1,107 @@
+Program: Fallout4-1.11.240.exe
+Image base: 140000000
+
+================================================================================
+Target 140b2c7da
+  140b2c7da: [E8 51 37 00 00] CALL 0x140b2ff30
+  140b2c7df: [8B 45 30] MOV EAX,dword ptr [RBP + 0x30]
+  140b2c7e2: [C1 E8 06] SHR EAX,0x6
+  140b2c7e5: [A8 01] TEST AL,0x1
+  140b2c7e7: [0F 84 C8 02 00 00] JZ 0x140b2cab5
+  140b2c7ed: [4C 8B 45 38] MOV R8,qword ptr [RBP + 0x38]
+  140b2c7f1: [48 8D 55 28] LEA RDX,[RBP + 0x28]
+  140b2c7f5: [48 8B 4D 28] MOV RCX,qword ptr [RBP + 0x28]
+  140b2c7f9: [E9 B2 02 00 00] JMP 0x140b2cab0
+  140b2c7fe: [48 8B CE] MOV RCX,RSI
+  140b2c801: [E8 1A FE B4 00] CALL 0x14167c620
+  140b2c806: [85 C0] TEST EAX,EAX
+
+================================================================================
+Target 140b2ca95
+  140b2ca95: [E8 96 34 00 00] CALL 0x140b2ff30
+  140b2ca9a: [8B 45 50] MOV EAX,dword ptr [RBP + 0x50]
+  140b2ca9d: [C1 E8 06] SHR EAX,0x6
+  140b2caa0: [A8 01] TEST AL,0x1
+  140b2caa2: [74 11] JZ 0x140b2cab5
+  140b2caa4: [4C 8B 45 58] MOV R8,qword ptr [RBP + 0x58]
+  140b2caa8: [48 8D 55 48] LEA RDX,[RBP + 0x48]
+  140b2caac: [48 8B 4D 48] MOV RCX,qword ptr [RBP + 0x48]
+  140b2cab0: [E8 FB A0 FA 00] CALL 0x141ad6bb0
+  140b2cab5: [48 8D 0D 4C 6D A1 01] LEA RCX,[0x142543808]
+  140b2cabc: [E8 AF 9A 55 00] CALL 0x141086570
+  140b2cac1: [E9 2A 0F 00 00] JMP 0x140b2d9f0
+
+================================================================================
+Target 140b2b0ef
+  140b2b0ef: [E8 3C 4E 00 00] CALL 0x140b2ff30
+  140b2b0f4: [48 8B CE] MOV RCX,RSI
+  140b2b0f7: [E8 44 38 00 00] CALL 0x140b2e940
+  140b2b0fc: [E8 FF 33 EB FF] CALL 0x1409de500
+  140b2b101: [48 8B C8] MOV RCX,RAX
+  140b2b104: [E8 97 C2 F0 FF] CALL 0x140a373a0
+  140b2b109: [48 8B CE] MOV RCX,RSI
+  140b2b10c: [E8 DF 40 00 00] CALL 0x140b2f1f0
+  140b2b111: [48 8B CE] MOV RCX,RSI
+  140b2b114: [E8 27 39 00 00] CALL 0x140b2ea40
+  140b2b119: [48 8B 05 60 FD 3A 02] MOV RAX,qword ptr [0x142edae80]
+  140b2b120: [4C 8D 4C 24 60] LEA R9,[RSP + 0x60]
+
+================================================================================
+Target 140b2b954
+  140b2b954: [E8 D7 45 00 00] CALL 0x140b2ff30
+  140b2b959: [33 D2] XOR EDX,EDX
+  140b2b95b: [48 8B CE] MOV RCX,RSI
+  140b2b95e: [E8 7D 50 00 00] CALL 0x140b309e0
+  140b2b963: [48 8B CE] MOV RCX,RSI
+  140b2b966: [E8 D5 30 00 00] CALL 0x140b2ea40
+  140b2b96b: [E9 7B 05 00 00] JMP 0x140b2beeb
+  140b2b970: [48 8D 15 21 BD 5C 02] LEA RDX,[0x1430f7698]
+  140b2b977: [48 8D 4C 24 28] LEA RCX,[RSP + 0x28]
+  140b2b97c: [E8 0F 2B 6F FF] CALL 0x14021e490
+  140b2b981: [48 8B 5C 24 28] MOV RBX,qword ptr [RSP + 0x28]
+  140b2b986: [41 BF FF FF FF FF] MOV R15D,0xffffffff
+
+================================================================================
+Target 140b2d900
+  140b2d900: [E8 2B 26 00 00] CALL 0x140b2ff30
+  140b2d905: [E9 B3 00 00 00] JMP 0x140b2d9bd
+  140b2d90a: [49 8D 4F F0] LEA RCX,[R15 + -0x10]
+  140b2d90e: [E8 6D 0B 00 00] CALL 0x140b2e480
+  140b2d913: [E9 B0 00 00 00] JMP 0x140b2d9c8
+  140b2d918: [48 85 F6] TEST RSI,RSI
+  140b2d91b: [0F 85 A7 00 00 00] JNZ 0x140b2d9c8
+  140b2d921: [E8 AA 9A 86 FF] CALL 0x1403973d0
+  140b2d926: [84 C0] TEST AL,AL
+  140b2d928: [75 09] JNZ 0x140b2d933
+  140b2d92a: [E8 11 67 87 FF] CALL 0x1403a4040
+  140b2d92f: [84 C0] TEST AL,AL
+
+================================================================================
+Target 140b2e676
+  140b2e676: [E8 B5 18 00 00] CALL 0x140b2ff30
+  140b2e67b: [48 8B CF] MOV RCX,RDI
+  140b2e67e: [E8 BD 02 00 00] CALL 0x140b2e940
+  140b2e683: [44 39 65 20] CMP dword ptr [RBP + 0x20],R12D
+  140b2e687: [75 27] JNZ 0x140b2e6b0
+  140b2e689: [F2 0F 10 05 FF AD DF 01] MOVSD XMM0,qword ptr [0x142929490]
+  140b2e691: [66 0F 2F 87 20 04 00 00] COMISD XMM0,qword ptr [RDI + 0x420]
+  140b2e699: [77 15] JA 0x140b2e6b0
+  140b2e69b: [48 8B 0D 8E 69 3F 02] MOV RCX,qword ptr [0x142f25030]
+  140b2e6a2: [41 B1 01] MOV R9B,0x1
+  140b2e6a5: [45 0F B6 C1] MOVZX R8D,R9B
+  140b2e6a9: [33 D2] XOR EDX,EDX
+
+================================================================================
+Target 140b2e8ff
+  140b2e8ff: [E8 2C 16 00 00] CALL 0x140b2ff30
+  140b2e904: [33 D2] XOR EDX,EDX
+  140b2e906: [48 8B CE] MOV RCX,RSI
+  140b2e909: [E8 D2 20 00 00] CALL 0x140b309e0
+  140b2e90e: [48 8B CE] MOV RCX,RSI
+  140b2e911: [E8 DA 08 00 00] CALL 0x140b2f1f0
+  140b2e916: [48 8D 0D 83 52 A1 01] LEA RCX,[0x142543ba0]
+  140b2e91d: [E8 4E 7C 55 00] CALL 0x141086570
+  140b2e922: [48 81 C4 80 00 00 00] ADD RSP,0x80
+  140b2e929: [5E] POP RSI
+  140b2e92a: [C3] RET
+  140b2e940: [48 89 5C 24 08] MOV qword ptr [RSP + 0x8],RBX

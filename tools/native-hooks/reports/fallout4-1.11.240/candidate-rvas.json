@@ -1,0 +1,1900 @@
+{
+  "schemaVersion": 1,
+  "binaryVersion": "Fallout4 1.11.240",
+  "manifestPath": "tools/native-hooks/papyrus_lootman_hooks.addresses.json",
+  "sourceFile": "commonlibf4-plugin/src/papyrus_lootman_hooks.cpp",
+  "generatedHeader": "commonlibf4-plugin/src/papyrus_lootman_hook_addresses.generated.h",
+  "entries": [
+    {
+      "id": "encounter_zone.load_change_cell_before_zone_reset",
+      "category": "call_site_rva",
+      "cppName": "kLoadChangeCellBeforeZoneResetCallSite",
+      "expectedCount": 1,
+      "expectedInstructionKind": "call_rel32",
+      "expectedOriginalTargetGroup": "encounter_zone.check_cell_before_reset",
+      "discoveryStatus": "proven",
+      "discoverySummary": "Resolve the LoadChange cell reset path and require exactly one direct CALL rel32 to the check-cell-before-reset helper.",
+      "candidateRvas": [
+        {
+          "id": "encounter-zone.reset-suppression.cell-before-reset",
+          "rva": "0x4D26F4",
+          "sourceId": "0x0",
+          "label": "encounter-zone.reset-suppression.cell-before-reset",
+          "status": "current_manifest_rva"
+        }
+      ],
+      "instructionWindowAddresses": [
+        "0x4D26F4"
+      ],
+      "evidence": [
+        "tools/ghidra/reports/fallout4-1.11.240/fo4-encounter-zone-target-functions.txt",
+        "tools/ghidra/reports/fallout4-1.11.240/fo4-encounter-zone-call-windows.txt"
+      ],
+      "unresolvedItems": [],
+      "proofReadiness": {
+        "status": "already_proven",
+        "summary": "The manifest already contains resolver proof metadata for this call-site family.",
+        "selectedSites": [
+          {
+            "id": "encounter-zone.reset-suppression.cell-before-reset",
+            "rva": "0x4D26F4",
+            "sourceId": "0x0",
+            "label": "encounter-zone.reset-suppression.cell-before-reset",
+            "absoluteAddress": "0x1404D26F4"
+          }
+        ],
+        "targetAbsoluteAddress": "0x140494E60",
+        "targetCandidates": [
+          {
+            "targetAbsoluteAddress": "0x140494E60",
+            "selectedSiteIds": [
+              "encounter-zone.reset-suppression.cell-before-reset"
+            ],
+            "selectedSiteAbsoluteAddresses": [
+              "0x1404D26F4"
+            ],
+            "evidence": [
+              "tools/ghidra/reports/fallout4-1.11.240/fo4-encounter-zone-call-windows.txt",
+              "tools/ghidra/reports/fallout4-1.11.240/fo4-encounter-zone-target-functions.txt"
+            ]
+          }
+        ],
+        "directCallInstructionCount": 1,
+        "missingDirectCallSites": [],
+        "extraSameTargetReferences": [],
+        "recommendedNextAction": "No proof refresh needed; resolver proof metadata is already present."
+      }
+    },
+    {
+      "id": "encounter_zone.reset_elapsed_from_detach_time",
+      "category": "function_rva",
+      "cppName": "kEncounterZoneResetElapsedFromDetachId",
+      "expectedCount": 1,
+      "discoveryStatus": "automated",
+      "discoverySummary": "Resolved for Fallout4 1.11.240 as Address Library ID 2200355 at offset 0x4D3150; current Ghidra evidence records the matched helper or global references. The installed Address Library mapping was verified on 2026-08-22.",
+      "candidateRvas": [],
+      "value": "0x4D3150",
+      "instructionWindowAddresses": [],
+      "evidence": [
+        "tools/ghidra/reports/fallout4-1.11.240/fo4-address-library-target-functions.txt"
+      ],
+      "unresolvedItems": [],
+      "proofReadiness": {
+        "status": "not_applicable",
+        "summary": "function_rva entries do not use direct call-site proof refresh.",
+        "selectedSites": [],
+        "targetCandidates": [],
+        "directCallInstructionCount": 0,
+        "missingDirectCallSites": [],
+        "extraSameTargetReferences": [],
+        "recommendedNextAction": "No call-site proof refresh needed."
+      }
+    },
+    {
+      "id": "workshop_shared_container.workshop_caravan_keyword_global",
+      "category": "global_rva",
+      "cppName": "kWorkshopCaravanKeywordGlobalId",
+      "expectedCount": 1,
+      "discoveryStatus": "automated",
+      "discoverySummary": "Resolved for Fallout4 1.11.240 as Address Library ID 4797310 at offset 0x30F7AB8; current Ghidra evidence records the matched helper or global references. The installed Address Library mapping was verified on 2026-08-22.",
+      "candidateRvas": [],
+      "value": "0x30F7AB8",
+      "instructionWindowAddresses": [],
+      "evidence": [
+        "tools/ghidra/reports/fallout4-1.11.240/fo4-address-library-global-refs.txt"
+      ],
+      "unresolvedItems": [],
+      "proofReadiness": {
+        "status": "not_applicable",
+        "summary": "global_rva entries do not use direct call-site proof refresh.",
+        "selectedSites": [],
+        "targetCandidates": [],
+        "directCallInstructionCount": 0,
+        "missingDirectCallSites": [],
+        "extraSameTargetReferences": [],
+        "recommendedNextAction": "No call-site proof refresh needed."
+      }
+    },
+    {
+      "id": "workshop_material.current_workshop_handle_global",
+      "category": "global_rva",
+      "cppName": "kCurrentWorkshopHandleGlobalId",
+      "expectedCount": 1,
+      "discoveryStatus": "automated",
+      "discoverySummary": "Resolved for Fallout4 1.11.240 as Address Library ID 4797241 at offset 0x30F7698; current Ghidra evidence records the matched helper or global references. The installed Address Library mapping was verified on 2026-08-22.",
+      "candidateRvas": [],
+      "value": "0x30F7698",
+      "instructionWindowAddresses": [],
+      "evidence": [
+        "tools/ghidra/reports/fallout4-1.11.240/fo4-address-library-global-refs.txt"
+      ],
+      "unresolvedItems": [],
+      "proofReadiness": {
+        "status": "not_applicable",
+        "summary": "global_rva entries do not use direct call-site proof refresh.",
+        "selectedSites": [],
+        "targetCandidates": [],
+        "directCallInstructionCount": 0,
+        "missingDirectCallSites": [],
+        "extraSameTargetReferences": [],
+        "recommendedNextAction": "No call-site proof refresh needed."
+      }
+    },
+    {
+      "id": "workshop_shared_container.populate_linked_workshop_container",
+      "category": "call_site_rva",
+      "cppName": "kPopulateLinkedWorkshopContainerCallSites",
+      "expectedCount": 3,
+      "expectedInstructionKind": "call_rel32",
+      "expectedOriginalTargetGroup": "workshop_shared_container.populate_linked_workshop_containers",
+      "discoveryStatus": "proven",
+      "discoverySummary": "Resolve all callers of the linked workshop container population helper and require exactly three direct CALL rel32 sites.",
+      "candidateRvas": [
+        {
+          "id": "workshop-shared-container.populate-linked.primary",
+          "rva": "0x3922A8",
+          "sourceId": "0x0",
+          "label": "workshop-shared-container.populate-linked.primary",
+          "status": "current_manifest_rva"
+        },
+        {
+          "id": "workshop-shared-container.populate-linked.workbench",
+          "rva": "0xB28966",
+          "sourceId": "0x0",
+          "label": "workshop-shared-container.populate-linked.workbench",
+          "status": "current_manifest_rva"
+        },
+        {
+          "id": "workshop-shared-container.populate-linked.menu",
+          "rva": "0x10895E6",
+          "sourceId": "0x0",
+          "label": "workshop-shared-container.populate-linked.menu",
+          "status": "current_manifest_rva"
+        }
+      ],
+      "instructionWindowAddresses": [
+        "0x3922A8",
+        "0xB28966",
+        "0x10895E6"
+      ],
+      "evidence": [
+        "tools/ghidra/reports/fallout4-1.11.240/fo4-shared-container-target-functions.txt",
+        "tools/ghidra/reports/fallout4-1.11.240/fo4-shared-container-call-windows.txt"
+      ],
+      "unresolvedItems": [],
+      "proofReadiness": {
+        "status": "already_proven",
+        "summary": "The manifest already contains resolver proof metadata for this call-site family.",
+        "selectedSites": [
+          {
+            "id": "workshop-shared-container.populate-linked.primary",
+            "rva": "0x3922A8",
+            "sourceId": "0x0",
+            "label": "workshop-shared-container.populate-linked.primary",
+            "absoluteAddress": "0x1403922A8"
+          },
+          {
+            "id": "workshop-shared-container.populate-linked.workbench",
+            "rva": "0xB28966",
+            "sourceId": "0x0",
+            "label": "workshop-shared-container.populate-linked.workbench",
+            "absoluteAddress": "0x140B28966"
+          },
+          {
+            "id": "workshop-shared-container.populate-linked.menu",
+            "rva": "0x10895E6",
+            "sourceId": "0x0",
+            "label": "workshop-shared-container.populate-linked.menu",
+            "absoluteAddress": "0x1410895E6"
+          }
+        ],
+        "targetAbsoluteAddress": "0x14038A140",
+        "targetCandidates": [
+          {
+            "targetAbsoluteAddress": "0x14038A140",
+            "selectedSiteIds": [
+              "workshop-shared-container.populate-linked.menu",
+              "workshop-shared-container.populate-linked.primary",
+              "workshop-shared-container.populate-linked.workbench"
+            ],
+            "selectedSiteAbsoluteAddresses": [
+              "0x1403922A8",
+              "0x140B28966",
+              "0x1410895E6"
+            ],
+            "evidence": [
+              "tools/ghidra/reports/fallout4-1.11.240/fo4-shared-container-call-windows.txt",
+              "tools/ghidra/reports/fallout4-1.11.240/fo4-shared-container-target-functions.txt"
+            ]
+          }
+        ],
+        "directCallInstructionCount": 3,
+        "missingDirectCallSites": [],
+        "extraSameTargetReferences": [],
+        "recommendedNextAction": "No proof refresh needed; resolver proof metadata is already present."
+      }
+    },
+    {
+      "id": "workshop_material.rebuild_workshop_supply",
+      "category": "call_site_rva",
+      "cppName": "kRebuildWorkshopSupplyCallSites",
+      "expectedCount": 4,
+      "expectedInstructionKind": "call_rel32",
+      "expectedOriginalTargetGroup": "workshop_material.rebuild_workshop_supply",
+      "discoveryStatus": "proven",
+      "discoverySummary": "Resolve workbench supply rebuild callers and require four direct CALL rel32 sites to the same rebuild helper.",
+      "candidateRvas": [
+        {
+          "id": "workshop-material.rebuild-supply.source-a1",
+          "rva": "0xA65746",
+          "sourceId": "0xA1",
+          "label": "workshop-material.rebuild-supply.source-a1",
+          "status": "current_manifest_rva"
+        },
+        {
+          "id": "workshop-material.rebuild-supply.source-a2",
+          "rva": "0xA5F459",
+          "sourceId": "0xA2",
+          "label": "workshop-material.rebuild-supply.source-a2",
+          "status": "current_manifest_rva"
+        },
+        {
+          "id": "workshop-material.rebuild-supply.source-a3",
+          "rva": "0xA6087C",
+          "sourceId": "0xA3",
+          "label": "workshop-material.rebuild-supply.source-a3",
+          "status": "current_manifest_rva"
+        },
+        {
+          "id": "workshop-material.rebuild-supply.source-a4",
+          "rva": "0xAEF9A9",
+          "sourceId": "0xA4",
+          "label": "workshop-material.rebuild-supply.source-a4",
+          "status": "current_manifest_rva"
+        }
+      ],
+      "instructionWindowAddresses": [
+        "0xA65746",
+        "0xA5F459",
+        "0xA6087C",
+        "0xAEF9A9"
+      ],
+      "evidence": [
+        "tools/ghidra/reports/fallout4-1.11.240/fo4-rebuild-supply-target-functions.txt",
+        "tools/ghidra/reports/fallout4-1.11.240/fo4-rebuild-supply-call-windows.txt"
+      ],
+      "unresolvedItems": [],
+      "proofReadiness": {
+        "status": "already_proven",
+        "summary": "The manifest already contains resolver proof metadata for this call-site family.",
+        "selectedSites": [
+          {
+            "id": "workshop-material.rebuild-supply.source-a1",
+            "rva": "0xA65746",
+            "sourceId": "0xA1",
+            "label": "workshop-material.rebuild-supply.source-a1",
+            "absoluteAddress": "0x140A65746"
+          },
+          {
+            "id": "workshop-material.rebuild-supply.source-a2",
+            "rva": "0xA5F459",
+            "sourceId": "0xA2",
+            "label": "workshop-material.rebuild-supply.source-a2",
+            "absoluteAddress": "0x140A5F459"
+          },
+          {
+            "id": "workshop-material.rebuild-supply.source-a3",
+            "rva": "0xA6087C",
+            "sourceId": "0xA3",
+            "label": "workshop-material.rebuild-supply.source-a3",
+            "absoluteAddress": "0x140A6087C"
+          },
+          {
+            "id": "workshop-material.rebuild-supply.source-a4",
+            "rva": "0xAEF9A9",
+            "sourceId": "0xA4",
+            "label": "workshop-material.rebuild-supply.source-a4",
+            "absoluteAddress": "0x140AEF9A9"
+          }
+        ],
+        "targetAbsoluteAddress": "0x140B29480",
+        "targetCandidates": [
+          {
+            "targetAbsoluteAddress": "0x140B29480",
+            "selectedSiteIds": [
+              "workshop-material.rebuild-supply.source-a1",
+              "workshop-material.rebuild-supply.source-a2",
+              "workshop-material.rebuild-supply.source-a3",
+              "workshop-material.rebuild-supply.source-a4"
+            ],
+            "selectedSiteAbsoluteAddresses": [
+              "0x140A5F459",
+              "0x140A6087C",
+              "0x140A65746",
+              "0x140AEF9A9"
+            ],
+            "evidence": [
+              "tools/ghidra/reports/fallout4-1.11.240/fo4-rebuild-supply-call-windows.txt",
+              "tools/ghidra/reports/fallout4-1.11.240/fo4-rebuild-supply-target-functions.txt"
+            ]
+          }
+        ],
+        "directCallInstructionCount": 4,
+        "missingDirectCallSites": [],
+        "extraSameTargetReferences": [],
+        "recommendedNextAction": "No proof refresh needed; resolver proof metadata is already present."
+      }
+    },
+    {
+      "id": "workshop_material.component_count_helper",
+      "category": "call_site_rva",
+      "cppName": "kComponentCountHelperCallSites",
+      "expectedCount": 2,
+      "expectedInstructionKind": "call_rel32",
+      "expectedOriginalTargetGroup": "workshop_material.component_count_helper",
+      "discoveryStatus": "proven",
+      "discoverySummary": "Resolve Papyrus and Workbench UI calls to the component count helper and require both call sites to share the same original target.",
+      "candidateRvas": [
+        {
+          "id": "workshop-material.component-count.papyrus",
+          "rva": "0x59BF5A",
+          "sourceId": "0xB1",
+          "label": "workshop-material.component-count.papyrus",
+          "status": "current_manifest_rva"
+        },
+        {
+          "id": "workshop-material.component-count.workbench-ui",
+          "rva": "0x117550B",
+          "sourceId": "0xB2",
+          "label": "workshop-material.component-count.workbench-ui",
+          "status": "current_manifest_rva"
+        }
+      ],
+      "instructionWindowAddresses": [
+        "0x59BF5A",
+        "0x117550B"
+      ],
+      "evidence": [
+        "tools/ghidra/reports/fallout4-1.11.240/fo4-component-count-helper-target-functions.txt",
+        "tools/ghidra/reports/fallout4-1.11.240/fo4-component-count-helper-call-windows.txt"
+      ],
+      "unresolvedItems": [],
+      "proofReadiness": {
+        "status": "already_proven",
+        "summary": "The manifest already contains resolver proof metadata for this call-site family.",
+        "selectedSites": [
+          {
+            "id": "workshop-material.component-count.papyrus",
+            "rva": "0x59BF5A",
+            "sourceId": "0xB1",
+            "label": "workshop-material.component-count.papyrus",
+            "absoluteAddress": "0x14059BF5A"
+          },
+          {
+            "id": "workshop-material.component-count.workbench-ui",
+            "rva": "0x117550B",
+            "sourceId": "0xB2",
+            "label": "workshop-material.component-count.workbench-ui",
+            "absoluteAddress": "0x14117550B"
+          }
+        ],
+        "targetAbsoluteAddress": "0x140507990",
+        "targetCandidates": [
+          {
+            "targetAbsoluteAddress": "0x140507990",
+            "selectedSiteIds": [
+              "workshop-material.component-count.papyrus",
+              "workshop-material.component-count.workbench-ui"
+            ],
+            "selectedSiteAbsoluteAddresses": [
+              "0x14059BF5A",
+              "0x14117550B"
+            ],
+            "evidence": [
+              "tools/ghidra/reports/fallout4-1.11.240/fo4-component-count-helper-call-windows.txt",
+              "tools/ghidra/reports/fallout4-1.11.240/fo4-component-count-helper-target-functions.txt"
+            ]
+          }
+        ],
+        "directCallInstructionCount": 2,
+        "missingDirectCallSites": [],
+        "extraSameTargetReferences": [],
+        "recommendedNextAction": "No proof refresh needed; resolver proof metadata is already present."
+      }
+    },
+    {
+      "id": "workshop_material.direct_component_count",
+      "category": "call_site_rva",
+      "cppName": "kDirectComponentCountCallSites",
+      "expectedCount": 5,
+      "expectedInstructionKind": "call_rel32",
+      "expectedOriginalTargetGroup": "workshop_material.direct_component_count",
+      "discoveryStatus": "proven",
+      "discoverySummary": "Resolve the five explicit direct component count hook sites and require each to be a direct CALL rel32 to the same helper.",
+      "candidateRvas": [
+        {
+          "id": "workshop-material.direct-component-count.source-e1",
+          "rva": "0x3BC71D",
+          "sourceId": "0xE1",
+          "label": "workshop-material.direct-component-count.source-e1",
+          "status": "current_manifest_rva"
+        },
+        {
+          "id": "workshop-material.direct-component-count.source-e2",
+          "rva": "0x39F5AF",
+          "sourceId": "0xE2",
+          "label": "workshop-material.direct-component-count.source-e2",
+          "status": "current_manifest_rva"
+        },
+        {
+          "id": "workshop-material.direct-component-count.source-e3",
+          "rva": "0xB32E7B",
+          "sourceId": "0xE3",
+          "label": "workshop-material.direct-component-count.source-e3",
+          "status": "current_manifest_rva"
+        },
+        {
+          "id": "workshop-material.direct-component-count.source-e4",
+          "rva": "0xB37828",
+          "sourceId": "0xE4",
+          "label": "workshop-material.direct-component-count.source-e4",
+          "status": "current_manifest_rva"
+        },
+        {
+          "id": "workshop-material.direct-component-count.source-e5",
+          "rva": "0xB2D13E",
+          "sourceId": "0xE5",
+          "label": "workshop-material.direct-component-count.source-e5",
+          "status": "current_manifest_rva"
+        }
+      ],
+      "instructionWindowAddresses": [
+        "0x3BC71D",
+        "0x39F5AF",
+        "0xB32E7B",
+        "0xB37828",
+        "0xB2D13E"
+      ],
+      "evidence": [
+        "tools/ghidra/reports/fallout4-1.11.240/fo4-direct-component-count-target-functions.txt",
+        "tools/ghidra/reports/fallout4-1.11.240/fo4-direct-component-count-call-windows.txt"
+      ],
+      "unresolvedItems": [],
+      "proofReadiness": {
+        "status": "already_proven",
+        "summary": "The manifest already contains resolver proof metadata for this call-site family.",
+        "selectedSites": [
+          {
+            "id": "workshop-material.direct-component-count.source-e1",
+            "rva": "0x3BC71D",
+            "sourceId": "0xE1",
+            "label": "workshop-material.direct-component-count.source-e1",
+            "absoluteAddress": "0x1403BC71D"
+          },
+          {
+            "id": "workshop-material.direct-component-count.source-e2",
+            "rva": "0x39F5AF",
+            "sourceId": "0xE2",
+            "label": "workshop-material.direct-component-count.source-e2",
+            "absoluteAddress": "0x14039F5AF"
+          },
+          {
+            "id": "workshop-material.direct-component-count.source-e3",
+            "rva": "0xB32E7B",
+            "sourceId": "0xE3",
+            "label": "workshop-material.direct-component-count.source-e3",
+            "absoluteAddress": "0x140B32E7B"
+          },
+          {
+            "id": "workshop-material.direct-component-count.source-e4",
+            "rva": "0xB37828",
+            "sourceId": "0xE4",
+            "label": "workshop-material.direct-component-count.source-e4",
+            "absoluteAddress": "0x140B37828"
+          },
+          {
+            "id": "workshop-material.direct-component-count.source-e5",
+            "rva": "0xB2D13E",
+            "sourceId": "0xE5",
+            "label": "workshop-material.direct-component-count.source-e5",
+            "absoluteAddress": "0x140B2D13E"
+          }
+        ],
+        "targetAbsoluteAddress": "0x140507D30",
+        "targetCandidates": [
+          {
+            "targetAbsoluteAddress": "0x140507D30",
+            "selectedSiteIds": [
+              "workshop-material.direct-component-count.source-e1",
+              "workshop-material.direct-component-count.source-e2",
+              "workshop-material.direct-component-count.source-e3",
+              "workshop-material.direct-component-count.source-e4",
+              "workshop-material.direct-component-count.source-e5"
+            ],
+            "selectedSiteAbsoluteAddresses": [
+              "0x14039F5AF",
+              "0x1403BC71D",
+              "0x140B2D13E",
+              "0x140B32E7B",
+              "0x140B37828"
+            ],
+            "evidence": [
+              "tools/ghidra/reports/fallout4-1.11.240/fo4-direct-component-count-call-windows.txt",
+              "tools/ghidra/reports/fallout4-1.11.240/fo4-direct-component-count-target-functions.txt"
+            ]
+          }
+        ],
+        "directCallInstructionCount": 5,
+        "missingDirectCallSites": [],
+        "extraSameTargetReferences": [],
+        "recommendedNextAction": "No proof refresh needed; resolver proof metadata is already present."
+      }
+    },
+    {
+      "id": "workshop_material.resource_status",
+      "category": "call_site_rva",
+      "cppName": "kWorkshopResourceStatusCallSites",
+      "expectedCount": 2,
+      "expectedInstructionKind": "call_rel32",
+      "expectedOriginalTargetGroup": "workshop_material.resource_status",
+      "discoveryStatus": "proven",
+      "discoverySummary": "Resolve resource status helper callers in the workshop menu placement path and require two direct CALL rel32 sites.",
+      "candidateRvas": [
+        {
+          "id": "workshop-material.resource-status.source-f1",
+          "rva": "0xB2F0B0",
+          "sourceId": "0xF1",
+          "label": "workshop-material.resource-status.source-f1",
+          "status": "current_manifest_rva"
+        },
+        {
+          "id": "workshop-material.resource-status.source-f2",
+          "rva": "0xB2D056",
+          "sourceId": "0xF2",
+          "label": "workshop-material.resource-status.source-f2",
+          "status": "current_manifest_rva"
+        }
+      ],
+      "instructionWindowAddresses": [
+        "0xB2F0B0",
+        "0xB2D056"
+      ],
+      "evidence": [
+        "tools/ghidra/reports/fallout4-1.11.240/fo4-resource-status-target-functions.txt",
+        "tools/ghidra/reports/fallout4-1.11.240/fo4-resource-status-call-windows.txt"
+      ],
+      "unresolvedItems": [],
+      "proofReadiness": {
+        "status": "already_proven",
+        "summary": "The manifest already contains resolver proof metadata for this call-site family.",
+        "selectedSites": [
+          {
+            "id": "workshop-material.resource-status.source-f1",
+            "rva": "0xB2F0B0",
+            "sourceId": "0xF1",
+            "label": "workshop-material.resource-status.source-f1",
+            "absoluteAddress": "0x140B2F0B0"
+          },
+          {
+            "id": "workshop-material.resource-status.source-f2",
+            "rva": "0xB2D056",
+            "sourceId": "0xF2",
+            "label": "workshop-material.resource-status.source-f2",
+            "absoluteAddress": "0x140B2D056"
+          }
+        ],
+        "targetAbsoluteAddress": "0x140B32DA0",
+        "targetCandidates": [
+          {
+            "targetAbsoluteAddress": "0x140B32DA0",
+            "selectedSiteIds": [
+              "workshop-material.resource-status.source-f1",
+              "workshop-material.resource-status.source-f2"
+            ],
+            "selectedSiteAbsoluteAddresses": [
+              "0x140B2D056",
+              "0x140B2F0B0"
+            ],
+            "evidence": [
+              "tools/ghidra/reports/fallout4-1.11.240/fo4-resource-status-call-windows.txt",
+              "tools/ghidra/reports/fallout4-1.11.240/fo4-resource-status-target-functions.txt"
+            ]
+          }
+        ],
+        "directCallInstructionCount": 2,
+        "missingDirectCallSites": [],
+        "extraSameTargetReferences": [],
+        "recommendedNextAction": "No proof refresh needed; resolver proof metadata is already present."
+      }
+    },
+    {
+      "id": "workshop_menu.select",
+      "category": "call_site_rva",
+      "cppName": "kWorkshopMenuSelectCallSites",
+      "expectedCount": 2,
+      "expectedInstructionKind": "call_rel32",
+      "expectedOriginalTargetGroup": "workshop_menu.select",
+      "discoveryStatus": "proven",
+      "discoverySummary": "Resolve SelectWorkshopMenuNode call sites from selected menu helper analysis and require two direct CALL rel32 sites.",
+      "candidateRvas": [
+        {
+          "id": "workshop-menu.select.source-a1",
+          "rva": "0xB2C69A",
+          "sourceId": "0xA1",
+          "label": "workshop-menu.select.source-a1",
+          "status": "current_manifest_rva"
+        },
+        {
+          "id": "workshop-menu.select.source-a2",
+          "rva": "0xB2C957",
+          "sourceId": "0xA2",
+          "label": "workshop-menu.select.source-a2",
+          "status": "current_manifest_rva"
+        }
+      ],
+      "instructionWindowAddresses": [
+        "0xB2C69A",
+        "0xB2C957"
+      ],
+      "evidence": [
+        "tools/ghidra/reports/fallout4-1.11.240/fo4-menu-select-target-functions.txt",
+        "tools/ghidra/reports/fallout4-1.11.240/fo4-menu-select-call-windows.txt"
+      ],
+      "unresolvedItems": [],
+      "proofReadiness": {
+        "status": "already_proven",
+        "summary": "The manifest already contains resolver proof metadata for this call-site family.",
+        "selectedSites": [
+          {
+            "id": "workshop-menu.select.source-a1",
+            "rva": "0xB2C69A",
+            "sourceId": "0xA1",
+            "label": "workshop-menu.select.source-a1",
+            "absoluteAddress": "0x140B2C69A"
+          },
+          {
+            "id": "workshop-menu.select.source-a2",
+            "rva": "0xB2C957",
+            "sourceId": "0xA2",
+            "label": "workshop-menu.select.source-a2",
+            "absoluteAddress": "0x140B2C957"
+          }
+        ],
+        "targetAbsoluteAddress": "0x1403970E0",
+        "targetCandidates": [
+          {
+            "targetAbsoluteAddress": "0x1403970E0",
+            "selectedSiteIds": [
+              "workshop-menu.select.source-a1",
+              "workshop-menu.select.source-a2"
+            ],
+            "selectedSiteAbsoluteAddresses": [
+              "0x140B2C69A",
+              "0x140B2C957"
+            ],
+            "evidence": [
+              "tools/ghidra/reports/fallout4-1.11.240/fo4-menu-select-call-windows.txt",
+              "tools/ghidra/reports/fallout4-1.11.240/fo4-menu-select-target-functions.txt"
+            ]
+          }
+        ],
+        "directCallInstructionCount": 2,
+        "missingDirectCallSites": [],
+        "extraSameTargetReferences": [],
+        "recommendedNextAction": "No proof refresh needed; resolver proof metadata is already present."
+      }
+    },
+    {
+      "id": "workshop_menu.availability",
+      "category": "call_site_rva",
+      "cppName": "kWorkshopMenuAvailabilityCallSites",
+      "expectedCount": 19,
+      "expectedInstructionKind": "call_rel32",
+      "expectedOriginalTargetGroup": "workshop_menu.availability",
+      "discoveryStatus": "proven",
+      "discoverySummary": "Resolve WorkshopMenuAvailability callers and require nineteen direct CALL rel32 sites to the same helper.",
+      "candidateRvas": [
+        {
+          "id": "workshop-menu.availability.source-91",
+          "rva": "0xB2C65E",
+          "sourceId": "0x91",
+          "label": "workshop-menu.availability.source-91",
+          "status": "current_manifest_rva"
+        },
+        {
+          "id": "workshop-menu.availability.source-92",
+          "rva": "0xB2C6C7",
+          "sourceId": "0x92",
+          "label": "workshop-menu.availability.source-92",
+          "status": "current_manifest_rva"
+        },
+        {
+          "id": "workshop-menu.availability.source-93",
+          "rva": "0xB2C91E",
+          "sourceId": "0x93",
+          "label": "workshop-menu.availability.source-93",
+          "status": "current_manifest_rva"
+        },
+        {
+          "id": "workshop-menu.availability.source-94",
+          "rva": "0xB2C984",
+          "sourceId": "0x94",
+          "label": "workshop-menu.availability.source-94",
+          "status": "current_manifest_rva"
+        },
+        {
+          "id": "workshop-menu.availability.source-95",
+          "rva": "0xB2E9D4",
+          "sourceId": "0x95",
+          "label": "workshop-menu.availability.source-95",
+          "status": "current_manifest_rva"
+        },
+        {
+          "id": "workshop-menu.availability.source-96",
+          "rva": "0x397185",
+          "sourceId": "0x96",
+          "label": "workshop-menu.availability.source-96",
+          "status": "current_manifest_rva"
+        },
+        {
+          "id": "workshop-menu.availability.source-97",
+          "rva": "0x3B82D2",
+          "sourceId": "0x97",
+          "label": "workshop-menu.availability.source-97",
+          "status": "current_manifest_rva"
+        },
+        {
+          "id": "workshop-menu.availability.source-98",
+          "rva": "0x3C1BCF",
+          "sourceId": "0x98",
+          "label": "workshop-menu.availability.source-98",
+          "status": "current_manifest_rva"
+        },
+        {
+          "id": "workshop-menu.availability.source-99",
+          "rva": "0xB2B894",
+          "sourceId": "0x99",
+          "label": "workshop-menu.availability.source-99",
+          "status": "current_manifest_rva"
+        },
+        {
+          "id": "workshop-menu.availability.source-9a",
+          "rva": "0xB2D75F",
+          "sourceId": "0x9A",
+          "label": "workshop-menu.availability.source-9a",
+          "status": "current_manifest_rva"
+        },
+        {
+          "id": "workshop-menu.availability.source-9b",
+          "rva": "0xB2D891",
+          "sourceId": "0x9B",
+          "label": "workshop-menu.availability.source-9b",
+          "status": "current_manifest_rva"
+        },
+        {
+          "id": "workshop-menu.availability.source-9c",
+          "rva": "0xB2ECFF",
+          "sourceId": "0x9C",
+          "label": "workshop-menu.availability.source-9c",
+          "status": "current_manifest_rva"
+        },
+        {
+          "id": "workshop-menu.availability.source-9d",
+          "rva": "0xB3035B",
+          "sourceId": "0x9D",
+          "label": "workshop-menu.availability.source-9d",
+          "status": "current_manifest_rva"
+        },
+        {
+          "id": "workshop-menu.availability.source-9e",
+          "rva": "0xB323A5",
+          "sourceId": "0x9E",
+          "label": "workshop-menu.availability.source-9e",
+          "status": "current_manifest_rva"
+        },
+        {
+          "id": "workshop-menu.availability.source-9f",
+          "rva": "0xB330EC",
+          "sourceId": "0x9F",
+          "label": "workshop-menu.availability.source-9f",
+          "status": "current_manifest_rva"
+        },
+        {
+          "id": "workshop-menu.availability.source-a0",
+          "rva": "0xB36148",
+          "sourceId": "0xA0",
+          "label": "workshop-menu.availability.source-a0",
+          "status": "current_manifest_rva"
+        },
+        {
+          "id": "workshop-menu.availability.source-a1",
+          "rva": "0xB36651",
+          "sourceId": "0xA1",
+          "label": "workshop-menu.availability.source-a1",
+          "status": "current_manifest_rva"
+        },
+        {
+          "id": "workshop-menu.availability.source-a2",
+          "rva": "0xB37630",
+          "sourceId": "0xA2",
+          "label": "workshop-menu.availability.source-a2",
+          "status": "current_manifest_rva"
+        },
+        {
+          "id": "workshop-menu.availability.source-a3",
+          "rva": "0xB376DB",
+          "sourceId": "0xA3",
+          "label": "workshop-menu.availability.source-a3",
+          "status": "current_manifest_rva"
+        }
+      ],
+      "instructionWindowAddresses": [
+        "0xB2C65E",
+        "0xB2C6C7",
+        "0xB2C91E",
+        "0xB2C984",
+        "0xB2E9D4",
+        "0x397185",
+        "0x3B82D2",
+        "0x3C1BCF",
+        "0xB2B894",
+        "0xB2D75F",
+        "0xB2D891",
+        "0xB2ECFF",
+        "0xB3035B",
+        "0xB323A5",
+        "0xB330EC",
+        "0xB36148",
+        "0xB36651",
+        "0xB37630",
+        "0xB376DB"
+      ],
+      "evidence": [
+        "tools/ghidra/reports/fallout4-1.11.240/fo4-availability-target-functions.txt",
+        "tools/ghidra/reports/fallout4-1.11.240/fo4-availability-call-windows.txt"
+      ],
+      "unresolvedItems": [],
+      "proofReadiness": {
+        "status": "already_proven",
+        "summary": "The manifest already contains resolver proof metadata for this call-site family.",
+        "selectedSites": [
+          {
+            "id": "workshop-menu.availability.source-91",
+            "rva": "0xB2C65E",
+            "sourceId": "0x91",
+            "label": "workshop-menu.availability.source-91",
+            "absoluteAddress": "0x140B2C65E"
+          },
+          {
+            "id": "workshop-menu.availability.source-92",
+            "rva": "0xB2C6C7",
+            "sourceId": "0x92",
+            "label": "workshop-menu.availability.source-92",
+            "absoluteAddress": "0x140B2C6C7"
+          },
+          {
+            "id": "workshop-menu.availability.source-93",
+            "rva": "0xB2C91E",
+            "sourceId": "0x93",
+            "label": "workshop-menu.availability.source-93",
+            "absoluteAddress": "0x140B2C91E"
+          },
+          {
+            "id": "workshop-menu.availability.source-94",
+            "rva": "0xB2C984",
+            "sourceId": "0x94",
+            "label": "workshop-menu.availability.source-94",
+            "absoluteAddress": "0x140B2C984"
+          },
+          {
+            "id": "workshop-menu.availability.source-95",
+            "rva": "0xB2E9D4",
+            "sourceId": "0x95",
+            "label": "workshop-menu.availability.source-95",
+            "absoluteAddress": "0x140B2E9D4"
+          },
+          {
+            "id": "workshop-menu.availability.source-96",
+            "rva": "0x397185",
+            "sourceId": "0x96",
+            "label": "workshop-menu.availability.source-96",
+            "absoluteAddress": "0x140397185"
+          },
+          {
+            "id": "workshop-menu.availability.source-97",
+            "rva": "0x3B82D2",
+            "sourceId": "0x97",
+            "label": "workshop-menu.availability.source-97",
+            "absoluteAddress": "0x1403B82D2"
+          },
+          {
+            "id": "workshop-menu.availability.source-98",
+            "rva": "0x3C1BCF",
+            "sourceId": "0x98",
+            "label": "workshop-menu.availability.source-98",
+            "absoluteAddress": "0x1403C1BCF"
+          },
+          {
+            "id": "workshop-menu.availability.source-99",
+            "rva": "0xB2B894",
+            "sourceId": "0x99",
+            "label": "workshop-menu.availability.source-99",
+            "absoluteAddress": "0x140B2B894"
+          },
+          {
+            "id": "workshop-menu.availability.source-9a",
+            "rva": "0xB2D75F",
+            "sourceId": "0x9A",
+            "label": "workshop-menu.availability.source-9a",
+            "absoluteAddress": "0x140B2D75F"
+          },
+          {
+            "id": "workshop-menu.availability.source-9b",
+            "rva": "0xB2D891",
+            "sourceId": "0x9B",
+            "label": "workshop-menu.availability.source-9b",
+            "absoluteAddress": "0x140B2D891"
+          },
+          {
+            "id": "workshop-menu.availability.source-9c",
+            "rva": "0xB2ECFF",
+            "sourceId": "0x9C",
+            "label": "workshop-menu.availability.source-9c",
+            "absoluteAddress": "0x140B2ECFF"
+          },
+          {
+            "id": "workshop-menu.availability.source-9d",
+            "rva": "0xB3035B",
+            "sourceId": "0x9D",
+            "label": "workshop-menu.availability.source-9d",
+            "absoluteAddress": "0x140B3035B"
+          },
+          {
+            "id": "workshop-menu.availability.source-9e",
+            "rva": "0xB323A5",
+            "sourceId": "0x9E",
+            "label": "workshop-menu.availability.source-9e",
+            "absoluteAddress": "0x140B323A5"
+          },
+          {
+            "id": "workshop-menu.availability.source-9f",
+            "rva": "0xB330EC",
+            "sourceId": "0x9F",
+            "label": "workshop-menu.availability.source-9f",
+            "absoluteAddress": "0x140B330EC"
+          },
+          {
+            "id": "workshop-menu.availability.source-a0",
+            "rva": "0xB36148",
+            "sourceId": "0xA0",
+            "label": "workshop-menu.availability.source-a0",
+            "absoluteAddress": "0x140B36148"
+          },
+          {
+            "id": "workshop-menu.availability.source-a1",
+            "rva": "0xB36651",
+            "sourceId": "0xA1",
+            "label": "workshop-menu.availability.source-a1",
+            "absoluteAddress": "0x140B36651"
+          },
+          {
+            "id": "workshop-menu.availability.source-a2",
+            "rva": "0xB37630",
+            "sourceId": "0xA2",
+            "label": "workshop-menu.availability.source-a2",
+            "absoluteAddress": "0x140B37630"
+          },
+          {
+            "id": "workshop-menu.availability.source-a3",
+            "rva": "0xB376DB",
+            "sourceId": "0xA3",
+            "label": "workshop-menu.availability.source-a3",
+            "absoluteAddress": "0x140B376DB"
+          }
+        ],
+        "targetAbsoluteAddress": "0x140399AD0",
+        "targetCandidates": [
+          {
+            "targetAbsoluteAddress": "0x140399AD0",
+            "selectedSiteIds": [
+              "workshop-menu.availability.source-91",
+              "workshop-menu.availability.source-92",
+              "workshop-menu.availability.source-93",
+              "workshop-menu.availability.source-94",
+              "workshop-menu.availability.source-95",
+              "workshop-menu.availability.source-96",
+              "workshop-menu.availability.source-97",
+              "workshop-menu.availability.source-98",
+              "workshop-menu.availability.source-99",
+              "workshop-menu.availability.source-9a",
+              "workshop-menu.availability.source-9b",
+              "workshop-menu.availability.source-9c",
+              "workshop-menu.availability.source-9d",
+              "workshop-menu.availability.source-9e",
+              "workshop-menu.availability.source-9f",
+              "workshop-menu.availability.source-a0",
+              "workshop-menu.availability.source-a1",
+              "workshop-menu.availability.source-a2",
+              "workshop-menu.availability.source-a3"
+            ],
+            "selectedSiteAbsoluteAddresses": [
+              "0x140397185",
+              "0x1403B82D2",
+              "0x1403C1BCF",
+              "0x140B2B894",
+              "0x140B2C65E",
+              "0x140B2C6C7",
+              "0x140B2C91E",
+              "0x140B2C984",
+              "0x140B2D75F",
+              "0x140B2D891",
+              "0x140B2E9D4",
+              "0x140B2ECFF",
+              "0x140B3035B",
+              "0x140B323A5",
+              "0x140B330EC",
+              "0x140B36148",
+              "0x140B36651",
+              "0x140B37630",
+              "0x140B376DB"
+            ],
+            "evidence": [
+              "tools/ghidra/reports/fallout4-1.11.240/fo4-availability-call-windows.txt",
+              "tools/ghidra/reports/fallout4-1.11.240/fo4-availability-target-functions.txt"
+            ]
+          }
+        ],
+        "directCallInstructionCount": 19,
+        "missingDirectCallSites": [],
+        "extraSameTargetReferences": [],
+        "recommendedNextAction": "No proof refresh needed; resolver proof metadata is already present."
+      }
+    },
+    {
+      "id": "workshop_menu.check_and_set_placement",
+      "category": "call_site_rva",
+      "cppName": "kWorkshopCheckAndSetPlacementCallSites",
+      "expectedCount": 4,
+      "expectedInstructionKind": "call_rel32",
+      "expectedOriginalTargetGroup": "workshop_menu.check_and_set_placement",
+      "discoveryStatus": "proven",
+      "discoverySummary": "Resolve CheckAndSetItemForPlacement callers and require four direct CALL rel32 sites to the same placement helper.",
+      "candidateRvas": [
+        {
+          "id": "workshop-menu.check-placement.source-a5",
+          "rva": "0xB2B0F7",
+          "sourceId": "0xA5",
+          "label": "workshop-menu.check-placement.source-a5",
+          "status": "current_manifest_rva"
+        },
+        {
+          "id": "workshop-menu.check-placement.source-a6",
+          "rva": "0xB2C6E2",
+          "sourceId": "0xA6",
+          "label": "workshop-menu.check-placement.source-a6",
+          "status": "current_manifest_rva"
+        },
+        {
+          "id": "workshop-menu.check-placement.source-a7",
+          "rva": "0xB2C99F",
+          "sourceId": "0xA7",
+          "label": "workshop-menu.check-placement.source-a7",
+          "status": "current_manifest_rva"
+        },
+        {
+          "id": "workshop-menu.check-placement.source-a8",
+          "rva": "0xB2E67E",
+          "sourceId": "0xA8",
+          "label": "workshop-menu.check-placement.source-a8",
+          "status": "current_manifest_rva"
+        }
+      ],
+      "instructionWindowAddresses": [
+        "0xB2B0F7",
+        "0xB2C6E2",
+        "0xB2C99F",
+        "0xB2E67E"
+      ],
+      "evidence": [
+        "tools/ghidra/reports/fallout4-1.11.240/fo4-check-placement-target-functions.txt",
+        "tools/ghidra/reports/fallout4-1.11.240/fo4-check-placement-call-windows.txt"
+      ],
+      "unresolvedItems": [],
+      "proofReadiness": {
+        "status": "already_proven",
+        "summary": "The manifest already contains resolver proof metadata for this call-site family.",
+        "selectedSites": [
+          {
+            "id": "workshop-menu.check-placement.source-a5",
+            "rva": "0xB2B0F7",
+            "sourceId": "0xA5",
+            "label": "workshop-menu.check-placement.source-a5",
+            "absoluteAddress": "0x140B2B0F7"
+          },
+          {
+            "id": "workshop-menu.check-placement.source-a6",
+            "rva": "0xB2C6E2",
+            "sourceId": "0xA6",
+            "label": "workshop-menu.check-placement.source-a6",
+            "absoluteAddress": "0x140B2C6E2"
+          },
+          {
+            "id": "workshop-menu.check-placement.source-a7",
+            "rva": "0xB2C99F",
+            "sourceId": "0xA7",
+            "label": "workshop-menu.check-placement.source-a7",
+            "absoluteAddress": "0x140B2C99F"
+          },
+          {
+            "id": "workshop-menu.check-placement.source-a8",
+            "rva": "0xB2E67E",
+            "sourceId": "0xA8",
+            "label": "workshop-menu.check-placement.source-a8",
+            "absoluteAddress": "0x140B2E67E"
+          }
+        ],
+        "targetAbsoluteAddress": "0x140B2E940",
+        "targetCandidates": [
+          {
+            "targetAbsoluteAddress": "0x140B2E940",
+            "selectedSiteIds": [
+              "workshop-menu.check-placement.source-a5",
+              "workshop-menu.check-placement.source-a6",
+              "workshop-menu.check-placement.source-a7",
+              "workshop-menu.check-placement.source-a8"
+            ],
+            "selectedSiteAbsoluteAddresses": [
+              "0x140B2B0F7",
+              "0x140B2C6E2",
+              "0x140B2C99F",
+              "0x140B2E67E"
+            ],
+            "evidence": [
+              "tools/ghidra/reports/fallout4-1.11.240/fo4-check-placement-call-windows.txt",
+              "tools/ghidra/reports/fallout4-1.11.240/fo4-check-placement-target-functions.txt"
+            ]
+          }
+        ],
+        "directCallInstructionCount": 4,
+        "missingDirectCallSites": [],
+        "extraSameTargetReferences": [],
+        "recommendedNextAction": "No proof refresh needed; resolver proof metadata is already present."
+      }
+    },
+    {
+      "id": "workshop_menu.start_placement",
+      "category": "call_site_rva",
+      "cppName": "kWorkshopStartPlacementCallSites",
+      "expectedCount": 7,
+      "expectedInstructionKind": "call_rel32",
+      "expectedOriginalTargetGroup": "workshop_menu.start_placement",
+      "discoveryStatus": "proven",
+      "discoverySummary": "Resolve StartWorkshopPlacement callers and require seven direct CALL rel32 sites to the same helper.",
+      "candidateRvas": [
+        {
+          "id": "workshop-menu.start-placement.source-a3",
+          "rva": "0xB2C7DA",
+          "sourceId": "0xA3",
+          "label": "workshop-menu.start-placement.source-a3",
+          "status": "current_manifest_rva"
+        },
+        {
+          "id": "workshop-menu.start-placement.source-a4",
+          "rva": "0xB2CA95",
+          "sourceId": "0xA4",
+          "label": "workshop-menu.start-placement.source-a4",
+          "status": "current_manifest_rva"
+        },
+        {
+          "id": "workshop-menu.start-placement.source-a9",
+          "rva": "0xB2B0EF",
+          "sourceId": "0xA9",
+          "label": "workshop-menu.start-placement.source-a9",
+          "status": "current_manifest_rva"
+        },
+        {
+          "id": "workshop-menu.start-placement.source-aa",
+          "rva": "0xB2B954",
+          "sourceId": "0xAA",
+          "label": "workshop-menu.start-placement.source-aa",
+          "status": "current_manifest_rva"
+        },
+        {
+          "id": "workshop-menu.start-placement.source-ab",
+          "rva": "0xB2D900",
+          "sourceId": "0xAB",
+          "label": "workshop-menu.start-placement.source-ab",
+          "status": "current_manifest_rva"
+        },
+        {
+          "id": "workshop-menu.start-placement.source-ac",
+          "rva": "0xB2E676",
+          "sourceId": "0xAC",
+          "label": "workshop-menu.start-placement.source-ac",
+          "status": "current_manifest_rva"
+        },
+        {
+          "id": "workshop-menu.start-placement.source-ad",
+          "rva": "0xB2E8FF",
+          "sourceId": "0xAD",
+          "label": "workshop-menu.start-placement.source-ad",
+          "status": "current_manifest_rva"
+        }
+      ],
+      "instructionWindowAddresses": [
+        "0xB2C7DA",
+        "0xB2CA95",
+        "0xB2B0EF",
+        "0xB2B954",
+        "0xB2D900",
+        "0xB2E676",
+        "0xB2E8FF"
+      ],
+      "evidence": [
+        "tools/ghidra/reports/fallout4-1.11.240/fo4-start-placement-target-functions.txt",
+        "tools/ghidra/reports/fallout4-1.11.240/fo4-start-placement-call-windows.txt"
+      ],
+      "unresolvedItems": [],
+      "proofReadiness": {
+        "status": "already_proven",
+        "summary": "The manifest already contains resolver proof metadata for this call-site family.",
+        "selectedSites": [
+          {
+            "id": "workshop-menu.start-placement.source-a3",
+            "rva": "0xB2C7DA",
+            "sourceId": "0xA3",
+            "label": "workshop-menu.start-placement.source-a3",
+            "absoluteAddress": "0x140B2C7DA"
+          },
+          {
+            "id": "workshop-menu.start-placement.source-a4",
+            "rva": "0xB2CA95",
+            "sourceId": "0xA4",
+            "label": "workshop-menu.start-placement.source-a4",
+            "absoluteAddress": "0x140B2CA95"
+          },
+          {
+            "id": "workshop-menu.start-placement.source-a9",
+            "rva": "0xB2B0EF",
+            "sourceId": "0xA9",
+            "label": "workshop-menu.start-placement.source-a9",
+            "absoluteAddress": "0x140B2B0EF"
+          },
+          {
+            "id": "workshop-menu.start-placement.source-aa",
+            "rva": "0xB2B954",
+            "sourceId": "0xAA",
+            "label": "workshop-menu.start-placement.source-aa",
+            "absoluteAddress": "0x140B2B954"
+          },
+          {
+            "id": "workshop-menu.start-placement.source-ab",
+            "rva": "0xB2D900",
+            "sourceId": "0xAB",
+            "label": "workshop-menu.start-placement.source-ab",
+            "absoluteAddress": "0x140B2D900"
+          },
+          {
+            "id": "workshop-menu.start-placement.source-ac",
+            "rva": "0xB2E676",
+            "sourceId": "0xAC",
+            "label": "workshop-menu.start-placement.source-ac",
+            "absoluteAddress": "0x140B2E676"
+          },
+          {
+            "id": "workshop-menu.start-placement.source-ad",
+            "rva": "0xB2E8FF",
+            "sourceId": "0xAD",
+            "label": "workshop-menu.start-placement.source-ad",
+            "absoluteAddress": "0x140B2E8FF"
+          }
+        ],
+        "targetAbsoluteAddress": "0x140B2FF30",
+        "targetCandidates": [
+          {
+            "targetAbsoluteAddress": "0x140B2FF30",
+            "selectedSiteIds": [
+              "workshop-menu.start-placement.source-a3",
+              "workshop-menu.start-placement.source-a4",
+              "workshop-menu.start-placement.source-a9",
+              "workshop-menu.start-placement.source-aa",
+              "workshop-menu.start-placement.source-ab",
+              "workshop-menu.start-placement.source-ac",
+              "workshop-menu.start-placement.source-ad"
+            ],
+            "selectedSiteAbsoluteAddresses": [
+              "0x140B2B0EF",
+              "0x140B2B954",
+              "0x140B2C7DA",
+              "0x140B2CA95",
+              "0x140B2D900",
+              "0x140B2E676",
+              "0x140B2E8FF"
+            ],
+            "evidence": [
+              "tools/ghidra/reports/fallout4-1.11.240/fo4-start-placement-call-windows.txt",
+              "tools/ghidra/reports/fallout4-1.11.240/fo4-start-placement-target-functions.txt"
+            ]
+          }
+        ],
+        "directCallInstructionCount": 7,
+        "missingDirectCallSites": [],
+        "extraSameTargetReferences": [],
+        "recommendedNextAction": "No proof refresh needed; resolver proof metadata is already present."
+      }
+    },
+    {
+      "id": "workshop_material.build_resource_check",
+      "category": "call_site_rva",
+      "cppName": "kWorkshopBuildResourceCheckCallSites",
+      "expectedCount": 3,
+      "expectedInstructionKind": "call_rel32",
+      "expectedOriginalTargetGroup": "workshop_material.build_resource_check",
+      "discoveryStatus": "proven",
+      "discoverySummary": "Resolve build resource checks from CanProduceWorkshop analysis and require three direct CALL rel32 sites to the same helper.",
+      "candidateRvas": [
+        {
+          "id": "workshop-material.build-resource-check.placement",
+          "rva": "0x392844",
+          "sourceId": "0xB1",
+          "label": "workshop-material.build-resource-check.placement",
+          "status": "current_manifest_rva"
+        },
+        {
+          "id": "workshop-material.build-resource-check.confirm",
+          "rva": "0x399136",
+          "sourceId": "0xB2",
+          "label": "workshop-material.build-resource-check.confirm",
+          "status": "current_manifest_rva"
+        },
+        {
+          "id": "workshop-material.build-resource-check.consume-precheck",
+          "rva": "0x3B7F7E",
+          "sourceId": "0xB3",
+          "label": "workshop-material.build-resource-check.consume-precheck",
+          "status": "current_manifest_rva"
+        }
+      ],
+      "instructionWindowAddresses": [
+        "0x392844",
+        "0x399136",
+        "0x3B7F7E"
+      ],
+      "evidence": [
+        "tools/ghidra/reports/fallout4-1.11.240/fo4-build-resource-check-target-functions.txt",
+        "tools/ghidra/reports/fallout4-1.11.240/fo4-build-resource-check-call-windows.txt"
+      ],
+      "unresolvedItems": [],
+      "proofReadiness": {
+        "status": "already_proven",
+        "summary": "The manifest already contains resolver proof metadata for this call-site family.",
+        "selectedSites": [
+          {
+            "id": "workshop-material.build-resource-check.placement",
+            "rva": "0x392844",
+            "sourceId": "0xB1",
+            "label": "workshop-material.build-resource-check.placement",
+            "absoluteAddress": "0x140392844"
+          },
+          {
+            "id": "workshop-material.build-resource-check.confirm",
+            "rva": "0x399136",
+            "sourceId": "0xB2",
+            "label": "workshop-material.build-resource-check.confirm",
+            "absoluteAddress": "0x140399136"
+          },
+          {
+            "id": "workshop-material.build-resource-check.consume-precheck",
+            "rva": "0x3B7F7E",
+            "sourceId": "0xB3",
+            "label": "workshop-material.build-resource-check.consume-precheck",
+            "absoluteAddress": "0x1403B7F7E"
+          }
+        ],
+        "targetAbsoluteAddress": "0x14042BFF0",
+        "targetCandidates": [
+          {
+            "targetAbsoluteAddress": "0x14042BFF0",
+            "selectedSiteIds": [
+              "workshop-material.build-resource-check.confirm",
+              "workshop-material.build-resource-check.consume-precheck",
+              "workshop-material.build-resource-check.placement"
+            ],
+            "selectedSiteAbsoluteAddresses": [
+              "0x140392844",
+              "0x140399136",
+              "0x1403B7F7E"
+            ],
+            "evidence": [
+              "tools/ghidra/reports/fallout4-1.11.240/fo4-build-resource-check-call-windows.txt",
+              "tools/ghidra/reports/fallout4-1.11.240/fo4-build-resource-check-target-functions.txt"
+            ]
+          }
+        ],
+        "directCallInstructionCount": 3,
+        "missingDirectCallSites": [],
+        "extraSameTargetReferences": [],
+        "recommendedNextAction": "No proof refresh needed; resolver proof metadata is already present."
+      }
+    },
+    {
+      "id": "workshop_material.consume_component",
+      "category": "call_site_rva",
+      "cppName": "kWorkshopConsumeComponentCallSites",
+      "expectedCount": 2,
+      "expectedInstructionKind": "call_rel32",
+      "expectedOriginalTargetGroup": "workshop_material.consume_component",
+      "discoveryStatus": "proven",
+      "discoverySummary": "Resolve workshop component consumption calls and require exactly two direct CALL rel32 sites to the same consume helper.",
+      "candidateRvas": [
+        {
+          "id": "workshop-material.consume-component.source-f3",
+          "rva": "0x399326",
+          "sourceId": "0xF3",
+          "label": "workshop-material.consume-component.source-f3",
+          "status": "current_manifest_rva"
+        },
+        {
+          "id": "workshop-material.consume-component.source-f4",
+          "rva": "0x3B805A",
+          "sourceId": "0xF4",
+          "label": "workshop-material.consume-component.source-f4",
+          "status": "current_manifest_rva"
+        }
+      ],
+      "instructionWindowAddresses": [
+        "0x399326",
+        "0x3B805A"
+      ],
+      "evidence": [
+        "tools/ghidra/reports/fallout4-1.11.240/fo4-consume-component-target-functions.txt",
+        "tools/ghidra/reports/fallout4-1.11.240/fo4-consume-component-call-windows.txt"
+      ],
+      "unresolvedItems": [],
+      "proofReadiness": {
+        "status": "already_proven",
+        "summary": "The manifest already contains resolver proof metadata for this call-site family.",
+        "selectedSites": [
+          {
+            "id": "workshop-material.consume-component.source-f3",
+            "rva": "0x399326",
+            "sourceId": "0xF3",
+            "label": "workshop-material.consume-component.source-f3",
+            "absoluteAddress": "0x140399326"
+          },
+          {
+            "id": "workshop-material.consume-component.source-f4",
+            "rva": "0x3B805A",
+            "sourceId": "0xF4",
+            "label": "workshop-material.consume-component.source-f4",
+            "absoluteAddress": "0x1403B805A"
+          }
+        ],
+        "targetAbsoluteAddress": "0x140392340",
+        "targetCandidates": [
+          {
+            "targetAbsoluteAddress": "0x140392340",
+            "selectedSiteIds": [
+              "workshop-material.consume-component.source-f3",
+              "workshop-material.consume-component.source-f4"
+            ],
+            "selectedSiteAbsoluteAddresses": [
+              "0x140399326",
+              "0x1403B805A"
+            ],
+            "evidence": [
+              "tools/ghidra/reports/fallout4-1.11.240/fo4-consume-component-call-windows.txt",
+              "tools/ghidra/reports/fallout4-1.11.240/fo4-consume-component-target-functions.txt"
+            ]
+          }
+        ],
+        "directCallInstructionCount": 2,
+        "missingDirectCallSites": [],
+        "extraSameTargetReferences": [],
+        "recommendedNextAction": "No proof refresh needed; resolver proof metadata is already present."
+      }
+    },
+    {
+      "id": "workshop_menu.selected_menu_node_function",
+      "category": "function_rva",
+      "cppName": "kWorkshopSelectedMenuNodeFunctionId",
+      "expectedCount": 1,
+      "discoveryStatus": "automated",
+      "discoverySummary": "Resolved for Fallout4 1.11.240 as RE::ID::Workshop::GetSelectedWorkshopMenuNode at offset 0x389DB0; current Ghidra evidence records the matched helper or global references. The installed Address Library mapping was verified on 2026-08-22.",
+      "candidateRvas": [],
+      "value": "0x389DB0",
+      "instructionWindowAddresses": [],
+      "evidence": [
+        "tools/ghidra/reports/fallout4-1.11.240/fo4-address-library-target-functions.txt"
+      ],
+      "unresolvedItems": [],
+      "proofReadiness": {
+        "status": "not_applicable",
+        "summary": "function_rva entries do not use direct call-site proof refresh.",
+        "selectedSites": [],
+        "targetCandidates": [],
+        "directCallInstructionCount": 0,
+        "missingDirectCallSites": [],
+        "extraSameTargetReferences": [],
+        "recommendedNextAction": "No call-site proof refresh needed."
+      }
+    },
+    {
+      "id": "workshop_menu.selected_row_global",
+      "category": "global_rva",
+      "cppName": "kWorkshopSelectedRowGlobalId",
+      "expectedCount": 1,
+      "discoveryStatus": "automated",
+      "discoverySummary": "Resolved for Fallout4 1.11.240 as RE::ID::Workshop::CurrentRow at offset 0x30F6F18; current Ghidra evidence records the matched helper or global references. The installed Address Library mapping was verified on 2026-08-22.",
+      "candidateRvas": [],
+      "value": "0x30F6F18",
+      "instructionWindowAddresses": [],
+      "evidence": [
+        "tools/ghidra/reports/fallout4-1.11.240/fo4-address-library-global-refs.txt"
+      ],
+      "unresolvedItems": [],
+      "proofReadiness": {
+        "status": "not_applicable",
+        "summary": "global_rva entries do not use direct call-site proof refresh.",
+        "selectedSites": [],
+        "targetCandidates": [],
+        "directCallInstructionCount": 0,
+        "missingDirectCallSites": [],
+        "extraSameTargetReferences": [],
+        "recommendedNextAction": "No call-site proof refresh needed."
+      }
+    },
+    {
+      "id": "workshop_material.resource_status_missing_resources",
+      "category": "constant",
+      "cppName": "kWorkshopResourceStatusMissingResources",
+      "expectedCount": 1,
+      "discoveryStatus": "manual",
+      "discoverySummary": "This is a semantic status value, not an executable RVA; update only if the resource status enum is re-proven.",
+      "candidateRvas": [],
+      "value": "2",
+      "instructionWindowAddresses": [],
+      "evidence": [
+        "tools/ghidra/reports/fo4-placement-resource-status-functions.txt"
+      ],
+      "unresolvedItems": [
+        "Semantic constant was retained without executable-address proof for this runtime; verify separately before changing it."
+      ],
+      "proofReadiness": {
+        "status": "not_applicable",
+        "summary": "constant entries do not use direct call-site proof refresh.",
+        "selectedSites": [],
+        "targetCandidates": [],
+        "directCallInstructionCount": 0,
+        "missingDirectCallSites": [],
+        "extraSameTargetReferences": [],
+        "recommendedNextAction": "No call-site proof refresh needed."
+      }
+    },
+    {
+      "id": "workshop_material.remove_components",
+      "category": "call_site_rva",
+      "cppName": "kRemoveComponentsCallSites",
+      "expectedCount": 2,
+      "expectedInstructionKind": "call_rel32",
+      "expectedOriginalTargetGroup": "workshop_material.remove_components",
+      "discoveryStatus": "proven",
+      "discoverySummary": "Resolve RemoveComponents wrappers and require exactly two direct CALL rel32 sites to the same remove helper.",
+      "candidateRvas": [
+        {
+          "id": "workshop-material.remove-components.source-f1",
+          "rva": "0x114F009",
+          "sourceId": "0xF1",
+          "label": "workshop-material.remove-components.source-f1",
+          "status": "current_manifest_rva"
+        },
+        {
+          "id": "workshop-material.remove-components.source-f2",
+          "rva": "0x114EA33",
+          "sourceId": "0xF2",
+          "label": "workshop-material.remove-components.source-f2",
+          "status": "current_manifest_rva"
+        }
+      ],
+      "instructionWindowAddresses": [
+        "0x114F009",
+        "0x114EA33"
+      ],
+      "evidence": [
+        "tools/ghidra/reports/fallout4-1.11.240/fo4-remove-components-target-functions.txt",
+        "tools/ghidra/reports/fallout4-1.11.240/fo4-remove-components-call-windows.txt"
+      ],
+      "unresolvedItems": [],
+      "proofReadiness": {
+        "status": "already_proven",
+        "summary": "The manifest already contains resolver proof metadata for this call-site family.",
+        "selectedSites": [
+          {
+            "id": "workshop-material.remove-components.source-f1",
+            "rva": "0x114F009",
+            "sourceId": "0xF1",
+            "label": "workshop-material.remove-components.source-f1",
+            "absoluteAddress": "0x14114F009"
+          },
+          {
+            "id": "workshop-material.remove-components.source-f2",
+            "rva": "0x114EA33",
+            "sourceId": "0xF2",
+            "label": "workshop-material.remove-components.source-f2",
+            "absoluteAddress": "0x14114EA33"
+          }
+        ],
+        "targetAbsoluteAddress": "0x141182A90",
+        "targetCandidates": [
+          {
+            "targetAbsoluteAddress": "0x141182A90",
+            "selectedSiteIds": [
+              "workshop-material.remove-components.source-f1",
+              "workshop-material.remove-components.source-f2"
+            ],
+            "selectedSiteAbsoluteAddresses": [
+              "0x14114EA33",
+              "0x14114F009"
+            ],
+            "evidence": [
+              "tools/ghidra/reports/fallout4-1.11.240/fo4-remove-components-call-windows.txt",
+              "tools/ghidra/reports/fallout4-1.11.240/fo4-remove-components-target-functions.txt"
+            ]
+          }
+        ],
+        "directCallInstructionCount": 2,
+        "missingDirectCallSites": [],
+        "extraSameTargetReferences": [],
+        "recommendedNextAction": "No proof refresh needed; resolver proof metadata is already present."
+      }
+    },
+    {
+      "id": "workshop_material.object_count_papyrus",
+      "category": "call_site_rva",
+      "cppName": "kWorkshopObjectCountPapyrusCallSite",
+      "expectedCount": 1,
+      "expectedInstructionKind": "call_rel32",
+      "expectedOriginalTargetGroup": "workshop_material.workshop_object_count",
+      "discoveryStatus": "proven",
+      "discoverySummary": "Resolve the Papyrus workshop object count call site from the exact Ghidra reference report and require one direct CALL rel32.",
+      "candidateRvas": [
+        {
+          "id": "workshop-material.object-count.papyrus",
+          "rva": "0x5DD7B4",
+          "sourceId": "0xC1",
+          "label": "workshop-material.object-count.papyrus",
+          "status": "current_manifest_rva"
+        }
+      ],
+      "instructionWindowAddresses": [
+        "0x5DD7B4"
+      ],
+      "evidence": [
+        "tools/ghidra/reports/fallout4-1.11.240/fo4-object-count-papyrus-target-functions.txt",
+        "tools/ghidra/reports/fallout4-1.11.240/fo4-object-count-papyrus-call-windows.txt"
+      ],
+      "unresolvedItems": [],
+      "proofReadiness": {
+        "status": "already_proven",
+        "summary": "The manifest already contains resolver proof metadata for this call-site family.",
+        "selectedSites": [
+          {
+            "id": "workshop-material.object-count.papyrus",
+            "rva": "0x5DD7B4",
+            "sourceId": "0xC1",
+            "label": "workshop-material.object-count.papyrus",
+            "absoluteAddress": "0x1405DD7B4"
+          }
+        ],
+        "targetAbsoluteAddress": "0x14059D690",
+        "targetCandidates": [
+          {
+            "targetAbsoluteAddress": "0x14059D690",
+            "selectedSiteIds": [
+              "workshop-material.object-count.papyrus"
+            ],
+            "selectedSiteAbsoluteAddresses": [
+              "0x1405DD7B4"
+            ],
+            "evidence": [
+              "tools/ghidra/reports/fallout4-1.11.240/fo4-object-count-papyrus-call-windows.txt",
+              "tools/ghidra/reports/fallout4-1.11.240/fo4-object-count-papyrus-target-functions.txt"
+            ]
+          }
+        ],
+        "directCallInstructionCount": 1,
+        "missingDirectCallSites": [],
+        "extraSameTargetReferences": [],
+        "recommendedNextAction": "No proof refresh needed; resolver proof metadata is already present."
+      }
+    },
+    {
+      "id": "workshop_material.current_workshop_object_count",
+      "category": "call_site_rva",
+      "cppName": "kCurrentWorkshopObjectCountCallSite",
+      "expectedCount": 1,
+      "expectedInstructionKind": "call_rel32",
+      "expectedOriginalTargetGroup": "workshop_material.current_workshop_object_count",
+      "discoveryStatus": "proven",
+      "discoverySummary": "Resolve the current-workshop object count call site from the exact Ghidra reference report and require one direct CALL rel32.",
+      "candidateRvas": [
+        {
+          "id": "workshop-material.object-count.current-workshop",
+          "rva": "0x59D6A8",
+          "sourceId": "0xC2",
+          "label": "workshop-material.object-count.current-workshop",
+          "status": "current_manifest_rva"
+        }
+      ],
+      "instructionWindowAddresses": [
+        "0x59D6A8"
+      ],
+      "evidence": [
+        "tools/ghidra/reports/fallout4-1.11.240/fo4-object-count-current-target-functions.txt",
+        "tools/ghidra/reports/fallout4-1.11.240/fo4-object-count-current-call-windows.txt"
+      ],
+      "unresolvedItems": [],
+      "proofReadiness": {
+        "status": "already_proven",
+        "summary": "The manifest already contains resolver proof metadata for this call-site family.",
+        "selectedSites": [
+          {
+            "id": "workshop-material.object-count.current-workshop",
+            "rva": "0x59D6A8",
+            "sourceId": "0xC2",
+            "label": "workshop-material.object-count.current-workshop",
+            "absoluteAddress": "0x14059D6A8"
+          }
+        ],
+        "targetAbsoluteAddress": "0x14037E190",
+        "targetCandidates": [
+          {
+            "targetAbsoluteAddress": "0x14037E190",
+            "selectedSiteIds": [
+              "workshop-material.object-count.current-workshop"
+            ],
+            "selectedSiteAbsoluteAddresses": [
+              "0x14059D6A8"
+            ],
+            "evidence": [
+              "tools/ghidra/reports/fallout4-1.11.240/fo4-object-count-current-call-windows.txt",
+              "tools/ghidra/reports/fallout4-1.11.240/fo4-object-count-current-target-functions.txt"
+            ]
+          }
+        ],
+        "directCallInstructionCount": 1,
+        "missingDirectCallSites": [],
+        "extraSameTargetReferences": [],
+        "recommendedNextAction": "No proof refresh needed; resolver proof metadata is already present."
+      }
+    },
+    {
+      "id": "workshop_supply_owner.field_e0",
+      "category": "layout_offset",
+      "cppName": "kWorkshopSupplyOwnerFieldE0Offset",
+      "expectedCount": 1,
+      "discoveryStatus": "manual",
+      "discoverySummary": "Raw diagnostic workshop supply owner layout read; do not treat as an executable RVA, Address Library candidate, or auto-update target.",
+      "candidateRvas": [],
+      "value": "0xE0",
+      "instructionWindowAddresses": [],
+      "evidence": [
+        "tools/ghidra/reports/fo4-workbench-shared-container-callers.txt"
+      ],
+      "unresolvedItems": [
+        "Diagnostic layout offset was retained without executable-address proof for this runtime; verify separately before changing it."
+      ],
+      "proofReadiness": {
+        "status": "not_applicable",
+        "summary": "layout_offset entries do not use direct call-site proof refresh.",
+        "selectedSites": [],
+        "targetCandidates": [],
+        "directCallInstructionCount": 0,
+        "missingDirectCallSites": [],
+        "extraSameTargetReferences": [],
+        "recommendedNextAction": "No call-site proof refresh needed."
+      }
+    },
+    {
+      "id": "workshop_supply_owner.field_e8",
+      "category": "layout_offset",
+      "cppName": "kWorkshopSupplyOwnerFieldE8Offset",
+      "expectedCount": 1,
+      "discoveryStatus": "manual",
+      "discoverySummary": "Raw diagnostic workshop supply owner layout read; do not treat as an executable RVA, Address Library candidate, or auto-update target.",
+      "candidateRvas": [],
+      "value": "0xE8",
+      "instructionWindowAddresses": [],
+      "evidence": [
+        "tools/ghidra/reports/fo4-workbench-shared-container-callers.txt"
+      ],
+      "unresolvedItems": [
+        "Diagnostic layout offset was retained without executable-address proof for this runtime; verify separately before changing it."
+      ],
+      "proofReadiness": {
+        "status": "not_applicable",
+        "summary": "layout_offset entries do not use direct call-site proof refresh.",
+        "selectedSites": [],
+        "targetCandidates": [],
+        "directCallInstructionCount": 0,
+        "missingDirectCallSites": [],
+        "extraSameTargetReferences": [],
+        "recommendedNextAction": "No call-site proof refresh needed."
+      }
+    },
+    {
+      "id": "workshop_supply_owner.field_f8",
+      "category": "layout_offset",
+      "cppName": "kWorkshopSupplyOwnerFieldF8Offset",
+      "expectedCount": 1,
+      "discoveryStatus": "manual",
+      "discoverySummary": "Raw diagnostic workshop supply owner layout read; do not treat as an executable RVA, Address Library candidate, or auto-update target.",
+      "candidateRvas": [],
+      "value": "0xF8",
+      "instructionWindowAddresses": [],
+      "evidence": [
+        "tools/ghidra/reports/fo4-workbench-shared-container-callers.txt"
+      ],
+      "unresolvedItems": [
+        "Diagnostic layout offset was retained without executable-address proof for this runtime; verify separately before changing it."
+      ],
+      "proofReadiness": {
+        "status": "not_applicable",
+        "summary": "layout_offset entries do not use direct call-site proof refresh.",
+        "selectedSites": [],
+        "targetCandidates": [],
+        "directCallInstructionCount": 0,
+        "missingDirectCallSites": [],
+        "extraSameTargetReferences": [],
+        "recommendedNextAction": "No call-site proof refresh needed."
+      }
+    },
+    {
+      "id": "workshop_supply_owner.field_2f8",
+      "category": "layout_offset",
+      "cppName": "kWorkshopSupplyOwnerField2F8Offset",
+      "expectedCount": 1,
+      "discoveryStatus": "manual",
+      "discoverySummary": "Raw diagnostic workshop supply owner layout read; do not treat as an executable RVA, Address Library candidate, or auto-update target.",
+      "candidateRvas": [],
+      "value": "0x2F8",
+      "instructionWindowAddresses": [],
+      "evidence": [
+        "tools/ghidra/reports/fo4-workbench-shared-container-callers.txt"
+      ],
+      "unresolvedItems": [
+        "Diagnostic layout offset was retained without executable-address proof for this runtime; verify separately before changing it."
+      ],
+      "proofReadiness": {
+        "status": "not_applicable",
+        "summary": "layout_offset entries do not use direct call-site proof refresh.",
+        "selectedSites": [],
+        "targetCandidates": [],
+        "directCallInstructionCount": 0,
+        "missingDirectCallSites": [],
+        "extraSameTargetReferences": [],
+        "recommendedNextAction": "No call-site proof refresh needed."
+      }
+    }
+  ]
+}
