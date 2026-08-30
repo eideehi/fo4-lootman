@@ -10,6 +10,7 @@ import { createTempDir, removeTempDir } from "../helpers/temp-dir.js";
 const recordHeaderSize = 24;
 const groupHeaderSize = 24;
 const compressedRecordFlag = 0x00040000;
+const localizedStringsFlag = 0x00000080;
 
 interface FixtureItem {
 	text: string;
@@ -20,6 +21,11 @@ interface FixtureRecord {
 	edid: string;
 	items: FixtureItem[];
 	compressed?: boolean;
+}
+
+interface FixtureOptions {
+	/** Sets the TES4 localized flag and stores string IDs in ITXT, the way a localized plugin does. */
+	localized?: boolean;
 }
 
 interface XmlRow {
@@ -47,6 +53,13 @@ function uint16(value: number): Buffer {
 	return buffer;
 }
 
+/** ITXT payload of a localized plugin: a 4-byte string ID into the .strings files, not text. */
+function stringId(value: number): Buffer {
+	const buffer = Buffer.alloc(4);
+	buffer.writeUInt32LE(value);
+	return buffer;
+}
+
 function record(signature: string, formId: number, data: Buffer, flags = 0): Buffer {
 	const header = Buffer.alloc(recordHeaderSize);
 	header.write(signature, 0, "latin1");
@@ -56,13 +69,15 @@ function record(signature: string, formId: number, data: Buffer, flags = 0): Buf
 	return Buffer.concat([header, data]);
 }
 
-function terminalRecord(fixture: FixtureRecord, formId: number): Buffer {
+function terminalRecord(fixture: FixtureRecord, formId: number, options: FixtureOptions = {}): Buffer {
 	const data = Buffer.concat([
 		subrecord("EDID", zstring(fixture.edid)),
 		subrecord("FULL", zstring(`${fixture.edid} Terminal`)),
 		...fixture.items.flatMap((item, index) => [
 			// A menu item is ITXT, then ANAM, then ITID, so the ITID trails the text it names.
-			subrecord("ITXT", zstring(item.text)),
+			// Every string ID here is below 0x01000000, so its high byte is 0 and the payload still
+			// looks NUL-terminated: exactly the case the TES4 flag has to catch.
+			subrecord("ITXT", options.localized === true ? stringId(0x00000100 + index) : zstring(item.text)),
 			subrecord("ANAM", Buffer.alloc(4)),
 			subrecord("ITID", uint16(item.itid ?? index + 1)),
 		]),
@@ -79,20 +94,20 @@ function group(label: string, records: Buffer[]): Buffer {
 	return Buffer.concat([header, body]);
 }
 
-function buildPlugin(fixtures: FixtureRecord[]): Buffer {
+function buildPlugin(fixtures: FixtureRecord[], options: FixtureOptions = {}): Buffer {
 	const header = Buffer.concat([subrecord("HEDR", Buffer.alloc(12)), subrecord("CNAM", zstring("lootman-test"))]);
 	const keyword = record("KYWD", 0x0f000001, subrecord("EDID", zstring("LTMN_UnrelatedKeyword")));
 	return Buffer.concat([
-		record("TES4", 0, header),
+		record("TES4", 0, header, options.localized === true ? localizedStringsFlag : 0),
 		group("KYWD", [keyword]),
-		group("TERM", fixtures.map((fixture, index) => terminalRecord(fixture, 0x0f000100 + index))),
+		group("TERM", fixtures.map((fixture, index) => terminalRecord(fixture, 0x0f000100 + index, options))),
 		group("MISC", [record("MISC", 0x0f000200, subrecord("EDID", zstring("LTMN_UnrelatedMisc")))]),
 	]);
 }
 
-function writePlugin(dir: string, name: string, fixtures: FixtureRecord[]): string {
+function writePlugin(dir: string, name: string, fixtures: FixtureRecord[], options: FixtureOptions = {}): string {
 	const file = path.join(dir, name);
-	fs.outputFileSync(file, buildPlugin(fixtures));
+	fs.outputFileSync(file, buildPlugin(fixtures, options));
 	return file;
 }
 
@@ -493,6 +508,165 @@ describe("apply-terminal-labels", () => {
 		longBuffer.writeUInt32LE(longBuffer.length, 4);
 		fs.outputFileSync(longHeader, longBuffer);
 		expect(() => applyTerminalLabels(longHeader, xml)).toThrow(/group walk ended at offset/);
+	});
+
+	it("refuses a localized plugin whose ITXT holds string IDs instead of text", () => {
+		const root = createTempDir();
+		dirs.push(root);
+		const plugin = writePlugin(root, "Fixture.esp", [configRoot], { localized: true });
+		const xml = writeTranslation(root, "Fixture.xml", [
+			{ edid: "LTMN_TERM_ConfigRoot", id: 0, source: "General Settings", dest: "基本設定" },
+		]);
+		const before = fs.readFileSync(plugin);
+
+		// The string IDs end in a zero byte, so a NUL-termination heuristic alone would accept them
+		// and overwrite the reference to the .strings entry with literal text.
+		for (const item of findRecord(before, "LTMN_TERM_ConfigRoot").items) {
+			expect(item.payload.length).toBe(4);
+			expect(item.payload[item.payload.length - 1]).toBe(0);
+		}
+
+		expect(() => applyTerminalLabels(plugin, xml)).toThrow(/flagged as localized/);
+		expect(fs.readFileSync(plugin).equals(before)).toBe(true);
+	});
+
+	it("refuses a plugin with duplicate terminal EDIDs instead of guessing which record wins", () => {
+		const root = createTempDir();
+		dirs.push(root);
+		// Two TERM records share an EDID: the patch path would take one and the verify path the
+		// other, so the run has to stop before anything is written.
+		const plugin = writePlugin(root, "Fixture.esp", [
+			configRoot,
+			{ edid: "LTMN_TERM_ConfigRoot", items: [{ text: "General Settings" }, { text: "Object Looting Filters" }, { text: "Log Level" }] },
+		]);
+		const xml = writeTranslation(root, "Fixture.xml", [
+			{ edid: "LTMN_TERM_ConfigRoot", id: 0, source: "General Settings", dest: "基本設定" },
+		]);
+		const before = fs.readFileSync(plugin);
+
+		expect(() => applyTerminalLabels(plugin, xml)).toThrow(/more than one TERM record with EDID LTMN_TERM_ConfigRoot/);
+		expect(fs.readFileSync(plugin).equals(before)).toBe(true);
+	});
+
+	it("refuses a plugin whose labels match neither the Source nor the Dest of the translation", () => {
+		const root = createTempDir();
+		dirs.push(root);
+		// This plugin was patched by an older export, so its labels are neither the English the rows
+		// expect to replace nor the Japanese they would write.
+		const plugin = writePlugin(root, "Fixture.esp", [{
+			edid: "LTMN_TERM_ConfigRoot",
+			items: [{ text: "基本設定" }, { text: "オブジェクト収集フィルター" }, { text: "ログレベル" }],
+		}]);
+		const xml = writeTranslation(root, "Fixture.xml", [
+			{ edid: "LTMN_TERM_ConfigRoot", id: 0, source: "General Settings", dest: "全体設定" },
+		]);
+		const before = fs.readFileSync(plugin);
+
+		expect(() => applyTerminalLabels(plugin, xml)).toThrow(/holds "基本設定", which is neither the translation Source "General Settings" nor its Dest "全体設定"/);
+		expect(fs.readFileSync(plugin).equals(before)).toBe(true);
+	});
+
+	it("accepts a row whose plugin text still matches the Source and patches it to the Dest", () => {
+		const root = createTempDir();
+		dirs.push(root);
+		const plugin = writePlugin(root, "Fixture.esp", [configRoot]);
+		const xml = writeTranslation(root, "Fixture.xml", [
+			{ edid: "LTMN_TERM_ConfigRoot", id: 0, source: "General Settings", dest: "基本設定" },
+			{ edid: "LTMN_TERM_ConfigRoot", id: 1, source: "Object Looting Filters", dest: "Object Looting Filters" },
+		]);
+
+		const result = applyTerminalLabels(plugin, xml);
+
+		expect(result.changed).toBe(1);
+		expect(result.unchanged).toBe(1);
+		expect(findRecord(fs.readFileSync(plugin), "LTMN_TERM_ConfigRoot").items[0].text).toBe("基本設定");
+	});
+
+	it("rejects a Dest carrying an embedded NUL that the game would read as a shorter label", () => {
+		const root = createTempDir();
+		dirs.push(root);
+		const plugin = writePlugin(root, "Fixture.esp", [configRoot]);
+		const xml = writeTranslation(root, "Fixture.xml", [
+			{ edid: "LTMN_TERM_ConfigRoot", id: 0, source: "General Settings", dest: "Bad&#0;Tail" },
+		]);
+		const before = fs.readFileSync(plugin);
+
+		expect(() => applyTerminalLabels(plugin, xml)).toThrow(/NUL character in Dest: LTMN_TERM_ConfigRoot id=0/);
+		expect(fs.readFileSync(plugin).equals(before)).toBe(true);
+	});
+
+	it("leaves an existing output file untouched when a run fails validation", () => {
+		const root = createTempDir();
+		dirs.push(root);
+		const plugin = writePlugin(root, "Fixture.esp", [configRoot]);
+		const output = path.join(root, "out", "Patched.esp");
+		fs.outputFileSync(output, "previous output");
+		const xml = writeTranslation(root, "Fixture.xml", [
+			{ edid: "LTMN_TERM_ConfigRoot", id: 0, source: "General Settings", dest: "基本設定" },
+			{ edid: "LTMN_TERM_ConfigRoot", id: 1, source: "Wrong Source", dest: "フィルター" },
+		]);
+
+		expect(() => applyTerminalLabels(plugin, xml, { outputPath: output })).toThrow(/neither the translation Source/);
+
+		expect(fs.readFileSync(output, "utf8")).toBe("previous output");
+		expect(fs.existsSync(`${output}.tmp`)).toBe(false);
+	});
+
+	it("rolls the staging file back when the patched bytes cannot be moved into place", () => {
+		const root = createTempDir();
+		dirs.push(root);
+		const plugin = writePlugin(root, "Fixture.esp", [configRoot]);
+		// A directory at the output path lets the staged write and its verification succeed, then
+		// fails the move, which is the only window in which a direct write would have destroyed it.
+		const output = path.join(root, "Patched.esp");
+		fs.outputFileSync(path.join(output, "sentinel.txt"), "keep me");
+		const xml = writeTranslation(root, "Fixture.xml", [
+			{ edid: "LTMN_TERM_ConfigRoot", id: 0, source: "General Settings", dest: "基本設定" },
+		]);
+		const before = fs.readFileSync(plugin);
+
+		// The failing syscall has to be the rename of the staging file: a run that failed while
+		// opening the output path itself would mean the patched bytes were still going straight
+		// there.
+		expect(() => applyTerminalLabels(plugin, xml, { outputPath: output })).toThrow(/rename/);
+		expect(() => applyTerminalLabels(plugin, xml, { outputPath: output })).toThrow(/Patched\.esp\.tmp/);
+
+		expect(fs.existsSync(`${output}.tmp`)).toBe(false);
+		expect(fs.readFileSync(path.join(output, "sentinel.txt"), "utf8")).toBe("keep me");
+		expect(fs.readFileSync(plugin).equals(before)).toBe(true);
+	});
+
+	it("refuses to write when a stale staging file is already in the way", () => {
+		const root = createTempDir();
+		dirs.push(root);
+		const plugin = writePlugin(root, "Fixture.esp", [configRoot]);
+		const stale = `${plugin}.tmp`;
+		fs.outputFileSync(stale, "left over by a crashed run");
+		const xml = writeTranslation(root, "Fixture.xml", [
+			{ edid: "LTMN_TERM_ConfigRoot", id: 0, source: "General Settings", dest: "基本設定" },
+		]);
+		const before = fs.readFileSync(plugin);
+
+		expect(() => applyTerminalLabels(plugin, xml)).toThrow(/staging file .* already exists/);
+
+		// The staging file is never assumed to be ours, so a refused run must not delete it either.
+		expect(fs.readFileSync(stale, "utf8")).toBe("left over by a crashed run");
+		expect(fs.readFileSync(plugin).equals(before)).toBe(true);
+	});
+
+	it("reports the committed Japanese plugin as fully patched already", () => {
+		// Real-data regression guard: the shipped ja plugin was patched from this export, so every
+		// row has to line up and nothing may be rewritten.
+		const plugin = path.resolve("packaging/resources/lootman/ja/LootMan.esp");
+		const xml = path.resolve("translation/Lootman_en_ja.xml");
+		const before = fs.readFileSync(plugin);
+
+		const result = applyTerminalLabels(plugin, xml, { dryRun: true });
+
+		expect(result.changed).toBe(0);
+		expect(result.unchanged).toBe(39);
+		expect(result.written).toBe(false);
+		expect(fs.readFileSync(plugin).equals(before)).toBe(true);
 	});
 
 	it("parses CLI arguments", () => {

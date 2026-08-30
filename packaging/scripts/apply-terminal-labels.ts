@@ -12,6 +12,7 @@ const recordHeaderSize = 24;
 const groupHeaderSize = 24;
 const subrecordHeaderSize = 6;
 const compressedRecordFlag = 0x00040000;
+const localizedStringsFlag = 0x00000080;
 const maxSubrecordSize = 0xffff;
 const terminalGroupLabel = "TERM";
 
@@ -47,6 +48,8 @@ export interface TerminalLabelRow {
 	index: number;
 	/** The ITID the index is expected to address; the plugin is the authority. */
 	itid: number;
+	/** The label the plugin is expected to hold before patching; guards against the wrong plugin. */
+	source: string;
 	dest: string;
 }
 
@@ -126,12 +129,23 @@ export function parseTerminalLabelRows(xml: string): TerminalLabelRow[] {
 		}
 		const index = Number.parseInt(id[1], 10);
 
+		const source = /<Source>([\s\S]*?)<\/Source>/.exec(body);
+		if (source === null) {
+			throw new Error(`Translation row for TERM:ITXT has no Source: ${recordEdid} id=${index}`);
+		}
+
 		const dest = /<Dest>([\s\S]*?)<\/Dest>/.exec(body);
 		if (dest === null) {
 			throw new Error(`Translation row for TERM:ITXT has no Dest: ${recordEdid} id=${index}`);
 		}
+		const destText = decodeXmlText(dest[1]);
+		// An embedded NUL would terminate the label early in-game while the subrecord still carries
+		// the tail, so the plugin would look patched and read wrong. Never write one.
+		if (destText.includes("\0")) {
+			throw new Error(`Translation row for TERM:ITXT has a NUL character in Dest: ${recordEdid} id=${index} (${JSON.stringify(destText)}); the game would only read the text before it`);
+		}
 
-		rows.push({ edid: recordEdid, index, itid: index + 1, dest: decodeXmlText(dest[1]) });
+		rows.push({ edid: recordEdid, index, itid: index + 1, source: decodeXmlText(source[1]), dest: destText });
 	}
 
 	return rows;
@@ -170,6 +184,21 @@ export function walkTopLevelGroups(buffer: Buffer, label: string): TopLevelGroup
 		throw new Error(`${label} group walk ended at offset ${offset} but the file is ${buffer.length} bytes`);
 	}
 	return groups;
+}
+
+/**
+ * A localized plugin keeps a 4-byte string ID in ITXT instead of text, and nearly every ID has a
+ * zero high byte, so the NUL-termination check below accepts one and the patch would overwrite the
+ * ID with literal bytes. The TES4 header flag is the only reliable signal, so it decides.
+ */
+function assertNotLocalized(buffer: Buffer, label: string): void {
+	if (buffer.length < recordHeaderSize) {
+		throw new Error(`${label} is too small to hold a TES4 record`);
+	}
+	const flags = buffer.readUInt32LE(8);
+	if ((flags & localizedStringsFlag) !== 0) {
+		throw new Error(`${label} is flagged as localized (TES4 flags 0x${flags.toString(16).toUpperCase().padStart(8, "0")}); its ITXT subrecords hold string IDs, not text, so its terminal labels live in the .strings files and cannot be patched here`);
+	}
 }
 
 function readTerminalItems(buffer: Buffer, dataStart: number, dataEnd: number, label: string): { edid: string; items: TerminalItem[] } {
@@ -211,7 +240,7 @@ function readTerminalItems(buffer: Buffer, dataStart: number, dataEnd: number, l
 				throw new Error(`${label} has an ITID at offset ${offset} with no preceding ITXT`);
 			}
 			if (pendingItxt.payloadEnd <= pendingItxt.payloadStart || buffer[pendingItxt.payloadEnd - 1] !== 0) {
-				throw new Error(`${label} has an ITXT at offset ${pendingItxt.itxtStart} that is not NUL-terminated text; localized plugins are not supported`);
+				throw new Error(`${label} has an ITXT at offset ${pendingItxt.itxtStart} that is not NUL-terminated text`);
 			}
 			items.push({
 				itid: buffer.readUInt16LE(payloadStart),
@@ -267,6 +296,30 @@ function collectTerminalRecords(buffer: Buffer, groups: TopLevelGroup[], label: 
 	return records;
 }
 
+/**
+ * The one lookup both the patch path and the verify path use, so they can never disagree about
+ * which record an EDID names. A duplicate EDID is rejected here, before anything is written: the
+ * translation cannot say which record it means, and silently picking one is how a plugin gets
+ * patched in the wrong place.
+ */
+function indexTerminalRecordsByEdid(records: TerminalRecord[], label: string): Map<string, TerminalRecord> {
+	const byEdid = new Map<string, TerminalRecord>();
+
+	for (const record of records) {
+		if (record.edid === "") {
+			// No EDID means no translation row can name it, so it is not a lookup candidate at all.
+			continue;
+		}
+		const existing = byEdid.get(record.edid);
+		if (existing !== undefined) {
+			throw new Error(`${label} has more than one TERM record with EDID ${record.edid} (offsets ${existing.start} and ${record.start}); resolve the duplicate before applying labels`);
+		}
+		byEdid.set(record.edid, record);
+	}
+
+	return byEdid;
+}
+
 function applyByteEdits(buffer: Buffer, edits: ByteEdit[]): Buffer {
 	const parts: Buffer[] = [];
 	let cursor = 0;
@@ -304,11 +357,9 @@ export function applyTerminalLabels(pluginPath: string, translationPath: string,
 	console.log(`Applying terminal labels to ${path.basename(pluginPath)}...`);
 
 	const groups = walkTopLevelGroups(original, pluginPath);
+	assertNotLocalized(original, pluginPath);
 	const records = collectTerminalRecords(original, groups, pluginPath);
-	const byEdid = new Map<string, TerminalRecord>();
-	for (const record of records) {
-		byEdid.set(record.edid, record);
-	}
+	const byEdid = indexTerminalRecordsByEdid(records, pluginPath);
 
 	const changes: TerminalLabelChange[] = [];
 	const edits: ByteEdit[] = [];
@@ -336,9 +387,23 @@ export function applyTerminalLabels(pluginPath: string, translationPath: string,
 			throw new Error(`Terminal record ${row.edid} item ${row.index} is ITID ${positional === undefined ? "missing" : positional.itid}, not ${row.itid}`);
 		}
 
+		// EDID plus ITID is the same key in every language of this plugin, so the key alone cannot
+		// tell the right plugin from the wrong one. The label the plugin holds now has to be either
+		// the row's pre-patch Source or its already-applied Dest; anything else means this
+		// translation does not belong to this file.
+		if (item.text !== row.source && item.text !== row.dest) {
+			throw new Error(`Terminal record ${row.edid} ITID ${row.itid} holds ${JSON.stringify(item.text)}, which is neither the translation Source ${JSON.stringify(row.source)} nor its Dest ${JSON.stringify(row.dest)}; ${path.basename(translationPath)} does not describe ${path.basename(pluginPath)}`);
+		}
+
 		if (item.text === row.dest) {
 			unchanged += 1;
 			continue;
+		}
+
+		if (row.dest === "") {
+			// xTranslator writes an empty Dest for a row nobody has translated yet; writing it would
+			// blank the menu item rather than leave the source label in place.
+			console.warn(`  WARNING: ${row.edid} ITID ${row.itid} has an empty Dest, so its label is being blanked`);
 		}
 
 		const payload = Buffer.concat([Buffer.from(row.dest, "utf8"), Buffer.from([0])]);
@@ -373,34 +438,50 @@ export function applyTerminalLabels(pluginPath: string, translationPath: string,
 		const at = shiftOffset(groupStart + 4, edits);
 		patched.writeUInt32LE(patched.readUInt32LE(at) + delta, at);
 	}
-	walkTopLevelGroups(patched, `${pluginPath} (patched)`);
+	// The full record and subrecord walk runs on the patched bytes before they can reach the disk,
+	// so a dry run proves exactly what a real run would write.
+	verifyTerminalLabels(patched, `${pluginPath} (patched)`, changes);
 
 	if (dryRun) {
 		console.log(`Terminal label dry run complete. changed=${changes.length} unchanged=${unchanged}`);
 		return { pluginPath, outputPath, dryRun, written: false, changes, changed: changes.length, unchanged };
 	}
 
-	fs.outputFileSync(outputPath, patched);
-	verifyWrittenLabels(outputPath, changes);
+	// The output path is usually the input path, so the patched bytes are staged beside it and only
+	// swapped in once they have been read back and verified. A failure or a crash then costs the
+	// staging file, never the plugin.
+	const stagingPath = `${outputPath}.tmp`;
+	if (fs.existsSync(stagingPath)) {
+		throw new Error(`Refusing to write ${outputPath}: the staging file ${stagingPath} already exists; delete it and re-run`);
+	}
+	try {
+		fs.outputFileSync(stagingPath, patched);
+		verifyTerminalLabels(fs.readFileSync(stagingPath), `${outputPath} (staged)`, changes);
+		fs.renameSync(stagingPath, outputPath);
+	} catch (e) {
+		fs.removeSync(stagingPath);
+		throw e;
+	}
+
 	console.log(`Terminal labels applied. changed=${changes.length} unchanged=${unchanged} output=${outputPath}`);
 	return { pluginPath, outputPath, dryRun, written: true, changes, changed: changes.length, unchanged };
 }
 
-/** Re-reads the written plugin and proves every new label is there as NUL-terminated UTF-8. */
-function verifyWrittenLabels(outputPath: string, changes: TerminalLabelChange[]): void {
-	const written = fs.readFileSync(outputPath);
-	const groups = walkTopLevelGroups(written, `${outputPath} (written)`);
-	const records = collectTerminalRecords(written, groups, `${outputPath} (written)`);
+/** Re-walks a patched plugin and proves every new label is there as NUL-terminated UTF-8. */
+function verifyTerminalLabels(buffer: Buffer, label: string, changes: TerminalLabelChange[]): void {
+	const groups = walkTopLevelGroups(buffer, label);
+	const records = collectTerminalRecords(buffer, groups, label);
+	// Same lookup the patch path used, so a duplicate EDID cannot make the two disagree.
+	const byEdid = indexTerminalRecordsByEdid(records, label);
 
 	for (const change of changes) {
-		const record = records.find((candidate) => candidate.edid === change.edid);
-		const item = record?.items.find((candidate) => candidate.itid === change.itid);
+		const item = byEdid.get(change.edid)?.items.find((candidate) => candidate.itid === change.itid);
 		if (item === undefined) {
-			throw new Error(`Written plugin lost terminal record ${change.edid} ITID ${change.itid}`);
+			throw new Error(`${label} lost terminal record ${change.edid} ITID ${change.itid}`);
 		}
 		const expected = Buffer.concat([Buffer.from(change.after, "utf8"), Buffer.from([0])]);
-		if (!written.subarray(item.payloadStart, item.payloadEnd).equals(expected)) {
-			throw new Error(`Written plugin does not hold the expected label for ${change.edid} ITID ${change.itid}`);
+		if (!buffer.subarray(item.payloadStart, item.payloadEnd).equals(expected)) {
+			throw new Error(`${label} does not hold the expected label for ${change.edid} ITID ${change.itid}`);
 		}
 	}
 }
