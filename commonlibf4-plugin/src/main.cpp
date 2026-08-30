@@ -6,6 +6,7 @@
 #include "papyrus_lootman.h"
 #include "properties.h"
 #include "runtime_probe.h"
+#include "terminal_labels.h"
 #include "vendor_chest.h"
 
 #include <atomic>
@@ -69,6 +70,9 @@ void OnMessage(F4SE::MessagingInterface::Message* a_msg)
 		TraceLifecycleMessage(a_msg->type, "before_properties_initialize");
 		properties::Initialize();
 		TraceLifecycleMessage(a_msg->type, "after_properties_initialize");
+		// Resolves the config holotape pages, captures their shipped item text and
+		// registers the menu sink that refreshes the value shown in each label.
+		terminal_labels::Initialize();
 		injection_data::LoadInjectionData();
 		vendor_chest::Initialize();
 		constructible_object::Initialize();
@@ -78,9 +82,20 @@ void OnMessage(F4SE::MessagingInterface::Message* a_msg)
 	{
 		// Clear transient handles from the previous runtime before another save is loaded.
 		papyrus_lootman::OnPreLoadGame();
+		// Drops the config holotape label state that belongs to the outgoing session:
+		// queued refreshes, the cached page pointers and the property-cache readiness
+		// flag. The captured original item text is per-process and is kept.
+		terminal_labels::OnPreLoadGame();
 		// Drop any queued HUD messages so a backlog from the previous session
 		// cannot surface in the newly loaded game.
 		message_queue::Reset();
+	}
+	else if (a_msg->type == F4SE::MessagingInterface::kPostLoadGame)
+	{
+		// Re-resolves the config holotape pages that OnPreLoadGame() cleared. Needed
+		// because kGameLoaded fires once per process, not once per save load, so
+		// nothing else would resolve those pages again.
+		terminal_labels::OnPostLoadGame();
 	}
 	TraceLifecycleMessage(a_msg->type, "exit");
 }

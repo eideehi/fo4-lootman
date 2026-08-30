@@ -36,7 +36,28 @@ namespace properties
 		lootable_book_item_type,
 		lootable_misc_item_type,
 		lootable_weap_item_type,
+		enable_lootman,
+		display_system_message,
+		play_pickup_sound,
+		play_container_animation,
+		automatically_link_and_unlink_to_workshop,
+		unlock_locked_container,
 	};
+
+	// Bit layout of `enabled_looting_form_type_mask`. Declared here because the
+	// config holotape labels resolve each per-form-type toggle from the same mask.
+	inline constexpr int kEnableFormTypeACTI = 1;
+	inline constexpr int kEnableFormTypeALCH = 2;
+	inline constexpr int kEnableFormTypeAMMO = 4;
+	inline constexpr int kEnableFormTypeARMO = 8;
+	inline constexpr int kEnableFormTypeBOOK = 16;
+	inline constexpr int kEnableFormTypeCONT = 32;
+	inline constexpr int kEnableFormTypeFLOR = 64;
+	inline constexpr int kEnableFormTypeINGR = 128;
+	inline constexpr int kEnableFormTypeKEYM = 256;
+	inline constexpr int kEnableFormTypeMISC = 512;
+	inline constexpr int kEnableFormTypeNPC_ = 1024;
+	inline constexpr int kEnableFormTypeWEAP = 2048;
 
 	enum Type
 	{
@@ -63,6 +84,11 @@ namespace properties
 	};
 
 	Value Get(Key key);
+	// Whether the last full update actually read values out of the Papyrus
+	// property object. False while the quest, the VM, its script type or its bound
+	// object could not be reached: every cached value is then `null` and the typed
+	// accessors below hand out their caller's default instead of a real setting.
+	bool IsResolved();
 	// Typed accessors return fallback values when the cached type does not match.
 	bool GetBool(Key key, bool defaultValue = false);
 	int GetInt(Key key, int defaultValue = 0);

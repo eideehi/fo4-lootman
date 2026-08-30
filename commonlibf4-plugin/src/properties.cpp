@@ -131,18 +131,16 @@ namespace properties
 	std::shared_mutex lock;
 	std::unordered_map<Key, Value> papyrusProperties;
 
-	inline constexpr int kEnableFormTypeACTI = 1;
-	inline constexpr int kEnableFormTypeALCH = 2;
-	inline constexpr int kEnableFormTypeAMMO = 4;
-	inline constexpr int kEnableFormTypeARMO = 8;
-	inline constexpr int kEnableFormTypeBOOK = 16;
-	inline constexpr int kEnableFormTypeCONT = 32;
-	inline constexpr int kEnableFormTypeFLOR = 64;
-	inline constexpr int kEnableFormTypeINGR = 128;
-	inline constexpr int kEnableFormTypeKEYM = 256;
-	inline constexpr int kEnableFormTypeMISC = 512;
-	inline constexpr int kEnableFormTypeNPC_ = 1024;
-	inline constexpr int kEnableFormTypeWEAP = 2048;
+	// Whether the last full update actually reached the Papyrus property object.
+	// Read without `lock` because callers only need the outcome of the last full
+	// update, not a value snapshot consistent with it.
+	std::atomic<bool> valuesResolved{ false };
+
+	// The key the resolution check reads. It has to be a property that is copied
+	// straight out of the script object, so the witness reports the one read it
+	// stands for: an aggregate such as `enabled_looting_form_type_mask` folds
+	// twelve reads into a single value and would report those reads instead.
+	constexpr Key kResolutionWitness = enable_lootman;
 
 	bool GetPapyrusProperty(const char* propertyName, RE::BSScript::Variable& outValue)
 	{
@@ -244,25 +242,54 @@ namespace properties
 		return result;
 	}
 
+	// Packs the twelve per-form-type looting toggles into one integer. The
+	// aggregate is only worth as much as the reads behind it: a toggle that cannot
+	// be read carries no value, and folding it in as `false` would publish a
+	// resolved-looking mask whose bits are partly guesses. One failed read
+	// therefore leaves the whole mask unresolved, so every reader sees that the
+	// setting is unknown instead of reading a bit that was never actually read.
 	Value BuildEnabledLootingFormTypeMask()
 	{
+		bool allResolved = true;
+		int mask = 0;
+
+		const auto applyToggle = [&](const char* propertyName, const int bit) {
+			const auto toggle = GetBoolProperty(propertyName);
+			if (toggle.type != boolean)
+			{
+				allResolved = false;
+				return;
+			}
+			if (toggle.data.b)
+			{
+				mask |= bit;
+			}
+		};
+
+		applyToggle("EnableObjectLootingOfACTI", kEnableFormTypeACTI);
+		applyToggle("EnableObjectLootingOfALCH", kEnableFormTypeALCH);
+		applyToggle("EnableObjectLootingOfAMMO", kEnableFormTypeAMMO);
+		applyToggle("EnableObjectLootingOfARMO", kEnableFormTypeARMO);
+		applyToggle("EnableObjectLootingOfBOOK", kEnableFormTypeBOOK);
+		applyToggle("EnableObjectLootingOfCONT", kEnableFormTypeCONT);
+		applyToggle("EnableObjectLootingOfFLOR", kEnableFormTypeFLOR);
+		applyToggle("EnableObjectLootingOfINGR", kEnableFormTypeINGR);
+		applyToggle("EnableObjectLootingOfKEYM", kEnableFormTypeKEYM);
+		applyToggle("EnableObjectLootingOfMISC", kEnableFormTypeMISC);
+		applyToggle("EnableObjectLootingOfNPC_", kEnableFormTypeNPC_);
+		applyToggle("EnableObjectLootingOfWEAP", kEnableFormTypeWEAP);
+
 		Value result;
+		if (!allResolved)
+		{
+			// Left null on purpose. Readers that ask for the type see an unresolved
+			// value; readers that ask for a number get their own default, which is the
+			// same answer they already get before the first update publishes anything.
+			return result;
+		}
+
 		result.type = integer;
-		result.data.i = 0;
-
-		if (GetBoolProperty("EnableObjectLootingOfACTI").data.b) result.data.i |= kEnableFormTypeACTI;
-		if (GetBoolProperty("EnableObjectLootingOfALCH").data.b) result.data.i |= kEnableFormTypeALCH;
-		if (GetBoolProperty("EnableObjectLootingOfAMMO").data.b) result.data.i |= kEnableFormTypeAMMO;
-		if (GetBoolProperty("EnableObjectLootingOfARMO").data.b) result.data.i |= kEnableFormTypeARMO;
-		if (GetBoolProperty("EnableObjectLootingOfBOOK").data.b) result.data.i |= kEnableFormTypeBOOK;
-		if (GetBoolProperty("EnableObjectLootingOfCONT").data.b) result.data.i |= kEnableFormTypeCONT;
-		if (GetBoolProperty("EnableObjectLootingOfFLOR").data.b) result.data.i |= kEnableFormTypeFLOR;
-		if (GetBoolProperty("EnableObjectLootingOfINGR").data.b) result.data.i |= kEnableFormTypeINGR;
-		if (GetBoolProperty("EnableObjectLootingOfKEYM").data.b) result.data.i |= kEnableFormTypeKEYM;
-		if (GetBoolProperty("EnableObjectLootingOfMISC").data.b) result.data.i |= kEnableFormTypeMISC;
-		if (GetBoolProperty("EnableObjectLootingOfNPC_").data.b) result.data.i |= kEnableFormTypeNPC_;
-		if (GetBoolProperty("EnableObjectLootingOfWEAP").data.b) result.data.i |= kEnableFormTypeWEAP;
-
+		result.data.i = mask;
 		return result;
 	}
 
@@ -282,6 +309,11 @@ namespace properties
 		std::shared_lock<std::shared_mutex> guard(lock);
 		const auto it = papyrusProperties.find(key);
 		return it != papyrusProperties.end() ? it->second : Value();
+	}
+
+	bool IsResolved()
+	{
+		return valuesResolved.load(std::memory_order_acquire);
 	}
 
 	bool GetBool(const Key key, const bool defaultValue)
@@ -313,6 +345,7 @@ namespace properties
 		// LTMN_Properties is a fixed quest record in LootMan.esp; native code reads its script properties directly.
 		auto* quest = utility::LookupForm("LootMan.esp|000F9A");
 		propertiesQuest.store(quest, std::memory_order_release);
+		valuesResolved.store(false, std::memory_order_release);
 		{
 			std::unique_lock<std::shared_mutex> guard(lock);
 			papyrusProperties.clear();
@@ -484,6 +517,42 @@ namespace properties
 			updates[lootable_weap_item_type] = GetIntProperty(propertyName);
 		}
 
+		propertyName = "EnableLootMan";
+		if (updateAll || propertyName == updateProperty)
+		{
+			updates[enable_lootman] = GetBoolProperty(propertyName);
+		}
+
+		propertyName = "DisplaySystemMessage";
+		if (updateAll || propertyName == updateProperty)
+		{
+			updates[display_system_message] = GetBoolProperty(propertyName);
+		}
+
+		propertyName = "PlayPickupSound";
+		if (updateAll || propertyName == updateProperty)
+		{
+			updates[play_pickup_sound] = GetBoolProperty(propertyName);
+		}
+
+		propertyName = "PlayContainerAnimation";
+		if (updateAll || propertyName == updateProperty)
+		{
+			updates[play_container_animation] = GetBoolProperty(propertyName);
+		}
+
+		propertyName = "AutomaticallyLinkAndUnlinkToWorkshop";
+		if (updateAll || propertyName == updateProperty)
+		{
+			updates[automatically_link_and_unlink_to_workshop] = GetBoolProperty(propertyName);
+		}
+
+		propertyName = "UnlockLockedContainer";
+		if (updateAll || propertyName == updateProperty)
+		{
+			updates[unlock_locked_container] = GetBoolProperty(propertyName);
+		}
+
 		propertyName = "LootManWorkshopRef";
 		if (updateAll || propertyName == updateProperty)
 		{
@@ -495,6 +564,18 @@ namespace properties
 					"source=native component=properties event=native_property_resolution_failed script=LTMN2:Properties property=\"{}\"",
 					propertyName);
 			}
+		}
+
+		if (updateAll)
+		{
+			// A full update that could not reach the property object leaves every value
+			// null, and the typed accessors then return their caller's defaults. Record
+			// which of the two happened so readers can tell a real setting from a
+			// fallback.
+			const auto witness = updates.find(kResolutionWitness);
+			valuesResolved.store(
+				witness != updates.end() && witness->second.type != null,
+				std::memory_order_release);
 		}
 
 		if (updates.empty() && !updateLootManWorkshopRef)

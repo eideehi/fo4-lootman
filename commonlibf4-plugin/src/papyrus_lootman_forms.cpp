@@ -7,6 +7,7 @@
 
 #include "log_settings.h"
 #include "properties.h"
+#include "terminal_labels.h"
 
 namespace papyrus_lootman
 {
@@ -252,6 +253,21 @@ namespace papyrus_lootman
 
 	void OnUpdateLootManProperty(std::monostate, BSFixedString propertyName)
 	{
+		// Read before the update, on the Papyrus VM thread: this callback can begin
+		// before a save load and finish after it, and the values read below then
+		// belong to the outgoing session. Carrying the epoch the read started under
+		// lets the label module refuse to publish them for the incoming one.
+		const auto labelLoadEpoch = terminal_labels::CurrentLoadEpoch();
+
 		properties::Update(propertyName.c_str());
+
+		const auto* rawPropertyName = propertyName.c_str();
+		if (!rawPropertyName || *rawPropertyName == '\0')
+		{
+			// An empty name means Papyrus refreshed every property, so the native
+			// cache now holds the values the config holotape labels render.
+			terminal_labels::MarkPropertyCacheReady(labelLoadEpoch);
+		}
+		terminal_labels::RefreshAll(labelLoadEpoch);
 	}
 }

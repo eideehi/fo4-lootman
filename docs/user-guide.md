@@ -327,6 +327,27 @@ You can obtain the holotape two ways:
 
 The terminal's root menu, `LootMan Configuration`, has four pages.
 
+On the `General Settings`, `Object Looting Filters`, and `Log Level` pages, each
+item carries the current setting in square brackets after the item text, so you
+can read a setting's state without changing it. Toggles and numeric items append
+the value itself, for example `Toggle deliver to player [On]`,
+`Toggle pickup sound [Off]`, and `Looting range + [12.5]`, while the `Log Level`
+page marks the level in effect with `[*]`. The root menu and the
+`Utilities & System` page have no values to show, so their items stay plain
+text.
+
+The item text comes from the plugin language you chose in the installer, while
+`On` and `Off` follow the game's own language setting. These match on a normal
+install; on a mismatched setup, for example the English plugin with the game set
+to Japanese, the two halves of a label can appear in different languages.
+
+Each label shows the value the setting had when the page was drawn. Changing a
+setting from the holotape always draws the page again, so the value you just
+changed updates immediately. If you change a setting from the MCM while the
+terminal is already sitting on a page, that page keeps showing the value it was
+drawn with: back out to the root menu and open the page again, or close and
+reopen the holotape, to see the current value.
+
 **General Settings**
 
 | Terminal item | Effect |
@@ -349,6 +370,9 @@ The terminal's root menu, `LootMan Configuration`, has four pages.
 The `Looting range +` / `Looting range -` and `Carry weight +` / `Carry weight -`
 items step the same `Looting Range` and `Carry Weight` values as the MCM
 `General Settings` sliders. Select an item repeatedly to move the value in steps.
+Because each pair drives a single setting, both items in a pair show the same
+bracketed value: `Looting range + [12.5]` and `Looting range - [12.5]`,
+`Carry weight + [300]` and `Carry weight - [300]`.
 
 **Object Looting Filters**
 
@@ -368,11 +392,18 @@ the Object Filter on the MCM Looting page:
 - `Toggle corpses (NPC_)`
 - `Toggle weapons (WEAP)`
 
+Each toggle shows its own state in brackets, for example
+`Toggle containers (CONT) [On]`.
+
 **Log Level**
 
 Seven options set the native DLL log level, writing the same value as the MCM
 `Native Log Level` dropdown and `Data/F4SE/Plugins/LootMan/config.json`:
 `Trace`, `Debug`, `Info`, `Warn`, `Error`, `Critical`, `Off`.
+
+Exactly one option is marked with `[*]`, the level currently in effect, for
+example `Info [*]`; the other six show their plain text. Selecting a different
+level moves the mark.
 
 **Utilities & System**
 

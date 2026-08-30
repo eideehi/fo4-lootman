@@ -383,6 +383,8 @@ Function ToggleEnableLootMan()
     EndIf
 
     properties.EnableLootMan = !properties.EnableLootMan
+    ApplySettingSideEffects("EnableLootMan")
+
     If (properties.EnableLootMan)
         system.ShowMessageImmediate(system.MESSAGE_ENABLED)
     Else

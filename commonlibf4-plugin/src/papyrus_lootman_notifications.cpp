@@ -7,6 +7,7 @@
 #include "injection_data.h"
 #include "message_queue.h"
 #include "properties.h"
+#include "utility.h"
 
 namespace papyrus_lootman
 {
@@ -179,26 +180,6 @@ namespace papyrus_lootman
 		}
 	}
 
-	namespace
-	{
-		std::string FormatConfigFloat(float value)
-		{
-			std::string text = std::to_string(value);
-			if (text.find('.') != std::string::npos)
-			{
-				while (!text.empty() && text.back() == '0')
-				{
-					text.pop_back();
-				}
-				if (!text.empty() && text.back() == '.')
-				{
-					text.pop_back();
-				}
-			}
-			return text;
-		}
-	}
-
 	void ShowConfigBool(std::monostate, BSFixedString labelKey, bool value)
 	{
 		const std::string label(labelKey.c_str());
@@ -226,7 +207,7 @@ namespace papyrus_lootman
 		message_queue::EnqueueLocalizedText(
 			"$LTMN_CFG_LINE",
 			"[LootMan] {name}: {value}",
-			{{ "{name}", message_queue::ResolveText(label, label) }, { "{value}", FormatConfigFloat(value) }});
+			{{ "{name}", message_queue::ResolveText(label, label) }, { "{value}", utility::FormatConfigFloat(value) }});
 	}
 
 	void ShowConfigText(std::monostate, BSFixedString labelKey, BSFixedString valueKey)

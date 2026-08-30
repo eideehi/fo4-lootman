@@ -27,4 +27,12 @@ namespace message_queue
 	// Look up a translation key in the loaded language map; returns fallbackText if absent.
 	// Used to resolve reusable UI label keys (e.g. $PAGE_*) for composed messages.
 	std::string ResolveText(const std::string& translationKey, const std::string& fallbackText);
+
+	// Resolve a translation key the same way ResolveText does, then substitute every
+	// {token} in the resolved template in a single left-to-right pass. Used to compose
+	// localized text that is rendered somewhere other than the HUD queue.
+	std::string FormatLocalizedText(
+		const std::string& translationKey,
+		const std::string& fallbackText,
+		const std::vector<TextReplacement>& replacements);
 }

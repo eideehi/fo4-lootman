@@ -435,4 +435,13 @@ namespace message_queue
 		const auto it = translations.find(translationKey);
 		return it == translations.end() ? fallbackText : it->second;
 	}
+
+	std::string FormatLocalizedText(
+		const std::string& translationKey,
+		const std::string& fallbackText,
+		const std::vector<TextReplacement>& replacements)
+	{
+		const auto templateText = ResolveText(translationKey, fallbackText);
+		return SubstituteTokens(templateText, replacements);
+	}
 }

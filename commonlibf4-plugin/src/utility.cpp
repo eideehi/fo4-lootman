@@ -19,6 +19,23 @@ namespace utility
 		return result;
 	}
 
+	std::string FormatConfigFloat(const float value)
+	{
+		std::string text = std::to_string(value);
+		if (text.find('.') != std::string::npos)
+		{
+			while (!text.empty() && text.back() == '0')
+			{
+				text.pop_back();
+			}
+			if (!text.empty() && text.back() == '.')
+			{
+				text.pop_back();
+			}
+		}
+		return text;
+	}
+
 	RE::TESForm* LookupForm(const std::string& value)
 	{
 		// Expected format: "PluginName.esp|00ABCDEF" (hex form id, load-order independent).

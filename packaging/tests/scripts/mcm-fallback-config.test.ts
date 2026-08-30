@@ -12,6 +12,21 @@ function extractPapyrusFunction(source: string, name: string): string {
 	return match![1]!;
 }
 
+function readTranslationEntries(file: string): Map<string, string> {
+	const text = fs.readFileSync(path.resolve(file)).toString("utf16le").replace(/^\uFEFF/, "");
+	const entries = new Map<string, string>();
+	for (const line of text.split(/\r?\n/)) {
+		const tab = line.indexOf("\t");
+		if (tab > 0) {
+			entries.set(line.slice(0, tab), line.slice(tab + 1));
+		}
+	}
+	return entries;
+}
+
+const EN_TRANSLATION = "packaging/resources/lootman/en/Interface/Translations/LootMan_en.txt";
+const JA_TRANSLATION = "packaging/resources/lootman/ja/Interface/Translations/LootMan_ja.txt";
+
 const SYSTEM_SCRIPT = "papyrus/Scripts/Source/User/LTMN2/System.psc";
 const PATCH_SCRIPT = "papyrus/Scripts/Source/User/LTMN2/Patch.psc";
 const MCM_SCRIPT = "papyrus/Scripts/Source/User/LTMN2/MCM.psc";
@@ -85,6 +100,20 @@ describe("mcm fallback config delivery", () => {
 		expect(onChange).toContain('If (modName != "LootMan")');
 		expect(onChange, "wrapper must guard modName before delegating").toMatch(/modName != "LootMan"[\s\S]*Return[\s\S]*ApplySettingSideEffects\(id\)/);
 		expect(mcmScript).toContain("Function ApplySettingSideEffects(string id)");
+	});
+
+	it("applies the shared side effects only after flipping EnableLootMan", () => {
+		// The side-effect pass republishes the flipped value to the native cache and
+		// refreshes the terminal labels, so it has to run on the new value. Ordering is
+		// checked by position inside the function body -- a `contains` would still pass
+		// if the call ran before the flip. The body ends at EndFunction, so a call
+		// found here is also necessarily inside the function.
+		const toggle = extractPapyrusFunction(mcmScript, "ToggleEnableLootMan");
+		const flipIndex = toggle.indexOf("properties.EnableLootMan = !properties.EnableLootMan");
+		const applyIndex = toggle.indexOf('ApplySettingSideEffects("EnableLootMan")');
+		expect(flipIndex, "ToggleEnableLootMan must flip the stored property").toBeGreaterThanOrEqual(0);
+		expect(applyIndex, "ToggleEnableLootMan must apply the shared side effects").toBeGreaterThanOrEqual(0);
+		expect(applyIndex, "side effects must run after the flip, not before").toBeGreaterThan(flipIndex);
 	});
 
 	it("keeps packed-bitmask ids out of the absolute SetBool path", () => {
@@ -212,17 +241,7 @@ describe("mcm fallback config delivery", () => {
 		expect(labelByProperty.size, "MCM config parsed no settings").toBeGreaterThan(20);
 
 		// Keys present in the shipped English translation.
-		const enKeys = new Set<string>();
-		const enText = fs
-			.readFileSync(path.resolve("packaging/resources/lootman/en/Interface/Translations/LootMan_en.txt"))
-			.toString("utf16le")
-			.replace(/^﻿/, "");
-		for (const line of enText.split(/\r?\n/)) {
-			const tab = line.indexOf("\t");
-			if (tab > 0) {
-				enKeys.add(line.slice(0, tab));
-			}
-		}
+		const enKeys = new Set(readTranslationEntries(EN_TRANSLATION).keys());
 
 		// Every GetLabelKey mapping must resolve in the translation file and, where the
 		// MCM binds the same id, must equal the MCM's label key (no stale/forked labels).
@@ -243,6 +262,22 @@ describe("mcm fallback config delivery", () => {
 		const logLevelValueKey = extractPapyrusFunction(configScript, "LogLevelValueKey");
 		for (const [, key] of logLevelValueKey.matchAll(/Return\s+"(\$[^"]+)"/gi)) {
 			expect(enKeys.has(key!), `LogLevelValueKey ${key} is missing from LootMan_en.txt`).toBe(true);
+		}
+	});
+
+	it("ships the terminal label templates unchanged in both translations", () => {
+		// The native label composer substitutes {name} and {value} into these lines. A
+		// reworded or renamed placeholder would leave the substitution token visible on
+		// the holotape page, so both locales must carry the exact template text.
+		const templates: Array<[string, string]> = [
+			["$LTMN_CFG_ITEM_LABEL", "{name} [{value}]"],
+			["$LTMN_CFG_ITEM_SELECTED", "{name} [*]"],
+		];
+		for (const file of [EN_TRANSLATION, JA_TRANSLATION]) {
+			const entries = readTranslationEntries(file);
+			for (const [key, value] of templates) {
+				expect(entries.get(key), `${file} must define ${key}`).toBe(value);
+			}
 		}
 	});
 });
