@@ -2295,6 +2295,18 @@ namespace papyrus_lootman
 		{
 			return {};
 		}
+		if (LinkedCountCoversRememberedLootManWorkshop(true))
+		{
+			// EvaluateWorkshopResourceStatusCall always queries with includeLinked=true.
+			// When the shared-container hook installed, the vanilla engine's own
+			// includeLinked walk already covers the LootMan-linked workshop, so
+			// ComposeRememberedWorkshopComponentCount can never set applied=true here
+			// (see its own early return above). Skip the per-material loop instead of
+			// paying for an O(container size) engine walk per required component whose
+			// result can never change the outcome - this was the dominant cost behind
+			// the settlement build-menu scroll lag (GitHub issue #17).
+			return {};
+		}
 
 		WorkshopResourceStatusEvaluationContext context;
 		context.selectedRecipe = selectedRecipe;
@@ -3434,6 +3446,18 @@ namespace papyrus_lootman
 			targetForm.formType == static_cast<std::uint32_t>(ENUM_FORM_ID::kMISC);
 		if (!targetIsComponent && !targetIsDirectItem)
 		{
+			return plan;
+		}
+
+		if (LinkedCountCoversRememberedLootManWorkshop(includeLinked))
+		{
+			// Mirrors the EvaluateWorkshopResourceStatus guard: when includeLinked is
+			// true and the shared-container hook installed, the vanilla engine's own
+			// walk already covers the LootMan-linked workshop, so no supplemental
+			// removal can ever apply here. Skip the per-component walk. Note this
+			// function is also called with includeLinked=false (HookedRemoveComponents
+			// forwarding the engine's own value) - in that case this guard must NOT
+			// fire, and the plan must still be computed normally.
 			return plan;
 		}
 

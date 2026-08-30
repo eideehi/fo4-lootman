@@ -367,4 +367,39 @@ describe("workshop runtime state policy", () => {
 		expect(userGuide).toContain("MCM uninstall clears LootMan runtime state");
 		expect(userGuide).toMatch(/cannot remove those already-loaded\s+static workshop menu records/);
 	});
+
+	it("skips the per-material workshop resource walk once the shared-container hook already covers it", () => {
+		const evaluateStatus = extractCppFunction(
+			hooksSource,
+			"WorkshopResourceStatusEvaluation EvaluateWorkshopResourceStatus(",
+		);
+		expectAllAfter(evaluateStatus, "if (!CanUseWorkshopMaterialAugmentation())", [
+			"LinkedCountCoversRememberedLootManWorkshop(true)",
+		]);
+		expectBefore(
+			evaluateStatus,
+			"LinkedCountCoversRememberedLootManWorkshop(true)",
+			"ExecuteSehCallSafe(&EvaluateWorkshopResourceStatusCall, &context)",
+		);
+
+		const consumptionPlan = extractCppFunction(
+			hooksSource,
+			"WorkshopMaterialConsumptionPlan BuildRememberedWorkshopMaterialConsumptionPlan(",
+		);
+		expect(consumptionPlan).toContain("LinkedCountCoversRememberedLootManWorkshop(includeLinked)");
+		expect(consumptionPlan).not.toMatch(/LinkedCountCoversRememberedLootManWorkshop\(true\)/);
+		expectAllAfter(consumptionPlan, "requestedCount == 0", [
+			"LinkedCountCoversRememberedLootManWorkshop(includeLinked)",
+		]);
+		expectBefore(
+			consumptionPlan,
+			"LinkedCountCoversRememberedLootManWorkshop(includeLinked)",
+			"ResolveActiveRememberedWorkshopForOwner(owner)",
+		);
+		expectBefore(
+			consumptionPlan,
+			"LinkedCountCoversRememberedLootManWorkshop(includeLinked)",
+			"addComponentRemoval = [&]",
+		);
+	});
 });
