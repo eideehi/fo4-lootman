@@ -295,6 +295,48 @@ limit (it failed too), and it changes auto-assigned object IDs into the high
 range (which is what exposed the `SetObjID` mask bug). So flag-stripping is a
 real technique, but it was not the fix for self-references.
 
+## Scripts cannot write non-Latin-1 text (e.g. Japanese) into a string field
+
+A `-script` cannot put Japanese (or any non-Latin-1 text) into a plugin string
+field such as `TERM:ITXT` on this build (FO4Script 4.1.5f). Five approaches were
+tried against a scratch stage and every one was ruled out by the saved bytes:
+
+| Approach | Result |
+| --- | --- |
+| UTF-8 Japanese literal in the `.pas` source | Does not compile. The parser reads source as the system ANSI code page. |
+| `#$XXXX` character constants | `Expression expected but '#' found` -- the engine does not support that syntax. |
+| `Chr($XXXX)` with a code point | Silently truncates to 8 bits: `Chr($6B66)` wrote `f` (`$66`). |
+| `Chr($XX)` emitting UTF-8 bytes | Double-encoded on save. |
+| `Chr($XX)` emitting CP932 bytes plus `-l:ja` | Same double-encoding; `-l:ja` sets "Using language: ja" but leaves **general string encoding: 1252**. |
+
+The pipeline is: the script's 8-bit string is decoded with the **general** string
+encoding (1252, Latin-1 in practice) and re-encoded with the **translatable**
+encoding (UTF-8) on save. Sending `E6 AD A6 E5 99 A8` (UTF-8 for a two-kanji
+word) stored `C3 A6 C2 AD C2 A6 C3 A5 C2 99 C2 A8`. That transform is not
+invertible for text outside Latin-1: reaching the required bytes would mean
+sending a code point above `$FF`, which an 8-bit string cannot hold.
+
+`-cp:` / `-cp-trans:` set only the **translatable** codepage (the binary's own
+help says so). No flag was found that changes the general codepage, so the
+Latin-1 leg of the pipeline cannot be removed.
+
+Two consequences:
+
+- **`GetElementEditValues` on a Japanese field returns mojibake**, because the
+  read uses that same general codepage. Comparing it against a correctly built
+  string never matches, so **select records and items by a stable key such as
+  `ITID`, never by their current localized text.** (Read-modify-write of the same
+  field is still byte-transparent, so trimming an existing string with `Copy` and
+  writing it back does work -- it never leaves the 8-bit domain.)
+- **Localized text edits belong in xTranslator**, driven by the
+  `translation/Lootman_en_ja.xml` source, not in an xEdit script.
+
+Two of these failures are invisible without watching the GUI: a source-encoding
+compile error and an unsupported-syntax error both appear **only in a modal
+dialog** and never reach the `-R:` log, which simply ends after
+`Background Loader: finished`. If a script produces no output and no error, look
+for a dialog before suspecting the arguments.
+
 ## try/except keeps long scripts alive
 
 DWScript supports `try ... except ... end`. Wrap risky steps so a long

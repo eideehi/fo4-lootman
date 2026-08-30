@@ -197,61 +197,61 @@
       <EDID>LTMN_TERM_ConfigGeneral</EDID>
       <REC id="0">TERM:ITXT</REC>
       <Source>Toggle LootMan</Source>
-      <Dest>LootMan の切替</Dest>
+      <Dest>LootMan</Dest>
     </String>
     <String List="0">
       <EDID>LTMN_TERM_ConfigGeneral</EDID>
       <REC id="1">TERM:ITXT</REC>
       <Source>Toggle system messages</Source>
-      <Dest>システムメッセージの切替</Dest>
+      <Dest>システムメッセージ</Dest>
     </String>
     <String List="0">
       <EDID>LTMN_TERM_ConfigGeneral</EDID>
       <REC id="2">TERM:ITXT</REC>
       <Source>Toggle pickup sound</Source>
-      <Dest>効果音の切替</Dest>
+      <Dest>効果音</Dest>
     </String>
     <String List="0">
       <EDID>LTMN_TERM_ConfigGeneral</EDID>
       <REC id="3">TERM:ITXT</REC>
       <Source>Toggle container animation</Source>
-      <Dest>コンテナアニメの切替</Dest>
+      <Dest>コンテナアニメーション</Dest>
     </String>
     <String List="0">
       <EDID>LTMN_TERM_ConfigGeneral</EDID>
       <REC id="4">TERM:ITXT</REC>
       <Source>Toggle ignore overweight</Source>
-      <Dest>重量オーバー無視の切替</Dest>
+      <Dest>重量オーバーを無視</Dest>
     </String>
     <String List="0">
       <EDID>LTMN_TERM_ConfigGeneral</EDID>
       <REC id="5">TERM:ITXT</REC>
       <Source>Toggle deliver to player</Source>
-      <Dest>プレイヤーへ渡すの切替</Dest>
+      <Dest>プレイヤーへ渡す</Dest>
     </String>
     <String List="0">
       <EDID>LTMN_TERM_ConfigGeneral</EDID>
       <REC id="6">TERM:ITXT</REC>
       <Source>Toggle silent looting</Source>
-      <Dest>サイレント収集の切替</Dest>
+      <Dest>取得メッセージを隠す</Dest>
     </String>
     <String List="0">
       <EDID>LTMN_TERM_ConfigGeneral</EDID>
       <REC id="7">TERM:ITXT</REC>
       <Source>Toggle no looting in settlement</Source>
-      <Dest>居住地で収集しないの切替</Dest>
+      <Dest>居住地では収集しない</Dest>
     </String>
     <String List="0">
       <EDID>LTMN_TERM_ConfigGeneral</EDID>
       <REC id="8">TERM:ITXT</REC>
       <Source>Toggle auto workshop link</Source>
-      <Dest>ワークショップ自動リンクの切替</Dest>
+      <Dest>ワークショップ自動リンク</Dest>
     </String>
     <String List="0">
       <EDID>LTMN_TERM_ConfigGeneral</EDID>
       <REC id="9">TERM:ITXT</REC>
       <Source>Toggle unlock containers</Source>
-      <Dest>コンテナ解錠の切替</Dest>
+      <Dest>施錠コンテナを解錠</Dest>
     </String>
     <String List="0">
       <EDID>LTMN_TERM_ConfigGeneral</EDID>
@@ -287,73 +287,73 @@
       <EDID>LTMN_TERM_ConfigObjectFilter</EDID>
       <REC id="0">TERM:ITXT</REC>
       <Source>Toggle activators (ACTI)</Source>
-      <Dest>アクティベーター (ACTI) の切替</Dest>
+      <Dest>アクティベーター (ACTI)</Dest>
     </String>
     <String List="0">
       <EDID>LTMN_TERM_ConfigObjectFilter</EDID>
       <REC id="1">TERM:ITXT</REC>
       <Source>Toggle aid (ALCH)</Source>
-      <Dest>薬品・食料 (ALCH) の切替</Dest>
+      <Dest>薬品・食料 (ALCH)</Dest>
     </String>
     <String List="0">
       <EDID>LTMN_TERM_ConfigObjectFilter</EDID>
       <REC id="2">TERM:ITXT</REC>
       <Source>Toggle ammo (AMMO)</Source>
-      <Dest>弾薬 (AMMO) の切替</Dest>
+      <Dest>弾薬 (AMMO)</Dest>
     </String>
     <String List="0">
       <EDID>LTMN_TERM_ConfigObjectFilter</EDID>
       <REC id="3">TERM:ITXT</REC>
       <Source>Toggle armor (ARMO)</Source>
-      <Dest>防具 (ARMO) の切替</Dest>
+      <Dest>防具 (ARMO)</Dest>
     </String>
     <String List="0">
       <EDID>LTMN_TERM_ConfigObjectFilter</EDID>
       <REC id="4">TERM:ITXT</REC>
       <Source>Toggle books (BOOK)</Source>
-      <Dest>本 (BOOK) の切替</Dest>
+      <Dest>本 (BOOK)</Dest>
     </String>
     <String List="0">
       <EDID>LTMN_TERM_ConfigObjectFilter</EDID>
       <REC id="5">TERM:ITXT</REC>
       <Source>Toggle containers (CONT)</Source>
-      <Dest>コンテナ (CONT) の切替</Dest>
+      <Dest>コンテナ (CONT)</Dest>
     </String>
     <String List="0">
       <EDID>LTMN_TERM_ConfigObjectFilter</EDID>
       <REC id="6">TERM:ITXT</REC>
       <Source>Toggle flora (FLOR)</Source>
-      <Dest>植物 (FLOR) の切替</Dest>
+      <Dest>植物 (FLOR)</Dest>
     </String>
     <String List="0">
       <EDID>LTMN_TERM_ConfigObjectFilter</EDID>
       <REC id="7">TERM:ITXT</REC>
       <Source>Toggle ingredients (INGR)</Source>
-      <Dest>材料 (INGR) の切替</Dest>
+      <Dest>材料 (INGR)</Dest>
     </String>
     <String List="0">
       <EDID>LTMN_TERM_ConfigObjectFilter</EDID>
       <REC id="8">TERM:ITXT</REC>
       <Source>Toggle keys (KEYM)</Source>
-      <Dest>鍵 (KEYM) の切替</Dest>
+      <Dest>鍵 (KEYM)</Dest>
     </String>
     <String List="0">
       <EDID>LTMN_TERM_ConfigObjectFilter</EDID>
       <REC id="9">TERM:ITXT</REC>
       <Source>Toggle misc (MISC)</Source>
-      <Dest>ジャンク・モジュール (MISC) の切替</Dest>
+      <Dest>ジャンク・モジュール (MISC)</Dest>
     </String>
     <String List="0">
       <EDID>LTMN_TERM_ConfigObjectFilter</EDID>
       <REC id="10">TERM:ITXT</REC>
       <Source>Toggle corpses (NPC_)</Source>
-      <Dest>死体 (NPC_) の切替</Dest>
+      <Dest>死体 (NPC_)</Dest>
     </String>
     <String List="0">
       <EDID>LTMN_TERM_ConfigObjectFilter</EDID>
       <REC id="11">TERM:ITXT</REC>
       <Source>Toggle weapons (WEAP)</Source>
-      <Dest>武器 (WEAP) の切替</Dest>
+      <Dest>武器 (WEAP)</Dest>
     </String>
     <String List="0">
       <EDID>LTMN_TERM_ConfigLogLevel</EDID>
