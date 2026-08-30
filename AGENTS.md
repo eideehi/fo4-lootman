@@ -90,6 +90,8 @@ Hard rules:
 - Native-hook/Ghidra tests: `pnpm run test:tools`
 - Release build: `pnpm run package:build`
 - DLL-only verification: `pnpm run package:build -- --no-papyrus`
+- Deploy product build: `pnpm run package:deploy`
+- Deploy debug build: `pnpm run package:deploy:dev`
 - Native-hook generation: `pnpm run native-hooks:generate`
 - Native-hook verification: `pnpm run native-hooks:verify`
 - Non-writing native-hook resolver: `pnpm run native-hooks:resolve`

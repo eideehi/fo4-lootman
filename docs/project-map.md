@@ -30,6 +30,8 @@ pnpm run test:packaging
 pnpm run test:tools
 pnpm run package:build
 pnpm run package:build -- --no-papyrus
+pnpm run package:deploy
+pnpm run package:deploy:dev
 pnpm run native-hooks:generate
 pnpm run native-hooks:verify
 pnpm run native-hooks:resolve

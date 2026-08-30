@@ -56,8 +56,8 @@ $locale = '<locale>'
 $stageName = 'stage-' + $locale
 $stageDir = Join-Path $workspace ('tools\xedit\' + $stageName)
 $scriptsDir = Join-Path $workspace 'tools\xedit'
-$logPath = Join-Path $workspace ('tools\xedit\' + $stageName + '-remove.log')
-$scriptName = 'RemoveUnusedProperties.pas'
+$logPath = Join-Path $workspace ('tools\xedit\' + $stageName + '-run.log')
+$scriptName = 'DumpWorkerManagerVMAD.pas'
 $targetPlugin = 'LootMan.esp'
 
 Start-Process -FilePath $xEditExe -WindowStyle Minimized -ArgumentList @(
@@ -82,14 +82,29 @@ Switch meanings:
 
 ## Scripts
 
-These scripts are expected under `tools/xedit/`.
+`tools/xedit/` does not hold a fixed, permanent script inventory. Most
+cleanup passes are done with single-use list/dump/remove `.pas` scripts
+written for that specific pass, then deleted once the resulting plugin
+change is validated and committed (for example, the mutation script for the
+worker-manager cleanup below was dropped after its one-time job completed;
+see commit `2fb51cd`). The `ListLoadedFiles.pas`, `ListLootManQuests.pas`,
+`DumpLootManProperties.pas`, and `RemoveUnusedProperties.pas` scripts
+formerly referenced here followed the same pattern and no longer exist in
+the repo. If you need that behavior again, write a new script of the same
+shape rather than expecting a durable copy to be present.
 
-- `ListLoadedFiles.pas`
-- `ListLootManQuests.pas`
-- `DumpLootManProperties.pas`
-- `RemoveUnusedProperties.pas`
+Any new or historical script name should not depend on a hardcoded plugin
+path.
 
-The historical filenames should not depend on a hardcoded plugin path.
+`tools/xedit/DumpWorkerManagerVMAD.pas` is a reusable, read-only exception to
+that pattern. It dumps the full VMAD element tree, attached script list, and
+property list for the twelve `LTMN_WorkerManager{ACTI,ALCH,AMMO,ARMO,BOOK,
+CONT,FLOR,INGR,KEYM,MISC,NPC_,WEAP}` quest records (form range
+`01000F9C`-`01000FA7`) from a `stage-en` or `stage-ja` directory, after
+validating that only `Fallout4.esm` and `LootMan.esp` (plus the xEdit-exposed
+`Fallout4.exe` runtime module, when present) are loaded. It writes a
+timestamped report file under `tools/xedit/` and makes no plugin edits. See
+"Worker-Manager Self-Reference Removal" below.
 
 ## Verified Quest IDs
 
@@ -99,7 +114,10 @@ The historical filenames should not depend on a hardcoded plugin path.
 
 Do not rename the plugin or compact/reassign these FormIDs.
 
-## Safe VMAD Removals For 3.0.0
+## Safe VMAD Removals
+
+This list is cumulative across releases: entries are added as further
+properties are validated for removal, and it is not tied to one version.
 
 Only these `LTMN2:Properties` VMAD properties are validated for removal:
 
@@ -111,13 +129,67 @@ Only these `LTMN2:Properties` VMAD properties are validated for removal:
 - `Locksmith04`
 - `ObjectTypeLooseMod`
 
-Do not remove these yet:
+None of the above have been removed yet: `papyrus/Scripts/Source/User/LTMN2/Properties.psc`
+still declares all seven as `auto const mandatory`, and all seven still
+appear in the compiled `LTMN_Properties` VMAD in both
+`packaging/resources/lootman/en/LootMan.esp` and
+`packaging/resources/lootman/ja/LootMan.esp`. This list only records what is
+safe to remove once that cleanup pass is actually run.
+
+Do not remove yet:
+
+- `WorkerManagerACTI` through `WorkerManagerWEAP` - these are `LTMN2:System`
+  properties declared on `LTMN_System` (not `LTMN2:Properties`), still
+  `auto const mandatory` in `System.psc`, still present in both compiled
+  plugins, and still actively read (`System.psc` calls `.Stop()` on each).
+  They are in active use, not merely unvalidated for removal.
+
+Already removed in a previous pass (kept here as a record; there is nothing
+left to remove for these):
 
 - `MaxWorkerThreads*`
 - `ActiveWorkerThreads*`
 - `TurboMode*`
-- `WorkerManagerACTI` through `WorkerManagerWEAP`
-- `DeliveredToPlayerWithoutLogs`
+
+None of these three appear anywhere in `papyrus/Scripts/Source/` or in
+either compiled `LootMan.esp` anymore.
+
+`DeliveredToPlayerWithoutLogs` is a special case: the Papyrus property
+declaration is intentionally kept in `Properties.psc` ("Legacy property kept
+so existing saves can migrate their setting") and is read and written by
+`Patch.psc` for save migration, but it no longer appears in either compiled
+plugin's VMAD. Do not delete the Papyrus declaration or the `Patch.psc`
+migration code; there is no VMAD entry left to remove.
+
+## Worker-Manager Self-Reference Removal
+
+Distinct from the `LTMN2:Properties` safe-removal list above. Validated by
+commit `2fb51cd` (`git show 2fb51cd` for the full description) and already
+applied to both localized plugins.
+
+This class removes an obsolete quest-level self-reference `Object` property
+(for example, the property on `LTMN_WorkerManagerACTI`'s manager script that
+pointed back at `LTMN_WorkerManagerACTI` itself) from each of the twelve
+inert legacy `LTMN_WorkerManager{ACTI,ALCH,AMMO,ARMO,BOOK,CONT,FLOR,INGR,
+KEYM,MISC,NPC_,WEAP}` quest records (form range `01000F9C`-`01000FA7`).
+
+Validation required before mutation:
+
+- (a) The target manager script declares no Papyrus properties at all (see
+  e.g. `papyrus/Scripts/Source/User/LTMN2/Looting/WorkerManagerACTI.psc`), so
+  the compiled VMAD property is a true orphan.
+- (b) The record's VMAD header version, object format, and attached-script
+  count match an expected shape. Abort before mutation if any record
+  differs.
+- (c) The removal is done as validate -> rebuild-from-clean-donor ->
+  re-validate, not in-place property deletion, because this xEdit build does
+  not reliably persist in-place VMAD property removal.
+- (d) Donor records are rotated so every rebuilt record is rebuilt from an
+  already-validated-clean donor.
+
+`tools/xedit/DumpWorkerManagerVMAD.pas` is the read-only inspection tool for
+this class; use it to re-verify record state before and after a mutation
+pass, and see "Scripts" above for what it dumps.
 
 ## Save Behavior
 
@@ -136,7 +208,12 @@ Expected successful log lines include:
 
 After each scripted cleanup:
 
-1. Re-run `DumpLootManProperties.pas` against the same staged directory.
+1. Re-run a read-only dump script against the same staged directory to
+   confirm the change. For the worker-manager self-reference removal class,
+   use `tools/xedit/DumpWorkerManagerVMAD.pas`. For other VMAD property
+   removals, write a dump script following the same read-only pattern (the
+   original `DumpLootManProperties.pas` no longer exists in the repo; see
+   "Scripts" above).
 2. Confirm the dump no longer contains the safe-removal names.
 3. Confirm these remaining properties are still present:
    - `ActivatorRef`
