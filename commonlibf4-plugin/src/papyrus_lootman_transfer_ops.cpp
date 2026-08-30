@@ -1,9 +1,6 @@
 #include "papyrus_lootman_internal.h"
 
-#include "runtime_probe.h"
-
 #include <algorithm>
-#include <atomic>
 #include <cstdint>
 #include <optional>
 #include <utility>
@@ -11,12 +8,6 @@
 namespace papyrus_lootman
 {
 	using namespace RE;
-
-	namespace
-	{
-		std::atomic<std::uint32_t> inventoryProbeRecords{ 0 };
-		constexpr std::uint32_t kInventoryProbeRecordLimit = 512;
-	}
 
 	struct ExtraCountData : BSExtraData
 	{
@@ -291,125 +282,6 @@ namespace papyrus_lootman
 			stackIndex
 		};
 		return ExecuteSehCallSafe(&InvokeRemoveScrapSourceCall, &context);
-	}
-
-	void TraceInventoryStackSnapshot(
-		TESObjectREFR* owner,
-		TESBoundObject* object,
-		std::optional<std::uint32_t> stackIndex,
-		std::uintptr_t expectedStackIdentity,
-		std::int32_t snapshotCount,
-		std::int32_t requestedCount,
-		const char* operation,
-		const char* mode)
-	{
-		if (!runtime_probe::IsEnabled())
-		{
-			return;
-		}
-
-		if (!runtime_probe::TryReserve(inventoryProbeRecords, kInventoryProbeRecordLimit))
-		{
-			return;
-		}
-
-		const char* outcome = "invalid_request";
-		std::int32_t observedCount = 0;
-		bool identityMatch = false;
-		bool entryProbeFailed = false;
-		if (owner && object && stackIndex && expectedStackIdentity != 0)
-		{
-			auto* inventoryList = owner->inventoryList;
-			if (!inventoryList)
-			{
-				outcome = "inventory_missing";
-			}
-			else
-			{
-				ReadLockGuard guard(inventoryList->rwLock);
-				std::uint32_t itemCount = 0;
-				if (!TryGetInventoryItemCountSafe(inventoryList, itemCount))
-				{
-					outcome = "item_count_probe_failed";
-				}
-				else
-				{
-					outcome = "item_missing";
-					for (std::uint32_t itemIndex = 0; itemIndex < itemCount; ++itemIndex)
-					{
-						TESForm* entryForm = nullptr;
-						BGSInventoryItem::Stack* stack = nullptr;
-						if (!TryGetInventoryEntrySafe(inventoryList, itemIndex, entryForm, stack))
-						{
-							entryProbeFailed = true;
-							continue;
-						}
-						if (entryForm != object)
-						{
-							continue;
-						}
-
-						std::uint32_t currentIndex = 0;
-						while (stack && currentIndex < *stackIndex)
-						{
-							BGSInventoryItem::Stack* nextStack = nullptr;
-							if (!TryGetNextStackSafe(stack, nextStack))
-							{
-								outcome = "stack_link_probe_failed";
-								stack = nullptr;
-								break;
-							}
-							stack = nextStack;
-							++currentIndex;
-						}
-
-						if (!stack)
-						{
-							if (outcome != "stack_link_probe_failed"sv)
-							{
-								outcome = "stack_missing";
-							}
-							break;
-						}
-
-						identityMatch = reinterpret_cast<std::uintptr_t>(stack) == expectedStackIdentity;
-						InventoryItemInfo currentInfo{};
-						if (!TryBuildFallbackStackInfoSafe(*stack, currentInfo))
-						{
-							outcome = "stack_info_probe_failed";
-						}
-						else
-						{
-							observedCount = currentInfo.totalCount;
-							outcome = identityMatch ?
-								(observedCount == snapshotCount ? "match" : "count_changed") :
-								"identity_mismatch";
-						}
-						break;
-					}
-					if (outcome == "item_missing"sv && entryProbeFailed)
-					{
-						outcome = "entry_probe_failed";
-					}
-				}
-			}
-		}
-
-		const auto sequence = runtime_probe::NextSequence();
-		REX::TRACE(
-			"source=native component=runtime_probe event=stack_snapshot_recheck probe_schema=1 ordering=reservation_only seq={} thread_id={} operation={} mode={} owner={:08X} item={:08X} stack={} snapshot_count={} requested_count={} observed_count={} identity_match={} outcome={}",
-			sequence,
-			REX::W32::GetCurrentThreadId(),
-			operation ? operation : "unknown",
-			mode ? mode : "unknown",
-			owner ? owner->formID : 0,
-			object ? object->formID : 0,
-			stackIndex ? static_cast<std::int32_t>(*stackIndex) : -1,
-			snapshotCount,
-			requestedCount,
-			observedCount,
-			identityMatch,
-			outcome);
 	}
 
 	struct TransferExtraPresenceCallContext

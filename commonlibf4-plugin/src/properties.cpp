@@ -1,5 +1,4 @@
 #include "properties.h"
-#include "runtime_probe.h"
 #include "utility.h"
 
 #include <atomic>
@@ -7,120 +6,6 @@
 
 namespace properties
 {
-	namespace
-	{
-		std::atomic<std::uint64_t> propertyProbeEpoch{ 0 };
-		std::atomic<std::uint32_t> propertyProbeRecords{ 0 };
-		std::atomic<std::uint32_t> activePropertyUpdates{ 0 };
-		std::atomic<std::uint32_t> activePropertyCopies{ 0 };
-		thread_local std::uint64_t currentPropertyUpdateEpoch = 0;
-		thread_local bool currentPropertyProbeSession = false;
-		constexpr std::uint32_t kPropertyProbeRecordLimit = 256;
-
-		bool ReservePropertyProbeRecord(std::uint64_t& sequence)
-		{
-			if (!runtime_probe::TryReserve(propertyProbeRecords, kPropertyProbeRecordLimit))
-			{
-				return false;
-			}
-			sequence = runtime_probe::NextSequence();
-			return true;
-		}
-
-		void TracePropertyProbe(
-			const char* event,
-			const char* property,
-			std::uint64_t epoch,
-			std::uint32_t activeUpdates,
-			std::uint32_t activeCopies,
-			const char* result)
-		{
-			std::uint64_t sequence = 0;
-			if (!ReservePropertyProbeRecord(sequence))
-			{
-				return;
-			}
-			REX::TRACE(
-				"source=native component=runtime_probe event={} probe_schema=1 ordering=reservation_only seq={} thread_id={} update_epoch={} active_updates_snapshot={} active_copies_snapshot={} property={} result={}",
-				event,
-				sequence,
-				REX::W32::GetCurrentThreadId(),
-				epoch,
-				activeUpdates,
-				activeCopies,
-				property,
-				result);
-		}
-
-		class PropertyUpdateProbeScope
-		{
-		public:
-			explicit PropertyUpdateProbeScope(bool updateAll) :
-				enabled(runtime_probe::IsEnabled()),
-				previousEpoch(currentPropertyUpdateEpoch),
-				previousSession(currentPropertyProbeSession)
-			{
-				if (!enabled)
-				{
-					return;
-				}
-				epoch = propertyProbeEpoch.fetch_add(1, std::memory_order_relaxed) + 1;
-				currentPropertyUpdateEpoch = epoch;
-				currentPropertyProbeSession = true;
-				const auto active = activePropertyUpdates.fetch_add(1, std::memory_order_acq_rel) + 1;
-				TracePropertyProbe("property_update", updateAll ? "all" : "named", epoch, active,
-					activePropertyCopies.load(std::memory_order_acquire), "enter");
-			}
-
-			~PropertyUpdateProbeScope()
-			{
-				if (!enabled)
-				{
-					return;
-				}
-				const auto active = activePropertyUpdates.fetch_sub(1, std::memory_order_acq_rel) - 1;
-				TracePropertyProbe("property_update", "none", epoch, active,
-					activePropertyCopies.load(std::memory_order_acquire), "exit");
-				currentPropertyUpdateEpoch = previousEpoch;
-				currentPropertyProbeSession = previousSession;
-			}
-
-		private:
-			bool enabled = false;
-			std::uint64_t epoch = 0;
-			std::uint64_t previousEpoch = 0;
-			bool previousSession = false;
-		};
-
-		class PropertyCopyProbeScope
-		{
-		public:
-			explicit PropertyCopyProbeScope(
-				std::uint32_t& outActiveUpdatesAtEnter,
-				std::uint32_t& outActiveCopiesAtEnter) :
-				enabled(currentPropertyProbeSession)
-			{
-				if (enabled)
-				{
-					outActiveUpdatesAtEnter = activePropertyUpdates.load(std::memory_order_acquire);
-					outActiveCopiesAtEnter = activePropertyCopies.fetch_add(1, std::memory_order_acq_rel) + 1;
-				}
-			}
-
-			~PropertyCopyProbeScope() noexcept
-			{
-				if (!enabled)
-				{
-					return;
-				}
-				activePropertyCopies.fetch_sub(1, std::memory_order_acq_rel);
-			}
-
-		private:
-			bool enabled = false;
-		};
-	}
-
 	// Resolved on the main thread in Initialize() (kGameLoaded) but read from VM worker threads via
 	// GetPapyrusProperty(); kept atomic so a reload cannot tear the pointer out from under a reader.
 	std::atomic<RE::TESForm*> propertiesQuest = nullptr;
@@ -192,17 +77,7 @@ namespace properties
 			return false;
 		}
 
-		std::uint32_t activeUpdatesAtEnter = 0;
-		std::uint32_t activeCopiesAtEnter = 0;
-		{
-			PropertyCopyProbeScope copyProbe(activeUpdatesAtEnter, activeCopiesAtEnter);
-			outValue = *prop;
-		}
-		if (currentPropertyProbeSession)
-		{
-			TracePropertyProbe("property_copy", propertyName, currentPropertyUpdateEpoch,
-				activeUpdatesAtEnter, activeCopiesAtEnter, "completed");
-		}
+		outValue = *prop;
 		return true;
 	}
 
@@ -361,7 +236,6 @@ namespace properties
 	{
 		const auto updateProperty = std::string(key ? key : "");
 		const bool updateAll = updateProperty.empty();
-		PropertyUpdateProbeScope probeScope(updateAll);
 		// Collect first, then publish under lock so readers never observe partially refreshed settings.
 		std::unordered_map<Key, Value> updates;
 		RE::TESObjectREFR* updatedLootManWorkshopRef = nullptr;

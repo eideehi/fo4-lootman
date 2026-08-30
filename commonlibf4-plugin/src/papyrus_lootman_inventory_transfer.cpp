@@ -116,8 +116,6 @@ namespace papyrus_lootman
 	{
 		TESBoundObject* object = nullptr;
 		std::uint32_t stackIndex = 0;
-		std::uintptr_t stackIdentity = 0;
-		std::int32_t stackSnapshotCount = 0;
 		std::int32_t count = 0;
 		float unitWeight = 0.0F;
 		BSTSmartPointer<ExtraDataList> extra;
@@ -132,8 +130,6 @@ namespace papyrus_lootman
 		std::int32_t count = 0;
 		float unitWeight = 0.0F;
 		std::optional<std::uint32_t> stackIndex;
-		std::uintptr_t stackIdentity = 0;
-		std::int32_t stackSnapshotCount = 0;
 		BSTSmartPointer<ExtraDataList> extra;
 		bool preserveStackExtra = false;
 		InventoryItemInfo info;
@@ -282,8 +278,6 @@ namespace papyrus_lootman
 							movableCount,
 							unitWeight,
 							currentStackIndex,
-							reinterpret_cast<std::uintptr_t>(currentStack),
-							stackInfo.totalCount,
 							currentStack->extra,
 							ShouldPreserveStackExtraForTransfer(
 								form,
@@ -357,8 +351,6 @@ namespace papyrus_lootman
 						stackInfo.totalCount,
 						unitWeight,
 						currentStackIndex,
-						reinterpret_cast<std::uintptr_t>(currentStack),
-						stackInfo.totalCount,
 						currentStack->extra,
 						ShouldPreserveStackExtraForTransfer(
 							form,
@@ -395,15 +387,6 @@ namespace papyrus_lootman
 			std::int32_t destBefore = 0;
 			const bool gotSrcBefore = TryGetReferenceItemCountSafe(src, request.object, srcBefore);
 			const bool gotDestBefore = TryGetReferenceItemCountSafe(dest, request.object, destBefore);
-			TraceInventoryStackSnapshot(
-				src,
-				request.object,
-				request.stackIndex,
-				request.stackIdentity,
-				request.stackSnapshotCount,
-				request.count,
-				"transfer_inventory_items",
-				request.preserveStackExtra ? "preserve" : "plain");
 
 			auto remaining = request.count;
 			bool transferFailed = false;
@@ -704,8 +687,6 @@ namespace papyrus_lootman
 					itemRequests.push_back(InventoryTransferRequest{
 						form,
 						currentStackIndex,
-						reinterpret_cast<std::uintptr_t>(currentStack),
-						stackInfo.totalCount,
 						resolvedCount,
 						unitWeight,
 						stackExtra,
@@ -751,15 +732,6 @@ namespace papyrus_lootman
 			std::int32_t destBefore = 0;
 			const bool gotSrcBefore = TryGetReferenceItemCountSafe(src, request.object, srcBefore);
 			const bool gotDestBefore = TryGetReferenceItemCountSafe(dest, request.object, destBefore);
-			TraceInventoryStackSnapshot(
-				src,
-				request.object,
-				request.stackIndex,
-				request.stackIdentity,
-				request.stackSnapshotCount,
-				request.count,
-				"transfer_lootable_inventory_items",
-				request.preserveStackExtra ? "preserve" : "plain");
 
 			auto remaining = request.count;
 			bool transferFailed = false;
@@ -1059,8 +1031,6 @@ namespace papyrus_lootman
 							requestCount,
 							0.0F,
 							currentStackIndex,
-							reinterpret_cast<std::uintptr_t>(currentStack),
-							stackInfo.totalCount,
 							currentStack->extra,
 							ShouldPreserveStackExtraForTransfer(
 								object,
@@ -1147,8 +1117,6 @@ namespace papyrus_lootman
 							requestCount,
 							0.0F,
 							currentStackIndex,
-							reinterpret_cast<std::uintptr_t>(currentStack),
-							stackCount,
 							stackExtra,
 							ShouldPreserveStackExtraForTransfer(
 								object,
@@ -1177,15 +1145,6 @@ namespace papyrus_lootman
 		{
 			for (const auto& request : requests)
 			{
-				TraceInventoryStackSnapshot(
-					src,
-					request.object,
-					request.stackIndex,
-					request.stackIdentity,
-					request.stackSnapshotCount,
-					request.count,
-					"move_inventory_item",
-					request.preserveStackExtra ? "preserve" : "plain");
 				auto remaining = request.count;
 				if (request.preserveStackExtra)
 				{

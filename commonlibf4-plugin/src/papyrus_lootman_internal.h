@@ -400,15 +400,6 @@ namespace papyrus_lootman
 		RE::TESBoundObject* object,
 		std::int32_t count,
 		std::optional<std::uint32_t> stackIndex);
-	void TraceInventoryStackSnapshot(
-		RE::TESObjectREFR* owner,
-		RE::TESBoundObject* object,
-		std::optional<std::uint32_t> stackIndex,
-		std::uintptr_t expectedStackIdentity,
-		std::int32_t snapshotCount,
-		std::int32_t requestedCount,
-		const char* operation,
-		const char* mode);
 	bool ShouldPreserveStackExtraForTransfer(
 		RE::TESBoundObject* object,
 		RE::ExtraDataList* extra,

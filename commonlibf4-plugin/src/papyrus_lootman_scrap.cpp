@@ -167,8 +167,6 @@ namespace papyrus_lootman
 		TESBoundObject* object = nullptr;
 		std::int32_t count = 0;
 		std::optional<std::uint32_t> stackIndex;
-		std::uintptr_t stackIdentity = 0;
-		std::int32_t stackSnapshotCount = 0;
 		bool isMisc = false;
 		std::unordered_map<BGSComponent*, std::uint32_t> componentData;
 	};
@@ -384,8 +382,6 @@ namespace papyrus_lootman
 							object,
 							scrapCount,
 							stackIndex,
-							reinterpret_cast<std::uintptr_t>(stack),
-							stackInfo.totalCount,
 							true,
 							{}
 						};
@@ -477,8 +473,6 @@ namespace papyrus_lootman
 					object,
 					scrapCount,
 					stackIndex,
-					reinterpret_cast<std::uintptr_t>(stack),
-					stackInfo.totalCount,
 					false,
 					{}
 				};
@@ -592,15 +586,6 @@ namespace papyrus_lootman
 			std::int32_t beforeCount = 0;
 			std::int32_t afterCount = 0;
 			const bool gotBefore = TryGetReferenceItemCountSafe(inventoryOwner, entry.object, beforeCount);
-			TraceInventoryStackSnapshot(
-				inventoryOwner,
-				entry.object,
-				entry.stackIndex,
-				entry.stackIdentity,
-				entry.stackSnapshotCount,
-				entry.count,
-				"scrap_inventory_item",
-				"scrap");
 			const bool removed = TryRemoveScrapSourceSafe(
 				inventoryOwner,
 				entry.object,
