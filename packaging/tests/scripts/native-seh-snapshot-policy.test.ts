@@ -29,6 +29,7 @@ describe("native SEH snapshot ownership policy", () => {
 	const diagnostics = readWorkspaceFile("commonlibf4-plugin/src/papyrus_lootman_diagnostics.cpp");
 	const actorState = readWorkspaceFile("commonlibf4-plugin/src/papyrus_lootman_actor_state.cpp");
 	const inventoryTransfer = readWorkspaceFile("commonlibf4-plugin/src/papyrus_lootman_inventory_transfer.cpp");
+	const playerItems = readWorkspaceFile("commonlibf4-plugin/src/papyrus_lootman_player_items.cpp");
 	const pluginBuild = readWorkspaceFile("commonlibf4-plugin/xmake.lua");
 	const commonlibBuild = readWorkspaceFile("commonlibf4-plugin/lib/commonlibf4/lib/commonlib-shared/xmake.lua");
 
@@ -124,5 +125,28 @@ describe("native SEH snapshot ownership policy", () => {
 		expect(safeMatch).toContain("__except (SehFilterRecoverable(GetExceptionCode()))");
 		expect(directTransfer.match(/TryMatchesAnyCachedSafe\(/g)).toHaveLength(2);
 		expect(directTransfer).not.toContain("!MatchesAnyCached(form, injection_data::include_quest_item");
+	});
+
+	it("does not classify transfer protection raw under an inventory read-lock owner", () => {
+		const leafProbe = playerItems.slice(
+			playerItems.indexOf("bool TryGetPlayerTransferProtectedStackCountSafe("),
+		);
+		const tryBody = leafProbe.match(/__try\s*\{([\s\S]*?)\}\s*__except/)?.[1] ?? "";
+		const directTransfer = sliceBetween(
+			inventoryTransfer,
+			"std::int32_t TransferInventoryItemsImpl(",
+			"std::int32_t TransferLootableInventoryItemsImpl(",
+		);
+		const singleMove = sliceBetween(inventoryTransfer, "void MoveInventoryItem(", "void MoveInventoryItems(");
+
+		expect(leafProbe.indexOf("bool TryGetPlayerTransferProtectedStackCountSafe(")).toBe(0);
+		expect(leafProbe).toContain("__except (SehFilterRecoverable(GetExceptionCode()))");
+		expect(tryBody).toContain("outProtectedCount = GetPlayerTransferProtectedStackCount(");
+		expect(tryBody).not.toMatch(/\b(?:std::|auto\b|\w+(?:Lock)?Guard\b)/);
+		for (const source of [directTransfer, singleMove]) {
+			expect(source).toContain("ReadLockGuard guard(inventoryList->rwLock);");
+			expect(source).toContain("TryGetPlayerTransferProtectedStackCountSafe(");
+			expect(source).not.toMatch(/=\s*GetPlayerTransferProtectedStackCount\(/);
+		}
 	});
 });

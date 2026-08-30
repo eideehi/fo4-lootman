@@ -244,15 +244,27 @@ namespace papyrus_lootman
 							continue;
 						}
 
-						const auto protectedCount = GetPlayerTransferProtectedStackCount(
-							form,
-							*currentStack,
-							stackInfo,
-							sourceIsPlayer,
-							sourceIsDead,
-							formIsFavorite,
-							hasFavoriteStack,
-							retainedFormFavorite);
+						// Transfer protection classifies the WEAP subtype, which can re-raise a
+						// recoverable match-probe fault. Catch it inside the helper's own SEH frame
+						// so the fault cannot unwind past this scope's ReadLockGuard, and fail closed
+						// by skipping the suspect stack instead of moving it unprotected.
+						std::int32_t protectedCount = 0;
+						if (!TryGetPlayerTransferProtectedStackCountSafe(
+								form,
+								*currentStack,
+								stackInfo,
+								sourceIsPlayer,
+								sourceIsDead,
+								formIsFavorite,
+								hasFavoriteStack,
+								retainedFormFavorite,
+								protectedCount))
+						{
+							REX::WARN(
+								"source=native component=inventory_transfer event=stack_skipped reason=protected_count_exception operation=transfer_inventory_items item={:08X}",
+								form->formID);
+							continue;
+						}
 						const auto movableCount = stackInfo.totalCount - protectedCount;
 						if (movableCount <= 0)
 						{
@@ -1010,15 +1022,27 @@ namespace papyrus_lootman
 							continue;
 						}
 
-						const auto protectedCount = GetPlayerTransferProtectedStackCount(
-							object,
-							*currentStack,
-							stackInfo,
-							true,
-							false,
-							formIsFavorite,
-							hasFavoriteStack,
-							retainedFormFavorite);
+						// Transfer protection classifies the WEAP subtype, which can re-raise a
+						// recoverable match-probe fault. Catch it inside the helper's own SEH frame
+						// so the fault cannot unwind past this scope's ReadLockGuard, and fail closed
+						// by skipping the suspect stack instead of moving it unprotected.
+						std::int32_t protectedCount = 0;
+						if (!TryGetPlayerTransferProtectedStackCountSafe(
+								object,
+								*currentStack,
+								stackInfo,
+								true,
+								false,
+								formIsFavorite,
+								hasFavoriteStack,
+								retainedFormFavorite,
+								protectedCount))
+						{
+							REX::WARN(
+								"source=native component=inventory_transfer event=stack_skipped reason=protected_count_exception operation=move_inventory_item item={:08X}",
+								object->formID);
+							continue;
+						}
 						const auto movableCount = stackInfo.totalCount - protectedCount;
 						if (movableCount <= 0)
 						{

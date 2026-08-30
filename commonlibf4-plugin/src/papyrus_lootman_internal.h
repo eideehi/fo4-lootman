@@ -234,6 +234,16 @@ namespace papyrus_lootman
 		bool formIsFavorite,
 		bool hasFavoriteStack,
 		bool& retainedFormFavorite);
+	bool TryGetPlayerTransferProtectedStackCountSafe(
+		const RE::TESForm* form,
+		const RE::BGSInventoryItem::Stack& stack,
+		const InventoryItemInfo& stackInfo,
+		bool ownerIsPlayer,
+		bool ownerIsDead,
+		bool formIsFavorite,
+		bool hasFavoriteStack,
+		bool& retainedFormFavorite,
+		std::int32_t& outProtectedCount);
 	bool IsDeadForLooting(const RE::TESObjectREFR* ref);
 	bool IsSettlement(const RE::BGSEncounterZone* zone);
 	bool IsOwnerEmptyOrFriend(RE::TESForm* owner);

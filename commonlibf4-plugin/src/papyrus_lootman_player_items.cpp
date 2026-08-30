@@ -159,4 +159,53 @@ namespace papyrus_lootman
 
 		return std::min(protectedCount, stackInfo.totalCount);
 	}
+
+	// ShouldProtectFullEquippedTransferStack classifies the WEAP subtype, which reaches MatchesAny and can
+	// deliberately re-raise a recoverable match-probe fault. Both transfer callers run this classification
+	// while holding the source inventory's ReadLockGuard, and under /EHsc that re-raise would unwind past the
+	// guard without running its destructor, leaving the read lock permanently held. Keep this __try frame free
+	// of objects requiring C++ unwinding (mirroring the other Try...Safe probes) so the fault is caught here
+	// and the caller's lock scope still exits normally.
+	bool TryGetPlayerTransferProtectedStackCountSafe(
+		const TESForm* form,
+		const BGSInventoryItem::Stack& stack,
+		const InventoryItemInfo& stackInfo,
+		bool ownerIsPlayer,
+		bool ownerIsDead,
+		bool formIsFavorite,
+		bool hasFavoriteStack,
+		bool& retainedFormFavorite,
+		std::int32_t& outProtectedCount)
+	{
+#if defined(_MSC_VER)
+		__try
+		{
+			outProtectedCount = GetPlayerTransferProtectedStackCount(
+				form,
+				stack,
+				stackInfo,
+				ownerIsPlayer,
+				ownerIsDead,
+				formIsFavorite,
+				hasFavoriteStack,
+				retainedFormFavorite);
+			return true;
+		}
+		__except (SehFilterRecoverable(GetExceptionCode()))
+		{
+			return false;
+		}
+#else
+		outProtectedCount = GetPlayerTransferProtectedStackCount(
+			form,
+			stack,
+			stackInfo,
+			ownerIsPlayer,
+			ownerIsDead,
+			formIsFavorite,
+			hasFavoriteStack,
+			retainedFormFavorite);
+		return true;
+#endif
+	}
 }
