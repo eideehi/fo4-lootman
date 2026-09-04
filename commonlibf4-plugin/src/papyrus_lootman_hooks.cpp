@@ -1599,8 +1599,24 @@ namespace papyrus_lootman
 
 		if (!originalDirectComponentCount ||
 			!owner ||
-			!component ||
-			!IsReadableFormType(reinterpret_cast<TESForm*>(owner), ENUM_FORM_ID::kREFR) ||
+			!component)
+		{
+			return adjustment;
+		}
+
+		if (LinkedCountCoversRememberedLootManWorkshop(includeLinked))
+		{
+			// ComposeRememberedWorkshopComponentCount leaves applied=false and
+			// totalCount=baseCount as soon as the shared-container hook covers the linked
+			// count, and the caller consumes only those two fields, so nothing below this
+			// point can change the hooked result. Bail out before the
+			// SEH-guarded form probes and the nearest-workshop search instead of paying
+			// for them once per required component per build-menu row - the same reason
+			// EvaluateWorkshopResourceStatus skips its per-material walk.
+			return adjustment;
+		}
+
+		if (!IsReadableFormType(reinterpret_cast<TESForm*>(owner), ENUM_FORM_ID::kREFR) ||
 			!IsReadableFormType(component, ENUM_FORM_ID::kCMPO))
 		{
 			return adjustment;
@@ -1651,9 +1667,9 @@ namespace papyrus_lootman
 			!owner ||
 			!outCount ||
 			!form ||
+			LinkedCountCoversRememberedLootManWorkshop(includeLinked) ||
 			!IsReadableFormType(form, ENUM_FORM_ID::kCMPO) ||
-			!IsReadableFormType(reinterpret_cast<TESForm*>(owner), ENUM_FORM_ID::kREFR) ||
-			LinkedCountCoversRememberedLootManWorkshop(includeLinked))
+			!IsReadableFormType(reinterpret_cast<TESForm*>(owner), ENUM_FORM_ID::kREFR))
 		{
 			return adjustment;
 		}
@@ -2537,6 +2553,14 @@ namespace papyrus_lootman
 		{
 			return originalStatus;
 		}
+		if (LinkedCountCoversRememberedLootManWorkshop(true))
+		{
+			// Same reasoning as the menu-availability hook: the evaluation comes back
+			// empty once the shared-container hook covers the linked count, so the
+			// adjust block can never run and only the compile-time-disabled log would
+			// read the probe. Skip the SEH-guarded recipe capture entirely.
+			return originalStatus;
+		}
 
 		const auto selectedRecipe = CaptureSelectedWorkshopRecipeProbe();
 		auto evaluation = EvaluateWorkshopResourceStatus(selectedRecipe);
@@ -2653,6 +2677,15 @@ namespace papyrus_lootman
 		}
 		if (!result || !outValue || originalOut != 0)
 		{
+			return result;
+		}
+		if (LinkedCountCoversRememberedLootManWorkshop(true))
+		{
+			// EvaluateWorkshopResourceStatus returns an empty evaluation once the
+			// shared-container hook covers the linked count, so the adjust block below
+			// can never run and the only other consumer is the compile-time-disabled
+			// availability log. Capturing the menu-node probe costs an SEH frame plus an
+			// engine menu-node lookup on every hooked row, so skip it here.
 			return result;
 		}
 
@@ -3289,8 +3322,19 @@ namespace papyrus_lootman
 		}
 
 		const auto runtimeStateGeneration = GetWorkshopRuntimeStateGeneration();
-		const auto recipeProbe = CaptureWorkshopRecipePointerProbe(recipe);
-		auto evaluation = EvaluateWorkshopResourceStatus(recipeProbe, owner);
+		SelectedWorkshopRecipeProbeSnapshot recipeProbe;
+		WorkshopResourceStatusEvaluation evaluation;
+		if (!LinkedCountCoversRememberedLootManWorkshop(true))
+		{
+			// EvaluateWorkshopResourceStatus returns an empty evaluation once the
+			// shared-container hook covers the linked count, so the capture and the walk
+			// are pure cost there. The generation check, the pending-consumption
+			// bookkeeping and the immediate-consume branch below still run for every
+			// source id; with applied=false they behave exactly as they did with the
+			// empty evaluation this branch used to compute.
+			recipeProbe = CaptureWorkshopRecipePointerProbe(recipe);
+			evaluation = EvaluateWorkshopResourceStatus(recipeProbe, owner);
+		}
 		auto adjustedResult = originalResult;
 		if (!originalResult &&
 			evaluation.evaluated &&

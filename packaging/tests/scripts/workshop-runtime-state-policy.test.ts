@@ -402,4 +402,74 @@ describe("workshop runtime state policy", () => {
 			"addComponentRemoval = [&]",
 		);
 	});
+
+	it("skips workshop menu probes and form checks once the shared-container hook covers the linked count", () => {
+		const directCount = extractCppFunction(
+			hooksSource,
+			"WorkshopMaterialCountAdjustment ApplyRememberedWorkshopDirectComponentCount(",
+		);
+		expectBefore(
+			directCount,
+			"LinkedCountCoversRememberedLootManWorkshop(includeLinked)",
+			"IsReadableFormType(",
+		);
+		expectBefore(
+			directCount,
+			"LinkedCountCoversRememberedLootManWorkshop(includeLinked)",
+			"ResolveActiveRememberedWorkshopForOwner(owner)",
+		);
+
+		const materialCount = extractCppFunction(
+			hooksSource,
+			"WorkshopMaterialCountAdjustment ApplyRememberedWorkshopMaterialCount(",
+		);
+		expectBefore(
+			materialCount,
+			"LinkedCountCoversRememberedLootManWorkshop(includeLinked)",
+			"IsReadableFormType(",
+		);
+
+		const availability = extractCppFunction(hooksSource, "bool HookedWorkshopMenuAvailability(");
+		expectAllAfter(availability, "if (!result || !outValue || originalOut != 0)", [
+			"LinkedCountCoversRememberedLootManWorkshop(true)",
+		]);
+		expectBefore(
+			availability,
+			"LinkedCountCoversRememberedLootManWorkshop(true)",
+			"CaptureWorkshopMenuRecipeProbe(row, menuResult)",
+		);
+
+		const resourceStatus = extractCppFunction(hooksSource, "std::uint32_t HookedWorkshopResourceStatus(");
+		expectAllAfter(resourceStatus, "if (originalStatus != kWorkshopResourceStatusMissingResources)", [
+			"LinkedCountCoversRememberedLootManWorkshop(true)",
+		]);
+		expectBefore(
+			resourceStatus,
+			"LinkedCountCoversRememberedLootManWorkshop(true)",
+			"CaptureSelectedWorkshopRecipeProbe()",
+		);
+
+		const buildResourceCheck = extractCppFunction(hooksSource, "bool HookedWorkshopBuildResourceCheck(");
+		expectAllAfter(buildResourceCheck, "if (originalResult)", [
+			"LinkedCountCoversRememberedLootManWorkshop(true)",
+		]);
+
+		// The originalResult==true branch keeps its own diagnostics-only probe capture,
+		// so the deferred-capture order is pinned on the adjustment path that follows it.
+		const adjustmentStart = buildResourceCheck.indexOf(
+			"const auto runtimeStateGeneration = GetWorkshopRuntimeStateGeneration()",
+		);
+		expect(adjustmentStart, "missing workshop build adjustment path anchor").toBeGreaterThanOrEqual(0);
+		const adjustmentPath = buildResourceCheck.slice(adjustmentStart);
+		expectBefore(
+			adjustmentPath,
+			"LinkedCountCoversRememberedLootManWorkshop(true)",
+			"CaptureWorkshopRecipePointerProbe(recipe)",
+		);
+		expectBefore(
+			adjustmentPath,
+			"EvaluateWorkshopResourceStatus(recipeProbe, owner)",
+			"UpdatePendingWorkshopBuildConsumption",
+		);
+	});
 });
