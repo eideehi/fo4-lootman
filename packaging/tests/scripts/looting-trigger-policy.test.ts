@@ -135,18 +135,17 @@ describe("looting trigger policy", () => {
 		expect(nativeDiagnostics).toContain("excluded_by_injection_data");
 		expect(nativeDiagnostics).not.toContain("REX::INFO");
 
-		expect(translationValue(englishTranslations, labelKey)).toBe("Dump Nearby Object Diagnostics");
-		expect(translationValue(englishTranslations, helpKey)).toBe(
-			"Writes detailed nearby object diagnostics to the LootMan log.",
-		);
-		expect(translationValue(japaneseEnglishTranslations, labelKey)).toBe("周囲のオブジェクト診断を出力");
-		expect(translationValue(japaneseEnglishTranslations, helpKey)).toBe(
-			"周囲のオブジェクト情報をLootManのログへ詳しく書き出します。",
-		);
-		expect(translationValue(japaneseTranslations, labelKey)).toBe("周囲のオブジェクト診断を出力");
-		expect(translationValue(japaneseTranslations, helpKey)).toBe(
-			"周囲のオブジェクト情報をLootManのログへ詳しく書き出します。",
-		);
+		for (const key of [labelKey, helpKey]) {
+			const english = translationValue(englishTranslations, key);
+			const japanese = translationValue(japaneseTranslations, key);
+
+			expect(english, `${key} has no English text`).not.toBe("");
+			expect(japanese, `${key} is not localized in ja/LootMan_ja.txt`).not.toBe(english);
+			expect(
+				translationValue(japaneseEnglishTranslations, key),
+				`${key} in ja/LootMan_en.txt must match ja/LootMan_ja.txt`,
+			).toBe(japanese);
+		}
 	});
 
 	it("keeps nearby object diagnostics row probes behind recoverable native boundaries", () => {
@@ -204,21 +203,21 @@ describe("looting trigger policy", () => {
 		expect(v300).toContain("properties.WorkerInvokeInterval = 1.0");
 	});
 
-	it("prevents interval zero in MCM and updates interval help text", () => {
+	it("prevents interval zero in MCM and keeps the interval help localized", () => {
 		const workerInterval = mcmConfig.pages
 			.flatMap((page) => page.content ?? [])
 			.find((item) => item.id === "WorkerInvokeInterval");
 		expect(workerInterval?.valueOptions?.min).toBe(0.1);
 
 		const intervalHelpKey = "$PAGE_LOOTING_WORKER_WORKER_INVOKE_INTERVAL_HELP";
-		expect(translationValue(englishTranslations, intervalHelpKey)).toBe(
-			"Set the interval for recurring item looting. Turn off LootMan to stop recurring item looting; hotkey looting remains available. (Unit: seconds)",
-		);
-		expect(translationValue(japaneseEnglishTranslations, intervalHelpKey)).toBe(
-			"一定時間ごとのアイテム収集間隔を設定します。一定時間ごとの収集を止めるにはLootManを無効にしてください。ショートカットキーからの収集は利用できます。（単位: 秒）",
-		);
-		expect(translationValue(japaneseTranslations, intervalHelpKey)).toBe(
-			"一定時間ごとのアイテム収集間隔を設定します。一定時間ごとの収集を止めるにはLootManを無効にしてください。ショートカットキーからの収集は利用できます。（単位: 秒）",
-		);
+		const english = translationValue(englishTranslations, intervalHelpKey);
+		const japanese = translationValue(japaneseTranslations, intervalHelpKey);
+
+		expect(english, `${intervalHelpKey} has no English text`).not.toBe("");
+		expect(japanese, `${intervalHelpKey} is not localized in ja/LootMan_ja.txt`).not.toBe(english);
+		expect(
+			translationValue(japaneseEnglishTranslations, intervalHelpKey),
+			`${intervalHelpKey} in ja/LootMan_en.txt must match ja/LootMan_ja.txt`,
+		).toBe(japanese);
 	});
 });

@@ -661,10 +661,13 @@ describe("apply-terminal-labels", () => {
 		const xml = path.resolve("translation/Lootman_en_ja.xml");
 		const before = fs.readFileSync(plugin);
 
+		const rows = parseTerminalLabelRows(fs.readFileSync(xml, "utf8").replace(/^\uFEFF/, ""));
+		expect(rows.length).toBeGreaterThan(0);
+
 		const result = applyTerminalLabels(plugin, xml, { dryRun: true });
 
 		expect(result.changed).toBe(0);
-		expect(result.unchanged).toBe(39);
+		expect(result.unchanged).toBe(rows.length);
 		expect(result.written).toBe(false);
 		expect(fs.readFileSync(plugin).equals(before)).toBe(true);
 	});

@@ -57,13 +57,19 @@ describe("always loot clothing option policy", () => {
 	});
 
 	it("localizes the option label and help in all three translation files", () => {
-		expect(translationValue(englishTranslations, LABEL_KEY)).toBe("Always Looting Clothing");
-		expect(translationValue(englishTranslations, HELP_KEY)).toBe(
-			"When on, it will also allow configured clothing to be looted even in Legendary Only.",
-		);
-		expect(translationValue(japaneseEnglishTranslations, LABEL_KEY)).toBe("Always Looting Clothing");
-		expect(translationValue(japaneseTranslations, LABEL_KEY)).toBe("衣類を常に収集する");
-		expect(translationValue(japaneseTranslations, HELP_KEY)).toContain("衣類");
+		for (const key of [LABEL_KEY, HELP_KEY]) {
+			const english = translationValue(englishTranslations, key);
+			const japanese = translationValue(japaneseTranslations, key);
+
+			expect(english, `${key} has no English text`).not.toBe("");
+			expect(japanese, `${key} is not localized in ja/LootMan_ja.txt`).not.toBe(english);
+			// This test owns the ja LootMan_en override: the Japanese ESP is played with the game
+			// language on English, so the override must carry the Japanese text, not the source text.
+			expect(
+				translationValue(japaneseEnglishTranslations, key),
+				`${key} in ja/LootMan_en.txt must match ja/LootMan_ja.txt`,
+			).toBe(japanese);
+		}
 	});
 
 	it("declares the persisted Papyrus property defaulting off and wires Config get/set", () => {

@@ -22,6 +22,12 @@ function extractPapyrusEvent(source: string, name: string): string {
 	return match![1]!;
 }
 
+function translationValue(source: string, key: string): string {
+	const line = source.split(/\r?\n/).find((entry) => entry.startsWith(`${key}\t`));
+	expect(line, `missing translation key ${key}`).toBeDefined();
+	return line!.slice(key.length + 1);
+}
+
 describe("system message policy", () => {
 	const systemScript = readWorkspaceFile("papyrus/Scripts/Source/User/LTMN2/System.psc");
 	const mcmScript = readWorkspaceFile("papyrus/Scripts/Source/User/LTMN2/MCM.psc");
@@ -152,11 +158,20 @@ describe("system message policy", () => {
 		expect(messageQueue).toContain("for (const auto& replacement : replacements)");
 		expect(messageQueue).toContain("return SubstituteTokens(text, msg.replacements);");
 
-		expect(englishTranslations).toContain("$LTMN_SYSTEM_MESSAGE_LINKED_TO_WORKSHOP_NAMED\t[LootMan] Workshop linked: {workshopName}.");
-		expect(englishTranslations).toContain("$LTMN_SYSTEM_MESSAGE_UNLINKED_TO_WORKSHOP_NAMED\t[LootMan] Workshop unlinked: {workshopName}.");
-		expect(japaneseEnglishTranslations).toContain("$LTMN_SYSTEM_MESSAGE_LINKED_TO_WORKSHOP_NAMED\t[LootMan] ワークショップ接続：{workshopName}");
-		expect(japaneseEnglishTranslations).toContain("$LTMN_SYSTEM_MESSAGE_UNLINKED_TO_WORKSHOP_NAMED\t[LootMan] ワークショップ接続解除：{workshopName}");
-		expect(japaneseTranslations).toContain("$LTMN_SYSTEM_MESSAGE_LINKED_TO_WORKSHOP_NAMED\t[LootMan] ワークショップ接続：{workshopName}");
-		expect(japaneseTranslations).toContain("$LTMN_SYSTEM_MESSAGE_UNLINKED_TO_WORKSHOP_NAMED\t[LootMan] ワークショップ接続解除：{workshopName}");
+		// The named workshop messages are rendered by SubstituteTokens, so every language has to
+		// keep the {workshopName} token; the wording around it is free to change.
+		for (const key of ["$LTMN_SYSTEM_MESSAGE_LINKED_TO_WORKSHOP_NAMED", "$LTMN_SYSTEM_MESSAGE_UNLINKED_TO_WORKSHOP_NAMED"]) {
+			const english = translationValue(englishTranslations, key);
+			const japanese = translationValue(japaneseTranslations, key);
+
+			expect(english, `${key} has no English text`).not.toBe("");
+			expect(english, `${key} lost the {workshopName} token in en/LootMan_en.txt`).toContain("{workshopName}");
+			expect(japanese, `${key} lost the {workshopName} token in ja/LootMan_ja.txt`).toContain("{workshopName}");
+			expect(japanese, `${key} is not localized in ja/LootMan_ja.txt`).not.toBe(english);
+			expect(
+				translationValue(japaneseEnglishTranslations, key),
+				`${key} in ja/LootMan_en.txt must match ja/LootMan_ja.txt`,
+			).toBe(japanese);
+		}
 	});
 });

@@ -72,7 +72,14 @@ describe("FOMOD release policy", () => {
 		expect(languageGroup).toContain('<plugin name="English">');
 		expect(languageGroup).toContain("Installs the English LootMan.esp.");
 		expect(languageGroup).toContain('<plugin name="Japanese">');
-		expect(languageGroup).toContain("日本語版の LootMan.esp をインストールします。");
+		// The Japanese choice must be described in Japanese and must name the file it installs;
+		// the sentence itself is translator-owned copy.
+		const japaneseDescription = getPluginBlocks(languageGroup)
+			.find((plugin) => plugin.includes('<plugin name="Japanese">'))
+			?.match(/<description>([\s\S]*?)<\/description>/)?.[1] ?? "";
+		expect(japaneseDescription, "the Japanese installer plugin has no description").not.toBe("");
+		expect(japaneseDescription, "the Japanese installer description does not name LootMan.esp").toContain("LootMan.esp");
+		expect(japaneseDescription, "the Japanese installer description is not localized").toMatch(/[^\x00-\x7F]/);
 		expect(languageGroup).not.toContain("German");
 		expect(languageGroup).not.toContain("files/resources/de");
 		expect(languageGroup).not.toContain("files/resources/ptbr");
