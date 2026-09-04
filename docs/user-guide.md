@@ -184,7 +184,7 @@ limits enforced by the MCM sliders.
 | `Enable Carry Weight Limit` | switch | on / off | When on, LootMan stops looting once its inventory exceeds the `Carry Weight` setting and shows the overweight HUD message. |
 | `Loot Is Deliver To Player` | switch | on / off | When on, looted items are added to the player inventory instead of LootMan's inventory. |
 | `Display Pickup Messages` | switch | on / off | When on, Fallout 4's native pickup messages are shown while LootMan loots items or delivers them to the player. |
-| `Enable Looting In Settlements` | switch | on / off | When on, LootMan also loots objects inside settlements you own or near their workshops. |
+| `Enable Looting In Settlements` | switch | on / off | When on, LootMan also loots objects in settlements and near workshops. |
 | `Automatically Link / Unlink To Workshop` | switch | on / off | When on, LootMan links and unlinks with the workshop at your current location automatically as you travel. |
 | `Pause Looting In Workshop Mode` | switch | on / off | When on, automatic looting pauses while the workshop build menu is open. The `Execute Looting` hotkey still runs a manual pass. Turn this on if the settlement build menu feels slow. |
 | `Unlock Locked Container` | switch | on / off | When on, LootMan consumes Bobby pins to unlock containers that you have the Locksmith perks to pick. Pins are taken from the player inventory first; if the player has none, LootMan falls back to pins stored in the LootMan workshop container. |
@@ -499,8 +499,9 @@ otherwise lose the shipment's payload.
 
 Unless `Enable Looting In Settlements` is on, LootMan pauses looting when the
 player enters a settlement location, a workshop-settlement location, or comes
-near an owned workshop. A throttled reminder HUD message can appear when
-entering such a location. Looting resumes when you leave the settlement, or
+near a workshop. The check reads location keywords and workshop proximity; it
+does not test settlement ownership. A throttled reminder HUD message can appear
+when entering such a location. Looting resumes when you leave the settlement, or
 immediately if `Enable Looting In Settlements` is on.
 
 ### Carry-Weight Behavior
@@ -839,7 +840,7 @@ toggle suppresses the row.
 | `[LootMan] LootMan is enabled.` | The `Toggle Enable LootMan` hotkey turned LootMan on. The MCM `Enable LootMan` switcher does not post this message. | No | Suppressed when off |
 | `[LootMan] LootMan is disabled.` | The `Toggle Enable LootMan` hotkey turned LootMan off. The MCM `Enable LootMan` switcher does not post this message. | No | Suppressed when off |
 | `[LootMan] Maximum carry-weight has been exceeded.` | Workshop container weight passes `Carry Weight` while `Enable Carry Weight Limit` is on. | Yes | Suppressed when off |
-| `[LootMan] Looting from settlements has been disabled.` | Player enters a settlement or owned workshop while `Enable Looting In Settlements` is off. | Yes | Suppressed when off |
+| `[LootMan] Looting from settlements has been disabled.` | Player enters a settlement location or comes near a workshop while `Enable Looting In Settlements` is off. | Yes | Suppressed when off |
 | `[LootMan] Could not find the workshop.` | `Toggle Link To Workshop` could not find a workshop nearby. | No | Suppressed when off |
 | `[LootMan] Linked to the workshop.` | LootMan linked to a workshop whose location has no name. | No | Suppressed when off |
 | `[LootMan] Workshop linked: {workshopName}.` | LootMan linked to a workshop whose location has a name. The name is substituted into `{workshopName}`. | No | Suppressed when off |
