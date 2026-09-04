@@ -61,6 +61,13 @@ function seedRequiredPapyrusSymbols(importDir: string): void {
 			"endStruct",
 		].join("\n"),
 	);
+	fs.outputFileSync(
+		path.join(importDir, "UI.psc"),
+		[
+			"ScriptName UI",
+			"bool Function IsMenuOpen(string menu) native global",
+		].join("\n"),
+	);
 }
 
 function seedCompileLayout(root: string) {
@@ -151,7 +158,7 @@ describe("compile-papyrus helpers", () => {
 		seedRequiredPapyrusSymbols(imports);
 
 		const resolved = getResolvedRequiredPapyrusImports([imports]);
-		expect(Object.keys(resolved).sort()).toEqual(["Math.psc", "MiscObject.psc", "ObjectReference.psc", "ScriptObject.psc"]);
+		expect(Object.keys(resolved).sort()).toEqual(["Math.psc", "MiscObject.psc", "ObjectReference.psc", "ScriptObject.psc", "UI.psc"]);
 
 		const formatted = formatResolvedPapyrusImports(resolved);
 		expect(formatted).toContain("- Math.psc:");

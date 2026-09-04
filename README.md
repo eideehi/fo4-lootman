@@ -58,6 +58,7 @@ Papyrus PEX files.
 - Supported: overwrite updates from LootMan 2.x and earlier 3.x releases to 3.3.0.
 - Not supported: overwrite updates from LootMan 1.x to 3.3.0.
 - If you are upgrading from 1.x, uninstall 1.x and make a clean save before installing 3.3.0.
+- 3.3.0 automatically renames and flips the settlement-looting, carry-weight-limit, and pickup-message settings so effective behavior does not change; downgrading to 3.2.0 keeps your pre-3.3.0 values, and re-upgrading later recomputes the new settings from those values, so any changes made on 3.3.0 in between are lost.
 - If you want to remove LootMan entirely or troubleshoot a broken install, use the in-game uninstall flow before reinstalling.
 
 ## Build And Packaging

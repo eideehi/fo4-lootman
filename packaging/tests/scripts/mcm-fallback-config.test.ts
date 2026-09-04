@@ -168,7 +168,7 @@ describe("mcm fallback config delivery", () => {
 		const general = readWorkspaceFile(`${FRAGMENT_DIR}/TERM_ConfigGeneral_FB8.psc`);
 		// EnableLootMan routes through the MCM action for its localized HUD message.
 		expect(extractPapyrusFunction(general, "Fragment_Terminal_01")).toContain("ToggleEnableLootMan()");
-		expect(extractPapyrusFunction(general, "Fragment_Terminal_08")).toContain('Toggle("NotLootingFromSettlement")');
+		expect(extractPapyrusFunction(general, "Fragment_Terminal_08")).toContain('Toggle("EnableLootingInSettlement")');
 		expect(extractPapyrusFunction(general, "Fragment_Terminal_11")).toMatch(/AdjustFloat\("LootingRange", 0\.5, 1\.0, 256\.0\)/);
 		expect(extractPapyrusFunction(general, "Fragment_Terminal_13")).toMatch(/AdjustInt\("CarryWeight", 100, 100, 10000\)/);
 
@@ -215,7 +215,7 @@ describe("mcm fallback config delivery", () => {
 	it("keeps GetLabelKey label keys resolvable and consistent with the MCM config", () => {
 		// Build id/propertyName -> label key from the MCM config, so a terminal HUD
 		// label can be checked against the MCM label for the same setting. (A stale
-		// LootingWithoutLogs key that differed from the MCM motivated this guard.)
+		// pickup-message key that differed from the MCM motivated this guard.)
 		const mcm = JSON.parse(readWorkspaceFile("packaging/resources/lootman/common/MCM/Config/LootMan/config.json")) as unknown;
 		const labelByProperty = new Map<string, string>();
 		const walk = (node: unknown): void => {

@@ -24,7 +24,7 @@ Function Fragment_Terminal_04(ObjectReference akTerminalRef)
 EndFunction
 
 Function Fragment_Terminal_05(ObjectReference akTerminalRef)
-    LTMN2:Config.Toggle("IgnoreOverweight")
+    LTMN2:Config.Toggle("EnableCarryWeightLimit")
 EndFunction
 
 Function Fragment_Terminal_06(ObjectReference akTerminalRef)
@@ -32,11 +32,11 @@ Function Fragment_Terminal_06(ObjectReference akTerminalRef)
 EndFunction
 
 Function Fragment_Terminal_07(ObjectReference akTerminalRef)
-    LTMN2:Config.Toggle("LootingWithoutLogs")
+    LTMN2:Config.Toggle("DisplayPickupMessage")
 EndFunction
 
 Function Fragment_Terminal_08(ObjectReference akTerminalRef)
-    LTMN2:Config.Toggle("NotLootingFromSettlement")
+    LTMN2:Config.Toggle("EnableLootingInSettlement")
 EndFunction
 
 Function Fragment_Terminal_09(ObjectReference akTerminalRef)

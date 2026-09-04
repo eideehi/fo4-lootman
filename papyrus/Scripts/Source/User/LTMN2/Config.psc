@@ -149,16 +149,16 @@ string Function GetLabelKey(string id) global
         Return "$PAGE_GENERAL_SETTINGS_PLAY_PICKUP_SOUND"
     ElseIf (id == "PlayContainerAnimation")
         Return "$PAGE_GENERAL_SETTINGS_PLAY_CONTAINER_ANIMATION"
-    ElseIf (id == "IgnoreOverweight")
-        Return "$PAGE_GENERAL_SETTINGS_IGNORE_OVERWEIGHT"
+    ElseIf (id == "EnableCarryWeightLimit")
+        Return "$PAGE_GENERAL_SETTINGS_ENABLE_CARRY_WEIGHT_LIMIT"
     ElseIf (id == "LootIsDeliverToPlayer")
         Return "$PAGE_GENERAL_SETTINGS_LOOT_IS_DELIVER_TO_PLAYER"
-    ElseIf (id == "LootingWithoutLogs")
-        ; The property was renamed DeliveredToPlayerWithoutLogs -> LootingWithoutLogs;
-        ; use the key the MCM config.json binds to this id so the HUD label matches MCM.
-        Return "$PAGE_GENERAL_SETTINGS_LOOTING_WITHOUT_LOGS"
-    ElseIf (id == "NotLootingFromSettlement")
-        Return "$PAGE_GENERAL_SETTINGS_NOT_LOOTING_FROM_SETTLEMENT"
+    ElseIf (id == "DisplayPickupMessage")
+        ; This setting was renamed again in 3.3.0; use the key the MCM config.json
+        ; binds to this id so the HUD label matches MCM.
+        Return "$PAGE_GENERAL_SETTINGS_DISPLAY_PICKUP_MESSAGE"
+    ElseIf (id == "EnableLootingInSettlement")
+        Return "$PAGE_GENERAL_SETTINGS_ENABLE_LOOTING_IN_SETTLEMENT"
     ElseIf (id == "AutomaticallyLinkAndUnlinkToWorkshop")
         Return "$PAGE_GENERAL_SETTINGS_AUTOMATICALLY_LINK_AND_UNLINK_TO_WORKSHOP"
     ElseIf (id == "UnlockLockedContainer")
@@ -228,16 +228,18 @@ bool Function ReadBool(LTMN2:Properties properties, string id) global
         Return properties.PlayContainerAnimation
     ElseIf (id == "UseLootingTimeBudget")
         Return properties.UseLootingTimeBudget
-    ElseIf (id == "IgnoreOverweight")
-        Return properties.IgnoreOverweight
+    ElseIf (id == "EnableCarryWeightLimit")
+        Return properties.EnableCarryWeightLimit
     ElseIf (id == "LootIsDeliverToPlayer")
         Return properties.LootIsDeliverToPlayer
-    ElseIf (id == "LootingWithoutLogs")
-        Return properties.LootingWithoutLogs
-    ElseIf (id == "NotLootingFromSettlement")
-        Return properties.NotLootingFromSettlement
+    ElseIf (id == "DisplayPickupMessage")
+        Return properties.DisplayPickupMessage
+    ElseIf (id == "EnableLootingInSettlement")
+        Return properties.EnableLootingInSettlement
     ElseIf (id == "AutomaticallyLinkAndUnlinkToWorkshop")
         Return properties.AutomaticallyLinkAndUnlinkToWorkshop
+    ElseIf (id == "PauseLootingInWorkshopMode")
+        Return properties.PauseLootingInWorkshopMode
     ElseIf (id == "UnlockLockedContainer")
         Return properties.UnlockLockedContainer
     ElseIf (id == "LootingLegendaryOnly")
@@ -348,16 +350,18 @@ bool Function WriteSettableBool(LTMN2:Properties properties, string id, bool val
         properties.PlayContainerAnimation = value
     ElseIf (id == "UseLootingTimeBudget")
         properties.UseLootingTimeBudget = value
-    ElseIf (id == "IgnoreOverweight")
-        properties.IgnoreOverweight = value
+    ElseIf (id == "EnableCarryWeightLimit")
+        properties.EnableCarryWeightLimit = value
     ElseIf (id == "LootIsDeliverToPlayer")
         properties.LootIsDeliverToPlayer = value
-    ElseIf (id == "LootingWithoutLogs")
-        properties.LootingWithoutLogs = value
-    ElseIf (id == "NotLootingFromSettlement")
-        properties.NotLootingFromSettlement = value
+    ElseIf (id == "DisplayPickupMessage")
+        properties.DisplayPickupMessage = value
+    ElseIf (id == "EnableLootingInSettlement")
+        properties.EnableLootingInSettlement = value
     ElseIf (id == "AutomaticallyLinkAndUnlinkToWorkshop")
         properties.AutomaticallyLinkAndUnlinkToWorkshop = value
+    ElseIf (id == "PauseLootingInWorkshopMode")
+        properties.PauseLootingInWorkshopMode = value
     ElseIf (id == "UnlockLockedContainer")
         properties.UnlockLockedContainer = value
     ElseIf (id == "LootingLegendaryOnly")

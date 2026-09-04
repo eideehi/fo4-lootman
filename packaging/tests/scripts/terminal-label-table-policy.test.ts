@@ -395,10 +395,10 @@ describe("config holotape label table", () => {
 				source.replace("{ LabelPage::kPrimary, 8,", "{ LabelPage::kPrimary, 88,"),
 			);
 			expect(violations).toContain(
-				"missing table entry for kPrimary#8 kBoolProperty properties::not_looting_from_settlement",
+				"missing table entry for kPrimary#8 kBoolProperty properties::enable_looting_in_settlement",
 			);
 			expect(violations).toContain(
-				"unexpected table entry kPrimary#88 kBoolProperty properties::not_looting_from_settlement",
+				"unexpected table entry kPrimary#88 kBoolProperty properties::enable_looting_in_settlement",
 			);
 		});
 

@@ -220,8 +220,8 @@
     <String List="0">
       <EDID>LTMN_TERM_ConfigGeneral</EDID>
       <REC id="4">TERM:ITXT</REC>
-      <Source>Toggle ignore overweight</Source>
-      <Dest>重量オーバーを無視</Dest>
+      <Source>Toggle carry weight limit</Source>
+      <Dest>所持重量制限</Dest>
     </String>
     <String List="0">
       <EDID>LTMN_TERM_ConfigGeneral</EDID>
@@ -232,14 +232,14 @@
     <String List="0">
       <EDID>LTMN_TERM_ConfigGeneral</EDID>
       <REC id="6">TERM:ITXT</REC>
-      <Source>Toggle silent looting</Source>
-      <Dest>取得メッセージを隠す</Dest>
+      <Source>Toggle pickup messages</Source>
+      <Dest>取得メッセージ</Dest>
     </String>
     <String List="0">
       <EDID>LTMN_TERM_ConfigGeneral</EDID>
       <REC id="7">TERM:ITXT</REC>
-      <Source>Toggle no looting in settlement</Source>
-      <Dest>居住地では収集しない</Dest>
+      <Source>Toggle looting in settlement</Source>
+      <Dest>居住地での収集</Dest>
     </String>
     <String List="0">
       <EDID>LTMN_TERM_ConfigGeneral</EDID>

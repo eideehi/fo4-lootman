@@ -107,6 +107,7 @@ const REQUIRED_PAPYRUS_SYMBOLS: RequiredPapyrusSymbol[] = [
 	{ scriptFile: "ScriptObject.psc", needle: "RegisterForExternalEvent", label: "ScriptObject.RegisterForExternalEvent" },
 	{ scriptFile: "ScriptObject.psc", needle: "UnregisterForExternalEvent", label: "ScriptObject.UnregisterForExternalEvent" },
 	{ scriptFile: "MiscObject.psc", needle: "struct MiscComponent", label: "MiscObject.MiscComponent" },
+	{ scriptFile: "UI.psc", needle: "IsMenuOpen", label: "UI.IsMenuOpen" },
 ];
 
 export function resolveImportScriptPath(scriptFile: string, importDirs: string[]): string | null {

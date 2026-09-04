@@ -148,7 +148,7 @@ Event Actor.OnLocationChange(Actor akSender, Location akOldLoc, Location akNewLo
         currentWorkshopLocation = currentWorkshop.myLocation
     EndIf
 
-    If (properties.NotLootingFromSettlement)
+    If (!properties.EnableLootingInSettlement)
         ; Evaluate settlement state even when the new cell carries no Location (many
         ; FO4 interiors fire OnLocationChange with akNewLoc == None). Otherwise the
         ; flag could get stuck true and silently keep looting disabled until the
@@ -601,6 +601,9 @@ Function Patch()
     If (CurrentModVersion < 30100)
         LTMN2:Patch.v3_1_0()
     EndIf
+    If (CurrentModVersion < 30300)
+        LTMN2:Patch.v3_3_0()
+    EndIf
 
     CurrentModVersion = MOD_VERSION
 
@@ -613,11 +616,11 @@ Function DeliverLootManInventory()
         string destination = "workshop"
         If (properties.LootIsDeliverToPlayer)
             destination = "player"
-            movedItems = LTMN2:LootMan.TransferInventoryItems(properties.LootManRef, player, properties.ITEM_TYPE_ALL, -1, properties.ObjectTypeLooseMod, properties.LootingWithoutLogs)
+            movedItems = LTMN2:LootMan.TransferInventoryItems(properties.LootManRef, player, properties.ITEM_TYPE_ALL, -1, properties.ObjectTypeLooseMod, !properties.DisplayPickupMessage)
         Else
-            movedItems = LTMN2:LootMan.TransferInventoryItems(properties.LootManRef, properties.LootManWorkshopRef, properties.ITEM_TYPE_ALL, -1, properties.ObjectTypeLooseMod, properties.LootingWithoutLogs)
+            movedItems = LTMN2:LootMan.TransferInventoryItems(properties.LootManRef, properties.LootManWorkshopRef, properties.ITEM_TYPE_ALL, -1, properties.ObjectTypeLooseMod, !properties.DisplayPickupMessage)
         EndIf
-        LogSystemEvent("lootman_inventory_delivered", "destination=" + destination + " moved_forms=" + movedItems + " remaining_count=" + properties.LootManRef.GetItemCount() + " suppress_messages=" + properties.LootingWithoutLogs)
+        LogSystemEvent("lootman_inventory_delivered", "destination=" + destination + " moved_forms=" + movedItems + " remaining_count=" + properties.LootManRef.GetItemCount() + " suppress_messages=" + (!properties.DisplayPickupMessage))
     EndIf
 EndFunction
 
@@ -641,7 +644,7 @@ Function Update()
 
     DeliverLootManInventory()
 
-    If (!properties.IgnoreOverweight)
+    If (properties.EnableCarryWeightLimit)
         bool wasOverweight = properties.IsOverweight
         float workshopWeight = properties.LootManWorkshopRef.GetInventoryWeight()
         bool overweight = workshopWeight > properties.CarryWeight
@@ -716,10 +719,15 @@ Function Looting(bool force = false)
     If (!force && !properties.EnableLootMan)
         Return
     EndIf
-    If (properties.IsOverweight && !properties.IgnoreOverweight)
+    ; Opt-in relief for the workshop build menu: skip the timer-driven pass while
+    ; the menu is open. The forced hotkey pass still runs.
+    If (!force && properties.PauseLootingInWorkshopMode && UI.IsMenuOpen("WorkshopMenu"))
         Return
     EndIf
-    If (properties.IsInSettlement && properties.NotLootingFromSettlement)
+    If (properties.IsOverweight && properties.EnableCarryWeightLimit)
+        Return
+    EndIf
+    If (properties.IsInSettlement && !properties.EnableLootingInSettlement)
         Return
     EndIf
     If (!LTMN2:Utils.IsLootingSafe())

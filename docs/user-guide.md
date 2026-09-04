@@ -64,6 +64,15 @@ LootMan 3.3.0 does not support overwrite updates from LootMan 1.x. If you are
 upgrading from 1.x, uninstall 1.x and make a clean save before installing
 3.3.0.
 
+When a save from 3.2.0 or earlier is loaded under 3.3.0, the settlement-looting,
+carry-weight-limit, and pickup-message settings are renamed and their On/Off
+meaning is flipped automatically, so your effective behavior does not change —
+for example, a save that previously kept looting past the carry-weight limit
+will show `Enable Carry Weight Limit` as Off after the update. If you later
+downgrade to 3.2.0, the old settings still hold your pre-3.3.0 values; if you
+then upgrade again, the three new settings are recomputed from those old
+values, so any changes you made on 3.3.0 in between are lost.
+
 When a save from 2.x is loaded under 3.3.0, the v3.0.0 save migration can
 change two MCM settings:
 
@@ -71,9 +80,9 @@ change two MCM settings:
   `0`), `Enable LootMan` is turned off and `Looting Interval` is reset to
   `1.0` seconds. Open `General Settings` and turn `Enable LootMan` back on if
   you want recurring looting to resume.
-- `Suppress Looting Pickup Messages` may be re-derived from your prior
-  configuration. If pickup messages are now hidden or shown when you did not
-  expect, adjust it in `General Settings`.
+- `Display Pickup Messages` may be re-derived from your prior configuration.
+  If pickup messages are now hidden or shown when you did not expect, adjust
+  it in `General Settings`.
 
 If you are removing LootMan completely or troubleshooting a broken install, use
 LootMan's in-game uninstall flow before reinstalling or removing files.
@@ -93,8 +102,8 @@ interval.
 ### LootMan Inventory and Delivery
 
 LootMan can hold collected items, move items to the player inventory, or work
-with a nearby workshop link. General settings control range, carry-weight
-behavior, pickup sounds, pickup-message suppression, settlement exclusions, and
+with a nearby workshop link. General settings control range, the carry-weight
+limit, pickup sounds, pickup-message display, settlement looting, and
 locked-container handling.
 
 ### Workshop Linking
@@ -172,11 +181,12 @@ limits enforced by the MCM sliders.
 | `Play Container Animation` | switch | on / off | Plays the open animation on containers LootMan loots from. |
 | `Looting Range` | slider | 1.0 – 256, step 0.5 (meters) | Distance from the player searched on each looting pass. The native plugin clamps the effective range at 200 meters, so slider values above 200 do not enlarge the search beyond 200 meters in 3.3.0. |
 | `Carry Weight` | slider | 100 – 10000, step 100 (pounds) | LootMan's maximum carry weight. |
-| `Ignore Overweight` | switch | on / off | When on, LootMan continues looting past the carry-weight limit and suppresses the overweight HUD message. |
+| `Enable Carry Weight Limit` | switch | on / off | When on, LootMan stops looting once its inventory exceeds the `Carry Weight` setting and shows the overweight HUD message. |
 | `Loot Is Deliver To Player` | switch | on / off | When on, looted items are added to the player inventory instead of LootMan's inventory. |
-| `Suppress Looting Pickup Messages` | switch | on / off | Hides Fallout 4's native pickup messages while LootMan loots items or delivers them to the player. |
-| `Not Looting From Settlement` | switch | on / off | When on, LootMan does not loot objects inside settlements you own or near their workshops. |
+| `Display Pickup Messages` | switch | on / off | When on, Fallout 4's native pickup messages are shown while LootMan loots items or delivers them to the player. |
+| `Enable Looting In Settlements` | switch | on / off | When on, LootMan also loots objects inside settlements you own or near their workshops. |
 | `Automatically Link / Unlink To Workshop` | switch | on / off | When on, LootMan links and unlinks with the workshop at your current location automatically as you travel. |
+| `Pause Looting In Workshop Mode` | switch | on / off | When on, automatic looting pauses while the workshop build menu is open. The `Execute Looting` hotkey still runs a manual pass. Turn this on if the settlement build menu feels slow. |
 | `Unlock Locked Container` | switch | on / off | When on, LootMan consumes Bobby pins to unlock containers that you have the Locksmith perks to pick. Pins are taken from the player inventory first; if the player has none, LootMan falls back to pins stored in the LootMan workshop container. |
 
 ### Looting
@@ -356,10 +366,10 @@ reopen the holotape, to see the current value.
 | `Toggle system messages` | Toggles `Display System Message`. |
 | `Toggle pickup sound` | Toggles `Play Pickup Sound`. |
 | `Toggle container animation` | Toggles `Play Container Animation`. |
-| `Toggle ignore overweight` | Toggles `Ignore Overweight`. |
+| `Toggle carry weight limit` | Toggles `Enable Carry Weight Limit`. |
 | `Toggle deliver to player` | Toggles `Loot Is Deliver To Player`. |
-| `Toggle silent looting` | Toggles `Suppress Looting Pickup Messages`. |
-| `Toggle no looting in settlement` | Toggles `Not Looting From Settlement`. |
+| `Toggle pickup messages` | Toggles `Display Pickup Messages`. |
+| `Toggle looting in settlement` | Toggles `Enable Looting In Settlements`. |
 | `Toggle auto workshop link` | Toggles `Automatically Link / Unlink To Workshop`. |
 | `Toggle unlock containers` | Toggles `Unlock Locked Container`. |
 | `Looting range +` | Raises `Looting Range` by 0.5 (meters), clamped to 1.0 – 256.0. |
@@ -426,8 +436,9 @@ instead. Selecting a toggle keeps you on the same page, so you can flip several
 settings in a row without backing out.
 
 The holotape exposes only a subset of the MCM. It does not include the
-`Looting Interval` and `Native Looting Budget` controls, the Inventory Filter,
-the Advanced Filter subtypes, the Move Items / Scrap Items utilities, or the
+`Looting Interval` and `Native Looting Budget` controls, `Pause Looting In
+Workshop Mode` (MCM-only, with no holotape item), the Inventory Filter, the
+Advanced Filter subtypes, the Move Items / Scrap Items utilities, or the
 Hotkeys. Use the MCM pages above for those settings.
 
 ## Behavior Reference
@@ -486,20 +497,22 @@ otherwise lose the shipment's payload.
 
 ### Settlement Exclusion
 
-When `Not Looting From Settlement` is on, LootMan pauses looting when the
+Unless `Enable Looting In Settlements` is on, LootMan pauses looting when the
 player enters a settlement location, a workshop-settlement location, or comes
 near an owned workshop. A throttled reminder HUD message can appear when
-entering such a location. Looting resumes when you leave the settlement.
+entering such a location. Looting resumes when you leave the settlement, or
+immediately if `Enable Looting In Settlements` is on.
 
 ### Carry-Weight Behavior
 
-LootMan enforces carry weight differently depending on the delivery mode:
+LootMan enforces carry weight differently depending on the delivery mode, and
+only while `Enable Carry Weight Limit` is on:
 
 - **Workshop delivery** (`Loot Is Deliver To Player` off, the default mode).
   LootMan tracks the LootMan workshop container's inventory weight against the
-  `Carry Weight` slider. When the weight exceeds the limit and `Ignore Overweight`
-  is off, LootMan stops looting and a throttled overweight HUD message can
-  appear. When the weight drops back below the limit, looting resumes.
+  `Carry Weight` slider. When the weight exceeds the limit, LootMan stops
+  looting and a throttled overweight HUD message can appear. When the weight
+  drops back below the limit, looting resumes.
 - **Delivery to player** (`Loot Is Deliver To Player` on). Looted items go
   straight to the player, so the LootMan workshop container stays empty and
   the `Carry Weight` slider does not gate looting. Instead, the native plugin
@@ -510,9 +523,9 @@ LootMan enforces carry weight differently depending on the delivery mode:
   been exceeded.` message described above only tracks the workshop container,
   not the player, so it will not appear in this mode.
 
-`Ignore Overweight` bypasses both checks: when on, both the workshop-mode
-stop and the delivery-to-player capacity stop are disabled and LootMan keeps
-looting regardless of either limit.
+When `Enable Carry Weight Limit` is off (the default), neither check applies:
+LootMan keeps looting regardless of either limit and shows no overweight
+message.
 
 ### Uninstall Returns Items
 
@@ -747,15 +760,16 @@ Check MCM first:
 - If LootMan says a feature is unavailable, confirm LootMan is installed and
   not already uninstalled.
 - If no items are looted, check `Enable LootMan`, `Looting Range`,
-  `Carry Weight`, `Ignore Overweight`, `Not Looting From Settlement`, and the
-  Object, Inventory, and Advanced filters on the Looting page.
+  `Carry Weight`, `Enable Carry Weight Limit`, `Enable Looting In Settlements`,
+  and the Object, Inventory, and Advanced filters on the Looting page.
 - If looting stops while `Loot Is Deliver To Player` is on and
-  `Ignore Overweight` is off, check the player character's own carry capacity
-  — delivery-to-player uses the vanilla `CarryWeight` actor value (perks,
-  equipment, mods included) and stops silently when the player is overweight,
-  regardless of the `Carry Weight` slider value. Turn on `Ignore Overweight`
-  to bypass both the workshop-mode and player-mode carry-weight stops.
-- If settlement objects are not looted, check `Not Looting From Settlement`.
+  `Enable Carry Weight Limit` is on, check the player character's own carry
+  capacity — delivery-to-player uses the vanilla `CarryWeight` actor value
+  (perks, equipment, mods included) and stops silently when the player is
+  overweight, regardless of the `Carry Weight` slider value. Turn off
+  `Enable Carry Weight Limit` to bypass both the workshop-mode and
+  player-mode carry-weight stops.
+- If settlement objects are not looted, check `Enable Looting In Settlements`.
 - If locked containers are skipped, confirm you have the matching Locksmith
   perk for the lock level, that pins are available in the player inventory
   or in the LootMan workshop container, and that `Unlock Locked Container` is
@@ -824,8 +838,8 @@ toggle suppresses the row.
 | `[LootMan] Uninstallation is complete.` | LootMan finishes its uninstall process. | No | Bypassed (always displays) |
 | `[LootMan] LootMan is enabled.` | The `Toggle Enable LootMan` hotkey turned LootMan on. The MCM `Enable LootMan` switcher does not post this message. | No | Suppressed when off |
 | `[LootMan] LootMan is disabled.` | The `Toggle Enable LootMan` hotkey turned LootMan off. The MCM `Enable LootMan` switcher does not post this message. | No | Suppressed when off |
-| `[LootMan] Maximum carry-weight has been exceeded.` | Workshop container weight passes `Carry Weight` while `Ignore Overweight` is off. | Yes | Suppressed when off |
-| `[LootMan] Looting from settlements has been disabled.` | Player enters a settlement or owned workshop while `Not Looting From Settlement` is on. | Yes | Suppressed when off |
+| `[LootMan] Maximum carry-weight has been exceeded.` | Workshop container weight passes `Carry Weight` while `Enable Carry Weight Limit` is on. | Yes | Suppressed when off |
+| `[LootMan] Looting from settlements has been disabled.` | Player enters a settlement or owned workshop while `Enable Looting In Settlements` is off. | Yes | Suppressed when off |
 | `[LootMan] Could not find the workshop.` | `Toggle Link To Workshop` could not find a workshop nearby. | No | Suppressed when off |
 | `[LootMan] Linked to the workshop.` | LootMan linked to a workshop whose location has no name. | No | Suppressed when off |
 | `[LootMan] Workshop linked: {workshopName}.` | LootMan linked to a workshop whose location has a name. The name is substituted into `{workshopName}`. | No | Suppressed when off |

@@ -1,7 +1,7 @@
 import fs from "fs-extra";
 import path from "node:path";
 import { afterEach, describe, expect, it } from "vitest";
-import { applyTerminalLabels, parseArgs, walkTopLevelGroups } from "../../scripts/apply-terminal-labels.js";
+import { applyTerminalLabels, parseArgs, walkTopLevelGroups, parseTerminalLabelRows } from "../../scripts/apply-terminal-labels.js";
 import { createTempDir, removeTempDir } from "../helpers/temp-dir.js";
 
 // The fixtures below are synthetic plugins: a TES4 record, a TERM group, and one unrelated group
@@ -667,6 +667,41 @@ describe("apply-terminal-labels", () => {
 		expect(result.unchanged).toBe(39);
 		expect(result.written).toBe(false);
 		expect(fs.readFileSync(plugin).equals(before)).toBe(true);
+	});
+
+	it("reports the committed English plugin as the untranslated source of every row", () => {
+		// Real-data regression guard for the en plugin: its labels are the Source column of the
+		// export, so a dry run must accept every row as a pending translation and refuse none.
+		const plugin = path.resolve("packaging/resources/lootman/en/LootMan.esp");
+		const xml = path.resolve("translation/Lootman_en_ja.xml");
+		const before = fs.readFileSync(plugin);
+
+		// Rows whose Dest equals their Source (the Log Level names stay English) read as already
+		// applied on the en plugin; every other row must be accepted as a pending translation.
+		const rows = parseTerminalLabelRows(fs.readFileSync(xml, "utf8").replace(/^\uFEFF/, ""));
+		const pending = rows.filter((row) => row.source !== row.dest).length;
+		expect(rows.length).toBeGreaterThan(0);
+		expect(pending).toBeGreaterThan(0);
+
+		const result = applyTerminalLabels(plugin, xml, { dryRun: true });
+
+		expect(result.changed).toBe(pending);
+		expect(result.unchanged).toBe(rows.length - pending);
+		expect(result.written).toBe(false);
+		expect(fs.readFileSync(plugin).equals(before)).toBe(true);
+
+		// The General Settings menu is the terminal the renamed options live on: every pending row
+		// of that terminal must be reported against the plugin's own current label, so expectations
+		// come from the export rather than from a copy of its text pinned here.
+		const general = new Map(result.changes.filter((c) => c.edid === "LTMN_TERM_ConfigGeneral").map((c) => [c.itid, c]));
+		const pendingGeneralRows = rows.filter((row) => row.edid === "LTMN_TERM_ConfigGeneral" && row.source !== row.dest);
+		expect(pendingGeneralRows.length, "the General Settings terminal has no pending rows").toBeGreaterThan(0);
+		for (const row of pendingGeneralRows) {
+			expect(general.get(row.itid), `LTMN_TERM_ConfigGeneral row ${row.itid} was not reported as a change`).toMatchObject({
+				before: row.source,
+				after: row.dest,
+			});
+		}
 	});
 
 	it("parses CLI arguments", () => {

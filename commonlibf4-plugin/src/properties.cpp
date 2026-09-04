@@ -312,10 +312,10 @@ namespace properties
 			updates[looting_range] = GetFloatProperty(propertyName);
 		}
 
-		propertyName = "NotLootingFromSettlement";
+		propertyName = "EnableLootingInSettlement";
 		if (updateAll || propertyName == updateProperty)
 		{
-			updates[not_looting_from_settlement] = GetBoolProperty(propertyName);
+			updates[enable_looting_in_settlement] = GetBoolProperty(propertyName);
 		}
 
 		propertyName = "LootableInventoryItemType";
@@ -349,10 +349,10 @@ namespace properties
 			updates[carry_weight] = GetIntProperty(propertyName);
 		}
 
-		propertyName = "IgnoreOverweight";
+		propertyName = "EnableCarryWeightLimit";
 		if (updateAll || propertyName == updateProperty)
 		{
-			updates[ignore_overweight] = GetBoolProperty(propertyName);
+			updates[enable_carry_weight_limit] = GetBoolProperty(propertyName);
 		}
 
 		propertyName = "LootIsDeliverToPlayer";
@@ -361,10 +361,10 @@ namespace properties
 			updates[loot_is_deliver_to_player] = GetBoolProperty(propertyName);
 		}
 
-		propertyName = "LootingWithoutLogs";
+		propertyName = "DisplayPickupMessage";
 		if (updateAll || propertyName == updateProperty)
 		{
-			updates[looting_without_logs] = GetBoolProperty(propertyName);
+			updates[display_pickup_message] = GetBoolProperty(propertyName);
 		}
 
 		propertyName = "LootableALCHItemType";

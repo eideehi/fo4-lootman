@@ -226,7 +226,7 @@ namespace papyrus_lootman
 		{
 			return false;
 		}
-		if (properties::GetBool(properties::looting_without_logs, true))
+		if (!properties::GetBool(properties::display_pickup_message, false))
 		{
 			return false;
 		}

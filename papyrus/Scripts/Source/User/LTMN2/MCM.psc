@@ -191,7 +191,7 @@ Function ApplySettingSideEffects(string id)
             LogMcmEvent("workshop_link_unchanged", "id=" + id + " workshop_nearby=" + (workshop != none), LOG_LEVEL_DEBUG)
         EndIf
 
-    ElseIf (id == "NotLootingFromSettlement")
+    ElseIf (id == "EnableLootingInSettlement")
         Location currentLocation = player.GetCurrentLocation()
         WorkshopScript currentWorkshop = LTMN2:Utils.GetCurrentWorkshop(player)
         bool isSettlementLocation = false

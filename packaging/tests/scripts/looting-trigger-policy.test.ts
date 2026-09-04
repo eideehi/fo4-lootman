@@ -71,8 +71,8 @@ describe("looting trigger policy", () => {
 		expect(systemScript).toContain("Function Looting(bool force = false)");
 		expect(looting).toContain("If (!force && !properties.EnableLootMan)");
 		expect(looting).not.toContain("If (!properties.EnableLootMan)");
-		expect(looting).toContain("If (properties.IsOverweight && !properties.IgnoreOverweight)");
-		expect(looting).toContain("If (properties.IsInSettlement && properties.NotLootingFromSettlement)");
+		expect(looting).toContain("If (properties.IsOverweight && properties.EnableCarryWeightLimit)");
+		expect(looting).toContain("If (properties.IsInSettlement && !properties.EnableLootingInSettlement)");
 		expect(looting).toContain("If (!LTMN2:Utils.IsLootingSafe())");
 		expect(looting).toContain("LTMN2:LootMan.LootNearbyEnabledReferences");
 
@@ -171,9 +171,9 @@ describe("looting trigger policy", () => {
 		expect(scrapItemsInternal).toContain("ScrapItemsType < SCRAP_ITEM_ALL || ScrapItemsType > SCRAP_ITEM_JUNK");
 
 		const settingChange = extractPapyrusFunction(mcmScript, "ApplySettingSideEffects");
-		const branchStart = settingChange.indexOf('ElseIf (id == "NotLootingFromSettlement")');
+		const branchStart = settingChange.indexOf('ElseIf (id == "EnableLootingInSettlement")');
 		const branchEnd = settingChange.indexOf('ElseIf (id == "WorkerInvokeInterval")');
-		expect(branchStart, "missing NotLootingFromSettlement branch").toBeGreaterThanOrEqual(0);
+		expect(branchStart, "missing EnableLootingInSettlement branch").toBeGreaterThanOrEqual(0);
 		expect(branchEnd, "missing WorkerInvokeInterval branch").toBeGreaterThan(branchStart);
 
 		const settlementBranch = settingChange.slice(branchStart, branchEnd);

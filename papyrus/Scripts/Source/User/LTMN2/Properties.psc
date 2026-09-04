@@ -72,13 +72,20 @@ Group Config
     bool property UseLootingTimeBudget = false auto hidden
     float property LootingTimeBudgetMs = 4.0 auto hidden
     int property CarryWeight = 1000 auto hidden
+    bool property EnableCarryWeightLimit = false auto hidden
+    ; Legacy property kept so existing saves can migrate their setting.
     bool property IgnoreOverweight = true auto hidden
     bool property LootIsDeliverToPlayer = false auto hidden
+    bool property DisplayPickupMessage = false auto hidden
+    ; Legacy property kept so existing saves can migrate their setting.
     bool property LootingWithoutLogs = true auto hidden
     ; Legacy property kept so existing saves can migrate their setting.
     bool property DeliveredToPlayerWithoutLogs = false auto hidden
+    bool property EnableLootingInSettlement = false auto hidden
+    ; Legacy property kept so existing saves can migrate their setting.
     bool property NotLootingFromSettlement = true auto hidden
     bool property AutomaticallyLinkAndUnlinkToWorkshop = false auto hidden
+    bool property PauseLootingInWorkshopMode = false auto hidden
     bool property UnlockLockedContainer = true auto hidden
 
     bool property EnableObjectLootingOfACTI = true auto hidden

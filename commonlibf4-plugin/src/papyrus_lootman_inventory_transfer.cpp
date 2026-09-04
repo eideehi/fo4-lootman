@@ -889,10 +889,10 @@ namespace papyrus_lootman
 		BGSKeyword* looseModKeyword,
 		bool suppressPlayerMessages)
 	{
-		// Read ignore_overweight once so the lock decision and the capacity
+		// Read enable_carry_weight_limit once so the lock decision and the capacity
 		// context's enabled state cannot disagree when the MCM flips the property
 		// between the two reads mid-transfer.
-		const bool trackCapacity = !properties::GetBool(properties::ignore_overweight, true);
+		const bool trackCapacity = properties::GetBool(properties::enable_carry_weight_limit, false);
 		std::unique_lock<std::mutex> capacityGuard;
 		if (trackCapacity)
 		{

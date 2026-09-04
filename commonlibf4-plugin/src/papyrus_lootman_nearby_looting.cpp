@@ -21,7 +21,7 @@ namespace papyrus_lootman
 	PropertiesSnapshot PropertiesSnapshot::Capture()
 	{
 		PropertiesSnapshot s;
-		s.notLootingFromSettlement = properties::GetBool(properties::not_looting_from_settlement);
+		s.notLootingFromSettlement = !properties::GetBool(properties::enable_looting_in_settlement, true);
 		s.lootingLegendaryOnly = properties::GetBool(properties::looting_legendary_only);
 		s.alwaysLootingExplosives = properties::GetBool(properties::always_looting_explosives);
 		s.alwaysLootingClothing = properties::GetBool(properties::always_looting_clothing);
@@ -348,10 +348,10 @@ namespace papyrus_lootman
 		std::reverse(refs.begin(), refs.end());
 
 		const auto candidateCount = refs.size();
-		// Read ignore_overweight once so the lock decision and the capacity
+		// Read enable_carry_weight_limit once so the lock decision and the capacity
 		// context's enabled state cannot disagree when the MCM flips the property
 		// between the two reads mid-pass.
-		const bool trackCapacity = !properties::GetBool(properties::ignore_overweight, true);
+		const bool trackCapacity = properties::GetBool(properties::enable_carry_weight_limit, false);
 		std::unique_lock<std::mutex> capacityGuard;
 		if (trackCapacity)
 		{
@@ -562,10 +562,10 @@ namespace papyrus_lootman
 				buffer.size(),
 				static_cast<std::size_t>(std::numeric_limits<std::int32_t>::max())));
 
-		// Read ignore_overweight once so the lock decision and the capacity
+		// Read enable_carry_weight_limit once so the lock decision and the capacity
 		// context's enabled state cannot disagree when the MCM flips the property
 		// between the two reads mid-pass.
-		const bool trackCapacity = !properties::GetBool(properties::ignore_overweight, true);
+		const bool trackCapacity = properties::GetBool(properties::enable_carry_weight_limit, false);
 		std::unique_lock<std::mutex> capacityGuard;
 		if (trackCapacity)
 		{

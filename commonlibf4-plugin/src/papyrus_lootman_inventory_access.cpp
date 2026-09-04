@@ -392,7 +392,7 @@ namespace papyrus_lootman
 		TESObjectREFR* workshop,
 		bool trackCapacity)
 	{
-		// The caller passes the same ignore_overweight reading it used for the
+		// The caller passes the same enable_carry_weight_limit reading it used for the
 		// lootCapacityLock decision. Re-reading the property here could disagree
 		// with that reading when the MCM flips it mid-pass, producing a capacity
 		// context that projects weight without holding the serializing lock.

@@ -184,14 +184,14 @@
           "groupCondition": { "AND": [1, 6] }
         },
         {
-          "id": "IgnoreOverweight",
-          "text": "$PAGE_GENERAL_SETTINGS_IGNORE_OVERWEIGHT",
+          "id": "EnableCarryWeightLimit",
+          "text": "$PAGE_GENERAL_SETTINGS_ENABLE_CARRY_WEIGHT_LIMIT",
           "type": "switcher",
-          "help": "$PAGE_GENERAL_SETTINGS_IGNORE_OVERWEIGHT_HELP",
+          "help": "$PAGE_GENERAL_SETTINGS_ENABLE_CARRY_WEIGHT_LIMIT_HELP",
           "valueOptions": {
             "sourceType": "PropertyValueBool",
             "sourceForm": "LootMan.esp|F9A",
-            "propertyName": "IgnoreOverweight"
+            "propertyName": "EnableCarryWeightLimit"
           },
           "groupCondition": { "AND": [1, 6] }
         },
@@ -208,26 +208,26 @@
           "groupCondition": { "AND": [1, 6] }
         },
         {
-          "id": "LootingWithoutLogs",
-          "text": "$PAGE_GENERAL_SETTINGS_LOOTING_WITHOUT_LOGS",
+          "id": "DisplayPickupMessage",
+          "text": "$PAGE_GENERAL_SETTINGS_DISPLAY_PICKUP_MESSAGE",
           "type": "switcher",
-          "help": "$PAGE_GENERAL_SETTINGS_LOOTING_WITHOUT_LOGS_HELP",
+          "help": "$PAGE_GENERAL_SETTINGS_DISPLAY_PICKUP_MESSAGE_HELP",
           "valueOptions": {
             "sourceType": "PropertyValueBool",
             "sourceForm": "LootMan.esp|F9A",
-            "propertyName": "LootingWithoutLogs"
+            "propertyName": "DisplayPickupMessage"
           },
           "groupCondition": { "AND": [1, 6] }
         },
         {
-          "id": "NotLootingFromSettlement",
-          "text": "$PAGE_GENERAL_SETTINGS_NOT_LOOTING_FROM_SETTLEMENT",
+          "id": "EnableLootingInSettlement",
+          "text": "$PAGE_GENERAL_SETTINGS_ENABLE_LOOTING_IN_SETTLEMENT",
           "type": "switcher",
-          "help": "$PAGE_GENERAL_SETTINGS_NOT_LOOTING_FROM_SETTLEMENT_HELP",
+          "help": "$PAGE_GENERAL_SETTINGS_ENABLE_LOOTING_IN_SETTLEMENT_HELP",
           "valueOptions": {
             "sourceType": "PropertyValueBool",
             "sourceForm": "LootMan.esp|F9A",
-            "propertyName": "NotLootingFromSettlement"
+            "propertyName": "EnableLootingInSettlement"
           },
           "groupCondition": { "AND": [1, 6] }
         },
@@ -240,6 +240,18 @@
             "sourceType": "PropertyValueBool",
             "sourceForm": "LootMan.esp|F9A",
             "propertyName": "AutomaticallyLinkAndUnlinkToWorkshop"
+          },
+          "groupCondition": { "AND": [1, 6] }
+        },
+        {
+          "id": "PauseLootingInWorkshopMode",
+          "text": "$PAGE_GENERAL_SETTINGS_PAUSE_LOOTING_IN_WORKSHOP_MODE",
+          "type": "switcher",
+          "help": "$PAGE_GENERAL_SETTINGS_PAUSE_LOOTING_IN_WORKSHOP_MODE_HELP",
+          "valueOptions": {
+            "sourceType": "PropertyValueBool",
+            "sourceForm": "LootMan.esp|F9A",
+            "propertyName": "PauseLootingInWorkshopMode"
           },
           "groupCondition": { "AND": [1, 6] }
         },

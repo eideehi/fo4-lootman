@@ -58,3 +58,14 @@ Function v3_1_0() global
         LTMN2:System.GrantConfigHolotape(Game.GetPlayer())
     EndIf
 EndFunction
+
+Function v3_3_0() global
+    LTMN2:Properties properties = LTMN2:Properties.GetInstance()
+
+    ; The three inverted options became positively named ones. Read the stored
+    ; values into the new properties without clearing the legacy ones, so the
+    ; step is idempotent and a downgrade still reads the player's own choice.
+    properties.EnableCarryWeightLimit = !properties.IgnoreOverweight
+    properties.DisplayPickupMessage = !properties.LootingWithoutLogs
+    properties.EnableLootingInSettlement = !properties.NotLootingFromSettlement
+EndFunction

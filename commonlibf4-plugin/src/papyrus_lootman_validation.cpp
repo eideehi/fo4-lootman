@@ -281,7 +281,7 @@ namespace papyrus_lootman
 				}
 				const bool notFromSettlement = props
 					? props->notLootingFromSettlement
-					: properties::GetBool(properties::not_looting_from_settlement);
+					: !properties::GetBool(properties::enable_looting_in_settlement, true);
 				if (notFromSettlement && IsSettlement(ez))
 				{
 					return false;
