@@ -46,6 +46,13 @@ Group Status
     bool property IsUninstalled = false auto hidden
     bool property IsNotUninstalled = true auto hidden
 
+    ; Set by System.ProbeNativePlugin on every load: true whenever F4SE reports no
+    ; loaded "lootman" plugin. Save-safe because the compile-time default covers
+    ; older saves. The probe runs from a short delayed timer, so a save loaded
+    ; straight into MCM can still read the previous session's value for a few
+    ; seconds; the next probe overwrites it.
+    bool property IsNativePluginMissing = false auto hidden
+
     bool property IsInSettlement = false auto hidden
     bool property IsOverweight = false auto hidden
 

@@ -18,6 +18,7 @@ int TIMER_INSTALL = 1 const
 int TIMER_INITIALIZE = 2 const
 int TIMER_UPDATE = 3 const
 int TIMER_LOOTING = 4 const
+int TIMER_NATIVE_PROBE = 5 const
 
 ; Number of registered system messages.
 int MESSAGE_COUNT = 11 const
@@ -96,22 +97,40 @@ EndFunction
 
 ; First quest init sets the save marker and schedules install.
 Event OnInit()
+    ; Resolve properties and arm the native-plugin probe before the first LootMan
+    ; native call. When lootman.dll never loaded, LogSystemEvent below aborts this
+    ; frame, and the probe timer is the only thing left to report why.
+    properties = LTMN2:Properties.GetInstance()
+    CancelTimer(TIMER_NATIVE_PROBE)
+    StartTimer(5, TIMER_NATIVE_PROBE)
+
+    ; This ordering is load-bearing, not cosmetic. OnPlayerLoadGame is the only
+    ; place that re-probes, and the one-shot probe timer armed above expires with
+    ; this session. If the subscription were created after LogSystemEvent, a
+    ; first run without lootman.dll would abort the frame here and leave the save
+    ; with no load hook at all - so a later repair of the DLL could never clear
+    ; IsNativePluginMissing and the MCM warning would stick on a healthy install.
+    player = Game.GetPlayer()
+    RegisterForRemoteEvent(player, "OnPlayerLoadGame")
+
     LogSystemEvent("first_run", "version=" + GetVersionString(MOD_VERSION))
 
-    player = Game.GetPlayer()
-    properties = LTMN2:Properties.GetInstance()
     messageDisplayCount = new int[MESSAGE_COUNT]
     lastMessageDisplayTime = new float[MESSAGE_COUNT]
 
     CurrentModVersion = MOD_VERSION
-
-    RegisterForRemoteEvent(player, "OnPlayerLoadGame")
 
     StartTimer(5, TIMER_INSTALL)
 EndEvent
 
 ; Reload transient state after a save load.
 Event Actor.OnPlayerLoadGame(Actor akSender)
+    ; Re-probe on every load before anything else runs: a value saved as "present"
+    ; is not a per-session reset, and this frame can still be aborted by an unbound
+    ; native at the log call below.
+    CancelTimer(TIMER_NATIVE_PROBE)
+    StartTimer(5, TIMER_NATIVE_PROBE)
+
     LogSystemEvent("load", "version=" + GetVersionString(MOD_VERSION) + " current_version=" + GetVersionString(CurrentModVersion))
 
     ; Force runtime setup to run again after load.
@@ -389,8 +408,34 @@ Event ObjectReference.OnItemAdded(ObjectReference akSender, Form akBaseItem, int
     EndIf
 EndEvent
 
+; Diagnose a missing lootman.dll without calling a single LootMan native. F4SE is
+; loaded in this failure mode - only lootman.dll is not - so F4SE.GetPluginVersion
+; is bound and safe. Its return value is a packed REL::Version, never 30300, so
+; only the sign is meaningful. Assume missing first: only a successful probe may
+; clear the flag, which keeps the answer honest whichever way the VM behaves.
+Function ProbeNativePlugin()
+    If (!properties)
+        ; An earlier frame aborted by an unbound native can leave this unresolved.
+        properties = LTMN2:Properties.GetInstance()
+    EndIf
+    If (!properties)
+        Return
+    EndIf
+    If (properties.IsUninstalled)
+        ; A probe event can already be queued when Uninstall clears the flag. Let
+        ; it expire silently instead of writing "missing" back over that clear.
+        Return
+    EndIf
+    properties.IsNativePluginMissing = true
+    If (F4SE.GetPluginVersion("lootman") >= 0)
+        properties.IsNativePluginMissing = false
+    EndIf
+EndFunction
+
 Event OnTimer(int aiTimerId)
-    If (aiTimerId == TIMER_LOOTING)
+    If (aiTimerId == TIMER_NATIVE_PROBE)
+        ProbeNativePlugin()
+    ElseIf (aiTimerId == TIMER_LOOTING)
         Looting()
         ResetLootingTimer()
     ElseIf (aiTimerId == TIMER_UPDATE)
@@ -477,6 +522,14 @@ Function Uninstall()
         LogSystemEvent("uninstall_skipped", "reason=already_uninstalled", LOG_LEVEL_DEBUG)
         Return
     EndIf
+
+    ; Retire the native-plugin diagnostic before the first LootMan native call
+    ; below. Uninstalling is exactly what a player does when the DLL is missing,
+    ; and that frame aborts at the first native - leaving the probe timer armed
+    ; and the flag frozen at "missing", so MCM would report "Uninstalled" and the
+    ; missing-plugin warning at the same time.
+    CancelTimer(TIMER_NATIVE_PROBE)
+    properties.IsNativePluginMissing = false
 
     properties.IsUninstalled = true
     properties.IsNotUninstalled = false

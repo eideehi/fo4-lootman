@@ -292,6 +292,11 @@ actions:
 
 - Status reads `[ LootMan Is Not Installed ]`, `[ LootMan Is Installed ]`, or
   `[ LootMan Is Uninstalled ]`.
+- A `Native Plugin` section appears only when LootMan's F4SE plugin is not
+  loaded. It warns that settings still respond while nothing is ever looted,
+  and points at the runtime, `lootman.dll`, and Address Library requirements.
+  LootMan re-checks this on every save load, so the section disappears by
+  itself once the plugin loads.
 - The `Force Install` section exposes an `Execute Force Install` button.
   Use it if LootMan is not installed after exiting Vault 111.
 - The `Uninstall` section exposes an `Execute Uninstall` switch. Turning it on
@@ -760,6 +765,17 @@ Check MCM first:
   manual-only looting.
 - If LootMan says a feature is unavailable, confirm LootMan is installed and
   not already uninstalled.
+- If MCM shows the `Native Plugin` warning on the System page, LootMan's F4SE
+  plugin is not loaded in this session: the ESP, the Papyrus scripts, and every
+  MCM setting still work, but all looting is native, so nothing is ever picked
+  up and `Data/F4SE/Plugins/LootMan.log` gets no new entries this session. A log
+  file left over from an earlier session that did work can still be on disk, so
+  finding one there does not mean the plugin loaded now. Check that Fallout 4 is
+  runtime `1.11.240`, that `Data/F4SE/Plugins/lootman.dll` is present, and that
+  Address Library for F4SE Plugins ships `version-1-11-240-0.bin`. Reinstalling
+  LootMan does repair a missing or corrupted `lootman.dll`, but it changes
+  nothing while the game runtime or the Address Library version is the mismatch.
+  Fix whichever is wrong and restart Fallout 4.
 - If no items are looted, check `Enable LootMan`, `Looting Range`,
   `Carry Weight`, `Enable Carry Weight Limit`, `Enable Looting In Settlements`,
   and the Object, Inventory, and Advanced filters on the Looting page.

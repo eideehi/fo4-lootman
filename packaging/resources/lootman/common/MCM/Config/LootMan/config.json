@@ -1228,12 +1228,29 @@
             "propertyName": "IsNotUninstalled"
           }
         },
+        {
+          "type": "hiddenSwitcher",
+          "text": "",
+          "groupControl": 8,
+          "valueOptions":
+          {
+            "sourceType": "PropertyValueBool",
+            "sourceForm": "LootMan.esp|F9A",
+            "propertyName": "IsNativePluginMissing"
+          }
+        },
 
         { "type": "section", "text": "$PAGE_SYSTEM_STATUS_SECTION" },
         { "type": "text", "text": "$PAGE_SYSTEM_STATUS_NOT_INSTALLED", "groupCondition": { "AND": [2, 6] } },
         { "type": "text", "text": "$PAGE_SYSTEM_STATUS_INSTALLED", "groupCondition": { "AND": [1, 6] } },
         { "type": "text", "text": "$PAGE_SYSTEM_STATUS_UNINSTALLED", "groupCondition": 5 },
         { "type": "spacer" },
+
+        { "type": "section", "text": "$PAGE_SYSTEM_NATIVE_PLUGIN_SECTION", "groupCondition": 8 },
+        { "type": "text", "text": "$PAGE_SYSTEM_NATIVE_PLUGIN_MISSING", "groupCondition": 8 },
+        { "type": "text", "text": "$PAGE_SYSTEM_NATIVE_PLUGIN_MISSING_TEXT", "groupCondition": 8 },
+        { "type": "text", "text": "$PAGE_SYSTEM_NATIVE_PLUGIN_MISSING_FIX", "groupCondition": 8 },
+        { "type": "spacer", "groupCondition": 8 },
 
         { "type": "section", "text": "$PAGE_SYSTEM_FORCE_INSTALL_SECTION", "groupCondition": { "AND": [2, 6] } },
         { "type": "text", "text": "$PAGE_SYSTEM_FORCE_INSTALL_SECTION_TEXT", "groupCondition": { "AND": [2, 6] } },
