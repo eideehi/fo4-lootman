@@ -15,29 +15,36 @@ Scriptname LTMN2:Config native hidden
 ; Boolean settings
 ; ---------------------------------------------------------------------------
 
-; Absolute set for a plain or object-filter bool. Do NOT use for packed-bitmask
-; ids (use ToggleBit) -- ApplySettingSideEffects XORs the packed int
-; unconditionally, so an absolute set there would flip an already-correct bit.
+; Absolute set for a plain or object-filter bool. Packed-bitmask ids are rejected
+; here; use ToggleBit for those. Writing one absolutely is no longer unsafe --
+; ApplySettingSideEffects rebuilds the packed ints from the backing bools rather
+; than flipping bits -- but the split entry points are the documented contract
+; every terminal fragment is wired to, so the rejection stays.
 Function SetBool(string id, bool value) global
     LTMN2:Properties properties = LTMN2:Properties.GetInstance()
     If (!WriteSettableBool(properties, id, value))
-        ; Packed-bitmask ids are toggle-only: ApplySettingSideEffects XORs the
-        ; packed int unconditionally, so an absolute set would desync. Reject here
-        ; so the contract is enforced, not just documented; callers use ToggleBit.
+        ; Packed-bitmask ids are toggle-only by contract, not by hazard: callers
+        ; reach them through ToggleBit. Reject here so the split is enforced rather
+        ; than only documented, and so an unknown id is never silently accepted.
         LTMN2:LootMan.LogEvent("config", "set_bool_rejected", "id=" + id + " reason=toggle_only", 3)
         Return
     EndIf
     LTMN2:MCM.GetInstance().ApplySettingSideEffects(id)
 EndFunction
 
-; Toggle a plain or object-filter bool.
+; Toggle a plain or object-filter bool. Reaches the same FlipBool dispatcher as
+; ToggleBit, so a packed-bitmask id passed here is toggled just as safely; the
+; two names document caller intent, they are not different code paths.
 Function Toggle(string id) global
     FlipBool(id)
 EndFunction
 
 ; Toggle a packed-bitmask id. Flips the backing bool the MCM switcher binds to;
-; ApplySettingSideEffects then XORs the matching packed int, exactly as MCM does.
-; This is the only safe entry point for those ids.
+; ApplySettingSideEffects then rebuilds the packed int from that bool and its
+; siblings, exactly as MCM does. This is the entry point terminal fragments are
+; wired to for those ids - not the only one that reaches them, since Toggle
+; shares the same dispatcher, but the only one that names the intent. What is
+; enforced is the other half: SetBool rejects packed ids outright.
 Function ToggleBit(string id) global
     FlipBool(id)
 EndFunction
@@ -402,9 +409,10 @@ bool Function WriteSettableBool(LTMN2:Properties properties, string id, bool val
     Return true
 EndFunction
 
-; Write a packed-bitmask backing bool (the bool the MCM switcher binds to). These
-; are toggle-only: ApplySettingSideEffects XORs the matching packed int, so they
-; are reached only through FlipBool, never the absolute SetBool path.
+; Write a packed-bitmask backing bool (the bool the MCM switcher binds to). The
+; bool is the authority: ApplySettingSideEffects derives the matching packed int
+; from it afterwards. These are reached only through FlipBool, because SetBool
+; keeps packed ids toggle-only by contract, never the absolute path.
 Function WritePackedBool(LTMN2:Properties properties, string id, bool value) global
     ; Packed-bitmask backing bools: inventory filter
     If (id == "EnableInventoryLootingOfALCH")

@@ -139,6 +139,22 @@ Function ApplySettingSideEffects(string id)
         player = Game.GetPlayer()
     EndIf
 
+    ; The MCM switcher (or LTMN2:Config.FlipBool) has already written the bool this
+    ; id names. Rebuild the packed masks from the bools so the native loot gate
+    ; agrees with what the switch shows - whatever state the pair was left in by an
+    ; earlier update that never got this far.
+    ;
+    ; Deliberately above the install-state guard below. Rebuilding a mask from its
+    ; own backing bool is pure state repair: it is correct in every install state,
+    ; and the caller has already mutated the bool by the time we get here. Skipping
+    ; it for a not-yet-installed or uninstalled save would strand the pair for the
+    ; rest of the session, because nothing else - not Install, not Initialize -
+    ; recomputes. The workshop, log-level and native side effects below are the
+    ; things that genuinely need an installed mod; this is not one of them.
+    If (properties.IsPackedSubtypeSetting(id))
+        properties.RecomputePackedMasks()
+    EndIf
+
     ; Skip side effects unless the mod is in an installed, usable state. MCM hides
     ; its config controls until install, but the holotape terminal can reach this
     ; entry directly, so guard here too. IsNotInitialized is intentionally not
@@ -149,7 +165,6 @@ Function ApplySettingSideEffects(string id)
     EndIf
 
     string prefix = "source=papyrus component=mcm event=setting_changed id=" + id
-    LogMcmEvent("setting_changed", "id=" + id)
 
     If (id == "AutomaticallyLinkAndUnlinkToWorkshop")
         WorkshopScript workshop = LTMN2:Utils.GetCurrentWorkshop(player)
@@ -214,58 +229,17 @@ Function ApplySettingSideEffects(string id)
     ElseIf (id == "LogLevel")
         LTMN2:LootMan.SetLogLevel(LogLevel)
         SyncLogLevelFromNative(true)
-
-    ElseIf (id == "EnableInventoryLootingOfALCH")
-        properties.LootableInventoryItemType = Math.LogicalXor(properties.LootableInventoryItemType, properties.ITEM_TYPE_ALCH)
-    ElseIf (id == "EnableInventoryLootingOfAMMO")
-        properties.LootableInventoryItemType = Math.LogicalXor(properties.LootableInventoryItemType, properties.ITEM_TYPE_AMMO)
-    ElseIf (id == "EnableInventoryLootingOfARMO")
-        properties.LootableInventoryItemType = Math.LogicalXor(properties.LootableInventoryItemType, properties.ITEM_TYPE_ARMO)
-    ElseIf (id == "EnableInventoryLootingOfBOOK")
-        properties.LootableInventoryItemType = Math.LogicalXor(properties.LootableInventoryItemType, properties.ITEM_TYPE_BOOK)
-    ElseIf (id == "EnableInventoryLootingOfINGR")
-        properties.LootableInventoryItemType = Math.LogicalXor(properties.LootableInventoryItemType, properties.ITEM_TYPE_INGR)
-    ElseIf (id == "EnableInventoryLootingOfKEYM")
-        properties.LootableInventoryItemType = Math.LogicalXor(properties.LootableInventoryItemType, properties.ITEM_TYPE_KEYM)
-    ElseIf (id == "EnableInventoryLootingOfMISC")
-        properties.LootableInventoryItemType = Math.LogicalXor(properties.LootableInventoryItemType, properties.ITEM_TYPE_MISC)
-    ElseIf (id == "EnableInventoryLootingOfWEAP")
-        properties.LootableInventoryItemType = Math.LogicalXor(properties.LootableInventoryItemType, properties.ITEM_TYPE_WEAP)
-
-    ElseIf (id == "EnableALCHItemAlcohol")
-        properties.LootableALCHItemType = Math.LogicalXor(properties.LootableALCHItemType, properties.ALCH_ITEM_TYPE_ALCOHOL)
-    ElseIf (id == "EnableALCHItemChemistry")
-        properties.LootableALCHItemType = Math.LogicalXor(properties.LootableALCHItemType, properties.ALCH_ITEM_TYPE_CHEMISTRY)
-    ElseIf (id == "EnableALCHItemFood")
-        properties.LootableALCHItemType = Math.LogicalXor(properties.LootableALCHItemType, properties.ALCH_ITEM_TYPE_FOOD)
-    ElseIf (id == "EnableALCHItemNukaCola")
-        properties.LootableALCHItemType = Math.LogicalXor(properties.LootableALCHItemType, properties.ALCH_ITEM_TYPE_NUKA_COLA)
-    ElseIf (id == "EnableALCHItemStimpak")
-        properties.LootableALCHItemType = Math.LogicalXor(properties.LootableALCHItemType, properties.ALCH_ITEM_TYPE_STIMPAK)
-    ElseIf (id == "EnableALCHItemSyringerAmmo")
-        properties.LootableALCHItemType = Math.LogicalXor(properties.LootableALCHItemType, properties.ALCH_ITEM_TYPE_SYRINGER_AMMO)
-    ElseIf (id == "EnableALCHItemWater")
-        properties.LootableALCHItemType = Math.LogicalXor(properties.LootableALCHItemType, properties.ALCH_ITEM_TYPE_WATER)
-    ElseIf (id == "EnableALCHItemOther")
-        properties.LootableALCHItemType = Math.LogicalXor(properties.LootableALCHItemType, properties.ALCH_ITEM_TYPE_OTHER)
-
-    ElseIf (id == "EnableBOOKItemPerkMagazine")
-        properties.LootableBOOKItemType = Math.LogicalXor(properties.LootableBOOKItemType, properties.BOOK_ITEM_TYPE_PERKMAGAZINE)
-    ElseIf (id == "EnableBOOKItemOther")
-        properties.LootableBOOKItemType = Math.LogicalXor(properties.LootableBOOKItemType, properties.BOOK_ITEM_TYPE_OTHER)
-
-    ElseIf (id == "EnableMISCItemBobblehead")
-        properties.LootableMISCItemType = Math.LogicalXor(properties.LootableMISCItemType, properties.MISC_ITEM_TYPE_BOBBLEHEAD)
-    ElseIf (id == "EnableMISCItemOther")
-        properties.LootableMISCItemType = Math.LogicalXor(properties.LootableMISCItemType, properties.MISC_ITEM_TYPE_OTHER)
-
-    ElseIf (id == "EnableWEAPItemGrenade")
-        properties.LootableWEAPItemType = Math.LogicalXor(properties.LootableWEAPItemType, properties.WEAP_ITEM_TYPE_GRENADE)
-    ElseIf (id == "EnableWEAPItemMine")
-        properties.LootableWEAPItemType = Math.LogicalXor(properties.LootableWEAPItemType, properties.WEAP_ITEM_TYPE_MINE)
-    ElseIf (id == "EnableWEAPItemOther")
-        properties.LootableWEAPItemType = Math.LogicalXor(properties.LootableWEAPItemType, properties.WEAP_ITEM_TYPE_OTHER)
     EndIf
+
+    ; Logged after the state change, not before it. LogMcmEvent is an LTMN2:LootMan
+    ; native, so on an install where lootman.dll never loaded it aborts this frame -
+    ; and doing that first is exactly what used to strand a packed mask behind the
+    ; bool MCM had already written. The mask rebuild above calls no LTMN2:LootMan
+    ; native, so it survives a missing lootman.dll: by the time this line can fail,
+    ; the Papyrus-side state is already committed. (It does use Math.LogicalOr, an
+    ; F4SE native, which is bound - F4SE is a hard prerequisite and is loaded in
+    ; exactly that failure mode; only lootman.dll is absent.)
+    LogMcmEvent("setting_changed", "id=" + id)
 
     LTMN2:LootMan.OnUpdateLootManProperty(id)
 EndFunction

@@ -118,8 +118,10 @@ describe("mcm fallback config delivery", () => {
 
 	it("keeps packed-bitmask ids out of the absolute SetBool path", () => {
 		// SetBool writes via WriteSettableBool, which must not handle packed-bitmask
-		// ids; those are toggle-only because ApplySettingSideEffects XORs the packed
-		// int, so an absolute set would desync the bool and the int.
+		// ids. ApplySettingSideEffects now rebuilds the packed ints from their bools,
+		// so an absolute set would be safe; the split is kept deliberately so callers
+		// reach those ids through the ToggleBit API instead of two ways of writing one
+		// setting.
 		const settable = extractPapyrusFunction(configScript, "WriteSettableBool");
 		const packedWriter = extractPapyrusFunction(configScript, "WritePackedBool");
 		for (const packed of ["EnableInventoryLootingOfALCH", "EnableALCHItemFood", "EnableBOOKItemPerkMagazine", "EnableMISCItemBobblehead", "EnableWEAPItemGrenade"]) {

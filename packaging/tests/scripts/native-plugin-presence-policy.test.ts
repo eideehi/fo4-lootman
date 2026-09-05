@@ -223,7 +223,7 @@ describe("native plugin presence policy", () => {
 		// without lootman.dll aborts the frame before the subscription exists, and
 		// the save is then stuck showing the warning forever.
 		expect(
-			papyrusStatements(extractPapyrusEvent(systemScript, "OnInit")).slice(0, 6),
+			papyrusStatements(extractPapyrusEvent(systemScript, "OnInit")).slice(0, 7),
 			"OnInit must resolve properties, arm the probe and register the load event before its first native call",
 		).toEqual([
 			"properties = LTMN2:Properties.GetInstance()",
@@ -231,6 +231,12 @@ describe("native plugin presence policy", () => {
 			"StartTimer(5, TIMER_NATIVE_PROBE)",
 			"player = Game.GetPlayer()",
 			'RegisterForRemoteEvent(player, "OnPlayerLoadGame")',
+			// Load-bearing here for the same reason as the two lines above it: the
+			// reconcile calls no LTMN2:LootMan native, so it still runs on the install
+			// where lootman.dll never loaded. It is not native-free - Math.LogicalOr
+			// is an F4SE native - but F4SE is a hard prerequisite and is loaded in
+			// exactly that failure mode. See packed-subtype-mask-policy.
+			"properties.RecomputePackedMasks()",
 			'LogSystemEvent("first_run", "version=" + GetVersionString(MOD_VERSION))',
 		]);
 

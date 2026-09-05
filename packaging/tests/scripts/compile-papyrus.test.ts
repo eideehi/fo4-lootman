@@ -28,7 +28,7 @@ function seedRequiredPapyrusSymbols(importDir: string): void {
 			"ScriptName Math",
 			"Function LogicalAnd()",
 			"EndFunction",
-			"Function LogicalXor()",
+			"Function LogicalOr()",
 			"EndFunction",
 		].join("\n"),
 	);

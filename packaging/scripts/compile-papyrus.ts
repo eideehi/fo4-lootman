@@ -101,7 +101,7 @@ interface RequiredPapyrusSymbol {
 
 const REQUIRED_PAPYRUS_SYMBOLS: RequiredPapyrusSymbol[] = [
 	{ scriptFile: "Math.psc", needle: "LogicalAnd", label: "Math.LogicalAnd" },
-	{ scriptFile: "Math.psc", needle: "LogicalXor", label: "Math.LogicalXor" },
+	{ scriptFile: "Math.psc", needle: "LogicalOr", label: "Math.LogicalOr" },
 	{ scriptFile: "ObjectReference.psc", needle: "GetDisplayName", label: "ObjectReference.GetDisplayName" },
 	{ scriptFile: "ObjectReference.psc", needle: "GetInventoryWeight", label: "ObjectReference.GetInventoryWeight" },
 	{ scriptFile: "ScriptObject.psc", needle: "RegisterForExternalEvent", label: "ScriptObject.RegisterForExternalEvent" },

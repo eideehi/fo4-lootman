@@ -113,6 +113,22 @@ Event OnInit()
     player = Game.GetPlayer()
     RegisterForRemoteEvent(player, "OnPlayerLoadGame")
 
+    ; Reconcile the packed subtype masks against their backing bools once per load.
+    ; OnInit and OnPlayerLoadGame are mutually exclusive - a new game runs one, a
+    ; loaded save the other - so between them this happens exactly once, and never
+    ; twice. It has to sit above LogSystemEvent for the same reason the probe does:
+    ; it calls no LTMN2:LootMan native, so it survives a missing lootman.dll and
+    ; still runs on the install where the masks drift in the first place - the one
+    ; where that log call aborts the frame. (It does call Math.LogicalOr, which is
+    ; an F4SE native, but F4SE is a hard prerequisite and is loaded in exactly that
+    ; failure mode; only lootman.dll is absent.)
+    ;
+    ; Unguarded here, unlike the OnPlayerLoadGame copy. This is the fresh-quest
+    ; path: CurrentModVersion is still 0, every packed property still holds its
+    ; compile-time default, and Patch never runs from here - so no migration can be
+    ; pending and the reconcile has nothing of the player's to overwrite.
+    properties.RecomputePackedMasks()
+
     LogSystemEvent("first_run", "version=" + GetVersionString(MOD_VERSION))
 
     messageDisplayCount = new int[MESSAGE_COUNT]
@@ -130,6 +146,22 @@ Event Actor.OnPlayerLoadGame(Actor akSender)
     ; native at the log call below.
     CancelTimer(TIMER_NATIVE_PROBE)
     StartTimer(5, TIMER_NATIVE_PROBE)
+
+    ; Reconcile the packed subtype masks against their backing bools, the same way
+    ; and for the same reason as OnInit. This is the repair path for saves that are
+    ; already carrying a mask which disagrees with its MCM switch, so it must run
+    ; before LogSystemEvent below can abort the frame on a missing lootman.dll.
+    ;
+    ; Skipped while a migration is pending, and that condition is load-bearing.
+    ; This reconcile derives masks from bools; Patch.v2_0_1 derives bools from
+    ; masks, the opposite direction. Running it first on a pre-2.0.1 save would
+    ; hand v2_0_1 a mask this very frame had just rebuilt from the compile-time
+    ; bool defaults, and the player's stored subtype choices would be read back as
+    ; those defaults. A migrating save is still reconciled - Patch() ends with its
+    ; own RecomputePackedMasks, once the chain has read the masks it needs.
+    If (CurrentModVersion == MOD_VERSION)
+        properties.RecomputePackedMasks()
+    EndIf
 
     LogSystemEvent("load", "version=" + GetVersionString(MOD_VERSION) + " current_version=" + GetVersionString(CurrentModVersion))
 
@@ -659,6 +691,14 @@ Function Patch()
     EndIf
 
     CurrentModVersion = MOD_VERSION
+
+    ; Re-establish the bool/mask invariant that the early load reconcile skipped for
+    ; this save. Every step above has finished reading the stored masks by now, so
+    ; deriving them back from the bools is either a no-op (v2_0_1 just set those
+    ; bools from these masks) or exactly the repair a stranded save came here for.
+    ; Above the patch_completed log for the usual reason: that log is an
+    ; LTMN2:LootMan native and can abort the frame before this line would run.
+    properties.RecomputePackedMasks()
 
     LogSystemEvent("patch_completed", "from_version=" + GetVersionString(fromVersion) + " current_version=" + GetVersionString(CurrentModVersion))
 EndFunction

@@ -169,3 +169,147 @@ Group System
     ; Used to utility function
     Keyword property ObjectTypeLooseMod auto const mandatory
 EndGroup
+
+; ---------------------------------------------------------------------------
+; Packed subtype masks
+; ---------------------------------------------------------------------------
+;
+; Every packed subtype option is stored twice: as the Config bool the MCM
+; switcher writes and the player reads, and as one bit of a Status mask the
+; native loot gate reads. The bool is the authority, because it is the value the
+; player actually chose and the only one the UI can show.
+;
+; The masks used to be kept in step by flipping the matching bit with
+; Math.LogicalXor from LTMN2:MCM.ApplySettingSideEffects. A flip is only correct
+; while the pair already agrees and the callback runs exactly once per bool
+; change, and neither holds: that callback returns early when the mod is not
+; installed, and it aborts on its first LTMN2:LootMan native when lootman.dll
+; failed to load - in both cases after MCM has already written the bool. A single
+; missed flip inverted the option permanently, because nothing outside a
+; version-bump migration ever reconciled the two again.
+;
+; Deriving instead of flipping removes the failure entirely: the mask has no state
+; of its own to lose.
+
+; Return bit when enabled and 0 otherwise, so one row of the mask table below fits
+; on one line.
+int Function MaskBit(bool enabled, int bit)
+    If (enabled)
+        Return bit
+    EndIf
+    Return 0
+EndFunction
+
+; Rebuild every packed mask from its backing bools. This is the only writer of the
+; five Lootable*ItemType values.
+;
+; Total and idempotent: each mask is assembled from zero, so every bit is set or
+; cleared to match its bool on every call, and calling it twice changes nothing.
+; One call therefore repairs any divergence, whatever produced it.
+;
+; Callable from the load path before the native plugin is known to be there: it
+; touches no LTMN2:LootMan function. Math.LogicalOr is an F4SE native, and F4SE is
+; loaded in the failure mode this guards against - only lootman.dll is missing.
+Function RecomputePackedMasks()
+    int inventoryMask = 0
+    inventoryMask = Math.LogicalOr(inventoryMask, MaskBit(EnableInventoryLootingOfALCH, ITEM_TYPE_ALCH))
+    inventoryMask = Math.LogicalOr(inventoryMask, MaskBit(EnableInventoryLootingOfAMMO, ITEM_TYPE_AMMO))
+    inventoryMask = Math.LogicalOr(inventoryMask, MaskBit(EnableInventoryLootingOfARMO, ITEM_TYPE_ARMO))
+    inventoryMask = Math.LogicalOr(inventoryMask, MaskBit(EnableInventoryLootingOfBOOK, ITEM_TYPE_BOOK))
+    inventoryMask = Math.LogicalOr(inventoryMask, MaskBit(EnableInventoryLootingOfINGR, ITEM_TYPE_INGR))
+    inventoryMask = Math.LogicalOr(inventoryMask, MaskBit(EnableInventoryLootingOfKEYM, ITEM_TYPE_KEYM))
+    inventoryMask = Math.LogicalOr(inventoryMask, MaskBit(EnableInventoryLootingOfMISC, ITEM_TYPE_MISC))
+    inventoryMask = Math.LogicalOr(inventoryMask, MaskBit(EnableInventoryLootingOfWEAP, ITEM_TYPE_WEAP))
+    LootableInventoryItemType = inventoryMask
+
+    int alchMask = 0
+    alchMask = Math.LogicalOr(alchMask, MaskBit(EnableALCHItemAlcohol, ALCH_ITEM_TYPE_ALCOHOL))
+    alchMask = Math.LogicalOr(alchMask, MaskBit(EnableALCHItemChemistry, ALCH_ITEM_TYPE_CHEMISTRY))
+    alchMask = Math.LogicalOr(alchMask, MaskBit(EnableALCHItemFood, ALCH_ITEM_TYPE_FOOD))
+    alchMask = Math.LogicalOr(alchMask, MaskBit(EnableALCHItemNukaCola, ALCH_ITEM_TYPE_NUKA_COLA))
+    alchMask = Math.LogicalOr(alchMask, MaskBit(EnableALCHItemStimpak, ALCH_ITEM_TYPE_STIMPAK))
+    alchMask = Math.LogicalOr(alchMask, MaskBit(EnableALCHItemSyringerAmmo, ALCH_ITEM_TYPE_SYRINGER_AMMO))
+    alchMask = Math.LogicalOr(alchMask, MaskBit(EnableALCHItemWater, ALCH_ITEM_TYPE_WATER))
+    alchMask = Math.LogicalOr(alchMask, MaskBit(EnableALCHItemOther, ALCH_ITEM_TYPE_OTHER))
+    LootableALCHItemType = alchMask
+
+    int bookMask = 0
+    bookMask = Math.LogicalOr(bookMask, MaskBit(EnableBOOKItemPerkMagazine, BOOK_ITEM_TYPE_PERKMAGAZINE))
+    bookMask = Math.LogicalOr(bookMask, MaskBit(EnableBOOKItemOther, BOOK_ITEM_TYPE_OTHER))
+    LootableBOOKItemType = bookMask
+
+    int miscMask = 0
+    miscMask = Math.LogicalOr(miscMask, MaskBit(EnableMISCItemBobblehead, MISC_ITEM_TYPE_BOBBLEHEAD))
+    miscMask = Math.LogicalOr(miscMask, MaskBit(EnableMISCItemOther, MISC_ITEM_TYPE_OTHER))
+    LootableMISCItemType = miscMask
+
+    int weapMask = 0
+    weapMask = Math.LogicalOr(weapMask, MaskBit(EnableWEAPItemGrenade, WEAP_ITEM_TYPE_GRENADE))
+    weapMask = Math.LogicalOr(weapMask, MaskBit(EnableWEAPItemMine, WEAP_ITEM_TYPE_MINE))
+    weapMask = Math.LogicalOr(weapMask, MaskBit(EnableWEAPItemOther, WEAP_ITEM_TYPE_OTHER))
+    LootableWEAPItemType = weapMask
+EndFunction
+
+; True when id names one of the 23 bools RecomputePackedMasks reads. Kept beside
+; that table on purpose: the two lists have to name the same settings, and a
+; policy test pins them to each other.
+bool Function IsPackedSubtypeSetting(string id)
+    ; Inventory item-type filter
+    If (id == "EnableInventoryLootingOfALCH")
+        Return true
+    ElseIf (id == "EnableInventoryLootingOfAMMO")
+        Return true
+    ElseIf (id == "EnableInventoryLootingOfARMO")
+        Return true
+    ElseIf (id == "EnableInventoryLootingOfBOOK")
+        Return true
+    ElseIf (id == "EnableInventoryLootingOfINGR")
+        Return true
+    ElseIf (id == "EnableInventoryLootingOfKEYM")
+        Return true
+    ElseIf (id == "EnableInventoryLootingOfMISC")
+        Return true
+    ElseIf (id == "EnableInventoryLootingOfWEAP")
+        Return true
+
+    ; ALCH subtype filter
+    ElseIf (id == "EnableALCHItemAlcohol")
+        Return true
+    ElseIf (id == "EnableALCHItemChemistry")
+        Return true
+    ElseIf (id == "EnableALCHItemFood")
+        Return true
+    ElseIf (id == "EnableALCHItemNukaCola")
+        Return true
+    ElseIf (id == "EnableALCHItemStimpak")
+        Return true
+    ElseIf (id == "EnableALCHItemSyringerAmmo")
+        Return true
+    ElseIf (id == "EnableALCHItemWater")
+        Return true
+    ElseIf (id == "EnableALCHItemOther")
+        Return true
+
+    ; BOOK subtype filter
+    ElseIf (id == "EnableBOOKItemPerkMagazine")
+        Return true
+    ElseIf (id == "EnableBOOKItemOther")
+        Return true
+
+    ; MISC subtype filter
+    ElseIf (id == "EnableMISCItemBobblehead")
+        Return true
+    ElseIf (id == "EnableMISCItemOther")
+        Return true
+
+    ; WEAP subtype filter
+    ElseIf (id == "EnableWEAPItemGrenade")
+        Return true
+    ElseIf (id == "EnableWEAPItemMine")
+        Return true
+    ElseIf (id == "EnableWEAPItemOther")
+        Return true
+    EndIf
+
+    Return false
+EndFunction
