@@ -31,8 +31,9 @@ namespace form_cache
 	namespace form_list
 	{
 		RE::BGSListForm* uniqueItems = nullptr;
-		// uniqueItemIds is rebuilt by Initialize() on the main thread (kGameLoaded, incl. mid-session save
-		// loads) but read per-form from VM worker threads on the loot-validation hot path. A shared_mutex
+		// uniqueItemIds is built by Initialize() on the F4SE message thread (kGameLoaded, which fires once
+		// per process and not on a save load) but read per-form from VM worker threads on the
+		// loot-validation hot path. A shared_mutex
 		// plus build-local-then-swap keeps a reader from traversing the set mid-clear()/rehash (data race /
 		// use-after-free), matching the sibling constructible_object / vendor_chest caches.
 		std::shared_mutex uniqueItemIdsMutex;

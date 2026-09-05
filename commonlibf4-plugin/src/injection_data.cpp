@@ -48,8 +48,10 @@ namespace injection_data
 	// before form/keyword resolution, so LoadInjectionData only ever sees concrete identifiers.
 	std::unordered_map<std::string, std::unordered_set<std::string>> lists;
 
-	// Runtime-resolved injection data. LoadInjectionData rebuilds it on every kGameLoaded (including
-	// mid-session save loads), but the loot/validation hot path reads it from VM worker threads. Because the
+	// Runtime-resolved injection data. LoadInjectionData builds it on kGameLoaded, which F4SE sends once
+	// per process after the game finishes loading and never again for a save load, so the JSON identifiers
+	// Initialize() parsed at plugin load are resolved exactly once and an edited file needs a game restart.
+	// The loot/validation hot path reads this from VM worker threads. Because the
 	// list/set accessors hand out a reference that outlives any internal lock, a shared_mutex find() cannot
 	// make them safe; instead the resolved maps live in one immutable snapshot published behind a shared_ptr.
 	// A reader copies the current snapshot pointer under a shared_lock, and a Ref accessor returns a
