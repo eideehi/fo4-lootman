@@ -1,0 +1,89 @@
+Program: Fallout4.exe
+Image base: 140000000
+
+================================================================================
+Target 1404d3150
+Function: FUN_1404d3150
+Entry: 1404d3150
+Body: [[1404d3150, 1404d31b7]]
+
+References to entry:
+  140494e2d -> 1404d3150 type=UNCONDITIONAL_CALL
+  1404a14c6 -> 1404d3150 type=UNCONDITIONAL_CALL
+  1404a34c9 -> 1404d3150 type=UNCONDITIONAL_CALL
+  140c952ea -> 1404d3150 type=UNCONDITIONAL_CALL
+  140c95304 -> 1404d3150 type=UNCONDITIONAL_CALL
+  140495044 -> 1404d3150 type=UNCONDITIONAL_CALL
+
+Outgoing references from function body:
+  1404d3156 -> 1404d31b5 type=CONDITIONAL_JUMP
+  1404d315b -> 1404d3183 type=CONDITIONAL_JUMP
+  1404d316b -> 1404d31a8 type=CONDITIONAL_JUMP
+  1404d3181 -> 1404d31a3 type=UNCONDITIONAL_JUMP
+  1404d3193 -> 1404d31a8 type=CONDITIONAL_JUMP
+  1404d31aa -> 1404d31b2 type=CONDITIONAL_JUMP
+  1404d31b0 -> 1404d31b5 type=CONDITIONAL_JUMP
+
+Instructions:
+  1404d3150: LEA EAX,[RDX + -0x1]
+  1404d3153: CMP EAX,-0x3
+  1404d3156: JA 0x1404d31b5
+  1404d3158: TEST R8B,R8B
+  1404d315b: JZ 0x1404d3183
+  1404d315d: CMP qword ptr [0x1431edb60],0x0
+  1404d3165: MOV EAX,dword ptr [0x142ee4248]
+  1404d316b: JZ 0x1404d31a8
+  1404d316d: XORPS XMM0,XMM0
+  1404d3170: CVTSI2SS XMM0,RAX
+  1404d3175: MOV RAX,qword ptr [0x1431edb98]
+  1404d317c: MULSS XMM0,dword ptr [RAX + 0x30]
+  1404d3181: JMP 0x1404d31a3
+  1404d3183: MOV R8,qword ptr [0x1431edb60]
+  1404d318a: MOV EAX,dword ptr [0x142ee4230]
+  1404d3190: TEST R8,R8
+  1404d3193: JZ 0x1404d31a8
+  1404d3195: XORPS XMM0,XMM0
+  1404d3198: CVTSI2SS XMM0,RAX
+  1404d319d: MULSS XMM0,dword ptr [R8 + 0x30]
+  1404d31a3: CVTTSS2SI RAX,XMM0
+  1404d31a8: CMP ECX,EDX
+  1404d31aa: JBE 0x1404d31b2
+  1404d31ac: SUB ECX,EDX
+  1404d31ae: CMP ECX,EAX
+  1404d31b0: JA 0x1404d31b5
+  1404d31b2: XOR AL,AL
+  1404d31b4: RE
+  1404d31b5: MOV AL,0x1
+  1404d31b7: RE
+
+Decompiled C:
+
+ulonglong FUN_1404d3150(uint param_1,uint param_2,char param_3)
+
+{
+  ulonglong uVar1;
+  float fVar2;
+
+  uVar1 = (ulonglong)(param_2 - 1);
+  if (0xfffffffd < param_2 - 1) goto LAB_1404d31b5;
+  if (param_3 == '\0') {
+    uVar1 = (ulonglong)DAT_142ee4230;
+    if (DAT_1431edb60 != 0) {
+      fVar2 = (float)uVar1 * *(float *)(DAT_1431edb60 + 0x30);
+      goto LAB_1404d31a3;
+    }
+  }
+  else {
+    uVar1 = (ulonglong)DAT_142ee4248;
+    if (DAT_1431edb60 != 0) {
+      fVar2 = (float)uVar1 * *(float *)(DAT_1431edb98 + 0x30);
+LAB_1404d31a3:
+      uVar1 = (ulonglong)fVar2;
+    }
+  }
+  if ((param_1 <= param_2) || (param_1 - param_2 <= (uint)uVar1)) {
+    return uVar1 & 0xffffffffffffff00;
+  }
+LAB_1404d31b5:
+  return CONCAT71((int7)(uVar1 >> 8),1);
+}

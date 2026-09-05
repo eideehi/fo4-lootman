@@ -1,0 +1,65 @@
+Program: Fallout4.exe
+Image base: 140000000
+
+================================================================================
+Target 140b2c7da
+  140b2c7da: [E8 51 37 00 00] CALL 0x140b2ff30
+  140b2c7df: [8B 45 30] MOV EAX,dword ptr [RBP + 0x30]
+  140b2c7e2: [C1 E8 06] SHR EAX,0x6
+  140b2c7e5: [A8 01] TEST AL,0x1
+  140b2c7e7: [0F 84 C8 02 00 00] JZ 0x140b2cab5
+  140b2c7ed: [4C 8B 45 38] MOV R8,qword ptr [RBP + 0x38]
+
+================================================================================
+Target 140b2ca95
+  140b2ca95: [E8 96 34 00 00] CALL 0x140b2ff30
+  140b2ca9a: [8B 45 50] MOV EAX,dword ptr [RBP + 0x50]
+  140b2ca9d: [C1 E8 06] SHR EAX,0x6
+  140b2caa0: [A8 01] TEST AL,0x1
+  140b2caa2: [74 11] JZ 0x140b2cab5
+  140b2caa4: [4C 8B 45 58] MOV R8,qword ptr [RBP + 0x58]
+
+================================================================================
+Target 140b2b0ef
+  140b2b0ef: [E8 3C 4E 00 00] CALL 0x140b2ff30
+  140b2b0f4: [48 8B CE] MOV RCX,RSI
+  140b2b0f7: [E8 44 38 00 00] CALL 0x140b2e940
+  140b2b0fc: [E8 FF 33 EB FF] CALL 0x1409de500
+  140b2b101: [48 8B C8] MOV RCX,RAX
+  140b2b104: [E8 97 C2 F0 FF] CALL 0x140a373a0
+
+================================================================================
+Target 140b2b954
+  140b2b954: [E8 D7 45 00 00] CALL 0x140b2ff30
+  140b2b959: [33 D2] XOR EDX,EDX
+  140b2b95b: [48 8B CE] MOV RCX,RSI
+  140b2b95e: [E8 7D 50 00 00] CALL 0x140b309e0
+  140b2b963: [48 8B CE] MOV RCX,RSI
+  140b2b966: [E8 D5 30 00 00] CALL 0x140b2ea40
+
+================================================================================
+Target 140b2d900
+  140b2d900: [E8 2B 26 00 00] CALL 0x140b2ff30
+  140b2d905: [E9 B3 00 00 00] JMP 0x140b2d9bd
+  140b2d90a: [49 8D 4F F0] LEA RCX,[R15 + -0x10]
+  140b2d90e: [E8 6D 0B 00 00] CALL 0x140b2e480
+  140b2d913: [E9 B0 00 00 00] JMP 0x140b2d9c8
+  140b2d918: [48 85 F6] TEST RSI,RSI
+
+================================================================================
+Target 140b2e676
+  140b2e676: [E8 B5 18 00 00] CALL 0x140b2ff30
+  140b2e67b: [48 8B CF] MOV RCX,RDI
+  140b2e67e: [E8 BD 02 00 00] CALL 0x140b2e940
+  140b2e683: [44 39 65 20] CMP dword ptr [RBP + 0x20],R12D
+  140b2e687: [75 27] JNZ 0x140b2e6b0
+  140b2e689: [F2 0F 10 05 FF AD DF 01] MOVSD XMM0,qword ptr [0x142929490]
+
+================================================================================
+Target 140b2e8ff
+  140b2e8ff: [E8 2C 16 00 00] CALL 0x140b2ff30
+  140b2e904: [33 D2] XOR EDX,EDX
+  140b2e906: [48 8B CE] MOV RCX,RSI
+  140b2e909: [E8 D2 20 00 00] CALL 0x140b309e0
+  140b2e90e: [48 8B CE] MOV RCX,RSI
+  140b2e911: [E8 DA 08 00 00] CALL 0x140b2f1f0

@@ -1,0 +1,52 @@
+Program: Fallout4.exe
+Image base: 140000000
+
+================================================================================
+Target 140494e60
+Function: FUN_140494e60
+Entry: 140494e60
+Body: [[140494e60, 140494e8b]]
+
+References to entry:
+  143edc1a4 -> 140494e60 type=DATA
+  1404d26f4 -> 140494e60 type=UNCONDITIONAL_CALL
+
+Outgoing references from function body:
+  140494e6d -> 140494e84 type=CONDITIONAL_JUMP
+  140494e72 -> 1404c9320 type=UNCONDITIONAL_CALL
+  140494e7a -> 140494e84 type=CONDITIONAL_JUMP
+
+Instructions:
+  140494e60: PUSH RBX
+  140494e62: SUB RSP,0x20
+  140494e66: CMP dword ptr [RCX + 0x40],0x0
+  140494e6a: MOV RBX,RCX
+  140494e6d: JZ 0x140494e84
+  140494e6f: MOV RCX,RDX
+  140494e72: CALL 0x1404c9320
+  140494e77: CMP EAX,dword ptr [RBX + 0x40]
+  140494e7a: JNC 0x140494e84
+  140494e7c: MOV AL,0x1
+  140494e7e: ADD RSP,0x20
+  140494e82: POP RBX
+  140494e83: RE
+  140494e84: XOR AL,AL
+  140494e86: ADD RSP,0x20
+  140494e8a: POP RBX
+  140494e8b: RE
+
+Decompiled C:
+
+undefined4 FUN_140494e60(longlong param_1,undefined8 param_2)
+
+{
+  uint uVar1;
+
+  if (*(int *)(param_1 + 0x40) != 0) {
+    uVar1 = FUN_1404c9320(param_2);
+    if (uVar1 < *(uint *)(param_1 + 0x40)) {
+      return 1;
+    }
+  }
+  return 0;
+}

@@ -1,0 +1,82 @@
+Program: Fallout4.exe
+Image base: 140000000
+
+================================================================================
+Target 14059d690
+Function: FUN_14059d690
+Entry: 14059d690
+Body: [[14059d690, 14059d71b]]
+
+References to entry:
+  143ef1b34 -> 14059d690 type=DATA
+  1405dd7b4 -> 14059d690 type=UNCONDITIONAL_CALL
+  142ef7950 -> 14059d690 type=DATA
+
+Outgoing references from function body:
+  14059d6a3 -> 14059d6bb type=CONDITIONAL_JUMP
+  14059d6a8 -> 14037e190 type=UNCONDITIONAL_CALL
+  14059d6d7 -> 14059d714 type=CONDITIONAL_JUMP
+  14059d6d9 -> 14037e430 type=UNCONDITIONAL_CALL
+  14059d6e0 -> 14059d6f5 type=CONDITIONAL_JUMP
+  14059d6f0 -> 14103c0c0 type=UNCONDITIONAL_CALL
+  14059d70f -> 14103c0c0 type=UNCONDITIONAL_CALL
+
+Instructions:
+  14059d690: PUSH RBX
+  14059d692: SUB RSP,0x20
+  14059d696: MOV dword ptr [R9],0x0
+  14059d69d: MOV RBX,R9
+  14059d6a0: TEST RDX,RDX
+  14059d6a3: JZ 0x14059d6bb
+  14059d6a5: MOV RCX,RDX
+  14059d6a8: CALL 0x14037e190
+  14059d6ad: MOV EAX,EAX
+  14059d6af: XORPS XMM0,XMM0
+  14059d6b2: CVTSI2SS XMM0,RAX
+  14059d6b7: MOVSS dword ptr [RBX],XMM0
+  14059d6bb: MOV ECX,dword ptr [0x143e73018]
+  14059d6c1: MOV RAX,qword ptr GS:[0x58]
+  14059d6ca: MOV EDX,0x830
+  14059d6cf: MOV RAX,qword ptr [RAX + RCX*0x8]
+  14059d6d3: CMP byte ptr [RDX + RAX*0x1],0x0
+  14059d6d7: JZ 0x14059d714
+  14059d6d9: CALL 0x14037e430
+  14059d6de: TEST AL,AL
+  14059d6e0: JNZ 0x14059d6f5
+  14059d6e2: MOV RCX,qword ptr [0x1430f83b8]
+  14059d6e9: LEA RDX,[0x1424b2dd8]
+  14059d6f0: CALL 0x14103c0c0
+  14059d6f5: MOVSS XMM2,dword ptr [RBX]
+  14059d6f9: LEA RDX,[0x1424b2e10]
+  14059d700: MOV RCX,qword ptr [0x1430f83b8]
+  14059d707: CVTPS2PD XMM2,XMM2
+  14059d70a: MOVQ R8,XMM2
+  14059d70f: CALL 0x14103c0c0
+  14059d714: MOV AL,0x1
+  14059d716: ADD RSP,0x20
+  14059d71a: POP RBX
+  14059d71b: RE
+
+Decompiled C:
+
+undefined8 FUN_14059d690(undefined8 param_1,longlong param_2,undefined8 param_3,float *param_4)
+
+{
+  char cVar1;
+  uint uVar2;
+
+  *param_4 = 0.0;
+  if (param_2 != 0) {
+    uVar2 = FUN_14037e190(param_2);
+    *param_4 = (float)uVar2;
+  }
+  if (*(char *)(*(longlong *)((longlong)ThreadLocalStoragePointer + (ulonglong)_tls_index * 8) +
+               0x830) != '\0') {
+    cVar1 = FUN_14037e430();
+    if (cVar1 == '\0') {
+      FUN_14103c0c0(DAT_1430f83b8,"GetObjectCount doesn\'t work outside of Workshop mode.");
+    }
+    FUN_14103c0c0(DAT_1430f83b8,"GetObjectCount >> %0.f",(double)*param_4);
+  }
+  return 1;
+}

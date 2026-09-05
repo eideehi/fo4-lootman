@@ -1,0 +1,11 @@
+Program: Fallout4.exe
+Image base: 140000000
+
+================================================================================
+Target 14059d6a8
+  14059d6a8: [E8 E3 0A DE FF] CALL 0x14037e190
+  14059d6ad: [8B C0] MOV EAX,EAX
+  14059d6af: [0F 57 C0] XORPS XMM0,XMM0
+  14059d6b2: [F3 48 0F 2A C0] CVTSI2SS XMM0,RAX
+  14059d6b7: [F3 0F 11 03] MOVSS dword ptr [RBX],XMM0
+  14059d6bb: [8B 0D 57 59 8D 03] MOV ECX,dword ptr [0x143e73018]

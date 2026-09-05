@@ -1,0 +1,11 @@
+Program: Fallout4.exe
+Image base: 140000000
+
+================================================================================
+Target 1405dd7b4
+  1405dd7b4: [E8 D7 FE FB FF] CALL 0x14059d690
+  1405dd7b9: [48 81 C4 C0 00 00 00] ADD RSP,0xc0
+  1405dd7c0: [5B] POP RBX
+  1405dd7c1: [C3] RE
+  1405dd7c2: [32 C0] XOR AL,AL
+  1405dd7c4: [48 81 C4 C0 00 00 00] ADD RSP,0xc0

@@ -1,0 +1,38 @@
+Program: Fallout4.exe
+Image base: 140000000
+
+================================================================================
+Target 140a65746
+  140a65746: [E8 35 3D 0C 00] CALL 0x140b29480
+  140a6574b: [48 83 7C 24 28 00] CMP qword ptr [RSP + 0x28],0x0
+  140a65751: [48 8B 7C 24 40] MOV RDI,qword ptr [RSP + 0x40]
+  140a65756: [48 8B 6C 24 58] MOV RBP,qword ptr [RSP + 0x58]
+  140a6575b: [74 12] JZ 0x140a6576f
+  140a6575d: [48 8D 4C 24 20] LEA RCX,[RSP + 0x20]
+
+================================================================================
+Target 140a5f459
+  140a5f459: [E8 22 A0 0C 00] CALL 0x140b29480
+  140a5f45e: [48 8B 07] MOV RAX,qword ptr [RDI]
+  140a5f461: [33 D2] XOR EDX,EDX
+  140a5f463: [48 8B CF] MOV RCX,RDI
+  140a5f466: [FF 90 78 01 00 00] CALL qword ptr [RAX + 0x178]
+  140a5f46c: [E8 9F AC 92 FF] CALL 0x14038a110
+
+================================================================================
+Target 140a6087c
+  140a6087c: [E8 FF 8B 0C 00] CALL 0x140b29480
+  140a60881: [48 83 7D A0 00] CMP qword ptr [RBP + -0x60],0x0
+  140a60886: [74 10] JZ 0x140a60898
+  140a60888: [48 8D 4D 98] LEA RCX,[RBP + -0x68]
+  140a6088c: [E8 7F 98 BF 00] CALL 0x14165a110
+  140a60891: [C7 45 B0 00 00 00 00] MOV dword ptr [RBP + -0x50],0x0
+
+================================================================================
+Target 140aef9a9
+  140aef9a9: [E8 D2 9A 03 00] CALL 0x140b29480
+  140aef9ae: [48 8B 1F] MOV RBX,qword ptr [RDI]
+  140aef9b1: [48 8B CF] MOV RCX,RDI
+  140aef9b4: [E8 C7 1F F7 FF] CALL 0x140a61980
+  140aef9b9: [8B D0] MOV EDX,EAX
+  140aef9bb: [48 8B CF] MOV RCX,RDI

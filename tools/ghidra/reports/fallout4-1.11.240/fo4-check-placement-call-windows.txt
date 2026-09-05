@@ -1,0 +1,38 @@
+Program: Fallout4.exe
+Image base: 140000000
+
+================================================================================
+Target 140b2b0f7
+  140b2b0f7: [E8 44 38 00 00] CALL 0x140b2e940
+  140b2b0fc: [E8 FF 33 EB FF] CALL 0x1409de500
+  140b2b101: [48 8B C8] MOV RCX,RAX
+  140b2b104: [E8 97 C2 F0 FF] CALL 0x140a373a0
+  140b2b109: [48 8B CE] MOV RCX,RSI
+  140b2b10c: [E8 DF 40 00 00] CALL 0x140b2f1f0
+
+================================================================================
+Target 140b2c6e2
+  140b2c6e2: [E8 59 22 00 00] CALL 0x140b2e940
+  140b2c6e7: [40 84 F6] TEST SIL,SIL
+  140b2c6ea: [0F 84 C5 03 00 00] JZ 0x140b2cab5
+  140b2c6f0: [66 44 39 25 20 A8 5C 02] CMP word ptr [0x1430f6f18],R12W
+  140b2c6f8: [76 0B] JBE 0x140b2c705
+  140b2c6fa: [33 D2] XOR EDX,EDX
+
+================================================================================
+Target 140b2c99f
+  140b2c99f: [E8 9C 1F 00 00] CALL 0x140b2e940
+  140b2c9a4: [40 84 F6] TEST SIL,SIL
+  140b2c9a7: [0F 84 08 01 00 00] JZ 0x140b2cab5
+  140b2c9ad: [66 44 39 25 63 A5 5C 02] CMP word ptr [0x1430f6f18],R12W
+  140b2c9b5: [76 0B] JBE 0x140b2c9c2
+  140b2c9b7: [33 D2] XOR EDX,EDX
+
+================================================================================
+Target 140b2e67e
+  140b2e67e: [E8 BD 02 00 00] CALL 0x140b2e940
+  140b2e683: [44 39 65 20] CMP dword ptr [RBP + 0x20],R12D
+  140b2e687: [75 27] JNZ 0x140b2e6b0
+  140b2e689: [F2 0F 10 05 FF AD DF 01] MOVSD XMM0,qword ptr [0x142929490]
+  140b2e691: [66 0F 2F 87 20 04 00 00] COMISD XMM0,qword ptr [RDI + 0x420]
+  140b2e699: [77 15] JA 0x140b2e6b0

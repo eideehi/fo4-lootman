@@ -1,0 +1,163 @@
+Program: Fallout4.exe
+Image base: 140000000
+
+================================================================================
+Target 14042bff0
+Function: FUN_14042bff0
+Entry: 14042bff0
+Body: [[14042bff0, 14042c0df]]
+
+References to entry:
+  143ed4a7c -> 14042bff0 type=DATA
+  142b45c7c -> 14042bff0 type=DATA
+  142b45c8c -> 14042bff0 type=DATA
+  140399136 -> 14042bff0 type=UNCONDITIONAL_CALL
+  140392844 -> 14042bff0 type=UNCONDITIONAL_CALL
+  1403b7f7e -> 14042bff0 type=UNCONDITIONAL_CALL
+
+Outgoing references from function body:
+  14042c018 -> 140503c80 type=UNCONDITIONAL_CALL
+  14042c01f -> 14042c0c6 type=CONDITIONAL_JUMP
+  14042c032 -> 14042c04b type=CONDITIONAL_JUMP
+  14042c039 -> 14042c04b type=CONDITIONAL_JUMP
+  14042c03e -> 14165a110 type=UNCONDITIONAL_CALL
+  14042c04e -> 14042c0c2 type=CONDITIONAL_JUMP
+  14042c056 -> 14042c0c2 type=CONDITIONAL_JUMP
+  14042c067 -> 14042c0c2 type=CONDITIONAL_JUMP
+  14042c07a -> 14038bfa0 type=UNCONDITIONAL_CALL
+  14042c099 -> 14042cb10 type=UNCONDITIONAL_CALL
+  14042c0a0 -> 14042c0ac type=CONDITIONAL_JUMP
+  14042c0a5 -> 14042c0ac type=CONDITIONAL_JUMP
+  14042c0aa -> 14042c0af type=UNCONDITIONAL_JUMP
+  14042c0b6 -> 14042c070 type=CONDITIONAL_JUMP
+  14042c0c0 -> 14042c0c6 type=CONDITIONAL_JUMP
+  14042c0c4 -> 14042c0c8 type=UNCONDITIONAL_JUMP
+
+Instructions:
+  14042bff0: MOV qword ptr [RSP + 0x10],RBX
+  14042bff5: MOV qword ptr [RSP + 0x18],RBP
+  14042bffa: PUSH RSI
+  14042bffb: PUSH R12
+  14042bffd: PUSH R13
+  14042bfff: PUSH R14
+  14042c001: PUSH R15
+  14042c003: SUB RSP,0x30
+  14042c007: MOV R15,qword ptr [RCX + 0x50]
+  14042c00b: MOVZX R13D,R9B
+  14042c00f: MOV RCX,RDX
+  14042c012: MOV R14,R8
+  14042c015: MOV RBX,RDX
+  14042c018: CALL 0x140503c80
+  14042c01d: TEST AL,AL
+  14042c01f: JZ 0x14042c0c6
+  14042c025: MOV R12,qword ptr [RBX + 0xf8]
+  14042c02c: MOV SIL,0x1
+  14042c02f: TEST R14,R14
+  14042c032: JZ 0x14042c04b
+  14042c034: CMP qword ptr [R14 + 0x8],0x0
+  14042c039: JZ 0x14042c04b
+  14042c03b: MOV RCX,R14
+  14042c03e: CALL 0x14165a110
+  14042c043: MOV dword ptr [R14 + 0x18],0x0
+  14042c04b: TEST R15,R15
+  14042c04e: JZ 0x14042c0c2
+  14042c050: MOV EAX,dword ptr [R15 + 0x10]
+  14042c054: TEST EAX,EAX
+  14042c056: JZ 0x14042c0c2
+  14042c058: MOV RBX,qword ptr [R15]
+  14042c05b: MOV EBP,EAX
+  14042c05d: SHL RBP,0x4
+  14042c061: ADD RBP,RBX
+  14042c064: CMP RBX,RBP
+  14042c067: JZ 0x14042c0c2
+  14042c069: MOV qword ptr [RSP + 0x60],RDI
+  14042c06e: NOP
+  14042c070: MOV EDX,dword ptr [RBX + 0x8]
+  14042c073: MOVZX ECX,R13B
+  14042c077: MOV RDI,qword ptr [RBX]
+  14042c07a: CALL 0x14038bfa0
+  14042c07f: MOV R9,R14
+  14042c082: MOV qword ptr [RSP + 0x28],R15
+  14042c087: MOV R8D,EAX
+  14042c08a: MOV qword ptr [RSP + 0x20],0x0
+  14042c093: MOV RDX,RDI
+  14042c096: MOV RCX,R12
+  14042c099: CALL 0x14042cb10
+  14042c09e: TEST AL,AL
+  14042c0a0: JZ 0x14042c0ac
+  14042c0a2: TEST SIL,SIL
+  14042c0a5: JZ 0x14042c0ac
+  14042c0a7: MOV SIL,0x1
+  14042c0aa: JMP 0x14042c0af
+  14042c0ac: XOR SIL,SIL
+  14042c0af: ADD RBX,0x10
+  14042c0b3: CMP RBX,RBP
+  14042c0b6: JNZ 0x14042c070
+  14042c0b8: MOV RDI,qword ptr [RSP + 0x60]
+  14042c0bd: TEST SIL,SIL
+  14042c0c0: JZ 0x14042c0c6
+  14042c0c2: MOV AL,0x1
+  14042c0c4: JMP 0x14042c0c8
+  14042c0c6: XOR AL,AL
+  14042c0c8: MOV RBX,qword ptr [RSP + 0x68]
+  14042c0cd: MOV RBP,qword ptr [RSP + 0x70]
+  14042c0d2: ADD RSP,0x30
+  14042c0d6: POP R15
+  14042c0d8: POP R14
+  14042c0da: POP R13
+  14042c0dc: POP R12
+  14042c0de: POP RSI
+  14042c0df: RE
+
+Decompiled C:
+
+undefined8 FUN_14042bff0(longlong param_1,longlong param_2,longlong param_3,undefined1 param_4)
+
+{
+  longlong *plVar1;
+  undefined8 uVar2;
+  bool bVar3;
+  char cVar4;
+  undefined4 uVar5;
+  undefined8 uVar6;
+  undefined8 *puVar7;
+  undefined8 *puVar8;
+
+  plVar1 = *(longlong **)(param_1 + 0x50);
+  cVar4 = FUN_140503c80(param_2);
+  if (cVar4 == '\0') {
+LAB_14042c0c6:
+    uVar6 = 0;
+  }
+  else {
+    uVar6 = *(undefined8 *)(param_2 + 0xf8);
+    bVar3 = true;
+    if ((param_3 != 0) && (*(longlong *)(param_3 + 8) != 0)) {
+      FUN_14165a110(param_3);
+      *(undefined4 *)(param_3 + 0x18) = 0;
+    }
+    if (plVar1 != (longlong *)0x0) {
+      if (*(uint *)(plVar1 + 2) != 0) {
+        puVar7 = (undefined8 *)*plVar1;
+        puVar8 = puVar7 + (ulonglong)*(uint *)(plVar1 + 2) * 2;
+        if (puVar7 != puVar8) {
+          do {
+            uVar2 = *puVar7;
+            uVar5 = FUN_14038bfa0(param_4,*(undefined4 *)(puVar7 + 1));
+            cVar4 = FUN_14042cb10(uVar6,uVar2,uVar5,param_3,0,plVar1);
+            if ((cVar4 == '\0') || (!bVar3)) {
+              bVar3 = false;
+            }
+            else {
+              bVar3 = true;
+            }
+            puVar7 = puVar7 + 2;
+          } while (puVar7 != puVar8);
+          if (!bVar3) goto LAB_14042c0c6;
+        }
+      }
+    }
+    uVar6 = 1;
+  }
+  return uVar6;
+}

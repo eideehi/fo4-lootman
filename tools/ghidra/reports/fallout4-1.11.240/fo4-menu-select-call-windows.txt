@@ -1,0 +1,20 @@
+Program: Fallout4.exe
+Image base: 140000000
+
+================================================================================
+Target 140b2c69a
+  140b2c69a: [E8 41 AA 86 FF] CALL 0x1403970e0
+  140b2c69f: [0F B7 0D 72 A8 5C 02] MOVZX ECX,word ptr [0x1430f6f18]
+  140b2c6a6: [48 8D 95 E8 00 00 00] LEA RDX,[RBP + 0xe8]
+  140b2c6ad: [0F B6 F0] MOVZX ESI,AL
+  140b2c6b0: [E8 FB D6 85 FF] CALL 0x140389db0
+  140b2c6b5: [0F B7 15 5C A8 5C 02] MOVZX EDX,word ptr [0x1430f6f18]
+
+================================================================================
+Target 140b2c957
+  140b2c957: [E8 84 A7 86 FF] CALL 0x1403970e0
+  140b2c95c: [0F B7 0D B5 A5 5C 02] MOVZX ECX,word ptr [0x1430f6f18]
+  140b2c963: [48 8D 95 E0 00 00 00] LEA RDX,[RBP + 0xe0]
+  140b2c96a: [0F B6 F0] MOVZX ESI,AL
+  140b2c96d: [E8 3E D4 85 FF] CALL 0x140389db0
+  140b2c972: [0F B7 15 9F A5 5C 02] MOVZX EDX,word ptr [0x1430f6f18]

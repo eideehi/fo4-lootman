@@ -12,24 +12,24 @@
       "expectedInstructionKind": "call_rel32",
       "expectedOriginalTargetGroup": "encounter_zone.check_cell_before_reset",
       "evidence": [
-        "tools/ghidra/reports/fallout4-1.11.221/fo4-encounter-zone-target-functions.txt",
-        "tools/ghidra/reports/fallout4-1.11.221/fo4-encounter-zone-call-windows.txt"
+        "tools/ghidra/reports/fallout4-1.11.240/fo4-encounter-zone-target-functions.txt",
+        "tools/ghidra/reports/fallout4-1.11.240/fo4-encounter-zone-call-windows.txt"
       ],
       "discoveryStrategy": {
         "status": "proven",
         "summary": "Resolve the LoadChange cell reset path and require exactly one direct CALL rel32 to the check-cell-before-reset helper.",
         "proof": {
           "kind": "ghidra_reference_report",
-          "report": "tools/ghidra/reports/fallout4-1.11.221/fo4-encounter-zone-target-functions.txt",
+          "report": "tools/ghidra/reports/fallout4-1.11.240/fo4-encounter-zone-target-functions.txt",
           "instructionReports": [
-            "tools/ghidra/reports/fallout4-1.11.221/fo4-encounter-zone-call-windows.txt"
+            "tools/ghidra/reports/fallout4-1.11.240/fo4-encounter-zone-call-windows.txt"
           ],
-          "targetAbsoluteAddress": "0x140494B40",
+          "targetAbsoluteAddress": "0x140494E60",
           "referenceType": "UNCONDITIONAL_CALL",
           "sites": [
             {
               "siteId": "encounter-zone.reset-suppression.cell-before-reset",
-              "absoluteAddress": "0x1404D23D4"
+              "absoluteAddress": "0x1404D26F4"
             }
           ]
         }
@@ -37,10 +37,10 @@
       "sites": [
         {
           "id": "encounter-zone.reset-suppression.cell-before-reset",
-          "rva": "0x4D23D4",
+          "rva": "0x4D26F4",
           "sourceId": "0x0",
           "label": "encounter-zone.reset-suppression.cell-before-reset",
-          "expectedTargetRva": "0x494B40",
+          "expectedTargetRva": "0x494E60",
           "contextSignatureVersion": 1,
           "contextBytes": "88 45 67"
         }
@@ -51,17 +51,17 @@
       "cppName": "kEncounterZoneResetElapsedFromDetachId",
       "category": "function_rva",
       "expectedCount": 1,
-      "value": "0x4D2E30",
+      "value": "0x4D3150",
       "addressLibrary": {
         "id": "2200355",
-        "offset": "0x4D2E30"
+        "offset": "0x4D3150"
       },
       "evidence": [
-        "tools/ghidra/reports/fo4-cell-detach-reset-functions.txt"
+        "tools/ghidra/reports/fallout4-1.11.240/fo4-cell-detach-reset-functions.txt"
       ],
       "discoveryStrategy": {
         "status": "automated",
-        "summary": "Resolved through exact Address Library ID 2200355 at offset 0x4D2E30; the encounter-zone reset report records the helper body and reset callers."
+        "summary": "Resolved through exact Address Library ID 2200355 at offset 0x4D3150; verified against the Fallout 4 1.11.240 encounter-zone reset helper body and callers."
       }
     },
     {
@@ -69,18 +69,18 @@
       "cppName": "kWorkshopCaravanKeywordGlobalId",
       "category": "global_rva",
       "expectedCount": 1,
-      "value": "0x30ECA38",
+      "value": "0x30F7AB8",
       "addressLibrary": {
         "id": "4797310",
-        "offset": "0x30ECA38"
+        "offset": "0x30F7AB8"
       },
       "evidence": [
-        "tools/ghidra/reports/fo4-workbench-shared-container-callers.txt",
-        "tools/ghidra/reports/fo4-workbench-linked-container-functions.txt"
+        "tools/ghidra/reports/fallout4-1.11.240/fo4-workshop-caravan-global-references.txt",
+        "tools/ghidra/reports/fallout4-1.11.240/fo4-workshop-caravan-caller-functions.txt"
       ],
       "discoveryStrategy": {
         "status": "automated",
-        "summary": "Resolved through exact Address Library ID 4797310 at offset 0x30ECA38; linked workshop container evidence reads the global as the workshop caravan keyword."
+        "summary": "Resolved through exact Address Library ID 4797310 at offset 0x30F7AB8; verified against Fallout 4 1.11.240 references and the corresponding linked workshop container function."
       }
     },
     {
@@ -88,17 +88,17 @@
       "cppName": "kCurrentWorkshopHandleGlobalId",
       "category": "global_rva",
       "expectedCount": 1,
-      "value": "0x30EC618",
+      "value": "0x30F7698",
       "addressLibrary": {
         "id": "4797241",
-        "offset": "0x30EC618"
+        "offset": "0x30F7698"
       },
       "evidence": [
-        "tools/ghidra/reports/fo4-current-workshop-global-refs.txt"
+        "tools/ghidra/reports/fallout4-1.11.240/fo4-current-workshop-global-refs.txt"
       ],
       "discoveryStrategy": {
         "status": "automated",
-        "summary": "Resolved through exact Address Library ID 4797241 at offset 0x30EC618; current-workshop reference evidence shows the handle global used across workshop context probes."
+        "summary": "Resolved through exact Address Library ID 4797241 at offset 0x30F7698; Fallout 4 1.11.240 reference evidence shows the global is read and written throughout the workshop context code."
       }
     },
     {
@@ -109,32 +109,32 @@
       "expectedInstructionKind": "call_rel32",
       "expectedOriginalTargetGroup": "workshop_shared_container.populate_linked_workshop_containers",
       "evidence": [
-        "tools/ghidra/reports/fallout4-1.11.221/fo4-shared-container-target-functions.txt",
-        "tools/ghidra/reports/fallout4-1.11.221/fo4-shared-container-call-windows.txt"
+        "tools/ghidra/reports/fallout4-1.11.240/fo4-shared-container-target-functions.txt",
+        "tools/ghidra/reports/fallout4-1.11.240/fo4-shared-container-call-windows.txt"
       ],
       "discoveryStrategy": {
         "status": "proven",
         "summary": "Resolve all callers of the linked workshop container population helper and require exactly three direct CALL rel32 sites.",
         "proof": {
           "kind": "ghidra_reference_report",
-          "report": "tools/ghidra/reports/fallout4-1.11.221/fo4-shared-container-target-functions.txt",
+          "report": "tools/ghidra/reports/fallout4-1.11.240/fo4-shared-container-target-functions.txt",
           "instructionReports": [
-            "tools/ghidra/reports/fallout4-1.11.221/fo4-shared-container-call-windows.txt"
+            "tools/ghidra/reports/fallout4-1.11.240/fo4-shared-container-call-windows.txt"
           ],
-          "targetAbsoluteAddress": "0x140389E20",
+          "targetAbsoluteAddress": "0x14038A140",
           "referenceType": "UNCONDITIONAL_CALL",
           "sites": [
             {
               "siteId": "workshop-shared-container.populate-linked.primary",
-              "absoluteAddress": "0x140391F88"
+              "absoluteAddress": "0x1403922A8"
             },
             {
               "siteId": "workshop-shared-container.populate-linked.workbench",
-              "absoluteAddress": "0x140B289E6"
+              "absoluteAddress": "0x140B28966"
             },
             {
               "siteId": "workshop-shared-container.populate-linked.menu",
-              "absoluteAddress": "0x141089296"
+              "absoluteAddress": "0x1410895E6"
             }
           ]
         }
@@ -142,28 +142,28 @@
       "sites": [
         {
           "id": "workshop-shared-container.populate-linked.primary",
-          "rva": "0x391F88",
+          "rva": "0x3922A8",
           "sourceId": "0x0",
           "label": "workshop-shared-container.populate-linked.primary",
-          "expectedTargetRva": "0x389E20",
+          "expectedTargetRva": "0x38A140",
           "contextSignatureVersion": 1,
           "contextBytes": "EB 27"
         },
         {
           "id": "workshop-shared-container.populate-linked.workbench",
-          "rva": "0xB289E6",
+          "rva": "0xB28966",
           "sourceId": "0x0",
           "label": "workshop-shared-container.populate-linked.workbench",
-          "expectedTargetRva": "0x389E20",
+          "expectedTargetRva": "0x38A140",
           "contextSignatureVersion": 1,
           "contextBytes": "44 8B 4F 10"
         },
         {
           "id": "workshop-shared-container.populate-linked.menu",
-          "rva": "0x1089296",
+          "rva": "0x10895E6",
           "sourceId": "0x0",
           "label": "workshop-shared-container.populate-linked.menu",
-          "expectedTargetRva": "0x389E20",
+          "expectedTargetRva": "0x38A140",
           "contextSignatureVersion": 1,
           "contextBytes": "48 8B 45 7F"
         }
@@ -177,36 +177,36 @@
       "expectedInstructionKind": "call_rel32",
       "expectedOriginalTargetGroup": "workshop_material.rebuild_workshop_supply",
       "evidence": [
-        "tools/ghidra/reports/fallout4-1.11.221/fo4-rebuild-supply-target-functions.txt",
-        "tools/ghidra/reports/fallout4-1.11.221/fo4-rebuild-supply-call-windows.txt"
+        "tools/ghidra/reports/fallout4-1.11.240/fo4-rebuild-supply-target-functions.txt",
+        "tools/ghidra/reports/fallout4-1.11.240/fo4-rebuild-supply-call-windows.txt"
       ],
       "discoveryStrategy": {
         "status": "proven",
         "summary": "Resolve workbench supply rebuild callers and require four direct CALL rel32 sites to the same rebuild helper.",
         "proof": {
           "kind": "ghidra_reference_report",
-          "report": "tools/ghidra/reports/fallout4-1.11.221/fo4-rebuild-supply-target-functions.txt",
+          "report": "tools/ghidra/reports/fallout4-1.11.240/fo4-rebuild-supply-target-functions.txt",
           "instructionReports": [
-            "tools/ghidra/reports/fallout4-1.11.221/fo4-rebuild-supply-call-windows.txt"
+            "tools/ghidra/reports/fallout4-1.11.240/fo4-rebuild-supply-call-windows.txt"
           ],
-          "targetAbsoluteAddress": "0x140B29500",
+          "targetAbsoluteAddress": "0x140B29480",
           "referenceType": "UNCONDITIONAL_CALL",
           "sites": [
             {
               "siteId": "workshop-material.rebuild-supply.source-a1",
-              "absoluteAddress": "0x140A65436"
+              "absoluteAddress": "0x140A65746"
             },
             {
               "siteId": "workshop-material.rebuild-supply.source-a2",
-              "absoluteAddress": "0x140A5F149"
+              "absoluteAddress": "0x140A5F459"
             },
             {
               "siteId": "workshop-material.rebuild-supply.source-a3",
-              "absoluteAddress": "0x140A6056C"
+              "absoluteAddress": "0x140A6087C"
             },
             {
               "siteId": "workshop-material.rebuild-supply.source-a4",
-              "absoluteAddress": "0x140AEFBF9"
+              "absoluteAddress": "0x140AEF9A9"
             }
           ]
         }
@@ -214,37 +214,37 @@
       "sites": [
         {
           "id": "workshop-material.rebuild-supply.source-a1",
-          "rva": "0xA65436",
+          "rva": "0xA65746",
           "sourceId": "0xA1",
           "label": "workshop-material.rebuild-supply.source-a1",
-          "expectedTargetRva": "0xB29500",
+          "expectedTargetRva": "0xB29480",
           "contextSignatureVersion": 1,
           "contextBytes": "48 83 7C 24 28 00"
         },
         {
           "id": "workshop-material.rebuild-supply.source-a2",
-          "rva": "0xA5F149",
+          "rva": "0xA5F459",
           "sourceId": "0xA2",
           "label": "workshop-material.rebuild-supply.source-a2",
-          "expectedTargetRva": "0xB29500",
+          "expectedTargetRva": "0xB29480",
           "contextSignatureVersion": 1,
           "contextBytes": "48 8B 07"
         },
         {
           "id": "workshop-material.rebuild-supply.source-a3",
-          "rva": "0xA6056C",
+          "rva": "0xA6087C",
           "sourceId": "0xA3",
           "label": "workshop-material.rebuild-supply.source-a3",
-          "expectedTargetRva": "0xB29500",
+          "expectedTargetRva": "0xB29480",
           "contextSignatureVersion": 1,
           "contextBytes": "48 83 7D A0 00"
         },
         {
           "id": "workshop-material.rebuild-supply.source-a4",
-          "rva": "0xAEFBF9",
+          "rva": "0xAEF9A9",
           "sourceId": "0xA4",
           "label": "workshop-material.rebuild-supply.source-a4",
-          "expectedTargetRva": "0xB29500",
+          "expectedTargetRva": "0xB29480",
           "contextSignatureVersion": 1,
           "contextBytes": "48 8B 1F"
         }
@@ -258,28 +258,28 @@
       "expectedInstructionKind": "call_rel32",
       "expectedOriginalTargetGroup": "workshop_material.component_count_helper",
       "evidence": [
-        "tools/ghidra/reports/fallout4-1.11.221/fo4-component-count-helper-target-functions.txt",
-        "tools/ghidra/reports/fallout4-1.11.221/fo4-component-count-helper-call-windows.txt"
+        "tools/ghidra/reports/fallout4-1.11.240/fo4-component-count-helper-target-functions.txt",
+        "tools/ghidra/reports/fallout4-1.11.240/fo4-component-count-helper-call-windows.txt"
       ],
       "discoveryStrategy": {
         "status": "proven",
         "summary": "Resolve Papyrus and Workbench UI calls to the component count helper and require both call sites to share the same original target.",
         "proof": {
           "kind": "ghidra_reference_report",
-          "report": "tools/ghidra/reports/fallout4-1.11.221/fo4-component-count-helper-target-functions.txt",
+          "report": "tools/ghidra/reports/fallout4-1.11.240/fo4-component-count-helper-target-functions.txt",
           "instructionReports": [
-            "tools/ghidra/reports/fallout4-1.11.221/fo4-component-count-helper-call-windows.txt"
+            "tools/ghidra/reports/fallout4-1.11.240/fo4-component-count-helper-call-windows.txt"
           ],
-          "targetAbsoluteAddress": "0x140507670",
+          "targetAbsoluteAddress": "0x140507990",
           "referenceType": "UNCONDITIONAL_CALL",
           "sites": [
             {
               "siteId": "workshop-material.component-count.papyrus",
-              "absoluteAddress": "0x14059BC3A"
+              "absoluteAddress": "0x14059BF5A"
             },
             {
               "siteId": "workshop-material.component-count.workbench-ui",
-              "absoluteAddress": "0x1411751BB"
+              "absoluteAddress": "0x14117550B"
             }
           ]
         }
@@ -287,19 +287,19 @@
       "sites": [
         {
           "id": "workshop-material.component-count.papyrus",
-          "rva": "0x59BC3A",
+          "rva": "0x59BF5A",
           "sourceId": "0xB1",
           "label": "workshop-material.component-count.papyrus",
-          "expectedTargetRva": "0x507670",
+          "expectedTargetRva": "0x507990",
           "contextSignatureVersion": 1,
           "contextBytes": "8B 44 24 30"
         },
         {
           "id": "workshop-material.component-count.workbench-ui",
-          "rva": "0x11751BB",
+          "rva": "0x117550B",
           "sourceId": "0xB2",
           "label": "workshop-material.component-count.workbench-ui",
-          "expectedTargetRva": "0x507670",
+          "expectedTargetRva": "0x507990",
           "contextSignatureVersion": 1,
           "contextBytes": "84 C0"
         }
@@ -313,46 +313,46 @@
       "expectedInstructionKind": "call_rel32",
       "expectedOriginalTargetGroup": "workshop_material.direct_component_count",
       "evidence": [
-        "tools/ghidra/reports/fallout4-1.11.221/fo4-direct-component-count-target-functions.txt",
-        "tools/ghidra/reports/fallout4-1.11.221/fo4-direct-component-count-call-windows.txt"
+        "tools/ghidra/reports/fallout4-1.11.240/fo4-direct-component-count-target-functions.txt",
+        "tools/ghidra/reports/fallout4-1.11.240/fo4-direct-component-count-call-windows.txt"
       ],
       "discoveryStrategy": {
         "status": "proven",
         "summary": "Resolve the five explicit direct component count hook sites and require each to be a direct CALL rel32 to the same helper.",
         "proof": {
           "kind": "ghidra_reference_report",
-          "report": "tools/ghidra/reports/fallout4-1.11.221/fo4-direct-component-count-target-functions.txt",
+          "report": "tools/ghidra/reports/fallout4-1.11.240/fo4-direct-component-count-target-functions.txt",
           "instructionReports": [
-            "tools/ghidra/reports/fallout4-1.11.221/fo4-direct-component-count-call-windows.txt"
+            "tools/ghidra/reports/fallout4-1.11.240/fo4-direct-component-count-call-windows.txt"
           ],
-          "targetAbsoluteAddress": "0x140507A10",
+          "targetAbsoluteAddress": "0x140507D30",
           "referenceType": "UNCONDITIONAL_CALL",
           "sites": [
             {
               "siteId": "workshop-material.direct-component-count.source-e1",
-              "absoluteAddress": "0x1403BC3FD"
+              "absoluteAddress": "0x1403BC71D"
             },
             {
               "siteId": "workshop-material.direct-component-count.source-e2",
-              "absoluteAddress": "0x14039F28F"
+              "absoluteAddress": "0x14039F5AF"
             },
             {
               "siteId": "workshop-material.direct-component-count.source-e3",
-              "absoluteAddress": "0x140B32EFB"
+              "absoluteAddress": "0x140B32E7B"
             },
             {
               "siteId": "workshop-material.direct-component-count.source-e4",
-              "absoluteAddress": "0x140B378A8"
+              "absoluteAddress": "0x140B37828"
             },
             {
               "siteId": "workshop-material.direct-component-count.source-e5",
-              "absoluteAddress": "0x140B2D1BE"
+              "absoluteAddress": "0x140B2D13E"
             }
           ],
           "excludedReferences": [
             {
-              "absoluteAddress": "0x1405076E5",
-              "reason": "Component helper internal fallback path, not one of the five direct component count hook sites; see tools/ghidra/reports/fallout4-1.11.221/fo4-direct-component-count-target-functions.txt."
+              "absoluteAddress": "0x140507A05",
+              "reason": "Component helper internal fallback path, not one of the five direct component count hook sites; see tools/ghidra/reports/fallout4-1.11.240/fo4-direct-component-count-target-functions.txt."
             }
           ]
         }
@@ -360,46 +360,46 @@
       "sites": [
         {
           "id": "workshop-material.direct-component-count.source-e1",
-          "rva": "0x3BC3FD",
+          "rva": "0x3BC71D",
           "sourceId": "0xE1",
           "label": "workshop-material.direct-component-count.source-e1",
-          "expectedTargetRva": "0x507A10",
+          "expectedTargetRva": "0x507D30",
           "contextSignatureVersion": 1,
           "contextBytes": "03 F0"
         },
         {
           "id": "workshop-material.direct-component-count.source-e2",
-          "rva": "0x39F28F",
+          "rva": "0x39F5AF",
           "sourceId": "0xE2",
           "label": "workshop-material.direct-component-count.source-e2",
-          "expectedTargetRva": "0x507A10",
+          "expectedTargetRva": "0x507D30",
           "contextSignatureVersion": 1,
           "contextBytes": "03 E8 49 8B CE"
         },
         {
           "id": "workshop-material.direct-component-count.source-e3",
-          "rva": "0xB32EFB",
+          "rva": "0xB32E7B",
           "sourceId": "0xE3",
           "label": "workshop-material.direct-component-count.source-e3",
-          "expectedTargetRva": "0x507A10",
+          "expectedTargetRva": "0x507D30",
           "contextSignatureVersion": 1,
-          "contextBytes": "03 E8 48 8B 0D AF 5B 73 02"
+          "contextBytes": "03 E8 48 8B 0D BF 0C 74 02"
         },
         {
           "id": "workshop-material.direct-component-count.source-e4",
-          "rva": "0xB378A8",
+          "rva": "0xB37828",
           "sourceId": "0xE4",
           "label": "workshop-material.direct-component-count.source-e4",
-          "expectedTargetRva": "0x507A10",
+          "expectedTargetRva": "0x507D30",
           "contextSignatureVersion": 1,
           "contextBytes": "03 F8"
         },
         {
           "id": "workshop-material.direct-component-count.source-e5",
-          "rva": "0xB2D1BE",
+          "rva": "0xB2D13E",
           "sourceId": "0xE5",
           "label": "workshop-material.direct-component-count.source-e5",
-          "expectedTargetRva": "0x507A10",
+          "expectedTargetRva": "0x507D30",
           "contextSignatureVersion": 1,
           "contextBytes": "01 85 F0 00 00 00"
         }
@@ -413,28 +413,28 @@
       "expectedInstructionKind": "call_rel32",
       "expectedOriginalTargetGroup": "workshop_material.resource_status",
       "evidence": [
-        "tools/ghidra/reports/fallout4-1.11.221/fo4-resource-status-target-functions.txt",
-        "tools/ghidra/reports/fallout4-1.11.221/fo4-resource-status-call-windows.txt"
+        "tools/ghidra/reports/fallout4-1.11.240/fo4-resource-status-target-functions.txt",
+        "tools/ghidra/reports/fallout4-1.11.240/fo4-resource-status-call-windows.txt"
       ],
       "discoveryStrategy": {
         "status": "proven",
         "summary": "Resolve resource status helper callers in the workshop menu placement path and require two direct CALL rel32 sites.",
         "proof": {
           "kind": "ghidra_reference_report",
-          "report": "tools/ghidra/reports/fallout4-1.11.221/fo4-resource-status-target-functions.txt",
+          "report": "tools/ghidra/reports/fallout4-1.11.240/fo4-resource-status-target-functions.txt",
           "instructionReports": [
-            "tools/ghidra/reports/fallout4-1.11.221/fo4-resource-status-call-windows.txt"
+            "tools/ghidra/reports/fallout4-1.11.240/fo4-resource-status-call-windows.txt"
           ],
-          "targetAbsoluteAddress": "0x140B32E20",
+          "targetAbsoluteAddress": "0x140B32DA0",
           "referenceType": "UNCONDITIONAL_CALL",
           "sites": [
             {
               "siteId": "workshop-material.resource-status.source-f1",
-              "absoluteAddress": "0x140B2F130"
+              "absoluteAddress": "0x140B2F0B0"
             },
             {
               "siteId": "workshop-material.resource-status.source-f2",
-              "absoluteAddress": "0x140B2D0D6"
+              "absoluteAddress": "0x140B2D056"
             }
           ]
         }
@@ -442,19 +442,19 @@
       "sites": [
         {
           "id": "workshop-material.resource-status.source-f1",
-          "rva": "0xB2F130",
+          "rva": "0xB2F0B0",
           "sourceId": "0xF1",
           "label": "workshop-material.resource-status.source-f1",
-          "expectedTargetRva": "0xB32E20",
+          "expectedTargetRva": "0xB32DA0",
           "contextSignatureVersion": 1,
           "contextBytes": "48 8B 4B 20"
         },
         {
           "id": "workshop-material.resource-status.source-f2",
-          "rva": "0xB2D0D6",
+          "rva": "0xB2D056",
           "sourceId": "0xF2",
           "label": "workshop-material.resource-status.source-f2",
-          "expectedTargetRva": "0xB32E20",
+          "expectedTargetRva": "0xB32DA0",
           "contextSignatureVersion": 1,
           "contextBytes": "48 8D 4D F8"
         }
@@ -468,28 +468,28 @@
       "expectedInstructionKind": "call_rel32",
       "expectedOriginalTargetGroup": "workshop_menu.select",
       "evidence": [
-        "tools/ghidra/reports/fallout4-1.11.221/fo4-menu-select-target-functions.txt",
-        "tools/ghidra/reports/fallout4-1.11.221/fo4-menu-select-call-windows.txt"
+        "tools/ghidra/reports/fallout4-1.11.240/fo4-menu-select-target-functions.txt",
+        "tools/ghidra/reports/fallout4-1.11.240/fo4-menu-select-call-windows.txt"
       ],
       "discoveryStrategy": {
         "status": "proven",
         "summary": "Resolve SelectWorkshopMenuNode call sites from selected menu helper analysis and require two direct CALL rel32 sites.",
         "proof": {
           "kind": "ghidra_reference_report",
-          "report": "tools/ghidra/reports/fallout4-1.11.221/fo4-menu-select-target-functions.txt",
+          "report": "tools/ghidra/reports/fallout4-1.11.240/fo4-menu-select-target-functions.txt",
           "instructionReports": [
-            "tools/ghidra/reports/fallout4-1.11.221/fo4-menu-select-call-windows.txt"
+            "tools/ghidra/reports/fallout4-1.11.240/fo4-menu-select-call-windows.txt"
           ],
-          "targetAbsoluteAddress": "0x140396DC0",
+          "targetAbsoluteAddress": "0x1403970E0",
           "referenceType": "UNCONDITIONAL_CALL",
           "sites": [
             {
               "siteId": "workshop-menu.select.source-a1",
-              "absoluteAddress": "0x140B2C71A"
+              "absoluteAddress": "0x140B2C69A"
             },
             {
               "siteId": "workshop-menu.select.source-a2",
-              "absoluteAddress": "0x140B2C9D7"
+              "absoluteAddress": "0x140B2C957"
             }
           ]
         }
@@ -497,21 +497,21 @@
       "sites": [
         {
           "id": "workshop-menu.select.source-a1",
-          "rva": "0xB2C71A",
+          "rva": "0xB2C69A",
           "sourceId": "0xA1",
           "label": "workshop-menu.select.source-a1",
-          "expectedTargetRva": "0x396DC0",
+          "expectedTargetRva": "0x3970E0",
           "contextSignatureVersion": 1,
-          "contextBytes": "0F B7 0D 72 F7 5B 02"
+          "contextBytes": "0F B7 0D 72 A8 5C 02"
         },
         {
           "id": "workshop-menu.select.source-a2",
-          "rva": "0xB2C9D7",
+          "rva": "0xB2C957",
           "sourceId": "0xA2",
           "label": "workshop-menu.select.source-a2",
-          "expectedTargetRva": "0x396DC0",
+          "expectedTargetRva": "0x3970E0",
           "contextSignatureVersion": 1,
-          "contextBytes": "0F B7 0D B5 F4 5B 02"
+          "contextBytes": "0F B7 0D B5 A5 5C 02"
         }
       ]
     },
@@ -523,96 +523,96 @@
       "expectedInstructionKind": "call_rel32",
       "expectedOriginalTargetGroup": "workshop_menu.availability",
       "evidence": [
-        "tools/ghidra/reports/fallout4-1.11.221/fo4-availability-target-functions.txt",
-        "tools/ghidra/reports/fallout4-1.11.221/fo4-availability-call-windows.txt"
+        "tools/ghidra/reports/fallout4-1.11.240/fo4-availability-target-functions.txt",
+        "tools/ghidra/reports/fallout4-1.11.240/fo4-availability-call-windows.txt"
       ],
       "discoveryStrategy": {
         "status": "proven",
         "summary": "Resolve WorkshopMenuAvailability callers and require nineteen direct CALL rel32 sites to the same helper.",
         "proof": {
           "kind": "ghidra_reference_report",
-          "report": "tools/ghidra/reports/fallout4-1.11.221/fo4-availability-target-functions.txt",
+          "report": "tools/ghidra/reports/fallout4-1.11.240/fo4-availability-target-functions.txt",
           "instructionReports": [
-            "tools/ghidra/reports/fallout4-1.11.221/fo4-availability-call-windows.txt"
+            "tools/ghidra/reports/fallout4-1.11.240/fo4-availability-call-windows.txt"
           ],
-          "targetAbsoluteAddress": "0x1403997B0",
+          "targetAbsoluteAddress": "0x140399AD0",
           "referenceType": "UNCONDITIONAL_CALL",
           "sites": [
             {
               "siteId": "workshop-menu.availability.source-91",
-              "absoluteAddress": "0x140B2C6DE"
+              "absoluteAddress": "0x140B2C65E"
             },
             {
               "siteId": "workshop-menu.availability.source-92",
-              "absoluteAddress": "0x140B2C747"
+              "absoluteAddress": "0x140B2C6C7"
             },
             {
               "siteId": "workshop-menu.availability.source-93",
-              "absoluteAddress": "0x140B2C99E"
+              "absoluteAddress": "0x140B2C91E"
             },
             {
               "siteId": "workshop-menu.availability.source-94",
-              "absoluteAddress": "0x140B2CA04"
+              "absoluteAddress": "0x140B2C984"
             },
             {
               "siteId": "workshop-menu.availability.source-95",
-              "absoluteAddress": "0x140B2EA54"
+              "absoluteAddress": "0x140B2E9D4"
             },
             {
               "siteId": "workshop-menu.availability.source-96",
-              "absoluteAddress": "0x140396E65"
+              "absoluteAddress": "0x140397185"
             },
             {
               "siteId": "workshop-menu.availability.source-97",
-              "absoluteAddress": "0x1403B7FB2"
+              "absoluteAddress": "0x1403B82D2"
             },
             {
               "siteId": "workshop-menu.availability.source-98",
-              "absoluteAddress": "0x1403C18AF"
+              "absoluteAddress": "0x1403C1BCF"
             },
             {
               "siteId": "workshop-menu.availability.source-99",
-              "absoluteAddress": "0x140B2B914"
+              "absoluteAddress": "0x140B2B894"
             },
             {
               "siteId": "workshop-menu.availability.source-9a",
-              "absoluteAddress": "0x140B2D7DF"
+              "absoluteAddress": "0x140B2D75F"
             },
             {
               "siteId": "workshop-menu.availability.source-9b",
-              "absoluteAddress": "0x140B2D911"
+              "absoluteAddress": "0x140B2D891"
             },
             {
               "siteId": "workshop-menu.availability.source-9c",
-              "absoluteAddress": "0x140B2ED7F"
+              "absoluteAddress": "0x140B2ECFF"
             },
             {
               "siteId": "workshop-menu.availability.source-9d",
-              "absoluteAddress": "0x140B303DB"
+              "absoluteAddress": "0x140B3035B"
             },
             {
               "siteId": "workshop-menu.availability.source-9e",
-              "absoluteAddress": "0x140B32425"
+              "absoluteAddress": "0x140B323A5"
             },
             {
               "siteId": "workshop-menu.availability.source-9f",
-              "absoluteAddress": "0x140B3316C"
+              "absoluteAddress": "0x140B330EC"
             },
             {
               "siteId": "workshop-menu.availability.source-a0",
-              "absoluteAddress": "0x140B361C8"
+              "absoluteAddress": "0x140B36148"
             },
             {
               "siteId": "workshop-menu.availability.source-a1",
-              "absoluteAddress": "0x140B366D1"
+              "absoluteAddress": "0x140B36651"
             },
             {
               "siteId": "workshop-menu.availability.source-a2",
-              "absoluteAddress": "0x140B376B0"
+              "absoluteAddress": "0x140B37630"
             },
             {
               "siteId": "workshop-menu.availability.source-a3",
-              "absoluteAddress": "0x140B3775B"
+              "absoluteAddress": "0x140B376DB"
             }
           ]
         }
@@ -620,172 +620,172 @@
       "sites": [
         {
           "id": "workshop-menu.availability.source-91",
-          "rva": "0xB2C6DE",
+          "rva": "0xB2C65E",
           "sourceId": "0x91",
           "label": "workshop-menu.availability.source-91",
-          "expectedTargetRva": "0x3997B0",
+          "expectedTargetRva": "0x399AD0",
           "contextSignatureVersion": 1,
           "contextBytes": "8B 8D F8 00 00 00"
         },
         {
           "id": "workshop-menu.availability.source-92",
-          "rva": "0xB2C747",
+          "rva": "0xB2C6C7",
           "sourceId": "0x92",
           "label": "workshop-menu.availability.source-92",
-          "expectedTargetRva": "0x3997B0",
+          "expectedTargetRva": "0x399AD0",
           "contextSignatureVersion": 1,
           "contextBytes": "8B 4D A0"
         },
         {
           "id": "workshop-menu.availability.source-93",
-          "rva": "0xB2C99E",
+          "rva": "0xB2C91E",
           "sourceId": "0x93",
           "label": "workshop-menu.availability.source-93",
-          "expectedTargetRva": "0x3997B0",
+          "expectedTargetRva": "0x399AD0",
           "contextSignatureVersion": 1,
           "contextBytes": "8B 4D A4"
         },
         {
           "id": "workshop-menu.availability.source-94",
-          "rva": "0xB2CA04",
+          "rva": "0xB2C984",
           "sourceId": "0x94",
           "label": "workshop-menu.availability.source-94",
-          "expectedTargetRva": "0x3997B0",
+          "expectedTargetRva": "0x399AD0",
           "contextSignatureVersion": 1,
           "contextBytes": "8B 4D A8"
         },
         {
           "id": "workshop-menu.availability.source-95",
-          "rva": "0xB2EA54",
+          "rva": "0xB2E9D4",
           "sourceId": "0x95",
           "label": "workshop-menu.availability.source-95",
-          "expectedTargetRva": "0x3997B0",
+          "expectedTargetRva": "0x399AD0",
           "contextSignatureVersion": 1,
           "contextBytes": "8B 4C 24 70"
         },
         {
           "id": "workshop-menu.availability.source-96",
-          "rva": "0x396E65",
+          "rva": "0x397185",
           "sourceId": "0x96",
           "label": "workshop-menu.availability.source-96",
-          "expectedTargetRva": "0x3997B0",
+          "expectedTargetRva": "0x399AD0",
           "contextSignatureVersion": 1,
           "contextBytes": "84 C0 74 0C"
         },
         {
           "id": "workshop-menu.availability.source-97",
-          "rva": "0x3B7FB2",
+          "rva": "0x3B82D2",
           "sourceId": "0x97",
           "label": "workshop-menu.availability.source-97",
-          "expectedTargetRva": "0x3997B0",
+          "expectedTargetRva": "0x399AD0",
           "contextSignatureVersion": 1,
           "contextBytes": "84 C0 74 3C 83 BC 24 A0 00 00 00 00"
         },
         {
           "id": "workshop-menu.availability.source-98",
-          "rva": "0x3C18AF",
+          "rva": "0x3C1BCF",
           "sourceId": "0x98",
           "label": "workshop-menu.availability.source-98",
-          "expectedTargetRva": "0x3997B0",
+          "expectedTargetRva": "0x399AD0",
           "contextSignatureVersion": 1,
           "contextBytes": "84 C0 74 3C 83 BC 24 98 00 00 00 00"
         },
         {
           "id": "workshop-menu.availability.source-99",
-          "rva": "0xB2B914",
+          "rva": "0xB2B894",
           "sourceId": "0x99",
           "label": "workshop-menu.availability.source-99",
-          "expectedTargetRva": "0x3997B0",
+          "expectedTargetRva": "0x399AD0",
           "contextSignatureVersion": 1,
           "contextBytes": "8B 4C 24 24"
         },
         {
           "id": "workshop-menu.availability.source-9a",
-          "rva": "0xB2D7DF",
+          "rva": "0xB2D75F",
           "sourceId": "0x9A",
           "label": "workshop-menu.availability.source-9a",
-          "expectedTargetRva": "0x3997B0",
+          "expectedTargetRva": "0x399AD0",
           "contextSignatureVersion": 1,
           "contextBytes": "8B 4D C4"
         },
         {
           "id": "workshop-menu.availability.source-9b",
-          "rva": "0xB2D911",
+          "rva": "0xB2D891",
           "sourceId": "0x9B",
           "label": "workshop-menu.availability.source-9b",
-          "expectedTargetRva": "0x3997B0",
+          "expectedTargetRva": "0x399AD0",
           "contextSignatureVersion": 1,
           "contextBytes": "8B 4D C8"
         },
         {
           "id": "workshop-menu.availability.source-9c",
-          "rva": "0xB2ED7F",
+          "rva": "0xB2ECFF",
           "sourceId": "0x9C",
           "label": "workshop-menu.availability.source-9c",
-          "expectedTargetRva": "0x3997B0",
+          "expectedTargetRva": "0x399AD0",
           "contextSignatureVersion": 1,
           "contextBytes": "8B 4C 24 4C"
         },
         {
           "id": "workshop-menu.availability.source-9d",
-          "rva": "0xB303DB",
+          "rva": "0xB3035B",
           "sourceId": "0x9D",
           "label": "workshop-menu.availability.source-9d",
-          "expectedTargetRva": "0x3997B0",
+          "expectedTargetRva": "0x399AD0",
           "contextSignatureVersion": 1,
           "contextBytes": "84 C0 74 11 83 7C 24 48 00"
         },
         {
           "id": "workshop-menu.availability.source-9e",
-          "rva": "0xB32425",
+          "rva": "0xB323A5",
           "sourceId": "0x9E",
           "label": "workshop-menu.availability.source-9e",
-          "expectedTargetRva": "0x3997B0",
+          "expectedTargetRva": "0x399AD0",
           "contextSignatureVersion": 1,
           "contextBytes": "84 C0 74 11 44 39 B5 B0 01 00 00"
         },
         {
           "id": "workshop-menu.availability.source-9f",
-          "rva": "0xB3316C",
+          "rva": "0xB330EC",
           "sourceId": "0x9F",
           "label": "workshop-menu.availability.source-9f",
-          "expectedTargetRva": "0x3997B0",
+          "expectedTargetRva": "0x399AD0",
           "contextSignatureVersion": 1,
           "contextBytes": "8B 4C 24 38"
         },
         {
           "id": "workshop-menu.availability.source-a0",
-          "rva": "0xB361C8",
+          "rva": "0xB36148",
           "sourceId": "0xA0",
           "label": "workshop-menu.availability.source-a0",
-          "expectedTargetRva": "0x3997B0",
+          "expectedTargetRva": "0x399AD0",
           "contextSignatureVersion": 1,
           "contextBytes": "8B 4D 87"
         },
         {
           "id": "workshop-menu.availability.source-a1",
-          "rva": "0xB366D1",
+          "rva": "0xB36651",
           "sourceId": "0xA1",
           "label": "workshop-menu.availability.source-a1",
-          "expectedTargetRva": "0x3997B0",
+          "expectedTargetRva": "0x399AD0",
           "contextSignatureVersion": 1,
           "contextBytes": "44 8B 45 AF"
         },
         {
           "id": "workshop-menu.availability.source-a2",
-          "rva": "0xB376B0",
+          "rva": "0xB37630",
           "sourceId": "0xA2",
           "label": "workshop-menu.availability.source-a2",
-          "expectedTargetRva": "0x3997B0",
+          "expectedTargetRva": "0x399AD0",
           "contextSignatureVersion": 1,
           "contextBytes": "8B 8C 24 88 00 00 00"
         },
         {
           "id": "workshop-menu.availability.source-a3",
-          "rva": "0xB3775B",
+          "rva": "0xB376DB",
           "sourceId": "0xA3",
           "label": "workshop-menu.availability.source-a3",
-          "expectedTargetRva": "0x3997B0",
+          "expectedTargetRva": "0x399AD0",
           "contextSignatureVersion": 1,
           "contextBytes": "44 8B 4C 24 70"
         }
@@ -799,36 +799,36 @@
       "expectedInstructionKind": "call_rel32",
       "expectedOriginalTargetGroup": "workshop_menu.check_and_set_placement",
       "evidence": [
-        "tools/ghidra/reports/fallout4-1.11.221/fo4-check-placement-target-functions.txt",
-        "tools/ghidra/reports/fallout4-1.11.221/fo4-check-placement-call-windows.txt"
+        "tools/ghidra/reports/fallout4-1.11.240/fo4-check-placement-target-functions.txt",
+        "tools/ghidra/reports/fallout4-1.11.240/fo4-check-placement-call-windows.txt"
       ],
       "discoveryStrategy": {
         "status": "proven",
         "summary": "Resolve CheckAndSetItemForPlacement callers and require four direct CALL rel32 sites to the same placement helper.",
         "proof": {
           "kind": "ghidra_reference_report",
-          "report": "tools/ghidra/reports/fallout4-1.11.221/fo4-check-placement-target-functions.txt",
+          "report": "tools/ghidra/reports/fallout4-1.11.240/fo4-check-placement-target-functions.txt",
           "instructionReports": [
-            "tools/ghidra/reports/fallout4-1.11.221/fo4-check-placement-call-windows.txt"
+            "tools/ghidra/reports/fallout4-1.11.240/fo4-check-placement-call-windows.txt"
           ],
-          "targetAbsoluteAddress": "0x140B2E9C0",
+          "targetAbsoluteAddress": "0x140B2E940",
           "referenceType": "UNCONDITIONAL_CALL",
           "sites": [
             {
               "siteId": "workshop-menu.check-placement.source-a5",
-              "absoluteAddress": "0x140B2B177"
+              "absoluteAddress": "0x140B2B0F7"
             },
             {
               "siteId": "workshop-menu.check-placement.source-a6",
-              "absoluteAddress": "0x140B2C762"
+              "absoluteAddress": "0x140B2C6E2"
             },
             {
               "siteId": "workshop-menu.check-placement.source-a7",
-              "absoluteAddress": "0x140B2CA1F"
+              "absoluteAddress": "0x140B2C99F"
             },
             {
               "siteId": "workshop-menu.check-placement.source-a8",
-              "absoluteAddress": "0x140B2E6FE"
+              "absoluteAddress": "0x140B2E67E"
             }
           ]
         }
@@ -836,37 +836,37 @@
       "sites": [
         {
           "id": "workshop-menu.check-placement.source-a5",
-          "rva": "0xB2B177",
+          "rva": "0xB2B0F7",
           "sourceId": "0xA5",
           "label": "workshop-menu.check-placement.source-a5",
-          "expectedTargetRva": "0xB2E9C0",
+          "expectedTargetRva": "0xB2E940",
           "contextSignatureVersion": 1,
-          "contextBytes": "E8 6F 30 EB FF"
+          "contextBytes": "E8 FF 33 EB FF"
         },
         {
           "id": "workshop-menu.check-placement.source-a6",
-          "rva": "0xB2C762",
+          "rva": "0xB2C6E2",
           "sourceId": "0xA6",
           "label": "workshop-menu.check-placement.source-a6",
-          "expectedTargetRva": "0xB2E9C0",
+          "expectedTargetRva": "0xB2E940",
           "contextSignatureVersion": 1,
           "contextBytes": "40 84 F6 0F 84 C5 03 00 00"
         },
         {
           "id": "workshop-menu.check-placement.source-a7",
-          "rva": "0xB2CA1F",
+          "rva": "0xB2C99F",
           "sourceId": "0xA7",
           "label": "workshop-menu.check-placement.source-a7",
-          "expectedTargetRva": "0xB2E9C0",
+          "expectedTargetRva": "0xB2E940",
           "contextSignatureVersion": 1,
           "contextBytes": "40 84 F6 0F 84 08 01 00 00"
         },
         {
           "id": "workshop-menu.check-placement.source-a8",
-          "rva": "0xB2E6FE",
+          "rva": "0xB2E67E",
           "sourceId": "0xA8",
           "label": "workshop-menu.check-placement.source-a8",
-          "expectedTargetRva": "0xB2E9C0",
+          "expectedTargetRva": "0xB2E940",
           "contextSignatureVersion": 1,
           "contextBytes": "44 39 65 20"
         }
@@ -880,48 +880,48 @@
       "expectedInstructionKind": "call_rel32",
       "expectedOriginalTargetGroup": "workshop_menu.start_placement",
       "evidence": [
-        "tools/ghidra/reports/fallout4-1.11.221/fo4-start-placement-target-functions.txt",
-        "tools/ghidra/reports/fallout4-1.11.221/fo4-start-placement-call-windows.txt"
+        "tools/ghidra/reports/fallout4-1.11.240/fo4-start-placement-target-functions.txt",
+        "tools/ghidra/reports/fallout4-1.11.240/fo4-start-placement-call-windows.txt"
       ],
       "discoveryStrategy": {
         "status": "proven",
         "summary": "Resolve StartWorkshopPlacement callers and require seven direct CALL rel32 sites to the same helper.",
         "proof": {
           "kind": "ghidra_reference_report",
-          "report": "tools/ghidra/reports/fallout4-1.11.221/fo4-start-placement-target-functions.txt",
+          "report": "tools/ghidra/reports/fallout4-1.11.240/fo4-start-placement-target-functions.txt",
           "instructionReports": [
-            "tools/ghidra/reports/fallout4-1.11.221/fo4-start-placement-call-windows.txt"
+            "tools/ghidra/reports/fallout4-1.11.240/fo4-start-placement-call-windows.txt"
           ],
-          "targetAbsoluteAddress": "0x140B2FFB0",
+          "targetAbsoluteAddress": "0x140B2FF30",
           "referenceType": "UNCONDITIONAL_CALL",
           "sites": [
             {
               "siteId": "workshop-menu.start-placement.source-a3",
-              "absoluteAddress": "0x140B2C85A"
+              "absoluteAddress": "0x140B2C7DA"
             },
             {
               "siteId": "workshop-menu.start-placement.source-a4",
-              "absoluteAddress": "0x140B2CB15"
+              "absoluteAddress": "0x140B2CA95"
             },
             {
               "siteId": "workshop-menu.start-placement.source-a9",
-              "absoluteAddress": "0x140B2B16F"
+              "absoluteAddress": "0x140B2B0EF"
             },
             {
               "siteId": "workshop-menu.start-placement.source-aa",
-              "absoluteAddress": "0x140B2B9D4"
+              "absoluteAddress": "0x140B2B954"
             },
             {
               "siteId": "workshop-menu.start-placement.source-ab",
-              "absoluteAddress": "0x140B2D980"
+              "absoluteAddress": "0x140B2D900"
             },
             {
               "siteId": "workshop-menu.start-placement.source-ac",
-              "absoluteAddress": "0x140B2E6F6"
+              "absoluteAddress": "0x140B2E676"
             },
             {
               "siteId": "workshop-menu.start-placement.source-ad",
-              "absoluteAddress": "0x140B2E97F"
+              "absoluteAddress": "0x140B2E8FF"
             }
           ]
         }
@@ -929,64 +929,64 @@
       "sites": [
         {
           "id": "workshop-menu.start-placement.source-a3",
-          "rva": "0xB2C85A",
+          "rva": "0xB2C7DA",
           "sourceId": "0xA3",
           "label": "workshop-menu.start-placement.source-a3",
-          "expectedTargetRva": "0xB2FFB0",
+          "expectedTargetRva": "0xB2FF30",
           "contextSignatureVersion": 1,
           "contextBytes": "8B 45 30"
         },
         {
           "id": "workshop-menu.start-placement.source-a4",
-          "rva": "0xB2CB15",
+          "rva": "0xB2CA95",
           "sourceId": "0xA4",
           "label": "workshop-menu.start-placement.source-a4",
-          "expectedTargetRva": "0xB2FFB0",
+          "expectedTargetRva": "0xB2FF30",
           "contextSignatureVersion": 1,
           "contextBytes": "8B 45 50"
         },
         {
           "id": "workshop-menu.start-placement.source-a9",
-          "rva": "0xB2B16F",
+          "rva": "0xB2B0EF",
           "sourceId": "0xA9",
           "label": "workshop-menu.start-placement.source-a9",
-          "expectedTargetRva": "0xB2FFB0",
+          "expectedTargetRva": "0xB2FF30",
           "contextSignatureVersion": 1,
           "contextBytes": "48 8B CE"
         },
         {
           "id": "workshop-menu.start-placement.source-aa",
-          "rva": "0xB2B9D4",
+          "rva": "0xB2B954",
           "sourceId": "0xAA",
           "label": "workshop-menu.start-placement.source-aa",
-          "expectedTargetRva": "0xB2FFB0",
+          "expectedTargetRva": "0xB2FF30",
           "contextSignatureVersion": 1,
           "contextBytes": "33 D2 48 8B CE E8 7D 50 00 00"
         },
         {
           "id": "workshop-menu.start-placement.source-ab",
-          "rva": "0xB2D980",
+          "rva": "0xB2D900",
           "sourceId": "0xAB",
           "label": "workshop-menu.start-placement.source-ab",
-          "expectedTargetRva": "0xB2FFB0",
+          "expectedTargetRva": "0xB2FF30",
           "contextSignatureVersion": 1,
           "contextBytes": "E9 B3 00 00 00"
         },
         {
           "id": "workshop-menu.start-placement.source-ac",
-          "rva": "0xB2E6F6",
+          "rva": "0xB2E676",
           "sourceId": "0xAC",
           "label": "workshop-menu.start-placement.source-ac",
-          "expectedTargetRva": "0xB2FFB0",
+          "expectedTargetRva": "0xB2FF30",
           "contextSignatureVersion": 1,
           "contextBytes": "48 8B CF"
         },
         {
           "id": "workshop-menu.start-placement.source-ad",
-          "rva": "0xB2E97F",
+          "rva": "0xB2E8FF",
           "sourceId": "0xAD",
           "label": "workshop-menu.start-placement.source-ad",
-          "expectedTargetRva": "0xB2FFB0",
+          "expectedTargetRva": "0xB2FF30",
           "contextSignatureVersion": 1,
           "contextBytes": "33 D2 48 8B CE E8 D2 20 00 00"
         }
@@ -1000,32 +1000,32 @@
       "expectedInstructionKind": "call_rel32",
       "expectedOriginalTargetGroup": "workshop_material.build_resource_check",
       "evidence": [
-        "tools/ghidra/reports/fallout4-1.11.221/fo4-build-resource-check-target-functions.txt",
-        "tools/ghidra/reports/fallout4-1.11.221/fo4-build-resource-check-call-windows.txt"
+        "tools/ghidra/reports/fallout4-1.11.240/fo4-build-resource-check-target-functions.txt",
+        "tools/ghidra/reports/fallout4-1.11.240/fo4-build-resource-check-call-windows.txt"
       ],
       "discoveryStrategy": {
         "status": "proven",
         "summary": "Resolve build resource checks from CanProduceWorkshop analysis and require three direct CALL rel32 sites to the same helper.",
         "proof": {
           "kind": "ghidra_reference_report",
-          "report": "tools/ghidra/reports/fallout4-1.11.221/fo4-build-resource-check-target-functions.txt",
+          "report": "tools/ghidra/reports/fallout4-1.11.240/fo4-build-resource-check-target-functions.txt",
           "instructionReports": [
-            "tools/ghidra/reports/fallout4-1.11.221/fo4-build-resource-check-call-windows.txt"
+            "tools/ghidra/reports/fallout4-1.11.240/fo4-build-resource-check-call-windows.txt"
           ],
-          "targetAbsoluteAddress": "0x14042BCD0",
+          "targetAbsoluteAddress": "0x14042BFF0",
           "referenceType": "UNCONDITIONAL_CALL",
           "sites": [
             {
               "siteId": "workshop-material.build-resource-check.placement",
-              "absoluteAddress": "0x140392524"
+              "absoluteAddress": "0x140392844"
             },
             {
               "siteId": "workshop-material.build-resource-check.confirm",
-              "absoluteAddress": "0x140398E16"
+              "absoluteAddress": "0x140399136"
             },
             {
               "siteId": "workshop-material.build-resource-check.consume-precheck",
-              "absoluteAddress": "0x1403B7C5E"
+              "absoluteAddress": "0x1403B7F7E"
             }
           ]
         }
@@ -1033,28 +1033,28 @@
       "sites": [
         {
           "id": "workshop-material.build-resource-check.placement",
-          "rva": "0x392524",
+          "rva": "0x392844",
           "sourceId": "0xB1",
           "label": "workshop-material.build-resource-check.placement",
-          "expectedTargetRva": "0x42BCD0",
+          "expectedTargetRva": "0x42BFF0",
           "contextSignatureVersion": 1,
           "contextBytes": "84 C0 0F 84 50 04 00 00"
         },
         {
           "id": "workshop-material.build-resource-check.confirm",
-          "rva": "0x398E16",
+          "rva": "0x399136",
           "sourceId": "0xB2",
           "label": "workshop-material.build-resource-check.confirm",
-          "expectedTargetRva": "0x42BCD0",
+          "expectedTargetRva": "0x42BFF0",
           "contextSignatureVersion": 1,
           "contextBytes": "84 C0 0F 84 2A 08 00 00"
         },
         {
           "id": "workshop-material.build-resource-check.consume-precheck",
-          "rva": "0x3B7C5E",
+          "rva": "0x3B7F7E",
           "sourceId": "0xB3",
           "label": "workshop-material.build-resource-check.consume-precheck",
-          "expectedTargetRva": "0x42BCD0",
+          "expectedTargetRva": "0x42BFF0",
           "contextSignatureVersion": 1,
           "contextBytes": "48 8B 4B 18"
         }
@@ -1068,28 +1068,28 @@
       "expectedInstructionKind": "call_rel32",
       "expectedOriginalTargetGroup": "workshop_material.consume_component",
       "evidence": [
-        "tools/ghidra/reports/fallout4-1.11.221/fo4-consume-component-target-functions.txt",
-        "tools/ghidra/reports/fallout4-1.11.221/fo4-consume-component-call-windows.txt"
+        "tools/ghidra/reports/fallout4-1.11.240/fo4-consume-component-target-functions.txt",
+        "tools/ghidra/reports/fallout4-1.11.240/fo4-consume-component-call-windows.txt"
       ],
       "discoveryStrategy": {
         "status": "proven",
         "summary": "Resolve workshop component consumption calls and require exactly two direct CALL rel32 sites to the same consume helper.",
         "proof": {
           "kind": "ghidra_reference_report",
-          "report": "tools/ghidra/reports/fallout4-1.11.221/fo4-consume-component-target-functions.txt",
+          "report": "tools/ghidra/reports/fallout4-1.11.240/fo4-consume-component-target-functions.txt",
           "instructionReports": [
-            "tools/ghidra/reports/fallout4-1.11.221/fo4-consume-component-call-windows.txt"
+            "tools/ghidra/reports/fallout4-1.11.240/fo4-consume-component-call-windows.txt"
           ],
-          "targetAbsoluteAddress": "0x140392020",
+          "targetAbsoluteAddress": "0x140392340",
           "referenceType": "UNCONDITIONAL_CALL",
           "sites": [
             {
               "siteId": "workshop-material.consume-component.source-f3",
-              "absoluteAddress": "0x140399006"
+              "absoluteAddress": "0x140399326"
             },
             {
               "siteId": "workshop-material.consume-component.source-f4",
-              "absoluteAddress": "0x1403B7D3A"
+              "absoluteAddress": "0x1403B805A"
             }
           ]
         }
@@ -1097,19 +1097,19 @@
       "sites": [
         {
           "id": "workshop-material.consume-component.source-f3",
-          "rva": "0x399006",
+          "rva": "0x399326",
           "sourceId": "0xF3",
           "label": "workshop-material.consume-component.source-f3",
-          "expectedTargetRva": "0x392020",
+          "expectedTargetRva": "0x392340",
           "contextSignatureVersion": 1,
           "contextBytes": "48 83 C7 10"
         },
         {
           "id": "workshop-material.consume-component.source-f4",
-          "rva": "0x3B7D3A",
+          "rva": "0x3B805A",
           "sourceId": "0xF4",
           "label": "workshop-material.consume-component.source-f4",
-          "expectedTargetRva": "0x392020",
+          "expectedTargetRva": "0x392340",
           "contextSignatureVersion": 1,
           "contextBytes": "48 83 C3 10"
         }
@@ -1120,18 +1120,18 @@
       "cppName": "kWorkshopSelectedMenuNodeFunctionId",
       "category": "function_rva",
       "expectedCount": 1,
-      "value": "0x389A90",
+      "value": "0x389DB0",
       "addressLibrary": {
         "id": "2195024",
-        "offset": "0x389A90",
+        "offset": "0x389DB0",
         "namedId": "RE::ID::Workshop::GetSelectedWorkshopMenuNode"
       },
       "evidence": [
-        "tools/ghidra/reports/fo4-selected-menu-helper-functions.txt"
+        "tools/ghidra/reports/fallout4-1.11.240/fo4-selected-menu-helper-functions.txt"
       ],
       "discoveryStrategy": {
         "status": "automated",
-        "summary": "Resolved through named Address Library ID RE::ID::Workshop::GetSelectedWorkshopMenuNode at offset 0x389A90; selected-menu reports record the helper body and callers."
+        "summary": "Resolved through named Address Library ID RE::ID::Workshop::GetSelectedWorkshopMenuNode at offset 0x389DB0 for Fallout 4 1.11.240; Ghidra report records the helper body and callers."
       }
     },
     {
@@ -1139,19 +1139,19 @@
       "cppName": "kWorkshopSelectedRowGlobalId",
       "category": "global_rva",
       "expectedCount": 1,
-      "value": "0x30EBE98",
+      "value": "0x30F6F18",
       "addressLibrary": {
         "id": "4797160",
-        "offset": "0x30EBE98",
+        "offset": "0x30F6F18",
         "namedId": "RE::ID::Workshop::CurrentRow"
       },
       "evidence": [
-        "tools/ghidra/reports/fo4-placement-secondary-globals.txt",
-        "tools/ghidra/reports/fo4-selected-menu-helper-functions.txt"
+        "tools/ghidra/reports/fallout4-1.11.240/fo4-placement-secondary-globals.txt",
+        "tools/ghidra/reports/fallout4-1.11.240/fo4-selected-menu-helper-functions.txt"
       ],
       "discoveryStrategy": {
         "status": "automated",
-        "summary": "Resolved through named Address Library ID RE::ID::Workshop::CurrentRow at offset 0x30EBE98; selected-menu and placement reports record the current-row global references."
+        "summary": "Resolved through named Address Library ID RE::ID::Workshop::CurrentRow at offset 0x30F6F18 for Fallout 4 1.11.240; selected-menu and placement reports record the current-row global references."
       }
     },
     {
@@ -1161,11 +1161,11 @@
       "expectedCount": 1,
       "value": "2",
       "evidence": [
-        "tools/ghidra/reports/fo4-placement-resource-status-functions.txt"
+        "tools/ghidra/reports/fallout4-1.11.240/fo4-resource-status-target-functions.txt"
       ],
       "discoveryStrategy": {
         "status": "manual",
-        "summary": "This is a semantic status value, not an executable RVA; update only if the resource status enum is re-proven."
+        "summary": "Fallout 4 1.11.240 resource-status helper re-proves semantic value 2 for missing resources: when available component count is below the required count, the function assigns status 2."
       }
     },
     {
@@ -1176,28 +1176,28 @@
       "expectedInstructionKind": "call_rel32",
       "expectedOriginalTargetGroup": "workshop_material.remove_components",
       "evidence": [
-        "tools/ghidra/reports/fallout4-1.11.221/fo4-remove-components-target-functions.txt",
-        "tools/ghidra/reports/fallout4-1.11.221/fo4-remove-components-call-windows.txt"
+        "tools/ghidra/reports/fallout4-1.11.240/fo4-remove-components-target-functions.txt",
+        "tools/ghidra/reports/fallout4-1.11.240/fo4-remove-components-call-windows.txt"
       ],
       "discoveryStrategy": {
         "status": "proven",
         "summary": "Resolve RemoveComponents wrappers and require exactly two direct CALL rel32 sites to the same remove helper.",
         "proof": {
           "kind": "ghidra_reference_report",
-          "report": "tools/ghidra/reports/fallout4-1.11.221/fo4-remove-components-target-functions.txt",
+          "report": "tools/ghidra/reports/fallout4-1.11.240/fo4-remove-components-target-functions.txt",
           "instructionReports": [
-            "tools/ghidra/reports/fallout4-1.11.221/fo4-remove-components-call-windows.txt"
+            "tools/ghidra/reports/fallout4-1.11.240/fo4-remove-components-call-windows.txt"
           ],
-          "targetAbsoluteAddress": "0x141182740",
+          "targetAbsoluteAddress": "0x141182A90",
           "referenceType": "UNCONDITIONAL_CALL",
           "sites": [
             {
               "siteId": "workshop-material.remove-components.source-f1",
-              "absoluteAddress": "0x14114ECB9"
+              "absoluteAddress": "0x14114F009"
             },
             {
               "siteId": "workshop-material.remove-components.source-f2",
-              "absoluteAddress": "0x14114E6E3"
+              "absoluteAddress": "0x14114EA33"
             }
           ]
         }
@@ -1205,19 +1205,19 @@
       "sites": [
         {
           "id": "workshop-material.remove-components.source-f1",
-          "rva": "0x114ECB9",
+          "rva": "0x114F009",
           "sourceId": "0xF1",
           "label": "workshop-material.remove-components.source-f1",
-          "expectedTargetRva": "0x1182740",
+          "expectedTargetRva": "0x1182A90",
           "contextSignatureVersion": 1,
           "contextBytes": "48 83 C3 10"
         },
         {
           "id": "workshop-material.remove-components.source-f2",
-          "rva": "0x114E6E3",
+          "rva": "0x114EA33",
           "sourceId": "0xF2",
           "label": "workshop-material.remove-components.source-f2",
-          "expectedTargetRva": "0x1182740",
+          "expectedTargetRva": "0x1182A90",
           "contextSignatureVersion": 1,
           "contextBytes": "E9 B7 00 00 00"
         }
@@ -1231,29 +1231,29 @@
       "expectedInstructionKind": "call_rel32",
       "expectedOriginalTargetGroup": "workshop_material.workshop_object_count",
       "evidence": [
-        "tools/ghidra/reports/fallout4-1.11.221/fo4-object-count-papyrus-target-functions.txt",
-        "tools/ghidra/reports/fallout4-1.11.221/fo4-object-count-papyrus-call-windows.txt"
+        "tools/ghidra/reports/fallout4-1.11.240/fo4-object-count-papyrus-target-functions.txt",
+        "tools/ghidra/reports/fallout4-1.11.240/fo4-object-count-papyrus-call-windows.txt"
       ],
       "discoveryStrategy": {
         "status": "proven",
         "summary": "Resolve the Papyrus workshop object count call site from the exact Ghidra reference report and require one direct CALL rel32.",
         "proof": {
           "kind": "ghidra_reference_report",
-          "report": "tools/ghidra/reports/fallout4-1.11.221/fo4-object-count-papyrus-target-functions.txt",
-          "targetAbsoluteAddress": "0x14059D370",
+          "report": "tools/ghidra/reports/fallout4-1.11.240/fo4-object-count-papyrus-target-functions.txt",
+          "targetAbsoluteAddress": "0x14059D690",
           "referenceType": "UNCONDITIONAL_CALL",
           "instructionReports": [
-            "tools/ghidra/reports/fallout4-1.11.221/fo4-object-count-papyrus-call-windows.txt"
+            "tools/ghidra/reports/fallout4-1.11.240/fo4-object-count-papyrus-call-windows.txt"
           ]
         }
       },
       "sites": [
         {
           "id": "workshop-material.object-count.papyrus",
-          "rva": "0x5DD494",
+          "rva": "0x5DD7B4",
           "sourceId": "0xC1",
           "label": "workshop-material.object-count.papyrus",
-          "expectedTargetRva": "0x59D370",
+          "expectedTargetRva": "0x59D690",
           "contextSignatureVersion": 1,
           "contextBytes": "48 81 C4 C0 00 00 00"
         }
@@ -1267,29 +1267,29 @@
       "expectedInstructionKind": "call_rel32",
       "expectedOriginalTargetGroup": "workshop_material.current_workshop_object_count",
       "evidence": [
-        "tools/ghidra/reports/fallout4-1.11.221/fo4-object-count-current-target-functions.txt",
-        "tools/ghidra/reports/fallout4-1.11.221/fo4-object-count-current-call-windows.txt"
+        "tools/ghidra/reports/fallout4-1.11.240/fo4-object-count-current-target-functions.txt",
+        "tools/ghidra/reports/fallout4-1.11.240/fo4-object-count-current-call-windows.txt"
       ],
       "discoveryStrategy": {
         "status": "proven",
         "summary": "Resolve the current-workshop object count call site from the exact Ghidra reference report and require one direct CALL rel32.",
         "proof": {
           "kind": "ghidra_reference_report",
-          "report": "tools/ghidra/reports/fallout4-1.11.221/fo4-object-count-current-target-functions.txt",
+          "report": "tools/ghidra/reports/fallout4-1.11.240/fo4-object-count-current-target-functions.txt",
           "instructionReports": [
-            "tools/ghidra/reports/fallout4-1.11.221/fo4-object-count-current-call-windows.txt"
+            "tools/ghidra/reports/fallout4-1.11.240/fo4-object-count-current-call-windows.txt"
           ],
-          "targetAbsoluteAddress": "0x14037DE70",
+          "targetAbsoluteAddress": "0x14037E190",
           "referenceType": "UNCONDITIONAL_CALL"
         }
       },
       "sites": [
         {
           "id": "workshop-material.object-count.current-workshop",
-          "rva": "0x59D388",
+          "rva": "0x59D6A8",
           "sourceId": "0xC2",
           "label": "workshop-material.object-count.current-workshop",
-          "expectedTargetRva": "0x37DE70",
+          "expectedTargetRva": "0x37E190",
           "contextSignatureVersion": 1,
           "contextBytes": "8B C0"
         }
@@ -1302,11 +1302,11 @@
       "expectedCount": 1,
       "value": "0xE0",
       "evidence": [
-        "tools/ghidra/reports/fo4-workbench-shared-container-callers.txt"
+        "tools/ghidra/reports/fallout4-1.11.240/fo4-workshop-supply-owner-layout.txt"
       ],
       "discoveryStrategy": {
         "status": "manual",
-        "summary": "Raw diagnostic workshop supply owner layout read; do not treat as an executable RVA, Address Library candidate, or auto-update target."
+        "summary": "Fallout 4 1.11.240 Ghidra comparison re-proves this workshop supply owner layout offset in the equivalent workbench supply function; the member offset is unchanged from 1.11.221."
       }
     },
     {
@@ -1316,11 +1316,11 @@
       "expectedCount": 1,
       "value": "0xE8",
       "evidence": [
-        "tools/ghidra/reports/fo4-workbench-shared-container-callers.txt"
+        "tools/ghidra/reports/fallout4-1.11.240/fo4-workshop-supply-owner-layout.txt"
       ],
       "discoveryStrategy": {
         "status": "manual",
-        "summary": "Raw diagnostic workshop supply owner layout read; do not treat as an executable RVA, Address Library candidate, or auto-update target."
+        "summary": "Fallout 4 1.11.240 Ghidra comparison re-proves this workshop supply owner layout offset in the equivalent workbench supply function; the member offset is unchanged from 1.11.221."
       }
     },
     {
@@ -1330,11 +1330,11 @@
       "expectedCount": 1,
       "value": "0xF8",
       "evidence": [
-        "tools/ghidra/reports/fo4-workbench-shared-container-callers.txt"
+        "tools/ghidra/reports/fallout4-1.11.240/fo4-workshop-supply-owner-layout.txt"
       ],
       "discoveryStrategy": {
         "status": "manual",
-        "summary": "Raw diagnostic workshop supply owner layout read; do not treat as an executable RVA, Address Library candidate, or auto-update target."
+        "summary": "Fallout 4 1.11.240 Ghidra comparison re-proves this workshop supply owner layout offset in the equivalent workbench supply function; the member offset is unchanged from 1.11.221."
       }
     },
     {
@@ -1344,11 +1344,11 @@
       "expectedCount": 1,
       "value": "0x2F8",
       "evidence": [
-        "tools/ghidra/reports/fo4-workbench-shared-container-callers.txt"
+        "tools/ghidra/reports/fallout4-1.11.240/fo4-workshop-supply-owner-layout.txt"
       ],
       "discoveryStrategy": {
         "status": "manual",
-        "summary": "Raw diagnostic workshop supply owner layout read; do not treat as an executable RVA, Address Library candidate, or auto-update target."
+        "summary": "Fallout 4 1.11.240 Ghidra comparison re-proves this workshop supply owner layout offset in the equivalent workbench supply function; the member offset is unchanged from 1.11.221."
       }
     }
   ]

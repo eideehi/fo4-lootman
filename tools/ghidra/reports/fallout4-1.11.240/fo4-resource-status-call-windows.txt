@@ -1,0 +1,20 @@
+Program: Fallout4.exe
+Image base: 140000000
+
+================================================================================
+Target 140b2f0b0
+  140b2f0b0: [E8 EB 3C 00 00] CALL 0x140b32da0
+  140b2f0b5: [48 8B 4B 20] MOV RCX,qword ptr [RBX + 0x20]
+  140b2f0b9: [85 C0] TEST EAX,EAX
+  140b2f0bb: [4C 8B BC 24 48 03 00 00] MOV R15,qword ptr [RSP + 0x348]
+  140b2f0c3: [41 BE 17 00 00 00] MOV R14D,0x17
+  140b2f0c9: [0F 95 C0] SETNZ AL
+
+================================================================================
+Target 140b2d056
+  140b2d056: [E8 45 5D 00 00] CALL 0x140b32da0
+  140b2d05b: [48 8D 4D F8] LEA RCX,[RBP + -0x8]
+  140b2d05f: [89 45 B8] MOV dword ptr [RBP + -0x48],EAX
+  140b2d062: [8B D8] MOV EBX,EAX
+  140b2d064: [E8 C7 8B 85 FF] CALL 0x140385c30
+  140b2d069: [48 8B D0] MOV RDX,RAX

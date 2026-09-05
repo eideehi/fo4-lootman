@@ -1,0 +1,188 @@
+Program: Fallout4.exe
+Image base: 140000000
+
+================================================================================
+Target 140389db0
+Function: FUN_140389db0
+Entry: 140389db0
+Body: [[140389db0, 140389e80]]
+
+References to entry:
+  143ec88f0 -> 140389db0 type=DATA
+  1403962bc -> 140389db0 type=UNCONDITIONAL_CALL
+  1403990b0 -> 140389db0 type=UNCONDITIONAL_CALL
+  14038a071 -> 140389db0 type=UNCONDITIONAL_CALL
+  14038a0c8 -> 140389db0 type=UNCONDITIONAL_CALL
+  140392674 -> 140389db0 type=UNCONDITIONAL_CALL
+  14039543f -> 140389db0 type=UNCONDITIONAL_CALL
+  14039703a -> 140389db0 type=UNCONDITIONAL_CALL
+  140397068 -> 140389db0 type=UNCONDITIONAL_CALL
+  1403970a8 -> 140389db0 type=UNCONDITIONAL_CALL
+  140397100 -> 140389db0 type=UNCONDITIONAL_CALL
+  1403971ee -> 140389db0 type=UNCONDITIONAL_CALL
+  140399aec -> 140389db0 type=UNCONDITIONAL_CALL
+  14039e193 -> 140389db0 type=UNCONDITIONAL_CALL
+  1403b82b1 -> 140389db0 type=UNCONDITIONAL_CALL
+  1403c1ba9 -> 140389db0 type=UNCONDITIONAL_CALL
+  140b2e95c -> 140389db0 type=UNCONDITIONAL_CALL
+  140b2ecd4 -> 140389db0 type=UNCONDITIONAL_CALL
+  140b2f235 -> 140389db0 type=UNCONDITIONAL_CALL
+  140b303be -> 140389db0 type=UNCONDITIONAL_CALL
+  140b30452 -> 140389db0 type=UNCONDITIONAL_CALL
+  140b3062e -> 140389db0 type=UNCONDITIONAL_CALL
+  140b30b35 -> 140389db0 type=UNCONDITIONAL_CALL
+  140b32dc0 -> 140389db0 type=UNCONDITIONAL_CALL
+  140b360e1 -> 140389db0 type=UNCONDITIONAL_CALL
+  140b375b2 -> 140389db0 type=UNCONDITIONAL_CALL
+  140b2b85d -> 140389db0 type=UNCONDITIONAL_CALL
+  140b2b873 -> 140389db0 type=UNCONDITIONAL_CALL
+  140b2bc79 -> 140389db0 type=UNCONDITIONAL_CALL
+  140b2bd8b -> 140389db0 type=UNCONDITIONAL_CALL
+  140b2c644 -> 140389db0 type=UNCONDITIONAL_CALL
+  140b2c6b0 -> 140389db0 type=UNCONDITIONAL_CALL
+  140b2c907 -> 140389db0 type=UNCONDITIONAL_CALL
+  140b2c96d -> 140389db0 type=UNCONDITIONAL_CALL
+  140b2cedb -> 140389db0 type=UNCONDITIONAL_CALL
+  140b2d4b4 -> 140389db0 type=UNCONDITIONAL_CALL
+  140b2e4c2 -> 140389db0 type=UNCONDITIONAL_CALL
+  140b33004 -> 140389db0 type=UNCONDITIONAL_CALL
+
+Outgoing references from function body:
+  140389dc7 -> 140389df4 type=CONDITIONAL_JUMP
+  140389dd7 -> 140389df4 type=CONDITIONAL_JUMP
+  140389de7 -> 140389e0f type=CONDITIONAL_JUMP
+  140389df2 -> 140389de0 type=CONDITIONAL_JUMP
+  140389e14 -> 140389e6c type=CONDITIONAL_JUMP
+  140389e1c -> 140389e6c type=CONDITIONAL_JUMP
+  140389e22 -> 140389e6c type=CONDITIONAL_JUMP
+  140389e2d -> 140389e54 type=CONDITIONAL_JUMP
+  140389e39 -> 140389e54 type=CONDITIONAL_JUMP
+  140389e47 -> 140389e7c type=CONDITIONAL_JUMP
+  140389e52 -> 140389e40 type=CONDITIONAL_JUMP
+  140389e6a -> 140389e16 type=CONDITIONAL_JUMP
+  140389e7f -> 140389e67 type=UNCONDITIONAL_JUMP
+
+Instructions:
+  140389db0: MOV qword ptr [RSP + 0x8],RBX
+  140389db5: XOR R11D,R11D
+  140389db8: MOV EBX,ECX
+  140389dba: MOV dword ptr [RDX],R11D
+  140389dbd: MOV R8D,dword ptr [0x1430f8150]
+  140389dc4: TEST R8D,R8D
+  140389dc7: JZ 0x140389df4
+  140389dc9: MOV RAX,qword ptr [0x1430f8140]
+  140389dd0: LEA R9,[RAX + R8*0x8]
+  140389dd4: CMP RAX,R9
+  140389dd7: JZ 0x140389df4
+  140389dd9: NOP dword ptr [RAX]
+  140389de0: MOV RCX,qword ptr [RAX]
+  140389de3: CMP byte ptr [RCX + 0x48],R11B
+  140389de7: JNZ 0x140389e0f
+  140389de9: INC dword ptr [RDX]
+  140389deb: ADD RAX,0x8
+  140389def: CMP RAX,R9
+  140389df2: JNZ 0x140389de0
+  140389df4: MOV RAX,qword ptr [0x1430f8140]
+  140389dfb: MOV RCX,qword ptr [RAX]
+  140389dfe: MOV byte ptr [RCX + 0x48],0x1
+  140389e02: MOV dword ptr [RDX],R11D
+  140389e05: MOV RCX,qword ptr [0x1430f8140]
+  140389e0c: MOV RCX,qword ptr [RCX]
+  140389e0f: MOV R10D,R11D
+  140389e12: TEST EBX,EBX
+  140389e14: JZ 0x140389e6c
+  140389e16: MOV dword ptr [RDX],R11D
+  140389e19: TEST RCX,RCX
+  140389e1c: JZ 0x140389e6c
+  140389e1e: CMP dword ptr [RCX + 0x20],R11D
+  140389e22: JBE 0x140389e6c
+  140389e24: LEA R9,[RCX + 0x10]
+  140389e28: MOV ECX,dword ptr [RCX + 0x20]
+  140389e2b: TEST ECX,ECX
+  140389e2d: JZ 0x140389e54
+  140389e2f: MOV RAX,qword ptr [R9]
+  140389e32: LEA R8,[RAX + RCX*0x8]
+  140389e36: CMP RAX,R8
+  140389e39: JZ 0x140389e54
+  140389e3b: NOP dword ptr [RAX + RAX*0x1]
+  140389e40: MOV RCX,qword ptr [RAX]
+  140389e43: CMP byte ptr [RCX + 0x48],R11B
+  140389e47: JNZ 0x140389e7c
+  140389e49: INC dword ptr [RDX]
+  140389e4b: ADD RAX,0x8
+  140389e4f: CMP RAX,R8
+  140389e52: JNZ 0x140389e40
+  140389e54: MOV RAX,qword ptr [R9]
+  140389e57: MOV RCX,qword ptr [RAX]
+  140389e5a: MOV byte ptr [RCX + 0x48],0x1
+  140389e5e: MOV dword ptr [RDX],R11D
+  140389e61: MOV RCX,qword ptr [R9]
+  140389e64: MOV RCX,qword ptr [RCX]
+  140389e67: CMP R10D,EBX
+  140389e6a: JC 0x140389e16
+  140389e6c: CMP R10D,EBX
+  140389e6f: MOV RBX,qword ptr [RSP + 0x8]
+  140389e74: CMOVZ R11,RCX
+  140389e78: MOV RAX,R11
+  140389e7b: RE
+  140389e7c: INC R10D
+  140389e7f: JMP 0x140389e67
+
+Decompiled C:
+
+ulonglong FUN_140389db0(uint param_1,int *param_2)
+
+{
+  longlong *plVar1;
+  ulonglong *puVar2;
+  ulonglong *puVar3;
+  ulonglong uVar4;
+  uint uVar5;
+  ulonglong uVar6;
+
+  uVar5 = 0;
+  *param_2 = 0;
+  if (DAT_1430f8150 != 0) {
+    puVar2 = DAT_1430f8140 + DAT_1430f8150;
+    for (puVar3 = DAT_1430f8140; puVar3 != puVar2; puVar3 = puVar3 + 1) {
+      uVar4 = *puVar3;
+      if (*(char *)(uVar4 + 0x48) != '\0') goto LAB_140389e0f;
+      *param_2 = *param_2 + 1;
+    }
+  }
+  *(undefined1 *)(*DAT_1430f8140 + 0x48) = 1;
+  *param_2 = 0;
+  uVar4 = *DAT_1430f8140;
+LAB_140389e0f:
+  uVar6 = 0;
+  if (param_1 != 0) {
+    do {
+      uVar5 = (uint)uVar6;
+      *param_2 = 0;
+      if ((uVar4 == 0) || (*(int *)(uVar4 + 0x20) == 0)) break;
+      plVar1 = (longlong *)(uVar4 + 0x10);
+      if (*(uint *)(uVar4 + 0x20) != 0) {
+        puVar3 = (ulonglong *)*plVar1;
+        puVar2 = puVar3 + *(uint *)(uVar4 + 0x20);
+        for (; puVar3 != puVar2; puVar3 = puVar3 + 1) {
+          uVar4 = *puVar3;
+          if (*(char *)(uVar4 + 0x48) != '\0') {
+            uVar6 = (ulonglong)(uVar5 + 1);
+            goto LAB_140389e67;
+          }
+          *param_2 = *param_2 + 1;
+        }
+      }
+      *(undefined1 *)(*(longlong *)*plVar1 + 0x48) = 1;
+      *param_2 = 0;
+      uVar4 = *(ulonglong *)*plVar1;
+LAB_140389e67:
+      uVar5 = (uint)uVar6;
+    } while (uVar5 < param_1);
+  }
+  uVar6 = 0;
+  if (uVar5 == param_1) {
+    uVar6 = uVar4;
+  }
+  return uVar6;
+}

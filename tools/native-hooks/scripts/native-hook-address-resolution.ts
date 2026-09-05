@@ -56,7 +56,7 @@ interface EvidenceInstruction {
 	disassembly: string;
 }
 
-const DEFAULT_EVIDENCE_REPORT = "tools/ghidra/reports/fallout4-1.11.221/proven-call-site-evidence.txt";
+const DEFAULT_EVIDENCE_REPORT = "tools/ghidra/reports/fallout4-1.11.240/proven-call-site-evidence.txt";
 
 const HEX_LITERAL_PATTERN = /^0x[0-9A-F]+$/i;
 const PLAIN_HEX_PATTERN = /^[0-9A-F]+$/i;
