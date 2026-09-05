@@ -407,12 +407,62 @@ namespace papyrus_lootman
 #endif
 	}
 
+	// Reads the base form's name in its own SEH frame. The enclosing TryIsLootableInventoryItemSafe guard
+	// already covers this call, but it converts any fault into "not lootable", so a fault raised while
+	// probing the name would silently drop a perfectly good item. Probing here instead lets the caller keep
+	// the codebase's conservative bias for an inconclusive probe: a failed read reports nothing and the
+	// caller treats the item as named.
+	bool TryIsNamedFormSafe(const TESForm* form, bool& outResult)
+	{
+#if defined(_MSC_VER)
+		__try
+		{
+			outResult = !TESFullName::GetFullName(*form).empty();
+			return true;
+		}
+		__except (SehFilterRecoverable(GetExceptionCode()))
+		{
+			return false;
+		}
+#else
+		outResult = !TESFullName::GetFullName(*form).empty();
+		return true;
+#endif
+	}
+
 	bool IsValidInventoryItem(const TESForm* form, const InventoryItemInfo& info, MatchCache* matchCache)
 	{
 		if (info.dropped) return false;
 		if (info.featured && !info.legendary &&
 		    !MatchesAnyCached(form, injection_data::include_featured_item, matchCache)) return false;
 		if (info.questItem && !MatchesAnyCached(form, injection_data::include_quest_item, matchCache)) return false;
+		// Same rule as the world path's final gate in IsValidObject, applied to inventory items: an object
+		// with no name is hidden from the player's inventory UI, so moving it into the player's pack hands
+		// over something that can never be seen, equipped or dropped again. The two are not semantically
+		// identical. IsValidObject reads ref->GetDisplayFullName(), which resolves an instanced or renamed
+		// name; this reads the base record's FULL. A form whose displayed name comes entirely from Instance
+		// Naming Rules with an empty base FULL is therefore skipped here while the same reference is still
+		// looted off the ground. No shipped Fallout 4 or DLC record has that shape - every playable nameless
+		// ARMO/MISC/WEAP/AMMO/ALCH in the base game and the six DLCs is a creature skin, a turret skin or a
+		// dummy - so the exposure is limited to third-party plugins that name equipment only through INNR.
+		// Creature equipment (SkinFeralGhoul and the other skins) carries no
+		// FULL field at all and leaves the non-playable flag clear, so the IsPlayable gate in IsValidForm does
+		// not catch it and the same object was rejected on the ground but looted out of a corpse.
+		//
+		// This lives on the inventory-item gate rather than in the shared IsValidForm because the world scan
+		// runs ACTI and FLOR base forms through IsValidForm too, and Fallout4.esm alone ships 685 playable
+		// nameless activators; a shared check would disable activator looting outright. IsValidInventoryItem
+		// is only reachable from TryIsLootableInventoryItemSafe, whose sole callers are the two inventory
+		// scans (HasLootableItem here and the transfer loop in papyrus_lootman_inventory_transfer.cpp), so
+		// the world path is untouched. Ordered last so the cheap flag tests short-circuit ahead of it.
+		if (form)
+		{
+			bool named = true;
+			if (TryIsNamedFormSafe(form, named) && !named)
+			{
+				return false;
+			}
+		}
 		return true;
 	}
 
