@@ -178,11 +178,6 @@ namespace papyrus_lootman
 			return false;
 		}
 
-		if (playPickupSound)
-		{
-			PlayPickUpSound(std::monostate{}, player, ref);
-		}
-
 		std::int32_t playerAfter = 0;
 		const bool gotPlayerAfter = TryGetReferenceItemCountSafe(player, object, playerAfter);
 		std::int32_t movedCount = 0;
@@ -200,6 +195,15 @@ namespace papyrus_lootman
 			// actually deposited less, the relay would siphon the player's own
 			// pre-existing ammo of this type into the loot destination.
 			movedCount = worldCount;
+		}
+
+		if (playPickupSound && (observedPlayerDelta || !gotPlayerBefore || !gotPlayerAfter))
+		{
+			// Play the pickup cue only once the player-side delta confirms the
+			// activation deposited something (mirrors TryLootWorldReference). An
+			// unreadable count stays inconclusive and still plays, so a probe
+			// failure never silences a pickup that really happened.
+			PlayPickUpSound(std::monostate{}, player, ref);
 		}
 
 		if (movedCount > 0 && dest != player && !observedPlayerDelta)
@@ -280,8 +284,21 @@ namespace papyrus_lootman
 		TESObjectREFR* actionRef,
 		TESObjectREFR* player,
 		bool playPickupSound,
-		LootCapacityContext* capacity)
+		LootCapacityContext* capacity,
+		ActivationOutcome* outOutcome)
 	{
+		// Default to kNotAttempted so every gate ahead of the activation reports the
+		// outcome that neither strikes nor clears the reference, without each early
+		// return having to remember to say so.
+		const auto reportOutcome = [&](ActivationOutcome outcome)
+		{
+			if (outOutcome)
+			{
+				*outOutcome = outcome;
+			}
+		};
+		reportOutcome(ActivationOutcome::kNotAttempted);
+
 		TESBoundObject* expectedItem = nullptr;
 		auto* baseObject = ref ? ref->GetObjectReference() : nullptr;
 		auto* flora = baseObject ? baseObject->As<TESFlora>() : nullptr;
@@ -340,6 +357,9 @@ namespace papyrus_lootman
 		}();
 		if (!activated)
 		{
+			// A refusal is evidence about the reference, not about the destination, so
+			// it feeds strike accounting like an activation that produced nothing.
+			reportOutcome(ActivationOutcome::kActivatedNoYield);
 			REX::DEBUG(
 				"source=native component=loot_nearby event=activation_skipped reason=activation_failed ref={:08X} base={:08X}",
 				ref ? ref->formID : 0,
@@ -347,15 +367,48 @@ namespace papyrus_lootman
 			return false;
 		}
 
-		if (playPickupSound)
-		{
-			PlayPickUpSound(std::monostate{}, player, ref);
-		}
+		// The produce probe runs for every activation that has a produce item, whatever
+		// the caller asked for: it is the sole evidence that a flora activation
+		// produced anything, so it cannot be conditional on a capacity context or a
+		// notification destination being present. Flora is the one synchronously
+		// verifiable case, because the engine adds TESFlora::produceItem inside the
+		// activation call itself.
 		std::int32_t afterCount = 0;
 		const bool gotAfter =
-			expectedItem &&
-			(capacity || notifyMovedItems) &&
-			TryGetReferenceItemCountSafe(actionRef, expectedItem, afterCount);
+			expectedItem && TryGetReferenceItemCountSafe(actionRef, expectedItem, afterCount);
+		// A plain activator (no produce item) starts from "yielded": it hands its items
+		// out from an OnActivate script, and the VM dispatches that event asynchronously,
+		// so nothing readable at this point could observe the delivery. Guessing "no
+		// yield" here would silence the pickup cue and undercount successful objects for
+		// every legitimate activator pickup, so the verdict is deferred instead - the
+		// caller marks the reference and the next pass that re-collects it settles the
+		// question (see MarkActivationAwaitingYieldEvidence).
+		// For flora an unreadable probe stays inconclusive and counts as a yield, for
+		// the same reason TryLootWorldReference treats inconclusive verification as
+		// success: uncertainty must never be turned into a suppression of a reference
+		// that really did hand something over.
+		bool activationYielded = true;
+		if (expectedItem)
+		{
+			const bool observedProduceIncrease = gotBefore && gotAfter && afterCount > beforeCount;
+			const bool produceProbeInconclusive = !gotAfter || (!gotBefore && afterCount > 0);
+			activationYielded = observedProduceIncrease || produceProbeInconclusive;
+			reportOutcome(
+				activationYielded ? ActivationOutcome::kYielded : ActivationOutcome::kActivatedNoYield);
+		}
+		else
+		{
+			reportOutcome(ActivationOutcome::kAwaitingEvidence);
+		}
+
+		if (playPickupSound && activationYielded)
+		{
+			// Flora gates the cue on the produce probe, so a harvest the engine accepted
+			// without producing anything stays silent. A plain activator always reaches
+			// here with activationYielded still true, which keeps its cue exactly as
+			// unconditional as the engine's own pickup is.
+			PlayPickUpSound(std::monostate{}, player, ref);
+		}
 		if (capacity && expectedItem)
 		{
 			if ((!gotBefore && !gotAfter) || (gotBefore && gotAfter && afterCount > beforeCount))
@@ -363,7 +416,7 @@ namespace papyrus_lootman
 				capacity->Accept(acceptedWeight);
 			}
 		}
-		if (notifyMovedItems)
+		if (notifyMovedItems && activationYielded)
 		{
 			const auto movedCount = GetObservedMovedCount(beforeCount, afterCount, gotBefore, gotAfter, 1);
 			notificationInfo.totalCount = movedCount;
@@ -373,7 +426,15 @@ namespace papyrus_lootman
 				movedCount,
 				notificationInfo);
 		}
-		return true;
+		if (!activationYielded)
+		{
+			REX::DEBUG(
+				"source=native component=loot_nearby event=activation_no_yield ref={:08X} base={:08X} produce={:08X}",
+				ref ? ref->formID : 0,
+				baseObject ? baseObject->formID : 0,
+				expectedItem ? expectedItem->formID : 0);
+		}
+		return activationYielded;
 	}
 
 	// Container animations call Activate; trap setups may keep activation/link

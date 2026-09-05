@@ -576,6 +576,9 @@ namespace papyrus_lootman
 		MatchCache matchCache;
 		matchCache.results.reserve(buffer.size() * 2);
 		std::vector<BGSMod::Attachment::Mod*> equipmentBuffer;
+		// Stamps every activation this pass starts, so the pass that activates a
+		// reference cannot also read its own mark back as evidence of a missing yield.
+		const auto activationPassId = BeginActivationYieldPass();
 
 		for (const auto& entry : buffer)
 		{
@@ -609,6 +612,30 @@ namespace papyrus_lootman
 			if (UsesWorldReferenceTransfer(actualFormType) && IsRecentlyLootedWorldRef(ref))
 			{
 				continue;
+			}
+			if (actualFormType == ENUM_FORM_ID::kACTI || actualFormType == ENUM_FORM_ID::kFLOR)
+			{
+				// Cross-pass yield evidence. A plain activator delivers from an
+				// OnActivate script that the VM dispatches asynchronously, so an
+				// activation started on an earlier pass had its verdict deferred. A
+				// reference that really delivered disables or destroys itself and
+				// CheckPrecondition then drops it at collection, so the collector
+				// handing us the same reference again is the proof that it did not.
+				if (SettleActivationYieldEvidence(ref, activationPassId))
+				{
+					REX::DEBUG(
+						"source=native component=loot_nearby event=activation_suppressed reason=no_yield_strike_limit ref={:08X} base={:08X}",
+						ref->formID,
+						baseForm->formID);
+				}
+				// Activation refs are never finalized like world refs, so one that keeps
+				// activating without yielding anything would spend a slot of the object
+				// and category budget every pass and starve the refs behind it. Skip it
+				// while its bounded cooldown is live; the cooldown hands back a retry.
+				if (IsSuppressedNoYieldActivationRef(ref))
+				{
+					continue;
+				}
 			}
 
 			bool validForm = false;
@@ -750,7 +777,37 @@ namespace papyrus_lootman
 			}
 			else if (actualFormType == ENUM_FORM_ID::kACTI || actualFormType == ENUM_FORM_ID::kFLOR)
 			{
-				successful = TryLootActivationReference(ref, dest, player, playPickupSound, &capacity);
+				auto activationOutcome = ActivationOutcome::kNotAttempted;
+				successful = TryLootActivationReference(
+					ref,
+					dest,
+					player,
+					playPickupSound,
+					&capacity,
+					&activationOutcome);
+				if (activationOutcome == ActivationOutcome::kAwaitingEvidence)
+				{
+					// Nothing observable at activation time can prove a plain
+					// activator's delivery, so park the verdict for the next pass that
+					// re-collects this reference to settle.
+					MarkActivationAwaitingYieldEvidence(ref, activationPassId);
+				}
+				else if (activationOutcome != ActivationOutcome::kNotAttempted)
+				{
+					// kNotAttempted means a gate ahead of the activation rejected the
+					// reference (no produce item, unreadable unit weight, destination at
+					// capacity). That is a destination or settings failure and says
+					// nothing about the reference, so it must neither strike nor clear:
+					// a plant refused while the player is near their carry limit has to
+					// stay lootable the moment they free space.
+					if (RecordActivationYieldOutcome(ref, activationOutcome == ActivationOutcome::kYielded))
+					{
+						REX::DEBUG(
+							"source=native component=loot_nearby event=activation_suppressed reason=no_yield_strike_limit ref={:08X} base={:08X}",
+							ref->formID,
+							baseForm->formID);
+					}
+				}
 			}
 			else if (UsesWorldReferenceTransfer(actualFormType))
 			{

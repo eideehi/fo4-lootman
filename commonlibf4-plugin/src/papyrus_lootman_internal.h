@@ -445,12 +445,36 @@ namespace papyrus_lootman
 		RE::TESObjectREFR* player,
 		bool playPickupSound,
 		LootCapacityContext* capacity);
+	// How an activation attempt ended, from the point of view of strike accounting.
+	// A plain bool cannot express it: "did not yield" and "never got as far as
+	// activating" both look like failure to the caller but mean opposite things for
+	// suppression.
+	enum class ActivationOutcome
+	{
+		// A gate ahead of the activation rejected the reference (no produce item, an
+		// unreadable unit weight, a destination at capacity). That says something
+		// about the destination or the settings, never about the reference, so it may
+		// neither strike nor clear.
+		kNotAttempted,
+		// The engine accepted the activation but the delivery cannot be observed from
+		// here: a plain activator hands its items out from an OnActivate script, which
+		// the VM dispatches asynchronously. The verdict has to come from a later pass.
+		kAwaitingEvidence,
+		// The activation was attempted and is known not to have delivered anything.
+		// A refused activation lands here too: a refusal is evidence about the
+		// reference itself.
+		kActivatedNoYield,
+		// The activation was observed to deliver, or the observation was inconclusive
+		// and uncertainty is resolved in the reference's favour.
+		kYielded,
+	};
 	bool TryLootActivationReference(
 		RE::TESObjectREFR* ref,
 		RE::TESObjectREFR* actionRef,
 		RE::TESObjectREFR* player,
 		bool playPickupSound,
-		LootCapacityContext* capacity);
+		LootCapacityContext* capacity,
+		ActivationOutcome* outOutcome = nullptr);
 	bool IsContainerAnimationCandidate(RE::TESObjectREFR* ref);
 	std::int32_t TransferInventoryItemsImpl(
 		RE::TESObjectREFR* src,
@@ -471,6 +495,30 @@ namespace papyrus_lootman
 	void UnlockObject(std::uint32_t formId);
 	bool IsRecentlyLootedWorldRef(const RE::TESObjectREFR* ref);
 	bool TryMarkRecentlyLootedWorldRef(RE::TESObjectREFR* ref);
+	// Bounded no-yield suppression for activation refs (ACTI/FLOR).
+	//
+	// BeginActivationYieldPass stamps one loot pass. MarkActivationAwaitingYieldEvidence
+	// records "activated, verdict pending" for a reference whose delivery cannot be
+	// observed at activation time; SettleActivationYieldEvidence turns such a mark
+	// into a strike once a *later* pass re-collects the same reference, which is the
+	// evidence that it never yielded (a reference that delivered disables or destroys
+	// itself and CheckPrecondition then drops it at collection). The pass stamp is
+	// what keeps the pass that marked from also settling its own mark.
+	// RecordActivationYieldOutcome applies a directly observed verdict instead: a
+	// yield drops the entry, a no-yield adds a strike.
+	//
+	// Both Settle and Record return true whenever the recorded outcome leaves the
+	// reference at or above the strike limit. That is a level and not an edge, so
+	// consecutive no-yield records keep reporting true.
+	//
+	// Suppression is not a plain timeout. Once armed, an elapsed cooldown hands back
+	// exactly one retry and re-arms with a longer cooldown if that retry yields
+	// nothing; only an observed yield or the stale timeout drops the entry.
+	std::uint64_t BeginActivationYieldPass();
+	bool IsSuppressedNoYieldActivationRef(const RE::TESObjectREFR* ref);
+	bool RecordActivationYieldOutcome(RE::TESObjectREFR* ref, bool yielded);
+	void MarkActivationAwaitingYieldEvidence(RE::TESObjectREFR* ref, std::uint64_t passId);
+	bool SettleActivationYieldEvidence(RE::TESObjectREFR* ref, std::uint64_t passId);
 	bool IsPapyrusObjectHandleAvailable(RE::TESObjectREFR* ref);
 	bool IsIncludedQuestItem(const RE::TESForm* form, MatchCache* matchCache);
 	InventoryItemInfo GetInventoryItemInfo(
