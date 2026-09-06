@@ -279,6 +279,18 @@ namespace papyrus_lootman
 		return movedCount > 0 || activated;
 	}
 
+	ActivationPolicy GetActivationPolicy(TESBoundObject* baseObject)
+	{
+		// Mirrors how TryLootActivationReference resolves expectedItem, because the two
+		// must agree: the collection loop asks for the policy before the activation, and
+		// a reference held under one policy but recorded under the other would be given
+		// either too many attempts or too few.
+		auto* flora = baseObject ? baseObject->As<TESFlora>() : nullptr;
+		return flora && flora->produceItem
+			? ActivationPolicy::kFloraProbe
+			: ActivationPolicy::kPlainActivator;
+	}
+
 	bool TryLootActivationReference(
 		TESObjectREFR* ref,
 		TESObjectREFR* actionRef,
@@ -288,7 +300,7 @@ namespace papyrus_lootman
 		ActivationOutcome* outOutcome)
 	{
 		// Default to kNotAttempted so every gate ahead of the activation reports the
-		// outcome that neither strikes nor clears the reference, without each early
+		// outcome that neither counts an attempt nor clears one, without each early
 		// return having to remember to say so.
 		const auto reportOutcome = [&](ActivationOutcome outcome)
 		{
@@ -357,8 +369,8 @@ namespace papyrus_lootman
 		}();
 		if (!activated)
 		{
-			// A refusal is evidence about the reference, not about the destination, so
-			// it feeds strike accounting like an activation that produced nothing.
+			// A refusal is a fact about the reference, not about the destination, so it
+			// counts as an attempt like an activation that produced nothing.
 			reportOutcome(ActivationOutcome::kActivatedNoYield);
 			REX::DEBUG(
 				"source=native component=loot_nearby event=activation_skipped reason=activation_failed ref={:08X} base={:08X}",
@@ -380,9 +392,9 @@ namespace papyrus_lootman
 		// out from an OnActivate script, and the VM dispatches that event asynchronously,
 		// so nothing readable at this point could observe the delivery. Guessing "no
 		// yield" here would silence the pickup cue and undercount successful objects for
-		// every legitimate activator pickup, so the verdict is deferred instead - the
-		// caller marks the reference and the next pass that re-collects it settles the
-		// question (see MarkActivationAwaitingYieldEvidence).
+		// every legitimate activator pickup. No later pass can observe it either, so the
+		// question is not asked at all: the caller counts the attempt and holds the
+		// reference from activating again (see RecordActivationAttempt).
 		// For flora an unreadable probe stays inconclusive and counts as a yield, for
 		// the same reason TryLootWorldReference treats inconclusive verification as
 		// success: uncertainty must never be turned into a suppression of a reference
@@ -398,7 +410,7 @@ namespace papyrus_lootman
 		}
 		else
 		{
-			reportOutcome(ActivationOutcome::kAwaitingEvidence);
+			reportOutcome(ActivationOutcome::kAttemptedUnobservable);
 		}
 
 		if (playPickupSound && activationYielded)

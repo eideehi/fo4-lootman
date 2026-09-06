@@ -445,21 +445,38 @@ namespace papyrus_lootman
 		RE::TESObjectREFR* player,
 		bool playPickupSound,
 		LootCapacityContext* capacity);
-	// How an activation attempt ended, from the point of view of strike accounting.
+	// Which evidence an activation of a reference can leave behind, which is what
+	// decides how many attempts it gets before its hold arms. The discriminator is the
+	// produce item rather than the form type, because the produce probe is the only
+	// yield this plugin can ever observe.
+	enum class ActivationPolicy
+	{
+		// A TESFlora base with a produce item: the engine adds the produce inside the
+		// activation call, so a miss here is genuinely observed. Several observed misses
+		// are what count up to this policy's attempt limit and arm its short hold.
+		kFloraProbe,
+		// Everything else. A plain activator delivers from an OnActivate script the VM
+		// dispatches asynchronously, so no observation made here or on any later pass
+		// can tell a delivery from a dud, and it gets a single attempt.
+		kPlainActivator,
+	};
+	ActivationPolicy GetActivationPolicy(RE::TESBoundObject* baseObject);
+	// How an activation attempt ended, from the point of view of attempt accounting.
 	// A plain bool cannot express it: "did not yield" and "never got as far as
 	// activating" both look like failure to the caller but mean opposite things for
-	// suppression.
+	// the hold.
 	enum class ActivationOutcome
 	{
 		// A gate ahead of the activation rejected the reference (no produce item, an
 		// unreadable unit weight, a destination at capacity). That says something
 		// about the destination or the settings, never about the reference, so it may
-		// neither strike nor clear.
+		// neither count an attempt nor clear one.
 		kNotAttempted,
-		// The engine accepted the activation but the delivery cannot be observed from
-		// here: a plain activator hands its items out from an OnActivate script, which
-		// the VM dispatches asynchronously. The verdict has to come from a later pass.
-		kAwaitingEvidence,
+		// The engine accepted the activation but nothing observable followed: a plain
+		// activator hands its items out from an OnActivate script, which the VM
+		// dispatches asynchronously. No later observation resolves it either, so the
+		// caller counts the attempt instead of waiting for a verdict that never comes.
+		kAttemptedUnobservable,
 		// The activation was attempted and is known not to have delivered anything.
 		// A refused activation lands here too: a refusal is evidence about the
 		// reference itself.
@@ -495,30 +512,21 @@ namespace papyrus_lootman
 	void UnlockObject(std::uint32_t formId);
 	bool IsRecentlyLootedWorldRef(const RE::TESObjectREFR* ref);
 	bool TryMarkRecentlyLootedWorldRef(RE::TESObjectREFR* ref);
-	// Bounded no-yield suppression for activation refs (ACTI/FLOR).
+	// Bounded activation-attempt accounting for activation refs (ACTI/FLOR), keyed per
+	// reference and scaled by the policy above.
 	//
-	// BeginActivationYieldPass stamps one loot pass. MarkActivationAwaitingYieldEvidence
-	// records "activated, verdict pending" for a reference whose delivery cannot be
-	// observed at activation time; SettleActivationYieldEvidence turns such a mark
-	// into a strike once a *later* pass re-collects the same reference, which is the
-	// evidence that it never yielded (a reference that delivered disables or destroys
-	// itself and CheckPrecondition then drops it at collection). The pass stamp is
-	// what keeps the pass that marked from also settling its own mark.
-	// RecordActivationYieldOutcome applies a directly observed verdict instead: a
-	// yield drops the entry, a no-yield adds a strike.
-	//
-	// Both Settle and Record return true whenever the recorded outcome leaves the
-	// reference at or above the strike limit. That is a level and not an edge, so
-	// consecutive no-yield records keep reporting true.
-	//
-	// Suppression is not a plain timeout. Once armed, an elapsed cooldown hands back
-	// exactly one retry and re-arms with a longer cooldown if that retry yields
-	// nothing; only an observed yield or the stale timeout drops the entry.
-	std::uint64_t BeginActivationYieldPass();
-	bool IsSuppressedNoYieldActivationRef(const RE::TESObjectREFR* ref);
-	bool RecordActivationYieldOutcome(RE::TESObjectREFR* ref, bool yielded);
-	void MarkActivationAwaitingYieldEvidence(RE::TESObjectREFR* ref, std::uint64_t passId);
-	bool SettleActivationYieldEvidence(RE::TESObjectREFR* ref, std::uint64_t passId);
+	// IsActivationHeld is a pure query: it reports whether the reference is inside a
+	// live hold and changes nothing. A query that handed back retries is what let a
+	// gate further down the same pass consume the retry without activating anything.
+	// RecordActivationAttempt counts one attempt, and it is the count reaching the
+	// policy limit that arms the hold; an attempt made after a hold had already expired
+	// lengthens the next one. It returns true whenever the reference sits at or above
+	// its limit afterwards, which is a level and not an edge, so repeated attempts keep
+	// reporting true. ClearActivationAttempts drops the history outright and nothing
+	// but an observed produce delivery justifies calling it.
+	bool IsActivationHeld(const RE::TESObjectREFR* ref, ActivationPolicy policy);
+	bool RecordActivationAttempt(RE::TESObjectREFR* ref, ActivationPolicy policy);
+	void ClearActivationAttempts(RE::TESObjectREFR* ref);
 	bool IsPapyrusObjectHandleAvailable(RE::TESObjectREFR* ref);
 	bool IsIncludedQuestItem(const RE::TESForm* form, MatchCache* matchCache);
 	InventoryItemInfo GetInventoryItemInfo(

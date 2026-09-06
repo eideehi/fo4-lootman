@@ -1,6 +1,5 @@
 #include "papyrus_lootman_internal.h"
 
-#include <atomic>
 #include <chrono>
 #include <cstdint>
 #include <mutex>
@@ -18,7 +17,7 @@ namespace papyrus_lootman
 	// opposite lifetimes (one marker is permanent until save load, the other expires
 	// on its own), and sharing a lock would tie the activation bookkeeping to the
 	// world-pickup finalize path it has nothing to do with.
-	std::mutex noYieldActivationLock;
+	std::mutex activationAttemptLock;
 
 	struct LockedObjectEntry
 	{
@@ -32,40 +31,32 @@ namespace papyrus_lootman
 	};
 
 	// Activation refs (ACTI/FLOR) are never finalized the way world refs are, so a
-	// reference that keeps accepting activations without producing anything stays
-	// lootable forever and burns a slot of every pass. Count those no-yield
-	// activations per reference instead of marking the reference permanently: unlike
+	// reference that keeps accepting activations without handing anything over stays
+	// lootable forever and burns a slot of every pass. Count the activations attempted
+	// per reference instead of marking the reference permanently: unlike
 	// recentlyLootedWorldRefs this must expire, because mirelurk eggs and harvested
 	// plants legitimately become lootable again within the same session.
-	struct NoYieldActivationEntry
+	struct ActivationAttemptEntry
 	{
 		TESFormID formID = 0;
-		std::uint32_t strikes = 0;
-		// How many times the suppression has already re-armed after a retry that still
-		// yielded nothing. It scales the cooldown, so a hopeless reference costs ever
-		// fewer activations instead of one per cooldown forever.
+		std::uint32_t attempts = 0;
+		// How many times the hold has already re-armed on an attempt made after an
+		// earlier hold had expired. It scales the hold, so a reference that never hands
+		// anything over costs ever fewer activations instead of one per hold forever.
 		std::uint32_t backoffLevel = 0;
-		// Set while a cooldown has handed back a retry whose result is still open, so
-		// the record that closes that retry can tell a re-arm from a first arming.
-		bool retryGranted = false;
-		// Non-zero while an activation is waiting for cross-pass evidence. Holding the
-		// id of the pass that activated is what stops that same pass from reading its
-		// own mark back as proof of a missing yield.
-		std::uint64_t awaitingEvidencePassId = 0;
 		Clock::time_point updatedAt{};
 	};
 
 	std::unordered_map<std::uint32_t, LockedObjectEntry> lockedObjects;
 	std::unordered_map<std::uint64_t, RecentlyLootedWorldRefEntry> recentlyLootedWorldRefs;
-	std::unordered_map<std::uint64_t, NoYieldActivationEntry> noYieldActivationRefs;
+	std::unordered_map<std::uint64_t, ActivationAttemptEntry> activationAttempts;
 	Clock::time_point lastLockedObjectCleanupAt{};
-	Clock::time_point lastNoYieldActivationCleanupAt{};
+	Clock::time_point lastActivationAttemptCleanupAt{};
 	// Cleanup resume cursor: an unordered_map has no ordered traversal, so the pass
 	// bound is expressed in buckets and picked up again where the previous pass left
 	// off. Iterators cannot be stored across calls (an insert can rehash), a bucket
 	// index can.
-	std::size_t noYieldActivationCleanupBucket = 0;
-	std::atomic<std::uint64_t> noYieldActivationPassCounter{ 0 };
+	std::size_t activationAttemptCleanupBucket = 0;
 
 	// Created refs are keyed by their 32-bit handle value, persistent refs by
 	// their formID. Those two 32-bit ranges overlap, so tag handle-derived keys
@@ -76,52 +67,83 @@ namespace papyrus_lootman
 	inline constexpr auto kLockedObjectCleanupInterval = std::chrono::seconds(1);
 	inline constexpr std::size_t kLockedObjectCleanupMaxPerPass = 32;
 
-	// Three strikes before suppression: a single no-yield activation is routinely a
-	// transient engine state (the produce is still being spawned, the destination
-	// briefly refuses the add), so one miss must not stop retrying, while a reference
-	// that misses three passes in a row is not going to yield on the fourth either.
-	inline constexpr std::uint32_t kNoYieldActivationStrikeLimit = 3;
-	// The cooldown is the self-healing part: a suppressed reference is retried once
-	// per cooldown, so a permanently unlootable activator costs one activation per
-	// interval instead of one per pass, while a plant that respawns mid-session is
-	// harvested again on the first retry after it becomes harvestable.
-	inline constexpr auto kNoYieldActivationCooldown = std::chrono::seconds(45);
+	// Flora is the observable class: the engine adds TESFlora::produceItem inside the
+	// activation call, so the produce probe really does say whether that activation
+	// delivered. Three misses before the hold arms, because a single miss is routinely
+	// a transient engine state (the produce is still being spawned, the destination
+	// briefly refuses the add), while a reference that misses three passes in a row is
+	// not going to produce on the fourth either.
+	inline constexpr std::uint32_t kFloraActivationAttemptLimit = 3;
+	// The hold is the self-healing part: a held reference is activated again once the
+	// hold expires, so a permanently unproductive one costs one activation per hold
+	// instead of one per pass, while a plant that respawns mid-session is harvested
+	// again on the first activation after it becomes harvestable.
+	inline constexpr auto kFloraActivationHold = std::chrono::seconds(45);
+	// A single fixed interval is not enough on its own: references are visited
+	// nearest-first, so several staggered plants that never produce would each keep
+	// spending one activation of the shared per-pass budget every 45s and starve the
+	// loot behind them. Each re-arm therefore doubles the wait: 45s, 90s, 180s, 360s,
+	// then the ceiling. Ten minutes is the longest a plant that becomes harvestable
+	// again may have to wait before it is activated once more, which is what trades
+	// harvest responsiveness against the cost of a permanently dead reference.
+	inline constexpr auto kFloraActivationHoldMax = std::chrono::minutes(10);
+	// A plain activator gets exactly one attempt, because nothing about it can be
+	// observed and so there is no such thing as a miss to count. Every base form on the
+	// shipped /include/activator list hands its entire payload out inside the first
+	// accepted OnActivate and then guards, destroys or disables itself, so a second
+	// activation cannot add loot; the one entry with no script-side guard at all
+	// (TrapFloraThistle, which only damages its own destruction data) would duplicate
+	// its item if a second activation landed before the destroyed flag did.
+	inline constexpr std::uint32_t kPlainActivationAttemptLimit = 1;
+	// Far above the 10s maximum pass interval and far above any plausible Papyrus
+	// dispatch latency, so the hold never expires merely because the VM has not run the
+	// OnActivate handler yet.
+	inline constexpr auto kPlainActivationHold = std::chrono::seconds(300);
 	// A single fixed interval is not enough on its own. References are visited
-	// nearest-first, so several staggered hopeless references each keep spending one
+	// nearest-first, so several staggered dead references each keep spending one
 	// activation of the shared per-pass budget every interval, and farther loot behind
 	// them can be starved indefinitely. Each re-arm therefore doubles the wait:
-	// 45s, 90s, 180s, 360s, then the ceiling. The ceiling is what a reference that
-	// becomes lootable again may have to wait through before it is retried, so it
-	// trades responsiveness against the worst-case cost of a dead reference.
-	inline constexpr auto kNoYieldActivationCooldownMax = std::chrono::minutes(10);
-	inline constexpr std::uint32_t kNoYieldActivationBackoffLevelMax = 4;
-	// Deliberately longer than kNoYieldActivationCooldownMax: an entry sitting out its
-	// longest cooldown must not be culled as stale, because that would reset its
-	// strikes and hand the reference back the full per-pass retry rate.
-	inline constexpr auto kNoYieldActivationStaleTimeout = std::chrono::minutes(15);
-	inline constexpr auto kNoYieldActivationCleanupInterval = std::chrono::seconds(1);
-	// Work bound per cleanup pass: at most kNoYieldActivationCleanupMaxPerPassBuckets
-	// buckets and kNoYieldActivationCleanupMaxPerPassExamined entries are *examined*
+	// 300s, 600s, 1200s, then the ceiling. The ceiling bounds a permanently stuck
+	// reference to roughly two activations an hour while capping what a misclassified
+	// one costs the player at half an hour.
+	inline constexpr auto kPlainActivationHoldMax = std::chrono::minutes(30);
+	inline constexpr std::uint32_t kActivationBackoffLevelMax = 4;
+	// Deliberately longer than the longest hold of either policy: an entry sitting out
+	// its longest hold must not be culled as stale, because that would reset its
+	// attempts and hand the reference back the full per-pass activation rate.
+	inline constexpr auto kActivationAttemptStaleTimeout = std::chrono::minutes(60);
+	inline constexpr auto kActivationAttemptCleanupInterval = std::chrono::seconds(1);
+	// Work bound per cleanup pass: at most kActivationAttemptCleanupMaxPerPassBuckets
+	// buckets and kActivationAttemptCleanupMaxPerPassExamined entries are *examined*
 	// (not merely removed), and the bucket cursor resumes on the next pass, so the map
 	// is covered over successive passes without the lock ever being held across a full
 	// traversal.
-	inline constexpr std::size_t kNoYieldActivationCleanupMaxPerPassExamined = 64;
-	inline constexpr std::size_t kNoYieldActivationCleanupMaxPerPassBuckets = 64;
+	inline constexpr std::size_t kActivationAttemptCleanupMaxPerPassExamined = 64;
+	inline constexpr std::size_t kActivationAttemptCleanupMaxPerPassBuckets = 64;
 	// Absolute ceiling on tracked references. The stale timeout alone cannot bound the
 	// map, because a player crossing a dense cell can insert faster than the timeout
 	// retires: past this many entries the least recently updated one is evicted to make
 	// room, which costs one pass over at most this many elements and only while full.
-	inline constexpr std::size_t kNoYieldActivationMaxEntries = 512;
+	inline constexpr std::size_t kActivationAttemptMaxEntries = 512;
 
-	std::chrono::seconds GetNoYieldActivationCooldown(std::uint32_t backoffLevel)
+	std::uint32_t GetActivationAttemptLimit(ActivationPolicy policy)
 	{
-		const auto level = backoffLevel < kNoYieldActivationBackoffLevelMax
+		return policy == ActivationPolicy::kFloraProbe
+			? kFloraActivationAttemptLimit
+			: kPlainActivationAttemptLimit;
+	}
+
+	std::chrono::seconds GetActivationHold(ActivationPolicy policy, std::uint32_t backoffLevel)
+	{
+		const auto level = backoffLevel < kActivationBackoffLevelMax
 			? backoffLevel
-			: kNoYieldActivationBackoffLevelMax;
-		const auto scaled = kNoYieldActivationCooldown * (std::int64_t{ 1 } << level);
-		return scaled < kNoYieldActivationCooldownMax
-			? scaled
-			: std::chrono::duration_cast<std::chrono::seconds>(kNoYieldActivationCooldownMax);
+			: kActivationBackoffLevelMax;
+		const bool floraProbe = policy == ActivationPolicy::kFloraProbe;
+		const auto scaled = (floraProbe ? kFloraActivationHold : kPlainActivationHold) *
+			(std::int64_t{ 1 } << level);
+		const auto ceiling = std::chrono::duration_cast<std::chrono::seconds>(
+			floraProbe ? kFloraActivationHoldMax : kPlainActivationHoldMax);
+		return scaled < ceiling ? scaled : ceiling;
 	}
 
 	std::uint64_t GetRecentlyLootedWorldRefKey(const TESObjectREFR* ref)
@@ -212,28 +234,28 @@ namespace papyrus_lootman
 		return TryMarkRecentlyLootedWorldRef(key, ref);
 	}
 
-	// Caller must hold noYieldActivationLock. An interval gate plus a bound on the
+	// Caller must hold activationAttemptLock. An interval gate plus a bound on the
 	// entries *examined* (not just the ones removed) keeps every call cheap: a map
 	// full of young entries costs one bounded slice of work per pass instead of a
 	// full traversal that removes nothing. The bucket cursor resumes where the
 	// previous pass stopped, so the whole map is still covered over successive passes.
-	std::size_t CleanupStaleNoYieldActivationsLocked(const Clock::time_point& now)
+	std::size_t CleanupStaleActivationAttemptsLocked(const Clock::time_point& now)
 	{
-		if (lastNoYieldActivationCleanupAt.time_since_epoch().count() != 0 &&
-			(now - lastNoYieldActivationCleanupAt) < kNoYieldActivationCleanupInterval)
+		if (lastActivationAttemptCleanupAt.time_since_epoch().count() != 0 &&
+			(now - lastActivationAttemptCleanupAt) < kActivationAttemptCleanupInterval)
 		{
 			return 0;
 		}
-		lastNoYieldActivationCleanupAt = now;
+		lastActivationAttemptCleanupAt = now;
 
-		const auto bucketCount = noYieldActivationRefs.bucket_count();
+		const auto bucketCount = activationAttempts.bucket_count();
 		if (bucketCount == 0)
 		{
 			return 0;
 		}
-		if (noYieldActivationCleanupBucket >= bucketCount)
+		if (activationAttemptCleanupBucket >= bucketCount)
 		{
-			noYieldActivationCleanupBucket = 0;
+			activationAttemptCleanupBucket = 0;
 		}
 
 		// Collect first, erase after: erase() cannot take a bucket-local iterator, and
@@ -242,78 +264,72 @@ namespace papyrus_lootman
 		std::size_t examinedCount = 0;
 		std::size_t visitedBuckets = 0;
 		while (visitedBuckets < bucketCount &&
-			   visitedBuckets < kNoYieldActivationCleanupMaxPerPassBuckets &&
-			   examinedCount < kNoYieldActivationCleanupMaxPerPassExamined)
+			   visitedBuckets < kActivationAttemptCleanupMaxPerPassBuckets &&
+			   examinedCount < kActivationAttemptCleanupMaxPerPassExamined)
 		{
-			const auto bucket = noYieldActivationCleanupBucket;
-			for (auto it = noYieldActivationRefs.begin(bucket); it != noYieldActivationRefs.end(bucket); ++it)
+			const auto bucket = activationAttemptCleanupBucket;
+			for (auto it = activationAttempts.begin(bucket); it != activationAttempts.end(bucket); ++it)
 			{
 				++examinedCount;
-				if ((now - it->second.updatedAt) >= kNoYieldActivationStaleTimeout)
+				if ((now - it->second.updatedAt) >= kActivationAttemptStaleTimeout)
 				{
 					staleKeys.push_back(it->first);
 				}
 			}
-			noYieldActivationCleanupBucket = (bucket + 1) % bucketCount;
+			activationAttemptCleanupBucket = (bucket + 1) % bucketCount;
 			++visitedBuckets;
 		}
 
 		std::size_t removedCount = 0;
 		for (const auto staleKey : staleKeys)
 		{
-			removedCount += noYieldActivationRefs.erase(staleKey);
+			removedCount += activationAttempts.erase(staleKey);
 		}
 		return removedCount;
 	}
 
-	// Caller must hold noYieldActivationLock. The stale timeout retires entries by age,
+	// Caller must hold activationAttemptLock. The stale timeout retires entries by age,
 	// which cannot bound the map on its own when a player crosses a dense cell faster
 	// than the timeout retires. This is the hard ceiling: while the map is full, drop
 	// the least recently updated entry so a new reference can still be tracked. The
-	// scan is one pass over at most kNoYieldActivationMaxEntries elements and only runs
+	// scan is one pass over at most kActivationAttemptMaxEntries elements and only runs
 	// while the map is at that ceiling.
-	void EvictOldestNoYieldActivationsLocked()
+	void EvictOldestActivationAttemptsLocked()
 	{
-		while (noYieldActivationRefs.size() >= kNoYieldActivationMaxEntries)
+		while (activationAttempts.size() >= kActivationAttemptMaxEntries)
 		{
-			auto oldest = noYieldActivationRefs.begin();
-			for (auto it = noYieldActivationRefs.begin(); it != noYieldActivationRefs.end(); ++it)
+			auto oldest = activationAttempts.begin();
+			for (auto it = activationAttempts.begin(); it != activationAttempts.end(); ++it)
 			{
 				if (it->second.updatedAt < oldest->second.updatedAt)
 				{
 					oldest = it;
 				}
 			}
-			noYieldActivationRefs.erase(oldest);
+			activationAttempts.erase(oldest);
 		}
 	}
 
-	// Caller must hold noYieldActivationLock. Returns the entry for key, resetting it
+	// Caller must hold activationAttemptLock. Returns the entry for key, resetting it
 	// first when the key was recycled onto a different reference, and enforcing the
 	// entry ceiling before a genuinely new entry is inserted.
-	NoYieldActivationEntry& GetOrCreateNoYieldActivationEntryLocked(std::uint64_t key, TESFormID formId)
+	ActivationAttemptEntry& GetOrCreateActivationAttemptEntryLocked(std::uint64_t key, TESFormID formId)
 	{
-		if (noYieldActivationRefs.find(key) == noYieldActivationRefs.end())
+		if (activationAttempts.find(key) == activationAttempts.end())
 		{
-			EvictOldestNoYieldActivationsLocked();
+			EvictOldestActivationAttemptsLocked();
 		}
 
-		auto& entry = noYieldActivationRefs[key];
+		auto& entry = activationAttempts[key];
 		if (entry.formID != formId)
 		{
-			entry = NoYieldActivationEntry{};
+			entry = ActivationAttemptEntry{};
 			entry.formID = formId;
 		}
 		return entry;
 	}
 
-	std::uint64_t BeginActivationYieldPass()
-	{
-		// Starts at 1, so a zeroed awaitingEvidencePassId can never match a real pass.
-		return noYieldActivationPassCounter.fetch_add(1, std::memory_order_relaxed) + 1;
-	}
-
-	bool IsSuppressedNoYieldActivationRef(const TESObjectREFR* ref)
+	bool IsActivationHeld(const TESObjectREFR* ref, ActivationPolicy policy)
 	{
 		auto key = GetRecentlyLootedWorldRefKey(ref);
 		if (key == 0)
@@ -325,41 +341,36 @@ namespace papyrus_lootman
 		// inside the lock's scope would skip the guard's destructor under /EHsc.
 		const auto formId = ref->formID;
 		const auto now = Clock::now();
-		std::lock_guard<std::mutex> guard(noYieldActivationLock);
-		auto it = noYieldActivationRefs.find(key);
-		if (it == noYieldActivationRefs.end())
+		std::lock_guard<std::mutex> guard(activationAttemptLock);
+		// Bind the map through a const reference so the compiler enforces what this
+		// query promises. A hold query that also mutated the entry is the defect this
+		// replaced: it handed back a retry that a gate further down the same pass could
+		// then consume without ever activating anything.
+		const auto& attempts = activationAttempts;
+		const auto it = attempts.find(key);
+		if (it == attempts.end())
 		{
 			return false;
 		}
 		if (it->second.formID != formId)
 		{
-			// Handle keys are recycled, so a hit for a different formID is stale
-			// identity, not strikes this reference earned.
-			noYieldActivationRefs.erase(it);
+			// Handle keys are recycled, so a hit for a different formID is stale identity
+			// and not history this reference earned. The entry is left for the cleanup
+			// sweep and for the next recorded attempt to reset, because erasing it here
+			// would make a query change what a later query sees.
 			return false;
 		}
-		if (it->second.strikes < kNoYieldActivationStrikeLimit)
+		if (it->second.attempts < GetActivationAttemptLimit(policy))
 		{
-			// Below the limit the reference keeps its normal per-pass retries. A single
-			// miss is routinely transient, so suppressing before the limit would stop
-			// retrying references that were about to yield.
+			// Below the limit the reference keeps its normal per-pass activations. For
+			// flora that is what stops a single transient miss from holding a plant that
+			// was about to produce.
 			return false;
 		}
-		if ((now - it->second.updatedAt) >= GetNoYieldActivationCooldown(it->second.backoffLevel))
-		{
-			// Hand back exactly one retry per cooldown by dropping to one strike below
-			// the limit: if that retry yields nothing the next recorded outcome
-			// re-arms the suppression at the next backoff level, and if it yields the
-			// entry is cleared.
-			it->second.strikes = kNoYieldActivationStrikeLimit - 1;
-			it->second.retryGranted = true;
-			it->second.updatedAt = now;
-			return false;
-		}
-		return true;
+		return (now - it->second.updatedAt) < GetActivationHold(policy, it->second.backoffLevel);
 	}
 
-	bool RecordActivationYieldOutcome(TESObjectREFR* ref, bool yielded)
+	bool RecordActivationAttempt(TESObjectREFR* ref, ActivationPolicy policy)
 	{
 		auto key = GetRecentlyLootedWorldRefKey(ref);
 		if (key == 0)
@@ -367,58 +378,63 @@ namespace papyrus_lootman
 			return false;
 		}
 
+		// Read the untrusted reference before taking the lock: an access violation
+		// inside the lock's scope would skip the guard's destructor under /EHsc.
 		const auto formId = ref->formID;
 		const auto now = Clock::now();
-		bool suppressed = false;
+		const auto limit = GetActivationAttemptLimit(policy);
+		bool held = false;
+		std::uint32_t attempts = 0;
+		std::uint32_t backoffLevel = 0;
 		std::size_t removedCount = 0;
 		{
-			std::lock_guard<std::mutex> guard(noYieldActivationLock);
-			removedCount = CleanupStaleNoYieldActivationsLocked(now);
-			if (yielded)
+			std::lock_guard<std::mutex> guard(activationAttemptLock);
+			removedCount = CleanupStaleActivationAttemptsLocked(now);
+			auto& entry = GetOrCreateActivationAttemptEntryLocked(key, formId);
+			if (entry.attempts >= limit &&
+				(now - entry.updatedAt) >= GetActivationHold(policy, entry.backoffLevel))
 			{
-				// A yield drops the entry outright, backoff level included. That is the
-				// whole self-healing story: a reference that becomes productive again is
-				// looted at full rate from the next pass on.
-				noYieldActivationRefs.erase(key);
+				// The previous hold has already run out and the reference is still here to be
+				// activated again, so lengthen the next hold. That is the whole test: for a
+				// plain activator nothing is observable either way, so the escalation is
+				// driven by the elapsed hold rather than by a verdict about the delivery.
+				// Without it a reference that never hands anything over keeps costing one
+				// activation per base hold forever, and with nearest-first ordering a few
+				// staggered ones can starve the loot behind them indefinitely.
+				entry.backoffLevel = entry.backoffLevel < kActivationBackoffLevelMax
+					? entry.backoffLevel + 1
+					: kActivationBackoffLevelMax;
 			}
-			else
+			if (entry.attempts < limit)
 			{
-				auto& entry = GetOrCreateNoYieldActivationEntryLocked(key, formId);
-				if (entry.strikes < kNoYieldActivationStrikeLimit)
-				{
-					++entry.strikes;
-				}
-				// The verdict is in, so nothing is awaiting cross-pass evidence anymore.
-				entry.awaitingEvidencePassId = 0;
-				entry.updatedAt = now;
-				suppressed = entry.strikes >= kNoYieldActivationStrikeLimit;
-				if (suppressed && entry.retryGranted)
-				{
-					// This closed a retry that a cooldown had handed back, and it still
-					// yielded nothing, so lengthen the next cooldown. Without this every
-					// hopeless reference keeps costing one activation per fixed cooldown
-					// forever, which with nearest-first ordering starves farther loot.
-					entry.backoffLevel = entry.backoffLevel < kNoYieldActivationBackoffLevelMax
-						? entry.backoffLevel + 1
-						: kNoYieldActivationBackoffLevelMax;
-					entry.retryGranted = false;
-				}
+				++entry.attempts;
 			}
+			entry.updatedAt = now;
+			attempts = entry.attempts;
+			backoffLevel = entry.backoffLevel;
+			held = entry.attempts >= limit;
 		}
 
 		if (removedCount > 0)
 		{
 			REX::DEBUG(
-				"source=native component=loot_state event=stale_no_yield_activations_released count={}",
+				"source=native component=loot_state event=stale_activation_attempts_released count={}",
 				removedCount);
 		}
-		return suppressed;
+		REX::DEBUG(
+			"source=native component=loot_state event=activation_attempt_recorded ref={:08X} attempts={} limit={} backoff_level={} hold_seconds={}",
+			formId,
+			attempts,
+			limit,
+			backoffLevel,
+			GetActivationHold(policy, backoffLevel).count());
+		return held;
 	}
 
-	void MarkActivationAwaitingYieldEvidence(TESObjectREFR* ref, std::uint64_t passId)
+	void ClearActivationAttempts(TESObjectREFR* ref)
 	{
 		auto key = GetRecentlyLootedWorldRefKey(ref);
-		if (key == 0 || passId == 0)
+		if (key == 0)
 		{
 			return;
 		}
@@ -427,45 +443,29 @@ namespace papyrus_lootman
 		// inside the lock's scope would skip the guard's destructor under /EHsc.
 		const auto formId = ref->formID;
 		const auto now = Clock::now();
-		std::lock_guard<std::mutex> guard(noYieldActivationLock);
-		auto& entry = GetOrCreateNoYieldActivationEntryLocked(key, formId);
-		entry.awaitingEvidencePassId = passId;
-		entry.updatedAt = now;
-	}
-
-	bool SettleActivationYieldEvidence(TESObjectREFR* ref, std::uint64_t passId)
-	{
-		auto key = GetRecentlyLootedWorldRefKey(ref);
-		if (key == 0 || passId == 0)
+		std::size_t removedCount = 0;
 		{
-			return false;
-		}
-
-		const auto formId = ref->formID;
-		bool settledAsNoYield = false;
-		{
-			std::lock_guard<std::mutex> guard(noYieldActivationLock);
-			auto it = noYieldActivationRefs.find(key);
-			if (it != noYieldActivationRefs.end() &&
-				it->second.formID == formId &&
-				it->second.awaitingEvidencePassId != 0 &&
-				it->second.awaitingEvidencePassId != passId)
+			std::lock_guard<std::mutex> guard(activationAttemptLock);
+			removedCount = CleanupStaleActivationAttemptsLocked(now);
+			// An observed yield drops the entry outright, backoff level included. That is
+			// the whole self-healing story: a reference that becomes productive again is
+			// looted at full rate from the next pass on. The erase is conditional on the
+			// stored identity, like every other operation on this map: handle keys are
+			// recycled, and an entry a different reference earned is not this one's to
+			// clear on its behalf.
+			const auto it = activationAttempts.find(key);
+			if (it != activationAttempts.end() && it->second.formID == formId)
 			{
-				// The reference we activated on an earlier pass is being handed to us
-				// again, so its handler never disabled or destroyed it and nothing it
-				// delivered removed it from collection: it did not yield. Requiring a
-				// *different* pass id is what keeps the pass that placed the mark from
-				// reading it straight back as evidence.
-				it->second.awaitingEvidencePassId = 0;
-				settledAsNoYield = true;
+				activationAttempts.erase(it);
 			}
 		}
 
-		if (!settledAsNoYield)
+		if (removedCount > 0)
 		{
-			return false;
+			REX::DEBUG(
+				"source=native component=loot_state event=stale_activation_attempts_released count={}",
+				removedCount);
 		}
-		return RecordActivationYieldOutcome(ref, false);
 	}
 
 	bool IsPapyrusObjectHandleAvailable(TESObjectREFR* ref)
@@ -584,11 +584,10 @@ namespace papyrus_lootman
 			recentlyLootedWorldRefs.clear();
 		}
 		{
-			std::lock_guard<std::mutex> guard(noYieldActivationLock);
-			noYieldActivationRefs.clear();
-			lastNoYieldActivationCleanupAt = {};
-			noYieldActivationCleanupBucket = 0;
-			noYieldActivationPassCounter.store(0, std::memory_order_relaxed);
+			std::lock_guard<std::mutex> guard(activationAttemptLock);
+			activationAttempts.clear();
+			lastActivationAttemptCleanupAt = {};
+			activationAttemptCleanupBucket = 0;
 		}
 		ClearWorkshopRuntimeState("preload");
 	}

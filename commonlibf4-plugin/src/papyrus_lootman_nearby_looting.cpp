@@ -576,9 +576,6 @@ namespace papyrus_lootman
 		MatchCache matchCache;
 		matchCache.results.reserve(buffer.size() * 2);
 		std::vector<BGSMod::Attachment::Mod*> equipmentBuffer;
-		// Stamps every activation this pass starts, so the pass that activates a
-		// reference cannot also read its own mark back as evidence of a missing yield.
-		const auto activationPassId = BeginActivationYieldPass();
 
 		for (const auto& entry : buffer)
 		{
@@ -613,26 +610,17 @@ namespace papyrus_lootman
 			{
 				continue;
 			}
+			auto activationPolicy = ActivationPolicy::kPlainActivator;
 			if (actualFormType == ENUM_FORM_ID::kACTI || actualFormType == ENUM_FORM_ID::kFLOR)
 			{
-				// Cross-pass yield evidence. A plain activator delivers from an
-				// OnActivate script that the VM dispatches asynchronously, so an
-				// activation started on an earlier pass had its verdict deferred. A
-				// reference that really delivered disables or destroys itself and
-				// CheckPrecondition then drops it at collection, so the collector
-				// handing us the same reference again is the proof that it did not.
-				if (SettleActivationYieldEvidence(ref, activationPassId))
-				{
-					REX::DEBUG(
-						"source=native component=loot_nearby event=activation_suppressed reason=no_yield_strike_limit ref={:08X} base={:08X}",
-						ref->formID,
-						baseForm->formID);
-				}
 				// Activation refs are never finalized like world refs, so one that keeps
-				// activating without yielding anything would spend a slot of the object
-				// and category budget every pass and starve the refs behind it. Skip it
-				// while its bounded cooldown is live; the cooldown hands back a retry.
-				if (IsSuppressedNoYieldActivationRef(ref))
+				// accepting activations without handing anything over would spend a slot of
+				// the object and category budget every pass and starve the refs behind it.
+				// Skip it while its hold is live. The query is a pure read and it sits ahead
+				// of every validity gate and ahead of markProcessed, so a held reference
+				// costs neither a gate nor a budget slot.
+				activationPolicy = GetActivationPolicy(baseForm);
+				if (IsActivationHeld(ref, activationPolicy))
 				{
 					continue;
 				}
@@ -777,6 +765,19 @@ namespace papyrus_lootman
 			}
 			else if (actualFormType == ENUM_FORM_ID::kACTI || actualFormType == ENUM_FORM_ID::kFLOR)
 			{
+				// Read the hold again now that this pass owns the per-object lock. The MCM's
+				// forced call and the timer-driven pass are not serialised, so another pass
+				// can have activated this very reference and armed its hold in the window
+				// between the admission check above and this point. That pass records its
+				// attempt while it still holds this same object lock, so whichever pass takes
+				// the lock second reads the armed hold here and stops. Without the re-read a
+				// plain activator can be activated twice inside one hold, and TrapFloraThistle
+				// has no script-side guard at all: a second activation that lands before its
+				// destroyed flag does duplicates the item.
+				if (IsActivationHeld(ref, activationPolicy))
+				{
+					continue;
+				}
 				auto activationOutcome = ActivationOutcome::kNotAttempted;
 				successful = TryLootActivationReference(
 					ref,
@@ -785,25 +786,32 @@ namespace papyrus_lootman
 					playPickupSound,
 					&capacity,
 					&activationOutcome);
-				if (activationOutcome == ActivationOutcome::kAwaitingEvidence)
+				if (activationOutcome == ActivationOutcome::kYielded)
 				{
-					// Nothing observable at activation time can prove a plain
-					// activator's delivery, so park the verdict for the next pass that
-					// re-collects this reference to settle.
-					MarkActivationAwaitingYieldEvidence(ref, activationPassId);
+					// The produce probe watched the delivery land, which is the one signal
+					// that earns a reference its history back: a plant that respawns
+					// mid-session is harvested at full rate again from the next pass on.
+					ClearActivationAttempts(ref);
 				}
 				else if (activationOutcome != ActivationOutcome::kNotAttempted)
 				{
 					// kNotAttempted means a gate ahead of the activation rejected the
-					// reference (no produce item, unreadable unit weight, destination at
-					// capacity). That is a destination or settings failure and says
-					// nothing about the reference, so it must neither strike nor clear:
-					// a plant refused while the player is near their carry limit has to
-					// stay lootable the moment they free space.
-					if (RecordActivationYieldOutcome(ref, activationOutcome == ActivationOutcome::kYielded))
+					// reference (no produce item, an unreadable unit weight, a destination at
+					// capacity). That is a destination or settings failure and says nothing
+					// about the reference, so it must neither count an attempt nor clear one:
+					// a plant refused while the player is near their carry limit has to stay
+					// lootable the moment they free space, and a plain activator has to keep
+					// the single attempt it gets.
+					if (RecordActivationAttempt(ref, activationPolicy))
 					{
+						// The hold is now armed, which is not the same thing as a reference
+						// being skipped. A plain activator reaches its limit on its first
+						// attempt, so this line accompanies every ordinary successful pickup;
+						// naming it "held" made a healthy loot read like a suppression in the
+						// log. The skip itself stays silent on purpose - it would repeat every
+						// pass for as long as the hold lasts.
 						REX::DEBUG(
-							"source=native component=loot_nearby event=activation_suppressed reason=no_yield_strike_limit ref={:08X} base={:08X}",
+							"source=native component=loot_nearby event=activation_hold_armed reason=attempt_limit ref={:08X} base={:08X}",
 							ref->formID,
 							baseForm->formID);
 					}
