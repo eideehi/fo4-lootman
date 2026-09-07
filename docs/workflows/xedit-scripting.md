@@ -328,8 +328,20 @@ Two consequences:
   `ITID`, never by their current localized text.** (Read-modify-write of the same
   field is still byte-transparent, so trimming an existing string with `Copy` and
   writing it back does work -- it never leaves the 8-bit domain.)
-- **Localized text edits belong in xTranslator**, driven by the
-  `translation/Lootman_en_ja.xml` source, not in an xEdit script.
+- **Localized text edits do not belong in an xEdit script.** In this repository
+  they are applied to the plugin bytes from `translation/Lootman_en_ja.xml`,
+  which is the source of truth for both plugins:
+  - `packaging/scripts/apply-terminal-labels.ts` patches `TERM:ITXT` labels.
+  - `packaging/scripts/apply-message-records.ts` writes the whole `MESG` group,
+    so LootMan's message records are created and localized there rather than by
+    an xEdit script. Its record table also carries the fixed FormIDs, which a
+    shipped record can never be moved off.
+
+  ```bash
+  npx tsx packaging/scripts/apply-message-records.ts \
+    packaging/resources/lootman/ja/LootMan.esp translation/Lootman_en_ja.xml \
+    --lang=ja --dry-run
+  ```
 
 Two of these failures are invisible without watching the GUI: a source-encoding
 compile error and an unsupported-syntax error both appear **only in a modal

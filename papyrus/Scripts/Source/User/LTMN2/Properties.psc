@@ -53,6 +53,14 @@ Group Status
     ; seconds; the next probe overwrites it.
     bool property IsNativePluginMissing = false auto hidden
 
+    ; The inverse of IsNativePluginMissing, written by the same two places. MCM has
+    ; no NOT operator in groupCondition, so a control that must appear only while
+    ; the plugin IS loaded needs its own positive group - the same reason
+    ; IsNotInstalled and IsNotUninstalled exist. Defaults to the optimistic side so
+    ; that a save loaded straight into MCM shows its settings during the few
+    ; seconds before the first probe rather than an empty page.
+    bool property IsNativePluginPresent = true auto hidden
+
     bool property IsInSettlement = false auto hidden
     bool property IsOverweight = false auto hidden
 

@@ -1,6 +1,17 @@
 import fs from "fs-extra";
 import path from "node:path";
 import { isCliEntry } from "./config.js";
+import {
+	assertNotLocalized,
+	compressedRecordFlag,
+	groupHeaderSize,
+	maxSubrecordSize,
+	recordHeaderSize,
+	subrecordHeaderSize,
+	walkTopLevelGroups,
+} from "./plugin-bytes.js";
+import type { TopLevelGroup } from "./plugin-bytes.js";
+import { parseTranslationStrings } from "./translation-xml.js";
 
 // Terminal menu-item labels cannot be translated by an xEdit script: the script
 // engine holds 8-bit strings and the save path re-encodes them from Latin-1, so
@@ -8,12 +19,6 @@ import { isCliEntry } from "./config.js";
 // plugin bytes directly is the only automatable path, and the sizes that move
 // when a label changes length are rewritten here.
 
-const recordHeaderSize = 24;
-const groupHeaderSize = 24;
-const subrecordHeaderSize = 6;
-const compressedRecordFlag = 0x00040000;
-const localizedStringsFlag = 0x00000080;
-const maxSubrecordSize = 0xffff;
 const terminalGroupLabel = "TERM";
 
 export interface TerminalLabelChange {
@@ -53,12 +58,6 @@ export interface TerminalLabelRow {
 	dest: string;
 }
 
-export interface TopLevelGroup {
-	label: string;
-	start: number;
-	size: number;
-}
-
 interface TerminalItem {
 	itid: number;
 	itxtStart: number;
@@ -80,125 +79,42 @@ interface ByteEdit {
 	bytes: Buffer;
 }
 
-function decodeXmlText(value: string): string {
-	return value.replace(/&(#[xX][0-9a-fA-F]+|#[0-9]+|[a-zA-Z]+);/g, (match, entity: string) => {
-		if (entity.startsWith("#x") || entity.startsWith("#X")) {
-			return String.fromCodePoint(Number.parseInt(entity.slice(2), 16));
-		}
-		if (entity.startsWith("#")) {
-			return String.fromCodePoint(Number.parseInt(entity.slice(1), 10));
-		}
-		switch (entity) {
-			case "amp":
-				return "&";
-			case "lt":
-				return "<";
-			case "gt":
-				return ">";
-			case "quot":
-				return "\"";
-			case "apos":
-				return "'";
-			default:
-				throw new Error(`Unsupported XML entity in translation source: ${match}`);
-		}
-	});
-}
-
-/** Reads the TERM:ITXT rows of an xTranslator XML export. The file is UTF-8 with a BOM. */
+/** Reads the TERM:ITXT rows of an xTranslator XML export. */
 export function parseTerminalLabelRows(xml: string): TerminalLabelRow[] {
 	const rows: TerminalLabelRow[] = [];
-	const stringBlocks = xml.matchAll(/<String\b[^>]*>([\s\S]*?)<\/String>/g);
 
-	for (const block of stringBlocks) {
-		const body = block[1];
-		const rec = /<REC\b([^>]*)>([\s\S]*?)<\/REC>/.exec(body);
-		if (rec === null || decodeXmlText(rec[2]).trim() !== "TERM:ITXT") {
+	for (const entry of parseTranslationStrings(xml)) {
+		if (entry.rec !== "TERM:ITXT") {
 			continue;
 		}
 
-		const edid = /<EDID>([\s\S]*?)<\/EDID>/.exec(body);
-		if (edid === null) {
-			throw new Error(`Translation row for TERM:ITXT has no EDID:\n${block[0]}`);
+		if (entry.edid === null) {
+			throw new Error(`Translation row for TERM:ITXT has no EDID:\n${entry.block}`);
 		}
-		const recordEdid = decodeXmlText(edid[1]).trim();
+		const recordEdid = entry.edid;
 
-		const id = /\bid="(\d+)"/.exec(rec[1]);
+		const id = /\bid="(\d+)"/.exec(entry.recAttributes);
 		if (id === null) {
 			throw new Error(`Translation row for TERM:ITXT has no REC id attribute: ${recordEdid}`);
 		}
 		const index = Number.parseInt(id[1], 10);
 
-		const source = /<Source>([\s\S]*?)<\/Source>/.exec(body);
-		if (source === null) {
+		if (entry.source === null) {
 			throw new Error(`Translation row for TERM:ITXT has no Source: ${recordEdid} id=${index}`);
 		}
-
-		const dest = /<Dest>([\s\S]*?)<\/Dest>/.exec(body);
-		if (dest === null) {
+		if (entry.dest === null) {
 			throw new Error(`Translation row for TERM:ITXT has no Dest: ${recordEdid} id=${index}`);
 		}
-		const destText = decodeXmlText(dest[1]);
 		// An embedded NUL would terminate the label early in-game while the subrecord still carries
 		// the tail, so the plugin would look patched and read wrong. Never write one.
-		if (destText.includes("\0")) {
-			throw new Error(`Translation row for TERM:ITXT has a NUL character in Dest: ${recordEdid} id=${index} (${JSON.stringify(destText)}); the game would only read the text before it`);
+		if (entry.dest.includes("\0")) {
+			throw new Error(`Translation row for TERM:ITXT has a NUL character in Dest: ${recordEdid} id=${index} (${JSON.stringify(entry.dest)}); the game would only read the text before it`);
 		}
 
-		rows.push({ edid: recordEdid, index, itid: index + 1, source: decodeXmlText(source[1]), dest: destText });
+		rows.push({ edid: recordEdid, index, itid: index + 1, source: entry.source, dest: entry.dest });
 	}
 
 	return rows;
-}
-
-/**
- * Walks the TES4 record and every top-level group, requiring the walk to land exactly on the end
- * of the buffer. Any stale size field makes the walk overshoot or stop short, so this is the check
- * that a patched plugin is still structurally intact.
- */
-export function walkTopLevelGroups(buffer: Buffer, label: string): TopLevelGroup[] {
-	if (buffer.length < recordHeaderSize || buffer.toString("latin1", 0, 4) !== "TES4") {
-		throw new Error(`${label} does not start with a TES4 record`);
-	}
-
-	const groups: TopLevelGroup[] = [];
-	let offset = recordHeaderSize + buffer.readUInt32LE(4);
-
-	while (offset < buffer.length) {
-		if (offset + groupHeaderSize > buffer.length) {
-			throw new Error(`${label} has a truncated group header at offset ${offset}`);
-		}
-		const signature = buffer.toString("latin1", offset, offset + 4);
-		if (signature !== "GRUP") {
-			throw new Error(`${label} expected GRUP at offset ${offset} but found ${signature}`);
-		}
-		const size = buffer.readUInt32LE(offset + 4);
-		if (size < groupHeaderSize || offset + size > buffer.length) {
-			throw new Error(`${label} has an invalid group size ${size} at offset ${offset}`);
-		}
-		groups.push({ label: buffer.toString("latin1", offset + 8, offset + 12), start: offset, size });
-		offset += size;
-	}
-
-	if (offset !== buffer.length) {
-		throw new Error(`${label} group walk ended at offset ${offset} but the file is ${buffer.length} bytes`);
-	}
-	return groups;
-}
-
-/**
- * A localized plugin keeps a 4-byte string ID in ITXT instead of text, and nearly every ID has a
- * zero high byte, so the NUL-termination check below accepts one and the patch would overwrite the
- * ID with literal bytes. The TES4 header flag is the only reliable signal, so it decides.
- */
-function assertNotLocalized(buffer: Buffer, label: string): void {
-	if (buffer.length < recordHeaderSize) {
-		throw new Error(`${label} is too small to hold a TES4 record`);
-	}
-	const flags = buffer.readUInt32LE(8);
-	if ((flags & localizedStringsFlag) !== 0) {
-		throw new Error(`${label} is flagged as localized (TES4 flags 0x${flags.toString(16).toUpperCase().padStart(8, "0")}); its ITXT subrecords hold string IDs, not text, so its terminal labels live in the .strings files and cannot be patched here`);
-	}
 }
 
 function readTerminalItems(buffer: Buffer, dataStart: number, dataEnd: number, label: string): { edid: string; items: TerminalItem[] } {

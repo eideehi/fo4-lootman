@@ -1,6 +1,7 @@
 import fs from "node:fs";
 import path from "node:path";
 import { describe, expect, it } from "vitest";
+import { MESSAGE_RECORDS, parseMessageTexts, verifyMessageRecords } from "../../scripts/apply-message-records.js";
 
 function readWorkspaceFile(file: string): string {
 	return fs.readFileSync(path.resolve(file), "utf8");
@@ -44,20 +45,45 @@ function translationValue(source: string, key: string): string {
 
 interface McmContentRow {
 	type?: string;
+	id?: string;
 	text?: string;
 	groupControl?: number;
 	groupCondition?: unknown;
 	valueOptions?: { sourceType?: string; sourceForm?: string; propertyName?: string };
 }
 
-const NATIVE_PROBE_GROUP = 8;
+// MCM group numbers are page-local, but the same two mean the same thing on every
+// page that uses them: 9 is "the plugin is missing", 10 is "the plugin is loaded".
+const NATIVE_PROBE_GROUP = 9;
+const NATIVE_PRESENT_GROUP = 10;
 
 const WARNING_KEYS = [
-	"$PAGE_SYSTEM_NATIVE_PLUGIN_SECTION",
-	"$PAGE_SYSTEM_NATIVE_PLUGIN_MISSING",
-	"$PAGE_SYSTEM_NATIVE_PLUGIN_MISSING_TEXT",
-	"$PAGE_SYSTEM_NATIVE_PLUGIN_MISSING_FIX",
+	"$COMMON_NATIVE_PLUGIN_SECTION",
+	"$COMMON_NATIVE_PLUGIN_MISSING",
+	"$COMMON_NATIVE_PLUGIN_MISSING_TEXT",
+	"$COMMON_NATIVE_PLUGIN_MISSING_FIX",
 ] as const;
+
+// Every page whose controls do nothing without the DLL. The System page is
+// deliberately absent: Force Install and Uninstall are what a stranded player
+// needs to reach, so they stay visible in exactly this failure mode.
+const GATED_PAGES = [
+	"$PAGE_GENERAL_SETTINGS",
+	"$PAGE_LOOTING_WORKER",
+	"$PAGE_UTILITY",
+	"$PAGE_HOTKEY",
+] as const;
+
+/** The group numbers a groupCondition reads, whatever shape it was written in. */
+function conditionGroups(condition: unknown): number[] {
+	if (typeof condition === "number") {
+		return [condition];
+	}
+	if (condition === null || typeof condition !== "object") {
+		return [];
+	}
+	return Object.values(condition as Record<string, number[]>).flat();
+}
 
 const TRANSLATION_FILES = [
 	"packaging/resources/lootman/common/Interface/Translations/LootMan_cn.txt",
@@ -80,7 +106,8 @@ describe("native plugin presence policy", () => {
 	const propertiesScript = readWorkspaceFile("papyrus/Scripts/Source/User/LTMN2/Properties.psc");
 	const mcmConfig = JSON.parse(
 		readWorkspaceFile("packaging/resources/lootman/common/MCM/Config/LootMan/config.json"),
-	) as { pages: Array<{ pageDisplayName?: string; content?: McmContentRow[] }> };
+	) as { content?: McmContentRow[]; pages: Array<{ pageDisplayName?: string; content?: McmContentRow[] }> };
+	const mainRows = mcmConfig.content ?? [];
 	const systemPage = mcmConfig.pages.find((page) => page.pageDisplayName === "$PAGE_SYSTEM");
 	const systemRows = systemPage?.content ?? [];
 
@@ -158,9 +185,15 @@ describe("native plugin presence policy", () => {
 			"If (properties.IsUninstalled)",
 			"Return",
 			"EndIf",
+			// The pair moves together, pessimistic side first. MCM cannot negate a
+			// group, so the pages read IsNativePluginPresent to decide whether a
+			// setting may be drawn at all; a window where neither flag is set would
+			// show a page with no warning and no settings on it.
 			"properties.IsNativePluginMissing = true",
+			"properties.IsNativePluginPresent = false",
 			'If (F4SE.GetPluginVersion("lootman") >= 0)',
 			"properties.IsNativePluginMissing = false",
+			"properties.IsNativePluginPresent = true",
 			"EndIf",
 		]);
 	});
@@ -255,6 +288,9 @@ describe("native plugin presence policy", () => {
 		expect(uninstall, "Uninstall leaves IsNativePluginMissing frozen at its last reading").toContain(
 			"properties.IsNativePluginMissing = false",
 		);
+		expect(uninstall, "Uninstall leaves IsNativePluginPresent frozen at its last reading").toContain(
+			"properties.IsNativePluginPresent = true",
+		);
 
 		const firstLootManNative = uninstall.indexOf("LTMN2:LootMan.");
 		expect(firstLootManNative, "Uninstall no longer calls a LootMan native").toBeGreaterThanOrEqual(0);
@@ -271,7 +307,7 @@ describe("native plugin presence policy", () => {
 		// uninstalling anything. Anything else in front of it - an early Return
 		// most of all - puts the cleanup back behind an abortable frame.
 		expect(
-			papyrusStatements(uninstall).slice(0, 10),
+			papyrusStatements(uninstall).slice(0, 11),
 			"Uninstall's diagnostic cleanup must sit directly after the skip guards",
 		).toEqual([
 			"If (properties.IsNotInstalled)",
@@ -284,11 +320,18 @@ describe("native plugin presence policy", () => {
 			"EndIf",
 			"CancelTimer(TIMER_NATIVE_PROBE)",
 			"properties.IsNativePluginMissing = false",
+			"properties.IsNativePluginPresent = true",
 		]);
 	});
 
 	it("stores the result in a save-safe hidden property that defaults to present", () => {
 		expect(propertiesScript).toContain("bool property IsNativePluginMissing = false auto hidden");
+
+		// The inverse defaults to the optimistic side for the same save-safety
+		// reason, and because the gated pages read it: a false default would blank
+		// every settings page for the few seconds before the first probe, and would
+		// blank them permanently on any save whose probe never ran.
+		expect(propertiesScript).toContain("bool property IsNativePluginPresent = true auto hidden");
 	});
 
 	it("binds the MCM warning rows to IsNativePluginMissing", () => {
@@ -319,6 +362,158 @@ describe("native plugin presence policy", () => {
 			expect(row, `config.json lost ${key}`).toBeDefined();
 			expect(row!.groupCondition).not.toBe(NATIVE_PROBE_GROUP);
 		}
+
+		// Nothing on the System page may require the plugin to be loaded. This is
+		// the page a stranded player has to reach: Force Install, Uninstall and the
+		// status rows are its whole point, and gating any of them on the missing
+		// DLL would lock the only recovery UI behind the failure it reports.
+		for (const row of systemRows) {
+			expect(
+				conditionGroups(row.groupCondition),
+				`the System page row ${row.text ?? row.type} must not require the plugin to be loaded`,
+			).not.toContain(NATIVE_PRESENT_GROUP);
+		}
+	});
+
+	it("shows the warning on the main page above the About section", () => {
+		// The System page was the original home of the warning and almost nobody
+		// opened it. The main page is what MCM draws the moment LootMan is picked
+		// from the mod list, so the warning has to be the first thing on it.
+		const switcher = mainRows.find((row) => row.groupControl === NATIVE_PROBE_GROUP);
+		expect(switcher, "the main page never reads IsNativePluginMissing").toMatchObject({
+			type: "hiddenSwitcher",
+			valueOptions: { sourceType: "PropertyValueBool", sourceForm: "LootMan.esp|F9A", propertyName: "IsNativePluginMissing" },
+		});
+
+		const about = mainRows.findIndex((row) => row.text === "$PAGE_MAIN_ABOUT_SECTION");
+		expect(about, "the main page lost its About section").toBeGreaterThanOrEqual(0);
+
+		for (const key of WARNING_KEYS) {
+			const index = mainRows.findIndex((row) => row.text === key);
+			expect(index, `the main page does not render ${key}`).toBeGreaterThanOrEqual(0);
+			expect(mainRows[index]!.groupCondition, `${key} is not gated on group ${NATIVE_PROBE_GROUP}`).toBe(NATIVE_PROBE_GROUP);
+			expect(index, `${key} must be drawn above the About section`).toBeLessThan(about);
+		}
+	});
+
+	it("replaces every settings page with the warning while the plugin is missing", () => {
+		for (const name of GATED_PAGES) {
+			const page = mcmConfig.pages.find((entry) => entry.pageDisplayName === name);
+			expect(page, `config.json has no ${name} page`).toBeDefined();
+			const rows = page!.content ?? [];
+
+			for (const [group, property] of [
+				[NATIVE_PROBE_GROUP, "IsNativePluginMissing"],
+				[NATIVE_PRESENT_GROUP, "IsNativePluginPresent"],
+			] as const) {
+				expect(
+					rows.find((row) => row.groupControl === group),
+					`${name} has no hiddenSwitcher for ${property}`,
+				).toMatchObject({
+					type: "hiddenSwitcher",
+					valueOptions: { sourceType: "PropertyValueBool", sourceForm: "LootMan.esp|F9A", propertyName: property },
+				});
+			}
+
+			// MCM resolves a page's group flags from the controls it has already
+			// walked, so a hiddenSwitcher declared below the rows that read it would
+			// leave them reading a group that is still false.
+			const lastSwitcher = rows.map((row) => row.type).lastIndexOf("hiddenSwitcher");
+			const firstConditional = rows.findIndex((row) => row.groupCondition !== undefined);
+			expect(lastSwitcher, `${name} declares a group after the first row that reads one`).toBeLessThan(firstConditional);
+
+			for (const key of WARNING_KEYS) {
+				const row = rows.find((entry) => entry.text === key);
+				expect(row, `${name} does not render ${key}`).toBeDefined();
+				expect(row!.groupCondition, `${key} on ${name} is not gated on group ${NATIVE_PROBE_GROUP}`).toBe(NATIVE_PROBE_GROUP);
+			}
+
+			// The gate itself: everything this page offers while LootMan is usable
+			// also requires the plugin to be loaded. Without this the page keeps
+			// answering to every click while nothing it sets can ever take effect,
+			// which is the exact failure three Nexus reports came from.
+			for (const row of rows) {
+				const groups = conditionGroups(row.groupCondition);
+				if (!groups.includes(1)) {
+					continue;
+				}
+				expect(
+					groups,
+					`${name} draws ${row.text ?? row.id ?? row.type} without requiring the plugin to be loaded`,
+				).toContain(NATIVE_PRESENT_GROUP);
+			}
+
+			// A row with no condition at all would survive the gate, so only the
+			// invisible group carriers may be unconditional.
+			for (const row of rows) {
+				if (row.groupCondition === undefined) {
+					expect(row.type, `${name} draws ${row.text ?? row.type} unconditionally`).toBe("hiddenSwitcher");
+				}
+			}
+		}
+	});
+
+	it("interrupts with a plugin message that a missing DLL cannot silence", () => {
+		const warn = extractPapyrusFunction(systemScript, "WarnNativePluginMissing");
+
+		// Same rule as the probe: this runs in the session where lootman.dll never
+		// loaded, so a single LootMan native would abort the frame that is trying to
+		// report exactly that. Game.GetFormFromFile and Message.Show are vanilla.
+		expect(warn, "the warning must not call a LootMan native").not.toContain("LTMN2:LootMan");
+		expect(warn, "the warning must not log through the native logger").not.toContain("LogSystemEvent");
+		expect(warn).toContain('Game.GetFormFromFile(0x000FBD, "LootMan.esp") As Message');
+		expect(warn).toContain(".Show()");
+
+		const statements = papyrusStatements(warn);
+		expect(statements[0], "the message must be gated on the probe's own answer").toBe(
+			"If (!properties || !properties.IsNativePluginMissing)",
+		);
+		// A missing record casts to none rather than throwing, so an older plugin
+		// paired with a newer script stays quiet instead of erroring every load.
+		expect(statements).toContain("If (warning)");
+
+		// The probe timer is one-shot and re-armed once per load, so dispatching the
+		// message from that branch is what makes it once per session. Moving it into
+		// Looting() or OnTimer's default path would pop it repeatedly.
+		expect(
+			papyrusStatements(extractPapyrusEvent(systemScript, "OnTimer")).slice(0, 3),
+			"the message must be dispatched by the probe timer, right after the probe",
+		).toEqual(["If (aiTimerId == TIMER_NATIVE_PROBE)", "ProbeNativePlugin()", "WarnNativePluginMissing()"]);
+	});
+
+	it("ships that message record in both plugins, localized, at one fixed FormID", () => {
+		const dictionary = readWorkspaceFile("translation/Lootman_en_ja.xml").replace(/^﻿/, "");
+		const spec = MESSAGE_RECORDS.find((entry) => entry.edid === "LTMN_MSG_NativePluginMissing");
+		expect(spec, "the message record is no longer in the tool's table").toBeDefined();
+
+		// 0xFBD is the FormID the Papyrus lookup above hardcodes, and a shipped record
+		// cannot move: every save that stored the old ID would lose the form.
+		expect(spec!.objectId).toBe(0xfbd);
+		expect(spec!.messageBox, "a corner notification would scroll away unread").toBe(true);
+
+		// verifyMessageRecords is the same check the writer runs before it saves, so
+		// the plugins in git are held to the record layout the tool guarantees.
+		for (const [language, plugin] of [
+			["en", "packaging/resources/lootman/en/LootMan.esp"],
+			["ja", "packaging/resources/lootman/ja/LootMan.esp"],
+		] as const) {
+			const texts = parseMessageTexts(dictionary, language);
+			verifyMessageRecords(fs.readFileSync(path.resolve(plugin)), plugin, texts);
+		}
+
+		const english = parseMessageTexts(dictionary, "en").get("LTMN_MSG_NativePluginMissing")!;
+		const japanese = parseMessageTexts(dictionary, "ja").get("LTMN_MSG_NativePluginMissing")!;
+		expect(japanese.desc, "the ja plugin ships the English wording").not.toBe(english.desc);
+		expect(japanese.full, "the ja plugin ships the English title").not.toBe(english.full);
+
+		// The popup has to name the same three things the MCM rows do, or it sends the
+		// player back into the reinstall loop this feature exists to end.
+		expect(english.desc).toContain("1.11.240");
+		expect(english.desc).toContain("lootman.dll");
+		expect(english.desc).toContain("Address Library");
+		expect(japanese.desc).toContain("1.11.240");
+		expect(japanese.desc).toContain("lootman.dll");
+		expect(japanese.desc).toContain("Address Library");
 	});
 
 	it("ships the warning in all thirteen translation files with a real de and ja wording", () => {
@@ -352,9 +547,9 @@ describe("native plugin presence policy", () => {
 		// The warning has to name the actual cause; a generic "something is wrong"
 		// row would send users back into another reinstall loop.
 		const missingText = [
-			translationValue(english, "$PAGE_SYSTEM_NATIVE_PLUGIN_MISSING"),
-			translationValue(english, "$PAGE_SYSTEM_NATIVE_PLUGIN_MISSING_TEXT"),
-			translationValue(english, "$PAGE_SYSTEM_NATIVE_PLUGIN_MISSING_FIX"),
+			translationValue(english, "$COMMON_NATIVE_PLUGIN_MISSING"),
+			translationValue(english, "$COMMON_NATIVE_PLUGIN_MISSING_TEXT"),
+			translationValue(english, "$COMMON_NATIVE_PLUGIN_MISSING_FIX"),
 		].join(" ");
 		expect(missingText).toContain("1.11.240");
 		expect(missingText).toContain("lootman.dll");
@@ -396,5 +591,12 @@ describe("native plugin presence policy", () => {
 		expect(troubleshooting).toContain("Native Plugin");
 		expect(troubleshooting).toContain("1.11.240");
 		expect(troubleshooting).toContain("Data/F4SE/Plugins/LootMan.log");
+
+		// Both surfaces are documented, so a player who saw only one of them can still
+		// recognize what they are looking at.
+		const configuration = guide.slice(guide.indexOf("## Configuration"), guide.indexOf("### General Settings"));
+		expect(configuration).toContain("LootMan Is Not Working");
+		expect(configuration).toContain("System");
+		expect(troubleshooting).toContain("LootMan Is Not Working");
 	});
 });

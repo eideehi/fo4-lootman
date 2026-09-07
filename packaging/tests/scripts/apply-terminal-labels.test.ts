@@ -1,7 +1,8 @@
 import fs from "fs-extra";
 import path from "node:path";
 import { afterEach, describe, expect, it } from "vitest";
-import { applyTerminalLabels, parseArgs, walkTopLevelGroups, parseTerminalLabelRows } from "../../scripts/apply-terminal-labels.js";
+import { applyTerminalLabels, parseArgs, parseTerminalLabelRows } from "../../scripts/apply-terminal-labels.js";
+import { walkTopLevelGroups } from "../../scripts/plugin-bytes.js";
 import { createTempDir, removeTempDir } from "../helpers/temp-dir.js";
 
 // The fixtures below are synthetic plugins: a TES4 record, a TERM group, and one unrelated group

@@ -170,6 +170,15 @@ already been uninstalled.
 LootMan configuration is organized by MCM page. Numeric ranges below are the
 limits enforced by the MCM sliders.
 
+If LootMan's F4SE plugin is not loaded, none of these settings can do anything,
+so MCM does not offer them: the main page opens on the `Native Plugin` warning,
+and `General Settings`, `Looting`, `Utility` and `Hotkeys` show that same
+warning in place of their controls. Only `System` stays complete, because
+`Force Install` and `Uninstall` are what you may still need. LootMan also shows
+a `LootMan Is Not Working` message box a few seconds into each session, so the
+failure is visible without opening MCM at all. Everything returns by itself on
+the first save load after the plugin loads.
+
 ### General Settings
 
 | Control | Type | Range / Step | Purpose |
@@ -296,7 +305,8 @@ actions:
   loaded. It warns that settings still respond while nothing is ever looted,
   and points at the runtime, `lootman.dll`, and Address Library requirements.
   LootMan re-checks this on every save load, so the section disappears by
-  itself once the plugin loads.
+  itself once the plugin loads. The System page keeps every control while the
+  warning is up: this is the page `Force Install` and `Uninstall` live on.
 - The `Force Install` section exposes an `Execute Force Install` button.
   Use it if LootMan is not installed after exiting Vault 111.
 - The `Uninstall` section exposes an `Execute Uninstall` switch. Turning it on
@@ -765,9 +775,11 @@ Check MCM first:
   manual-only looting.
 - If LootMan says a feature is unavailable, confirm LootMan is installed and
   not already uninstalled.
-- If MCM shows the `Native Plugin` warning on the System page, LootMan's F4SE
-  plugin is not loaded in this session: the ESP, the Papyrus scripts, and every
-  MCM setting still work, but all looting is native, so nothing is ever picked
+- If a `LootMan Is Not Working` message box appears a few seconds after a load,
+  or MCM shows the `Native Plugin` warning — on the main page, and in place of
+  the controls on every page but `System` — LootMan's F4SE plugin is not loaded
+  in this session: the ESP, the Papyrus scripts, and MCM itself still work, but
+  all looting is native, so nothing is ever picked
   up and `Data/F4SE/Plugins/LootMan.log` gets no new entries this session. A log
   file left over from an earlier session that did work can still be on disk, so
   finding one there does not mean the plugin loaded now. Check that Fallout 4 is

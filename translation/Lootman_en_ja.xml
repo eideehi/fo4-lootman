@@ -421,5 +421,17 @@
       <Source>Uninstall LootMan</Source>
       <Dest>LootMan をアンインストール</Dest>
     </String>
+    <String List="0">
+      <EDID>LTMN_MSG_NativePluginMissing</EDID>
+      <REC>MESG:FULL</REC>
+      <Source>LootMan Is Not Working</Source>
+      <Dest>LootManは動作していません</Dest>
+    </String>
+    <String List="0">
+      <EDID>LTMN_MSG_NativePluginMissing</EDID>
+      <REC>MESG:DESC</REC>
+      <Source>LootMan's F4SE plugin (lootman.dll) is not loaded, so nothing will be looted in this session. Check that Fallout 4 is runtime 1.11.240, that Data/F4SE/Plugins/lootman.dll is installed, and that Address Library for F4SE Plugins provides version-1-11-240-0.bin, then restart Fallout 4. MCM shows the same warning on every LootMan page.</Source>
+      <Dest>LootManのF4SEプラグイン(lootman.dll)が読み込まれていないため、このセッションでは何も回収されません。Fallout 4のバージョンが1.11.240であること、Data/F4SE/Plugins/lootman.dllが導入されていること、Address Library for F4SE Pluginsがversion-1-11-240-0.binを提供していることを確認し、Fallout 4を再起動してください。MCMのLootManの全ページにも同じ警告が表示されます。</Dest>
+    </String>
   </Content>
 </SSTXMLRessources>

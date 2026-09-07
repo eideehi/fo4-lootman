@@ -458,15 +458,41 @@ Function ProbeNativePlugin()
         ; it expire silently instead of writing "missing" back over that clear.
         Return
     EndIf
+    ; Both flags move together: MCM cannot negate a group, so the pages read the
+    ; positive one to decide whether a setting may be shown at all. Write the
+    ; pessimistic pair before the probe and the optimistic pair only after it
+    ; returns, so no reader can ever see "not missing and not present".
     properties.IsNativePluginMissing = true
+    properties.IsNativePluginPresent = false
     If (F4SE.GetPluginVersion("lootman") >= 0)
         properties.IsNativePluginMissing = false
+        properties.IsNativePluginPresent = true
+    EndIf
+EndFunction
+
+; Say it outside MCM as well. The MCM warning only reaches a player who opens MCM
+; and reads the page it is on; this one interrupts, which is what the three Nexus
+; reports behind this feature needed. Everything here survives a missing
+; lootman.dll: Game.GetFormFromFile and Message.Show are vanilla natives, and the
+; wording is plugin data, so the en and ja plugins each carry their own. The probe
+; timer is one-shot per session, so this shows once per load, not once per pass.
+Function WarnNativePluginMissing()
+    If (!properties || !properties.IsNativePluginMissing)
+        Return
+    EndIf
+
+    ; LTMN_MSG_NativePluginMissing. A cast that fails leaves none behind rather
+    ; than throwing, so an older plugin without the record simply stays quiet.
+    Message warning = Game.GetFormFromFile(0x000FBD, "LootMan.esp") As Message
+    If (warning)
+        warning.Show()
     EndIf
 EndFunction
 
 Event OnTimer(int aiTimerId)
     If (aiTimerId == TIMER_NATIVE_PROBE)
         ProbeNativePlugin()
+        WarnNativePluginMissing()
     ElseIf (aiTimerId == TIMER_LOOTING)
         Looting()
         ResetLootingTimer()
@@ -562,6 +588,7 @@ Function Uninstall()
     ; missing-plugin warning at the same time.
     CancelTimer(TIMER_NATIVE_PROBE)
     properties.IsNativePluginMissing = false
+    properties.IsNativePluginPresent = true
 
     properties.IsUninstalled = true
     properties.IsNotUninstalled = false
