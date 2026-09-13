@@ -734,13 +734,14 @@ namespace papyrus_lootman
 		}
 
 		std::int32_t movedStacks = 0;
+		// No pass-budget check here: the budget gates *starting* scan work on the next candidate, never
+		// finishing work already collected for this one. The read lock above is released by now, so the
+		// unbounded-work-under-lock hazard the ceiling exists to prevent does not apply, and `requests` is
+		// already bounded by however far the (still budget-limited) collection scan got. Re-checking the
+		// sticky budget here would discard an already-collected, already-eligible request list whenever the
+		// scan itself tripped the ceiling, leaving the container permanently unlooted across repeated passes.
 		for (const auto& request : requests)
 		{
-			if (passBudget && passBudget->ShouldStop())
-			{
-				break;
-			}
-
 			if (!request.object || request.count <= 0)
 			{
 				continue;
@@ -785,12 +786,11 @@ namespace papyrus_lootman
 						remaining = 0;
 					}
 				}
+				// Likewise no pass-budget check inside the chunk loop: abandoning a stack midway through its
+				// own chunked move only splits one already-approved transfer, and the loop is bounded by
+				// `remaining` (each iteration moves up to 65535 or breaks on failure).
 				while (remaining > 0 && !request.preserveStackExtra)
 				{
-					if (passBudget && passBudget->ShouldStop())
-					{
-						break;
-					}
 					const auto chunk = std::min<std::int32_t>(remaining, 65535);
 					if (!TryMoveInventoryItemSafe(
 							src,
@@ -852,7 +852,14 @@ namespace papyrus_lootman
 					movedCount);
 				if (capacity)
 				{
-					capacity->Accept(acceptedWeight);
+					// Charge the capacity budget for what actually moved, not the full requested
+					// count: a chunked move that failed partway through moves less than
+					// request.count, and charging acceptedWeight (unitWeight * request.count)
+					// would over-debit the shared pass budget and wrongly reject later items.
+					const float chargedWeight = (capacity->enabled && observedMovedCount < request.count) ?
+						request.unitWeight * static_cast<float>(observedMovedCount) :
+						acceptedWeight;
+					capacity->Accept(chargedWeight);
 				}
 				if (notifyMovedItems)
 				{
