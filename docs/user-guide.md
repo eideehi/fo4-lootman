@@ -27,7 +27,7 @@ Before installing, make sure your setup supports the mod's current packaged
 requirements:
 
 - Fallout 4 with the runtime option exposed by the installer: `1.11.240`.
-- MCM version 2 or later.
+- MCM version 1.43 or later.
 - F4SE and a load order setup capable of loading native F4SE plugins.
 - Address Library for F4SE Plugins with support for Fallout 4 `1.11.240`
   (`version-1-11-240-0.bin`).
