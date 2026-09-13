@@ -89,8 +89,17 @@ namespace papyrus_lootman
 				}
 			}
 
-			BSAutoLock guard(cell->spinLock);
-			for (auto& objPtr : cell->references)
+			std::vector<NiPointer<TESObjectREFR>> snapshot;
+			{
+				BSAutoLock guard(cell->spinLock);
+				snapshot.reserve(cell->references.size());
+				for (auto& objPtr : cell->references)
+				{
+					snapshot.push_back(objPtr);
+				}
+			}
+
+			for (auto& objPtr : snapshot)
 			{
 				auto obj = objPtr.get();
 				if (!obj)

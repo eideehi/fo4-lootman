@@ -478,41 +478,49 @@ namespace papyrus_lootman
 		std::uint32_t nearbyFormId = 0;
 		std::uint32_t nearbyBaseFormId = 0;
 		float nearbyDistanceSq = 0.0F;
+
+		std::vector<NiPointer<TESObjectREFR>> snapshot;
 		{
 			BSAutoLock guard(cell->spinLock);
+			snapshot.reserve(cell->references.size());
 			for (auto& objPtr : cell->references)
 			{
-				auto* other = objPtr.get();
-				if (!other || other == ref || !CheckPrecondition(other))
-				{
-					continue;
-				}
-
-				const auto pos = other->GetPosition();
-				const auto dx = origin.x - pos.x;
-				const auto dy = origin.y - pos.y;
-				const auto dz = origin.z - pos.z;
-				const auto distanceSq = dx * dx + dy * dy + dz * dz;
-				if (distanceSq > kNearbyContainerTrapProbeRadiusSq)
-				{
-					continue;
-				}
-
-				auto* otherBase = other->GetObjectReference();
-				if (otherBase && otherBase->GetFormType() == ENUM_FORM_ID::kCONT)
-				{
-					continue;
-				}
-				if (!HasActivationOrLinkSideEffectExtras(other))
-				{
-					continue;
-				}
-
-				nearbyFormId = other->formID;
-				nearbyBaseFormId = otherBase ? otherBase->formID : 0;
-				nearbyDistanceSq = distanceSq;
-				break;
+				snapshot.push_back(objPtr);
 			}
+		}
+
+		for (auto& objPtr : snapshot)
+		{
+			auto* other = objPtr.get();
+			if (!other || other == ref || !CheckPrecondition(other))
+			{
+				continue;
+			}
+
+			const auto pos = other->GetPosition();
+			const auto dx = origin.x - pos.x;
+			const auto dy = origin.y - pos.y;
+			const auto dz = origin.z - pos.z;
+			const auto distanceSq = dx * dx + dy * dy + dz * dz;
+			if (distanceSq > kNearbyContainerTrapProbeRadiusSq)
+			{
+				continue;
+			}
+
+			auto* otherBase = other->GetObjectReference();
+			if (otherBase && otherBase->GetFormType() == ENUM_FORM_ID::kCONT)
+			{
+				continue;
+			}
+			if (!HasActivationOrLinkSideEffectExtras(other))
+			{
+				continue;
+			}
+
+			nearbyFormId = other->formID;
+			nearbyBaseFormId = otherBase ? otherBase->formID : 0;
+			nearbyDistanceSq = distanceSq;
+			break;
 		}
 
 		if (nearbyFormId == 0)
