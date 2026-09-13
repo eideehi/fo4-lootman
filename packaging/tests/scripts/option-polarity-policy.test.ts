@@ -146,7 +146,7 @@ describe("option polarity policy", () => {
 	});
 
 	it("migrates stored values into the new properties behind a 3.3.0 version gate", () => {
-		expect(systemScript).toContain("int MOD_VERSION = 30300 const");
+		expect(systemScript).toContain("int MOD_VERSION = 30400 const");
 
 		const patch = extractPapyrusFunction(systemScript, "Patch");
 		expect(patch).toMatch(/If \(CurrentModVersion < 30300\)\s*\r?\n\s*LTMN2:Patch\.v3_3_0\(\)/);
@@ -452,6 +452,6 @@ describe("option polarity policy", () => {
 			expect(userGuide, `user guide still names ${label}`).not.toContain(label);
 		}
 
-		expect(readme).toContain("3.3.0 Update Policy");
+		expect(readme).toContain("3.4.0 Update Policy");
 	});
 });

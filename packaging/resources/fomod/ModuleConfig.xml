@@ -14,8 +14,8 @@
             <optionalFileGroups order="Explicit">
                 <group name="About Compatibility" type="SelectAny">
                     <plugins order="Explicit">
-                        <plugin name="LootMan 3.3.0 update compatibility">
-                            <description>LootMan 3.3.0 supports overwrite updates from LootMan 2.x and earlier 3.x releases. LootMan 3.3.0 does not support overwrite updates from LootMan 1.x. If you are upgrading from 1.x, uninstall 1.x and make a clean save before installing 3.3.0.</description>
+                        <plugin name="LootMan 3.4.0 update compatibility">
+                            <description>LootMan 3.4.0 supports overwrite updates from LootMan 2.x and earlier 3.x releases. LootMan 3.4.0 does not support overwrite updates from LootMan 1.x. If you are upgrading from 1.x, uninstall 1.x and make a clean save before installing 3.4.0.</description>
                             <conditionFlags>
                                 <flag name="compatibility_notice_read">selected</flag>
                             </conditionFlags>
@@ -78,7 +78,7 @@
                 <group name="Select your game version." type="SelectAny">
                     <plugins order="Explicit">
                         <plugin name="1.11.240">
-                            <description>Required: LootMan 3.3.0 supports only Fallout4.exe 1.11.240 and also requires Address Library for F4SE Plugins with version-1-11-240-0.bin. The native plugin will not load on 1.11.221, 1.10.163, or other runtimes.</description>
+                            <description>Required: LootMan 3.4.0 supports only Fallout4.exe 1.11.240 and also requires Address Library for F4SE Plugins with version-1-11-240-0.bin. The native plugin will not load on 1.11.221, 1.10.163, or other runtimes.</description>
                             <conditionFlags>
                                 <flag name="runtime_1_11_240">selected</flag>
                             </conditionFlags>

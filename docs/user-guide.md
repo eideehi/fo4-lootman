@@ -42,7 +42,7 @@ dependency's own release page when setting up F4SE or MCM.
 
 The current FOMOD installer presents the following groups in order:
 
-1. **About Compatibility** — a required acknowledgement of the 3.3.0 update
+1. **About Compatibility** — a required acknowledgement of the 3.4.0 update
    compatibility notice. You cannot deselect it.
 2. **Select plugin language.** — choose exactly one of English or Japanese for
    `LootMan.esp`.
@@ -57,12 +57,12 @@ The current FOMOD installer presents the following groups in order:
 
 ### Updating From Older Versions
 
-LootMan 3.3.0 supports overwrite updates from LootMan 2.x and earlier 3.x
+LootMan 3.4.0 supports overwrite updates from LootMan 2.x and earlier 3.x
 releases.
 
-LootMan 3.3.0 does not support overwrite updates from LootMan 1.x. If you are
+LootMan 3.4.0 does not support overwrite updates from LootMan 1.x. If you are
 upgrading from 1.x, uninstall 1.x and make a clean save before installing
-3.3.0.
+3.4.0.
 
 When a save from 3.2.0 or earlier is loaded under 3.3.0, the settlement-looting,
 carry-weight-limit, and pickup-message settings are renamed and their On/Off
@@ -73,7 +73,7 @@ downgrade to 3.2.0, the old settings still hold your pre-3.3.0 values; if you
 then upgrade again, the three new settings are recomputed from those old
 values, so any changes you made on 3.3.0 in between are lost.
 
-When a save from 2.x is loaded under 3.3.0, the v3.0.0 save migration can
+When a save from 2.x is loaded under 3.4.0, the v3.0.0 save migration can
 change two MCM settings:
 
 - If your 2.x save was using manual-only looting (`Looting Interval` set to
@@ -188,7 +188,7 @@ the first save load after the plugin loads.
 | `Native Log Level` | dropdown | Trace, Debug, Info, Warn, Error, Critical, Off | Controls the native DLL log level. Changes are saved to `Data/F4SE/Plugins/LootMan/config.json`. |
 | `Play Pickup Sound` | switch | on / off | Plays sound effects when items are looted. |
 | `Play Container Animation` | switch | on / off | Plays the open animation on containers LootMan loots from. |
-| `Looting Range` | slider | 1.0 – 256, step 0.5 (meters) | Distance from the player searched on each looting pass. The native plugin clamps the effective range at 200 meters, so slider values above 200 do not enlarge the search beyond 200 meters in 3.3.0. |
+| `Looting Range` | slider | 1.0 – 256, step 0.5 (meters) | Distance from the player searched on each looting pass. The native plugin clamps the effective range at 200 meters, so slider values above 200 do not enlarge the search beyond 200 meters in 3.4.0. |
 | `Carry Weight` | slider | 100 – 10000, step 100 (pounds) | LootMan's maximum carry weight. |
 | `Enable Carry Weight Limit` | switch | on / off | When on, LootMan stops looting once its inventory exceeds the `Carry Weight` setting and shows the overweight HUD message. |
 | `Loot Is Deliver To Player` | switch | on / off | When on, looted items are added to the player inventory instead of LootMan's inventory. |
@@ -840,8 +840,8 @@ removing files. If you hard-remove `LootMan.esp` or its assets from a save that
 still references those static records, another workshop-menu mod may still warn
 about the missing LootMan Trunk entry.
 
-For LootMan 1.x to 3.3.0 upgrades, uninstall 1.x and make a clean save before
-installing 3.3.0. For LootMan 2.x or earlier 3.x releases to 3.3.0,
+For LootMan 1.x to 3.4.0 upgrades, uninstall 1.x and make a clean save before
+installing 3.4.0. For LootMan 2.x or earlier 3.x releases to 3.4.0,
 overwrite updates are supported.
 
 ## Source, Credits, and Licensing
@@ -883,7 +883,7 @@ install / uninstall completion messages, which are routed directly through the
 native plugin and always display.
 
 One additional localized string ships with LootMan but is not displayed by
-the current 3.3.0 code paths:
+the current 3.4.0 code paths:
 
 - `[LootMan] Locked container ignored because there is no Bobby pin.`
 
