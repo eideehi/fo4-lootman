@@ -48,27 +48,39 @@ namespace papyrus_lootman
 
 	bool LootPassBudget::ShouldStop()
 	{
+		// Sticky short-circuit: once either limit has tripped, every later call in this
+		// pass returns true immediately without re-deriving anything. Without this, a trip
+		// mid-scan of one candidate (via the passBudget threaded into HasLootableItem) would
+		// only be rechecked here on the 64-call cadence below, letting up to 64 more
+		// iterations of expensive work run on remaining candidates before it trips again.
+		if (hitObjectLimit || hitTimeBudget)
+		{
+			return true;
+		}
 		if (processedObjects >= hardMaxObjects ||
 			(!useTimeBudget && processedObjects >= maxObjects))
 		{
 			hitObjectLimit = true;
 			return true;
 		}
-		if (useTimeBudget)
+		// Always enforce an elapsed-time ceiling, even when the user has not enabled the MCM
+		// time budget: useTimeBudget picks which ceiling applies, but the check itself is no
+		// longer conditional on it. This closes a real gap where, with the time budget off,
+		// the very first candidate scanned in a pass had no cap on how long its own scan
+		// could take (e.g. a single huge inventory with nothing currently lootable).
+		const double ceilingMs = useTimeBudget ? timeBudgetMs : kHardPassCeilingMs;
+		// Time-stop once at least one object has been looted (so a pass always
+		// makes progress), or, when a dense cell keeps rejecting every
+		// candidate (processedObjects stays 0), on a bounded scan cadence so
+		// the elapsed-time guard cannot be starved into an unbounded
+		// main-thread scan. The cadence caps the worst-case overrun at ~64
+		// candidate evaluations past the budget.
+		const bool timeCheckDue =
+			processedObjects > 0 || (scannedObjects > 0 && (scannedObjects & 0x3F) == 0);
+		if (timeCheckDue && ElapsedMilliseconds(startedAt) >= ceilingMs)
 		{
-			// Time-stop once at least one object has been looted (so a pass always
-			// makes progress), or, when a dense cell keeps rejecting every
-			// candidate (processedObjects stays 0), on a bounded scan cadence so
-			// the elapsed-time guard cannot be starved into an unbounded
-			// main-thread scan. The cadence caps the worst-case overrun at ~64
-			// candidate evaluations past the budget.
-			const bool timeCheckDue =
-				processedObjects > 0 || (scannedObjects > 0 && (scannedObjects & 0x3F) == 0);
-			if (timeCheckDue && ElapsedMilliseconds(startedAt) >= timeBudgetMs)
-			{
-				hitTimeBudget = true;
-				return true;
-			}
+			hitTimeBudget = true;
+			return true;
 		}
 		++scannedObjects;
 		return false;

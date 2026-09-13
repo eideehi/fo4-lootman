@@ -128,6 +128,12 @@ namespace papyrus_lootman
 	};
 
 	inline constexpr std::size_t kMaxItemsProcessedPerThreadLimit = 10000;
+	// Always-on safety net for LootPassBudget::ShouldStop()'s elapsed-time check when the
+	// user has not enabled the MCM time budget. It sits comfortably above the MCM slider's
+	// documented maximum (30ms, docs/user-guide.md's "Time Budget" row) so it never changes
+	// behavior for anyone using that slider, and only bounds the otherwise-unbounded case
+	// where a single huge inventory scan would run with no time cap at all.
+	inline constexpr double kHardPassCeilingMs = 50.0;
 
 	struct LootPassBudget
 	{
@@ -547,7 +553,8 @@ namespace papyrus_lootman
 		const PropertiesSnapshot* props,
 		MatchCache* matchCache,
 		bool sourceIsDead,
-		std::vector<RE::BGSMod::Attachment::Mod*>* modBuffer = nullptr);
+		std::vector<RE::BGSMod::Attachment::Mod*>* modBuffer = nullptr,
+		LootPassBudget* passBudget = nullptr);
 	bool TryIsValidFormSafe(
 		RE::TESForm* form,
 		const PropertiesSnapshot* props,
@@ -570,7 +577,8 @@ namespace papyrus_lootman
 		RE::TESForm* baseForm,
 		std::vector<RE::BGSMod::Attachment::Mod*>* modBuffer,
 		MatchCache* matchCache,
-		bool& outResult);
+		bool& outResult,
+		LootPassBudget* passBudget = nullptr);
 
 	std::int32_t FindNearestValidWorkshopId(std::monostate, RE::TESObjectREFR* ref);
 	void LogEvent(

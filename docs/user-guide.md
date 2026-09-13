@@ -221,6 +221,8 @@ These controls cap how much work the native looting pass may do each interval.
 | `Max Corpses Per Pass` | slider | 0 – 64, step 1 | Maximum number of dead actors processed per pass. Set to 0 to skip corpses. |
 | `Max Activators / Flora Per Pass` | slider | 0 – 128, step 1 | Maximum number of activators and flora processed per pass. Set to 0 to skip both. |
 
+Even with `Use Time Budget` off, an internal safety ceiling can still stop a pass early on an unusually large container or corpse, so a `hit_time_budget` indicator may appear in logs regardless of that setting.
+
 **Object Filter**
 
 Enables or disables looting for each type of object placed in the world.

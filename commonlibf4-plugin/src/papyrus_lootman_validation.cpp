@@ -750,7 +750,7 @@ namespace papyrus_lootman
 
 	bool HasLootableItem(BGSInventoryList* inventoryList, const PropertiesSnapshot* props = nullptr,
 		MatchCache* matchCache = nullptr, bool sourceIsDead = false,
-		std::vector<BGSMod::Attachment::Mod*>* modBuffer)
+		std::vector<BGSMod::Attachment::Mod*>* modBuffer, LootPassBudget* passBudget)
 	{
 		if (!inventoryList) return false;
 
@@ -782,6 +782,11 @@ namespace papyrus_lootman
 
 		for (std::uint32_t index = 0; index < itemCount && !result; ++index)
 		{
+			if (passBudget && passBudget->ShouldStop())
+			{
+				break;
+			}
+
 			TESForm* form = nullptr;
 			BGSInventoryItem::Stack* stack = nullptr;
 			if (!TryGetInventoryEntrySafe(inventoryList, index, form, stack) || !form)
@@ -813,6 +818,11 @@ namespace papyrus_lootman
 
 			while (stack)
 			{
+				if (passBudget && passBudget->ShouldStop())
+				{
+					break;
+				}
+
 				bool stackLootable = false;
 
 				InventoryItemInfo stackInfo{};
@@ -896,7 +906,7 @@ namespace papyrus_lootman
 
 	bool IsLootableObject(TESObjectREFR* ref, const PropertiesSnapshot* props = nullptr,
 		TESForm* baseForm = nullptr, std::vector<BGSMod::Attachment::Mod*>* modBuffer = nullptr,
-		MatchCache* matchCache = nullptr)
+		MatchCache* matchCache = nullptr, LootPassBudget* passBudget = nullptr)
 	{
 		if (!ref) return false;
 		auto form = baseForm ? baseForm : ref->GetObjectReference();
@@ -914,7 +924,7 @@ namespace papyrus_lootman
 				return false;
 			}
 			EnsureContainerInventoryListForLootScan(ref, form);
-			const bool hasLootableItem = HasLootableItem(ref->inventoryList, props, matchCache, false, modBuffer);
+			const bool hasLootableItem = HasLootableItem(ref->inventoryList, props, matchCache, false, modBuffer, passBudget);
 			if (!hasLootableItem)
 			{
 				return false;
@@ -934,7 +944,7 @@ namespace papyrus_lootman
 			{
 				return false;
 			}
-			if (!HasLootableItem(ref->inventoryList, props, matchCache, true, modBuffer))
+			if (!HasLootableItem(ref->inventoryList, props, matchCache, true, modBuffer, passBudget))
 			{
 				return false;
 			}
@@ -1019,7 +1029,7 @@ namespace papyrus_lootman
 
 	bool TryIsLootableObjectSafe(TESObjectREFR* ref, const PropertiesSnapshot* props,
 		TESForm* baseForm, std::vector<BGSMod::Attachment::Mod*>* modBuffer,
-		MatchCache* matchCache, bool& outResult)
+		MatchCache* matchCache, bool& outResult, LootPassBudget* passBudget)
 	{
 #if defined(_MSC_VER)
 		__try
@@ -1029,7 +1039,8 @@ namespace papyrus_lootman
 				props,
 				baseForm,
 				modBuffer,
-				matchCache);
+				matchCache,
+				passBudget);
 			return true;
 		}
 		__except (SehFilterRecoverable(GetExceptionCode()))
@@ -1042,7 +1053,8 @@ namespace papyrus_lootman
 			props,
 			baseForm,
 			modBuffer,
-			matchCache);
+			matchCache,
+			passBudget);
 		return true;
 #endif
 	}

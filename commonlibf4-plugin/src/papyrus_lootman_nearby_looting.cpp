@@ -676,7 +676,8 @@ namespace papyrus_lootman
 				baseForm,
 				&equipmentBuffer,
 				&matchCache,
-				lootableObject);
+				lootableObject,
+				&budget);
 			if (!gotLootableObject || !lootableObject)
 			{
 				continue;
